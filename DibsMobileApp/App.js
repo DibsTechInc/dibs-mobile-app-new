@@ -27,7 +27,7 @@ export default class App extends Component<{}> {
       <NavigatorIOS
         style={styles.container}
         initialRoute={{
-          title: 'Flex Studios',
+          title: 'Flex Studios Schedule',
           component: SchedulePage,
         }}/>
     );
