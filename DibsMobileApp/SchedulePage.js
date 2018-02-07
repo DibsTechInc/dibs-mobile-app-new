@@ -27,7 +27,7 @@ function urlForQueryAndPage(key, value, pageNumber) {
       .map(key => key + '=' + encodeURIComponent(data[key]))
       .join('&');
   
-    return 'http://10.0.1.20:3000/api/studios/events?studios[0]=1&start=2018-02-02%2000:00:00&end=2018-02-02%2023:59:59';
+    return 'http://localhost:3000/api/studios/events?studios[0]=1&start=2018-02-02%2000:00:00&end=2018-02-02%2023:59:59';
   }
 
 export default class SearchPage extends Component<{}> {
