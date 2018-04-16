@@ -1,6 +1,4 @@
-'use strict';
-
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import Moment from 'moment';
 import {
   StyleSheet,
@@ -15,80 +13,81 @@ import Svg,{
   Line,
 } from 'react-native-svg';
 
-export default class EventsResults extends Component<{}> {
-    _keyExtractor = (item, index) => index;
+export default class EventsResults extends Component {
+  keyExtractor = (item, index) => index;
   
-    _renderItem = ({item, index}) => (
-        <ListItem
-          item={item}
-          index={index}
-          onPressItem={this._onPressItem}
-        />
-      );
+  renderItem = ({item, index}) => (
+    <ListItem
+      item={item}
+      index={index}
+      onPressItem={this.onPressItem}
+    />
+  );
       
-      _onPressItem = (index) => {
-        console.log("Pressed row: "+index);
-      };
+  onPressItem = (index) => {
+    console.log("Pressed row: "+index);
+  };
   
-    render() {
-      return (
-        <FlatList
-          data={this.props.listings}
-          keyExtractor={this._keyExtractor}
-          renderItem={this._renderItem}
-        />
-      );
-    }
+  render() {
+    return (
+      <FlatList
+        data={this.props.listings}
+        keyExtractor={this.keyExtractor}
+        renderItem={this.renderItem}
+      />
+    );
+  }
 }
 
 class ListItem extends React.PureComponent {
-    _onPress = () => {
+  onPress = () => {
       this.props.onPressItem(this.props.index);
     }
   
-    render() {
-      const item = this.props.item;
-      const price = "$" + item.price;
-      const startTime = Moment(item.start_time).format('h:mm a');
-      const end = Moment.utc(item.end_time, "HH:mm");
-      const start = Moment.utc(item.start_time, "HH:mm");
-      const d = Moment.duration(end.diff(start));
-      const duration = Moment.utc(+d).format('mm') + " minutes";
-      return (
-        <TouchableHighlight
-          onPress={this._onPress}
-          underlayColor='#dddddd'>
-          <View>
-            <View style={styles.rowContainer}>
-                <View style={styles.columnContainer}>
-                  <Text style={styles.title}>{startTime}</Text>
-                  <Text style={styles.title}>{duration}</Text>
-                </View>
-                <View style={styles.columnContainer}>
-                  <Text style={styles.title}>{item.name}</Text>
-                  <Text style={styles.title}>{item.instructor.name}</Text>
-                </View>
-                <View style={styles.columnContainer}>
-                    <Text style={styles.title}>{item.location.name}</Text>
-                </View>
-                <View style={styles.columnContainer}>
-                    <Text style={styles.price}>{price}</Text>
-                </View>
-                <Svg height="60" width="60">
-                    <Circle
-                        cx="30"
-                        cy="30"
-                        r="20"
-                        fill="#8dc63f"
-                    />
-                </Svg>
-            </View>
-            <View style={styles.separator}/>
+  render() {
+    const item = this.props.item;
+    const price = "$" + item.price;
+    const startTime = Moment(item.start_time).format('h:mm a');
+    const end = Moment.utc(item.end_time, "HH:mm");
+    const start = Moment.utc(item.start_time, "HH:mm");
+    const d = Moment.duration(end.diff(start));
+    const duration = Moment.utc(+d).format('mm') + " minutes";
+  
+    return (
+      <TouchableHighlight
+        onPress={this.onPress}
+        underlayColor='#dddddd'>
+        <View>
+          <View style={styles.rowContainer}>
+              <View style={styles.columnContainer}>
+                <Text style={styles.title}>{startTime}</Text>
+                <Text style={styles.title}>{duration}</Text>
+              </View>
+              <View style={styles.columnContainer}>
+                <Text style={styles.title}>{item.name}</Text>
+                <Text style={styles.title}>{item.instructor.name}</Text>
+              </View>
+              <View style={styles.columnContainer}>
+                  <Text style={styles.title}>{item.location.name}</Text>
+              </View>
+              <View style={styles.columnContainer}>
+                  <Text style={styles.price}>{price}</Text>
+              </View>
+              <Svg height="60" width="60">
+                  <Circle
+                      cx="30"
+                      cy="30"
+                      r="20"
+                      fill="#8dc63f"
+                  />
+              </Svg>
           </View>
-        </TouchableHighlight>
-      );
-    }
+          <View style={styles.separator}/>
+        </View>
+      </TouchableHighlight>
+    );
   }
+}
 
 const styles = StyleSheet.create({
     textContainer: {
