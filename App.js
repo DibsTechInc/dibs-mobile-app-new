@@ -8,7 +8,7 @@ import {
   NavigatorIOS,
 } from 'react-native';
 
-import SchedulePage from './SchedulePage';
+import { SchedulePage, SchedulePageResults } from './app/components/SchedulePage/';
 
 export default class App extends React.Component {
   render() {

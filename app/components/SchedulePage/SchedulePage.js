@@ -25,6 +25,7 @@ function urlForQueryAndPage(key, value, pageNumber) {
     .map(key => key + '=' + encodeURIComponent(data[key]))
     .join('&');
   
+    // react native does not allow localhost - must enter actual local host address
   return 'http://10.51.110.1:3000/api/studio/events?studios[0]=1&start=2018-04-16%2000:00:00&end=2018-04-16%2023:59:59';
 }
 
