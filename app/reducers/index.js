@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
 
-export default combineReducers(Object.assign(
-
-));
+export default combineReducers({
+  testReducer: () => [],
+});
