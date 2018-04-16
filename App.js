@@ -12,6 +12,7 @@ import SchedulePage from './SchedulePage';
 
 export default class App extends React.Component {
   render() {
+    console.log('rendered?')
     return (
       <NavigatorIOS
         style={styles.container}

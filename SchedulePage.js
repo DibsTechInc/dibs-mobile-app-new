@@ -25,7 +25,7 @@ function urlForQueryAndPage(key, value, pageNumber) {
     .map(key => key + '=' + encodeURIComponent(data[key]))
     .join('&');
   
-  return 'http://localhost:3000/api/studios/events?studios[0]=1&start=2018-02-02%2000:00:00&end=2018-02-02%2023:59:59';
+  return 'http://10.51.110.1:3000/api/studio/events?studios[0]=1&start=2018-04-16%2000:00:00&end=2018-04-16%2023:59:59';
 }
 
 export default class SearchPage extends Component {
@@ -85,7 +85,7 @@ export default class SearchPage extends Component {
     return (
       <View style={styles.container}>
         <Text style={styles.description}>
-          Test loading schedule page!
+          Test loading schedule page...
         </Text>
         <View style={styles.flowRight}>
           <Button
@@ -101,13 +101,12 @@ export default class SearchPage extends Component {
   }
 }
 
-
 const styles = StyleSheet.create({
   description: {
     marginBottom: 20,
     fontSize: 18,
     textAlign: 'center',
-    color: '#656565'
+    color: 'blue'
   },
   container: {
     padding: 30,
