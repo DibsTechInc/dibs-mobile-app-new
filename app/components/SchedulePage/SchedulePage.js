@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import EventsResults from './SchedulePageResults';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import {
   StyleSheet,
   Text,
@@ -9,6 +10,10 @@ import {
   ActivityIndicator,
   Image,
 } from 'react-native';
+
+import EventsResults from './SchedulePageResults';
+import { requestEventData } from '../../actions/EventActions';
+import { getEventsState } from '../../selectors/Events';
 
 function urlForQueryAndPage(key, value, pageNumber) {
   const data = {
@@ -29,7 +34,7 @@ function urlForQueryAndPage(key, value, pageNumber) {
   return 'http://10.51.110.1:3000/api/studio/events?studios[0]=1&start=2018-04-16%2000:00:00&end=2018-04-16%2023:59:59';
 }
 
-export default class SearchPage extends Component {
+class SearchPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -38,6 +43,11 @@ export default class SearchPage extends Component {
       message: '',
     };
   };
+
+  componentDidMount() {
+    console.log('The component mounted!')
+    console.log(this.props, 'propz')
+  }
 
   onSearchTextChanged = (event) => {
     console.log('_onSearchTextChanged');
@@ -88,6 +98,9 @@ export default class SearchPage extends Component {
         <Text style={styles.description}>
           Test loading schedule page...
         </Text>
+        <Text style={styles.description}>
+          Testing to see if events load in logs...
+        </Text>
         <View style={styles.flowRight}>
           <Button
             onPress={this.onSearchPressed}
@@ -101,6 +114,11 @@ export default class SearchPage extends Component {
     );
   }
 }
+
+// SearchPage.propTypes = {
+//   events: PropTypes.arrayOf(PropTypes.shape()),
+//   requestEventData: PropTypes.func,
+// }
 
 const styles = StyleSheet.create({
   description: {
@@ -131,3 +149,14 @@ const styles = StyleSheet.create({
     color: '#48BBEC',
     },
 });
+
+const mapStateToProps = state => ({
+  events: getEventsState(state),
+});
+
+const mapDispatchToProps = {
+  requestEventData,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(SearchPage)
+

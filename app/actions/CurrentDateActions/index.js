@@ -1,4 +1,4 @@
-import { SET_CURRENT_DATE } from '../constants/CurrentDateConstants';
+import { SET_CURRENT_DATE } from '../../constants/CurrentDateConstants';
 
 /**
  * setCurrentDate
