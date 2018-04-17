@@ -56,7 +56,7 @@ export function requestEventData({ eventids } = {}) {
     // TODO: insert in current start ate
     // TODO: insert studio id in
     // TODO: set up proxy
-    const query = `http://10.51.110.1:3000/api/studio/events?studios[0]=1&start=${startDate}&end=${endDate}`;
+    const query = `http://10.51.110.1:3000/api/studio/events?studios[0]=${studio.id}&start=${startDate}&end=${endDate}`;
 
     // let data = { studios: [studio.id] };
 

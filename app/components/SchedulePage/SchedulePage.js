@@ -11,6 +11,7 @@ import {
   Image,
 } from 'react-native';
 import _ from 'lodash';
+import CalendarStrip from '../CalendarStrip';
 
 import SchedulePageEvents from './SchedulePageEvents';
 import { requestEventData } from '../../actions/EventActions';
@@ -60,9 +61,7 @@ class SchedulePage extends Component {
 
     return (
       <View style={styles.container}>
-        <Text style={fontStyles}>
-          React Native Slick
-        </Text>
+        <CalendarStrip />
         {this.props.isLoading ? <ActivityIndicator size='large'/> : <SchedulePageEvents listings={this.props.events} />}
       </View>
     );
@@ -76,9 +75,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   container: {
-    padding: 30,
+    padding: 10,
     marginTop: 65,
-    alignItems: 'center',
   },
   flowRight: {
     flexDirection: 'row',
