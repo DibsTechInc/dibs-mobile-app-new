@@ -5,10 +5,6 @@ import { SET_CURRENT_DATE } from '../constants/CurrentDateConstants';
  * @param {string} value new date
  * @returns {type} action on the state
  */
-const setCurrentDate = function setCurrentDate(value) {
+export function setCurrentDate(value) {
   return { type: SET_CURRENT_DATE, value }
-}
-
-export {
-  setCurrentDate,
 }

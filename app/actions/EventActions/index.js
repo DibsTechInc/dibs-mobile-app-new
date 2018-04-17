@@ -7,3 +7,5 @@ import {
   SET_EVENTS_LOADING_FALSE,
   SETTING_EVENT_VIA_ACTION,
 } from '../constants/EventConstants';
+import { getEventsOnCurrentDate } from '../../selectors/Events';
+import { setCurrentDate } from '../CurrentDateActions';
