@@ -14,11 +14,11 @@ import {
 import { SchedulePage } from './app/components/SchedulePage/';
 import reducers from './app/reducers';
 
-const store = createStore(reducers, applyMiddleware(thunk));
+const configuredStore = createStore(reducers, applyMiddleware(thunk));
 
 const App = () => {
   return (
-    <Provider store={store}>
+    <Provider store={configuredStore}>
       <NavigatorIOS
         style={styles.container}
         initialRoute={{

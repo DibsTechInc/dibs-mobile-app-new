@@ -7,7 +7,7 @@ import {
   SET_EVENTS_LOADING_FALSE,
   SETTING_EVENT_VIA_ACTION,
 } from '../../constants/EventConstants';
-import { getEventsOnCurrentDate } from '../../selectors/Events';
+import { getEventsOnCurrentDate } from '../../selectors/EventsSelectors';
 import { setCurrentDate } from '../CurrentDateActions';
 
 /**
@@ -16,7 +16,6 @@ import { setCurrentDate } from '../CurrentDateActions';
  * @returns {Object} action on the state
  */
 export function setEvents(value) {
-  console.log('get in setEvents?')
   return { type: SET_EVENTS, value };
 }
 
@@ -51,13 +50,13 @@ export function requestEventData({ eventids } = {}) {
     if (!getEventsOnCurrentDate(state).length) dispatch(setEventsLoadingTrue());
 
     // TODO: deal with if eventids exists 
-    // const startDate = moment(currentDate).startOf('day').tz(studio.mainTZ).format('YYYY-MM-DD HH:mm:ss');
-    // const endDate = data.end = moment(currentDate).endOf('day').tz(studio.mainTZ).format('YYYY-MM-DD HH:mm:ss');
+    const startDate = moment(currentDate).startOf('day').tz(studio.mainTZ).format('YYYY-MM-DD HH:mm:ss');
+    const endDate = moment(currentDate).endOf('day').tz(studio.mainTZ).format('YYYY-MM-DD HH:mm:ss');
 
     // TODO: insert in current start ate
     // TODO: insert studio id in
     // TODO: set up proxy
-    const query = `http://10.51.110.1:3000/api/studio/events?studios[0]=1&start=2018-04-16%2000:00:00&end=2018-04-16%2023:59:59`;
+    const query = `http://10.51.110.1:3000/api/studio/events?studios[0]=1&start=${startDate}&end=${endDate}`;
 
     // let data = { studios: [studio.id] };
 
@@ -72,8 +71,8 @@ export function requestEventData({ eventids } = {}) {
     fetch(query)
       .then(res => res.json())
       .then((res) => {
-        console.log('reach here?')
-        dispatch(setEvents(res.events))
+        dispatch(setEvents(res.events));
+        dispatch(setEventsLoadingFalse());
       })
       .catch(error => {
         // set error here
