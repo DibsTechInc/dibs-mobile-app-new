@@ -1,7 +1,7 @@
 import SchedulePage from './SchedulePage';
-import SchedulePageResults from './SchedulePageResults';
+import SchedulePageEvents from './SchedulePageEvents';
 
 export {
   SchedulePage,
-  SchedulePageResults,
+  SchedulePageEvents,
 }

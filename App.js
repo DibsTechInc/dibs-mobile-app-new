@@ -1,6 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
 
 import {
   StyleSheet,
@@ -10,12 +11,14 @@ import {
   NavigatorIOS,
 } from 'react-native';
 
-import { SchedulePage, SchedulePageResults } from './app/components/SchedulePage/';
+import { SchedulePage } from './app/components/SchedulePage/';
 import reducers from './app/reducers';
+
+const store = createStore(reducers, applyMiddleware(thunk));
 
 const App = () => {
   return (
-    <Provider store={createStore(reducers)}>
+    <Provider store={store}>
       <NavigatorIOS
         style={styles.container}
         initialRoute={{

@@ -16,6 +16,7 @@ import { setCurrentDate } from '../CurrentDateActions';
  * @returns {Object} action on the state
  */
 export function setEvents(value) {
+  console.log('get in setEvents?')
   return { type: SET_EVENTS, value };
 }
 
@@ -39,7 +40,7 @@ export function setEventsLoadingFalse() {
  * requestEventData from the server
  * @returns {function} dispatches actions for async request
  */
-export function requestEventData({ eventids } = {}, cb) {
+export function requestEventData({ eventids } = {}) {
   return function innerRequestEventData(dispatch, getState) {
     if (getState().events.loading) return;
 
@@ -50,8 +51,8 @@ export function requestEventData({ eventids } = {}, cb) {
     if (!getEventsOnCurrentDate(state).length) dispatch(setEventsLoadingTrue());
 
     // TODO: deal with if eventids exists 
-    const startDate = moment(currentDate).startOf('day').tz(studio.mainTZ).format('YYYY-MM-DD HH:mm:ss');
-    const endDate = data.end = moment(currentDate).endOf('day').tz(studio.mainTZ).format('YYYY-MM-DD HH:mm:ss');
+    // const startDate = moment(currentDate).startOf('day').tz(studio.mainTZ).format('YYYY-MM-DD HH:mm:ss');
+    // const endDate = data.end = moment(currentDate).endOf('day').tz(studio.mainTZ).format('YYYY-MM-DD HH:mm:ss');
 
     // TODO: insert in current start ate
     // TODO: insert studio id in
@@ -71,8 +72,8 @@ export function requestEventData({ eventids } = {}, cb) {
     fetch(query)
       .then(res => res.json())
       .then((res) => {
+        console.log('reach here?')
         dispatch(setEvents(res.events))
-        cb();
       })
       .catch(error => {
         // set error here

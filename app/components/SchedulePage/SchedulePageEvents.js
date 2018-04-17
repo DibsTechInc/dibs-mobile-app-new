@@ -13,7 +13,7 @@ import Svg,{
   Line,
 } from 'react-native-svg';
 
-export default class EventsResults extends Component {
+export default class SchedulePageEvents extends Component {
   keyExtractor = (item, index) => index;
   
   renderItem = ({item, index}) => (

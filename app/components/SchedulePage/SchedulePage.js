@@ -11,28 +11,9 @@ import {
   Image,
 } from 'react-native';
 
-import EventsResults from './SchedulePageResults';
+import SchedulePageEvents from './SchedulePageEvents';
 import { requestEventData } from '../../actions/EventActions';
-import { getEventsState } from '../../selectors/Events';
-
-function urlForQueryAndPage(key, value, pageNumber) {
-  const data = {
-    country: 'uk',
-    pretty: '1',
-    encoding: 'json',
-    listing_type: 'buy',
-    action: 'search_listings',
-    page: pageNumber,
-  };
-  data[key] = value;
-  
-  const querystring = Object.keys(data)
-    .map(key => key + '=' + encodeURIComponent(data[key]))
-    .join('&');
-  
-    // react native does not allow localhost - must enter actual local host address
-  return 'http://10.51.110.1:3000/api/studio/events?studios[0]=1&start=2018-04-16%2000:00:00&end=2018-04-16%2023:59:59';
-}
+import { getEventsData } from '../../selectors/Events';
 
 class SearchPage extends Component {
   constructor(props) {
@@ -45,80 +26,45 @@ class SearchPage extends Component {
   };
 
   componentDidMount() {
-    console.log('The component mounted!')
-    console.log(this.props, 'propz')
+    this.props.requestEventData();
   }
 
-  onSearchTextChanged = (event) => {
-    console.log('_onSearchTextChanged');
-    this.setState({ searchString: event.nativeEvent.text });
-    console.log('Current: '+this.state.searchString+', Next: '+event.nativeEvent.text);
-  };
+  // handleResponse = (response) => {
+  //   this.setState({ isLoading: false , message: '' });
+  //   console.log("in handle response");
+  //   console.log(response);
+  //   if (response.events) {
+  //     console.log("in handle response events");
+  //     this.props.navigator.push({
+  //       title: 'Results',
+  //       component: SchedulePageEvents,
+  //       passProps: {listings: response.events}
+  //     });
+  //   } else {
+  //     this.setState({ message: 'Location not recognized; please try again.'});
+  //   }
+  // };
 
-  executeQuery = (query) => {
-    console.log(query);
-    this.setState({ isLoading: true });
-    fetch(query)
-      .then(response => response.json())
-      .then(response => this.handleResponse(response))
-      .catch(error =>
-        this.setState({
-          isLoading: false,
-          message: 'Something bad happened ' + error
-        }),
-      );
-  }; 
-
-  handleResponse = (response) => {
-    this.setState({ isLoading: false , message: '' });
-    console.log("in handle response");
-    console.log(response);
-    if (response.events) {
-      console.log("in handle response events");
-      this.props.navigator.push({
-        title: 'Results',
-        component: EventsResults,
-        passProps: {listings: response.events}
-      });
-    } else {
-      this.setState({ message: 'Location not recognized; please try again.'});
-    }
-  };
-
-  onSearchPressed = () => {
-    const query = urlForQueryAndPage('place_name', this.state.searchString, 1);
-    this.executeQuery(query);
-  };
 
   render() {
+    console.log(this.props.events, 'events')
     const spinner = this.state.isLoading ? <ActivityIndicator size='large'/> : null;
     
     return (
       <View style={styles.container}>
         <Text style={styles.description}>
-          Test loading schedule page...
+          React Native Slick
         </Text>
-        <Text style={styles.description}>
-          Testing to see if events load in logs...
-        </Text>
-        <View style={styles.flowRight}>
-          <Button
-            onPress={this.onSearchPressed}
-            color='#48BBEC'
-            title='Go'
-          />
-        </View>
-        {spinner}
-        <Text style={styles.description}>{this.state.message}</Text>
+        <SchedulePageEvents listings={this.props.events} />
       </View>
     );
   }
 }
 
-// SearchPage.propTypes = {
-//   events: PropTypes.arrayOf(PropTypes.shape()),
-//   requestEventData: PropTypes.func,
-// }
+SearchPage.propTypes = {
+  events: PropTypes.arrayOf(PropTypes.shape()),
+  requestEventData: PropTypes.func,
+}
 
 const styles = StyleSheet.create({
   description: {
@@ -151,7 +97,7 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = state => ({
-  events: getEventsState(state),
+  events: getEventsData(state),
 });
 
 const mapDispatchToProps = {

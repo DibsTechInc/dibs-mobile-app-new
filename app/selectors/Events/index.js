@@ -55,6 +55,7 @@ export function getEventsLoading(state) {
  * @returns {Object} events state
  */
 export function getEventsData(state) {
+  // console.log(state.events, 'helloMoopMoop')
   return getEventsState(state).data;
 }
 
