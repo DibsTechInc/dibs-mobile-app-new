@@ -4,7 +4,7 @@ import {
   SET_EVENTS_LOADING_TRUE,
   SET_EVENTS_LOADING_FALSE,
   SETTING_EVENT_VIA_ACTION,
-} from '../constants/EventConstants';
+} from '../../constants/EventConstants';
 
 const initialState = {
   loading: false,

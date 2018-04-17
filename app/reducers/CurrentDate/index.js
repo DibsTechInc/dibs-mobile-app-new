@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { SET_CURRENT_DATE } from '../constants/CurrentDateConstants';
+import { SET_CURRENT_DATE } from '../../constants/CurrentDateConstants';
 
 
 /** @namespace WidgetErrorReducer */
@@ -11,7 +11,9 @@ import { SET_CURRENT_DATE } from '../constants/CurrentDateConstants';
  *
  * @returns {array} the new state
  */
-export default function currentDateReducer(state = _dibs_config.start || moment().local(), action) {
+// reducer was state = _dibs_config.start || moment().local()
+// figure out what _dibs_config.start is
+export default function currentDateReducer(state = moment().local(), action) {
   switch (action.type) {
     case SET_CURRENT_DATE:
       return moment(moment(action.value).local(), 'YYYY-MM-DD');
