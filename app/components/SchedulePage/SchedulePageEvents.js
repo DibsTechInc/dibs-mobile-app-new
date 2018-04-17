@@ -14,7 +14,7 @@ import Svg,{
 } from 'react-native-svg';
 
 export default class SchedulePageEvents extends Component {
-  keyExtractor = (item, index) => index;
+  keyExtractor = (item, index) => `list-item-${index}`
   
   renderItem = ({item, index}) => (
     <ListItem
