@@ -35,10 +35,12 @@ class CalendarStrip extends Component {
 
         const startingDate = this.setLocale(moment(this.props.startingDate));
         const selectedDate = this.setLocale(moment(this.props.selectedDate));
+        const currentDate = this.setLocale(moment(this.props.currentDate));
 
         this.state = {
             startingDate,
-            selectedDate
+            selectedDate,
+            currentDate,
         };
 
         this.resetAnimation();
@@ -63,6 +65,7 @@ class CalendarStrip extends Component {
     //Receiving props and set selected date
     componentWillReceiveProps(nextProps) {
         if (nextProps.selectedDate !== this.props.selectedDate) {
+
             const selectedDate = this.setLocale(moment(nextProps.selectedDate));
             this.setState({
                 selectedDate
@@ -101,24 +104,34 @@ class CalendarStrip extends Component {
     //Using isoWeekday so that it will start from Monday
     getDatesForWeek() {
         const me = this;
-        let dates = [];
         let startDate = moment(this.state.startingDate);
+        let currentDate = moment(this.state.currentDate);
+        let currentDay = moment().day();
+
+        let dateInfos = [];
 
         arr.forEach((item, index) => {
-            let date;
-            if (me.props.useIsoWeekday) {
-              date = me.setLocale(moment(startDate.isoWeekday(index + 1)));
+            let dateInfo = {
+                date: null,
+                isExpiredDate: null,
             }
-            else {
-              date = me.setLocale(moment(startDate).add(index, 'days'));
-            }
-            dates.push(date);
+            dateInfo.date = me.setLocale(moment(startDate).add(index, 'days'));
+            dateInfo.isExpiredDate = dateInfo.date.isBefore(this.state.currentDate);
+
+            dateInfos.push(dateInfo);
         });
-        return dates;
+
+        return dateInfos;
     }
 
     //Handling press on date/selecting date
     onDateSelected(date) {
+        const invalidSelection = date.isBefore(this.state.startingDate);
+        
+        if (invalidSelection) {
+            return;
+        }
+
         this.setState({selectedDate: date});
         if (this.props.onDateSelected) {
             this.props.onDateSelected(date);
@@ -169,8 +182,8 @@ class CalendarStrip extends Component {
     //Function that formats the calendar header
     //It also formats the month section if the week is in between months
     formatCalendarHeader() {
-        let firstDay = this.getDatesForWeek()[0];
-        let lastDay = this.getDatesForWeek()[this.getDatesForWeek().length - 1];
+        let firstDay = this.getDatesForWeek()[0].date;
+        let lastDay = this.getDatesForWeek()[this.getDatesForWeek().length - 1].date;
         let monthFormatting = '';
         //Parsing the month part of the user defined formating
         if ((this.props.calendarHeaderFormat.match(/Mo/g) || []).length > 0) {
@@ -193,15 +206,20 @@ class CalendarStrip extends Component {
     }
 
     render() {
+        const oneWeekAgo = this.state.startingDate.clone().subtract(1, 'w').add(1, 'd');
+        const canGoBack = oneWeekAgo.isBefore(this.state.currentDate);
+
         let opacityAnim = 1;
-        let datesRender = this.getDatesForWeek().map((date, index) => {
+        let datesRender = this.getDatesForWeek().map(({ date, isExpiredDate }, index) => {
             if (this.props.calendarAnimation) {
                 opacityAnim = this.animatedValue[index];
             }
+
             return (
                 <Animated.View key={date} style={{opacity: opacityAnim, flex: 1}}>
                     <CalendarDay
                         date={date}
+                        isExpiredDate={isExpiredDate}
                         key={date}
                         selected={this.isDateSelected(date)}
                         onDateSelected={this.onDateSelected}
@@ -222,8 +240,8 @@ class CalendarStrip extends Component {
             <View style={[styles.calendarContainer, {backgroundColor: this.props.calendarColor}, this.props.style]}>
                 <Text style={[styles.calendarHeader, this.props.calendarHeaderStyle]}>{this.formatCalendarHeader()}</Text>
                 <View style={styles.datesStrip}>
-                    <TouchableOpacity style={[styles.iconContainer, this.props.iconContainer]} onPress={this.getPreviousWeek}>
-                        <Image style={[styles.icon, this.props.iconStyle, this.props.iconLeftStyle]} source={this.props.iconLeft}/>
+                    <TouchableOpacity style={[styles.iconContainer, this.props.iconContainer]} onPress={this.getPreviousWeek} disabled={canGoBack}>
+                        {!canGoBack && <Image style={[styles.icon, this.props.iconStyle, this.props.iconLeftStyle]} source={this.props.iconLeft}/>}
                     </TouchableOpacity>
                     <View style={styles.calendarDates}>
                         {datesRender}
@@ -238,11 +256,11 @@ class CalendarStrip extends Component {
 }
 
 CalendarStrip.defaultProps = {
-    startingDate: moment(),
-    useIsoWeekday: true,
+    startingDate: moment().seconds(0).milliseconds(0),
+    currentDate: moment().seconds(0).milliseconds(0),
     iconLeft: require('./img/left-arrow-black.png'),
     iconRight: require('./img/right-arrow-black.png'),
-    calendarHeaderFormat: 'MMMM YYYY'
+    calendarHeaderFormat: 'MMMM YYYY',
 };
 
 CalendarStrip.propTypes = {
@@ -251,10 +269,10 @@ CalendarStrip.propTypes = {
     highlightColor: PropTypes.string,
     borderHighlightColor: PropTypes.string,
 
+    currentDate: PropTypes.any,
     startingDate: PropTypes.any,
     selectedDate: PropTypes.any,
     onDateSelected: PropTypes.func,
-    useIsoWeekday: PropTypes.bool,
 
     iconLeft: PropTypes.any,
     iconRight: PropTypes.any,

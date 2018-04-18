@@ -46,7 +46,6 @@ class SchedulePage extends Component {
   }
 
   handleDateSelected(selectedDate) {
-    console.log('date selected!', selectedDate);
     this.props.setCurrentDate(selectedDate);
   }
 
@@ -59,6 +58,7 @@ class SchedulePage extends Component {
     }
 
     const studioColor = `#${this.props.studioConfig.color}`;
+    // const disabledColor = ``
 
     return (
       <StyledView>
@@ -67,14 +67,14 @@ class SchedulePage extends Component {
             selection={'background'} // type of selection circle
             selectionAnimation={{duration: 300, borderWidth: 1}} // animation when selecting a date
             style={{paddingTop: 20, paddingBottom: 10}}
-            calendarHeaderStyle={{color: 'white'}}
+            // calendarHeaderStyle={{color: 'white'}}
             calendarColor={studioColor} // main background color
-            highlightColor={'#9265DC'} // color of the selection circle
-            dateNumberStyle={{color: 'white'}}
-            dateNameStyle={{color: 'white'}}
-            highlightDateNumberStyle={{color: 'yellow'}}
-            highlightDateNameStyle={{color: 'yellow'}}
-            borderHighlightColor={'white'}
+            highlightColor={'#f4f4f4'} // color of the selection circle
+            // dateNumberStyle={{color: '#f4f4f4'}}
+            // dateNameStyle={{color: '#f4f4f4'}}
+            // highlightDateNumberStyle={{color: 'yellow'}}
+            // highlightDateNameStyle={{color: 'yellow'}}
+            // borderHighlightColor={'#fff'}
             iconContainer={{flex: 0.1}}
             onDateSelected={this.handleDateSelected}
         />

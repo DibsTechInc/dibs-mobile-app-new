@@ -46,7 +46,7 @@ export default StyleSheet.create({
     },
     weekendDateName: {
         fontSize: 10,
-        color: '#fff',
+        color: '#000',
         textAlign: 'center'
     },
     dateNumber: {
@@ -56,8 +56,19 @@ export default StyleSheet.create({
     },
     weekendDateNumber: {
         fontSize: 18,
-        color: '#fff',
+        color: '#000',
         fontWeight: 'bold',
         textAlign: 'center'
-    }
+    },
+    disabledDateName: {
+        fontSize: 10,
+        color: 'darkgray',
+        textAlign: 'center',
+    },
+    disabledDateNumber: {
+        fontSize: 18,
+        color: 'darkgray',
+        fontWeight: 'bold',
+        textAlign: 'center'
+    },
 });

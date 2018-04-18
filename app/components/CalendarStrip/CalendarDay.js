@@ -66,7 +66,7 @@ class CalendarDay extends Component {
                 throw new Error('CalendarDay Error! Type of animation is incorrect!');
             }
         }
-
+        
         let dateNameStyle = [styles.dateName, this.props.dateNameStyle];
         let dateNumberStyle = [styles.dateNumber, this.props.dateNumberStyle];
         if (this.props.date.isoWeekday() === 6 || this.props.date.isoWeekday() === 7) {
@@ -74,9 +74,14 @@ class CalendarDay extends Component {
             dateNumberStyle = [styles.weekendDateNumber, this.props.weekendDateNumberStyle];
         }
 
+        if (this.props.isExpiredDate) {
+            dateNameStyle = [styles.disabledDateName, this.props.disabledDateNameStyle];
+            dateNumberStyle = [styles.disabledDateNumber, this.props.disabledDateNumberStyle];
+        }
+
         return (
             <Animated.View style={[styles.dateContainer, animObject]}>
-                <TouchableOpacity onPress={this.props.onDateSelected.bind(this, this.props.date)}>
+                <TouchableOpacity onPress={this.props.onDateSelected.bind(this, this.props.date)} disabled={this.props.isExpiredDate}>
                     <Text style={dateNameStyle}>{this.props.date.format('ddd').toUpperCase()}</Text>
                     <Text style={dateNumberStyle}>{this.props.date.date()}</Text>
                 </TouchableOpacity>
@@ -107,9 +112,13 @@ CalendarDay.propTypes = {
     dateNumberStyle: PropTypes.any,
     weekendDateNameStyle: PropTypes.any,
     weekendDateNumberStyle: PropTypes.any,
+    disabledDateNameStyle: PropTypes.any,
+    disabledDateNumberStyle: PropTypes.any,
 
     selection: PropTypes.string,
     selectionAnimation: PropTypes.shape(),
+
+    isExpiredDate: PropTypes.bool,
 };
 
 export default CalendarDay;
