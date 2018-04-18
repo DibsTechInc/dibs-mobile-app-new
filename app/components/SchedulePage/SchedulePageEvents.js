@@ -12,6 +12,37 @@ import Svg,{
   Circle,
   Line,
 } from 'react-native-svg';
+import styled from 'styled-components';
+
+const StyledRowContainer = styled.View`
+  flex-direction: row;
+  padding: 5px;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const StyledColumnContainer = styled.View`
+  flex-direction: column;
+  padding: 10px;
+  justify-content: center;
+  align-items: center;
+`;
+
+const StyledTitle = styled.Text`
+  font-size: 12px;
+  color: #656565;
+`;
+
+const StyledPrice = styled.Text`
+  font-size: 18px;
+  font-weight: bold;
+  color: #656565;
+`;
+
+const StyledSeparator = styled.View`
+  height: 1px;
+  backgroundColor: #dddddd;
+`;
 
 export default class SchedulePageEvents extends Component {
   keyExtractor = (item, index) => `list-item-${index}`
@@ -58,21 +89,21 @@ class ListItem extends React.PureComponent {
         onPress={this.onPress}
         underlayColor='#dddddd'>
         <View>
-          <View style={styles.rowContainer}>
-              <View style={styles.columnContainer}>
-                <Text style={styles.title}>{startTime}</Text>
-                <Text style={styles.title}>{duration}</Text>
-              </View>
-              <View style={styles.columnContainer}>
-                <Text style={styles.title}>{item.name}</Text>
-                <Text style={styles.title}>{item.instructor.name}</Text>
-              </View>
-              <View style={styles.columnContainer}>
-                  <Text style={styles.title}>{item.location.name}</Text>
-              </View>
-              <View style={styles.columnContainer}>
-                  <Text style={styles.price}>{price}</Text>
-              </View>
+          <StyledRowContainer>
+              <StyledColumnContainer>
+                <StyledTitle>{startTime}</StyledTitle>
+                <StyledTitle>{duration}</StyledTitle>
+              </StyledColumnContainer>
+              <StyledColumnContainer>
+                <StyledTitle>{item.name}</StyledTitle>
+                <StyledTitle>{item.instructor.name}</StyledTitle>
+              </StyledColumnContainer>
+              <StyledColumnContainer>
+                  <StyledTitle>{item.location.name}</StyledTitle>
+              </StyledColumnContainer>
+              <StyledColumnContainer>
+                  <StyledPrice>{price}</StyledPrice>
+              </StyledColumnContainer>
               <Svg height="60" width="60">
                   <Circle
                       cx="30"
@@ -81,42 +112,11 @@ class ListItem extends React.PureComponent {
                       fill="#8dc63f"
                   />
               </Svg>
-          </View>
-          <View style={styles.separator}/>
+          </StyledRowContainer>
+          <StyledSeparator />
         </View>
       </TouchableHighlight>
     );
   }
 }
-
-const styles = StyleSheet.create({
-    textContainer: {
-        flex: 1
-    },
-    separator: {
-        height: 1,
-        backgroundColor: '#dddddd'
-    },
-    price: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#656565'
-    },
-    title: {
-        fontSize: 12,
-        color: '#656565',
-    },
-    rowContainer: {
-        flexDirection: 'row',
-        padding: 5,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    columnContainer: {
-      flexDirection: 'column',
-      padding: 10,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-});
 
