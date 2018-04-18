@@ -86,30 +86,30 @@ class CalendarDay extends Component {
 }
 
 CalendarDay.defaultProps = {
-  selection: 'border',
-  selectionAnimation: {
-      duration: 0,
-      borderWidth: 1
-  },
-  borderHighlightColor: '#000'
+    selection: 'border',
+    selectionAnimation: {
+        duration: 0,
+        borderWidth: 1
+    },
+    borderHighlightColor: '#000'
 };
 
 CalendarDay.propTypes = {
-  date: PropTypes.shape().isRequired,
-  onDateSelected: PropTypes.func.isRequired,
-  selected: PropTypes.bool.isRequired,
+    date: PropTypes.shape().isRequired,
+    onDateSelected: PropTypes.func.isRequired,
+    selected: PropTypes.bool.isRequired,
 
-  calendarColor: PropTypes.string,
-  highlightColor: PropTypes.string,
-  borderHighlightColor: PropTypes.string,
+    calendarColor: PropTypes.string,
+    highlightColor: PropTypes.string,
+    borderHighlightColor: PropTypes.string,
 
-  dateNameStyle: PropTypes.any,
-  dateNumberStyle: PropTypes.any,
-  weekendDateNameStyle: PropTypes.any,
-  weekendDateNumberStyle: PropTypes.any,
+    dateNameStyle: PropTypes.any,
+    dateNumberStyle: PropTypes.any,
+    weekendDateNameStyle: PropTypes.any,
+    weekendDateNumberStyle: PropTypes.any,
 
-  selection: PropTypes.string,
-  selectionAnimation: PropTypes.shape(),
+    selection: PropTypes.string,
+    selectionAnimation: PropTypes.shape(),
 };
 
 export default CalendarDay;
