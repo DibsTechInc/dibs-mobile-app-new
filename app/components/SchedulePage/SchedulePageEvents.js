@@ -26,6 +26,7 @@ const StyledColumnContainer = styled.View`
   padding: 10px;
   justify-content: center;
   align-items: center;
+  flex-basis: 20%;
 `;
 
 const StyledTitle = styled.Text`
@@ -54,11 +55,11 @@ export default class SchedulePageEvents extends Component {
       onPressItem={this.onPressItem}
     />
   );
-      
+
   onPressItem = (index) => {
     console.log("Pressed row: "+index);
   };
-  
+
   render() {
     return (
       <FlatList
@@ -82,28 +83,29 @@ class ListItem extends React.PureComponent {
     const end = Moment.utc(item.end_time, "HH:mm");
     const start = Moment.utc(item.start_time, "HH:mm");
     const d = Moment.duration(end.diff(start));
-    const duration = Moment.utc(+d).format('mm') + " minutes";
+    const duration = Moment.utc(+d).format('mm') + " min";
   
     return (
-      <TouchableHighlight
-        onPress={this.onPress}
-        underlayColor='#dddddd'>
-        <View>
-          <StyledRowContainer>
-              <StyledColumnContainer>
-                <StyledTitle>{startTime}</StyledTitle>
-                <StyledTitle>{duration}</StyledTitle>
-              </StyledColumnContainer>
-              <StyledColumnContainer>
-                <StyledTitle>{item.name}</StyledTitle>
-                <StyledTitle>{item.instructor.name}</StyledTitle>
-              </StyledColumnContainer>
-              <StyledColumnContainer>
-                  <StyledTitle>{item.location.name}</StyledTitle>
-              </StyledColumnContainer>
-              <StyledColumnContainer>
-                  <StyledPrice>{price}</StyledPrice>
-              </StyledColumnContainer>
+      <View>
+        <StyledRowContainer>
+            <StyledColumnContainer>
+              <StyledTitle>{startTime}</StyledTitle>
+              <StyledTitle>{duration}</StyledTitle>
+            </StyledColumnContainer>
+            <StyledColumnContainer>
+              <StyledTitle>{item.name}</StyledTitle>
+              <StyledTitle>{item.instructor.name}</StyledTitle>
+            </StyledColumnContainer>
+            <StyledColumnContainer>
+                <StyledTitle>{item.location.name}</StyledTitle>
+            </StyledColumnContainer>
+            <StyledColumnContainer>
+                <StyledPrice>{price}</StyledPrice>
+            </StyledColumnContainer>
+            <TouchableHighlight 
+              onPress={this.onPress}
+              underlayColor='#fff'
+            >
               <Svg height="60" width="60">
                   <Circle
                       cx="30"
@@ -112,10 +114,10 @@ class ListItem extends React.PureComponent {
                       fill="#8dc63f"
                   />
               </Svg>
-          </StyledRowContainer>
-          <StyledSeparator />
-        </View>
-      </TouchableHighlight>
+            </TouchableHighlight>
+        </StyledRowContainer>
+        <StyledSeparator />
+      </View>
     );
   }
 }
