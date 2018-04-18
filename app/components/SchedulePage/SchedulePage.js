@@ -54,15 +54,16 @@ class SchedulePage extends Component {
 
 
   render() {
-    const stylesNotLoaded = _.isEmpty(this.props.studioConfig);
+    const configsNotLoaded = _.isEmpty(this.props.studioConfig);
 
-    if (stylesNotLoaded) {
+    if (configsNotLoaded) {
       return null;
     }
 
     const studioColor = `#${this.props.studioConfig.color}`;
-    // const disabledColor = ``
+    const studioFontMedium = this.props.studioConfig.studio_fonts.medium;
 
+    console.log(this.props.studioConfig)
     return (
       <StyledView>
         <CalendarStrip
@@ -75,7 +76,7 @@ class SchedulePage extends Component {
             iconContainer={{flex: 0.1}}
             onDateSelected={this.handleDateSelected}
         />
-          {this.props.isLoading ? <StyledActivityIndicator size='large'/> : <SchedulePageEvents studioConfig={this.props.studioConfig} listings={this.props.events}
+          {this.props.isLoading ? <StyledActivityIndicator size='large'/> : <SchedulePageEvents studioColor={studioColor} listings={this.props.events}
             />
           }
       </StyledView>

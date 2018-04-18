@@ -52,6 +52,7 @@ export default class SchedulePageEvents extends Component {
     <ListItem
       item={item}
       index={index}
+      studioColor={this.props.studioColor}
       onPressItem={this.onPressItem}
     />
   );
@@ -73,7 +74,7 @@ export default class SchedulePageEvents extends Component {
 
 class ListItem extends React.PureComponent {
   onPress = () => {
-      this.props.onPressItem(this.props.index);
+      this.props.onPressItem(this.props.listings);
     }
   
   render() {
@@ -111,7 +112,7 @@ class ListItem extends React.PureComponent {
                       cx="30"
                       cy="30"
                       r="20"
-                      fill="#8dc63f"
+                      fill={this.props.studioColor}
                   />
               </Svg>
             </TouchableHighlight>
