@@ -232,6 +232,8 @@ class CalendarStrip extends Component {
                         selection={this.props.selection}
                         selectionAnimation={this.props.selectionAnimation}
                         borderHighlightColor={this.props.borderHighlightColor}
+                        highlightDateNameStyle={this.props.highlightDateNameStyle}
+                        highlightDateNumberStyle={this.props.highlightDateNumberStyle}
                     />
                 </Animated.View>
             );
@@ -292,6 +294,9 @@ CalendarStrip.propTypes = {
     dateNumberStyle: PropTypes.any,
     weekendDateNameStyle: PropTypes.any,
     weekendDateNumberStyle: PropTypes.any,
+
+    highlightDateNameStyle: PropTypes.any,
+    highlightDateNumberStyle: PropTypes.any,
 
     locale: PropTypes.shape(),
 };

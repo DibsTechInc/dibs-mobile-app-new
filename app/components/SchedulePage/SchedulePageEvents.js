@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
+import { SwipeListView } from 'react-native-swipe-list-view';
 import Moment from 'moment';
+
 import {
   StyleSheet,
   Image,
@@ -8,10 +10,12 @@ import {
   FlatList,
   Text,
 } from 'react-native';
+
 import Svg,{
   Circle,
   Line,
 } from 'react-native-svg';
+
 import styled from 'styled-components';
 
 const StyledRowContainer = styled.View`
@@ -26,7 +30,7 @@ const StyledColumnContainer = styled.View`
   padding: 10px;
   justify-content: center;
   align-items: center;
-  flex-basis: 20%;
+  flex-basis: 25%;
 `;
 
 const StyledTitle = styled.Text`
@@ -45,7 +49,7 @@ const StyledSeparator = styled.View`
   backgroundColor: #dddddd;
 `;
 
-export default class SchedulePageEvents extends Component {
+class SchedulePageEvents extends Component {
   keyExtractor = (item, index) => `list-item-${index}`
   
   renderItem = ({item, index}) => (
@@ -63,10 +67,19 @@ export default class SchedulePageEvents extends Component {
 
   render() {
     return (
-      <FlatList
+      <SwipeListView
+        useFlatList
         data={this.props.listings}
         keyExtractor={this.keyExtractor}
         renderItem={this.renderItem}
+        renderHiddenItem={ (data, rowMap) => (
+            <View style={styles.rowBack}>
+              <Text style={styles.rowBackText}>Drop</Text>
+              <Text style={styles.rowBackText}>Book</Text>
+            </View>
+        )}
+        rightOpenValue={-200}
+        disableRightSwipe
       />
     );
   }
@@ -87,7 +100,7 @@ class ListItem extends React.PureComponent {
     const duration = Moment.utc(+d).format('mm') + " min";
   
     return (
-      <View>
+      <View style={styles.rowFront}>
         <StyledRowContainer>
             <StyledColumnContainer>
               <StyledTitle>{startTime}</StyledTitle>
@@ -103,19 +116,6 @@ class ListItem extends React.PureComponent {
             <StyledColumnContainer>
                 <StyledPrice>{price}</StyledPrice>
             </StyledColumnContainer>
-            <TouchableHighlight 
-              onPress={this.onPress}
-              underlayColor='#fff'
-            >
-              <Svg height="60" width="60">
-                  <Circle
-                      cx="30"
-                      cy="30"
-                      r="20"
-                      fill={this.props.studioColor}
-                  />
-              </Svg>
-            </TouchableHighlight>
         </StyledRowContainer>
         <StyledSeparator />
       </View>
@@ -123,3 +123,26 @@ class ListItem extends React.PureComponent {
   }
 }
 
+const styles = StyleSheet.create({
+  rowBack: {
+    alignItems: 'center',
+		backgroundColor: '#8dc63f',
+		flex: 1,
+		flexDirection: 'row',
+		justifyContent: 'flex-end',
+    paddingRight: 20,
+  },
+  rowBackText: {
+    color: '#fff',
+    marginRight: 30,
+  },
+  rowFront: {
+    alignItems: 'center',
+		backgroundColor: '#fff',
+    justifyContent: 'center',
+    borderBottomWidth: 1,
+    borderColor: 'lightgray',
+  },
+});
+
+export default SchedulePageEvents;

@@ -11,6 +11,7 @@ import {
   NavigatorIOS,
 } from 'react-native';
 
+// TODO: App Entry will obviously not be schedule page - will change later
 import { SchedulePage } from './app/components/SchedulePage/';
 import reducers from './app/reducers';
 
@@ -22,7 +23,7 @@ const App = () => {
       <NavigatorIOS
         style={styles.container}
         initialRoute={{
-          title: 'Flex Studios Schedule',
+          title: '',
           component: SchedulePage,
         }}/>
     </Provider>

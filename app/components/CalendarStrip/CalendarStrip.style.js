@@ -6,7 +6,8 @@ export default StyleSheet.create({
         overflow: 'hidden'
     },
     datesStrip: {
-        flexDirection: 'row'
+        flexDirection: 'row',
+        marginBottom: 10,
     },
     calendarDates: {
         flex: 1,
@@ -46,7 +47,7 @@ export default StyleSheet.create({
     },
     weekendDateName: {
         fontSize: 10,
-        color: '#000',
+        color: '#fff',
         textAlign: 'center'
     },
     dateNumber: {
@@ -56,7 +57,7 @@ export default StyleSheet.create({
     },
     weekendDateNumber: {
         fontSize: 18,
-        color: '#000',
+        color: '#fff',
         fontWeight: 'bold',
         textAlign: 'center'
     },
@@ -66,9 +67,21 @@ export default StyleSheet.create({
         textAlign: 'center',
     },
     disabledDateNumber: {
-        fontSize: 18,
+        fontSize: 10,
         color: 'darkgray',
         fontWeight: 'bold',
         textAlign: 'center'
+    },
+    highlightDateNameStyle: {
+        fontSize: 8,
+        color: 'blue',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    highlightDateNumberStyle: {
+        fontSize: 16,
+        color: 'blue',
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
 });

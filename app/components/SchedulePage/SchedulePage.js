@@ -22,7 +22,8 @@ import { getEventsOnCurrentDate, getEventsLoading } from '../../selectors/Events
 import { getStudioDibsConfig } from '../../selectors/StudioSelectors';
 
 const StyledView = styled.View`
-  margin-top: 65px;
+  padding-top: 65px;
+  height: 100%;
 `;
 
 const StyledActivityIndicator = styled.ActivityIndicator`
@@ -73,8 +74,14 @@ class SchedulePage extends Component {
             style={{paddingTop: 20, paddingBottom: 10}}
             calendarColor={studioColor} // main background color
             highlightColor={'#f4f4f4'} // color of the selection circle
-            iconContainer={{flex: 0.1}}
+            iconContainer={{ flex: 0.1 }}
             onDateSelected={this.handleDateSelected}
+            dateNumberStyle={{color: 'white'}}
+            dateNameStyle={{ color: 'white' }}
+            calendarHeaderStyle={{ color: 'white'}}
+            borderHighlightColor={'white'}
+            highlightDateNameStyle={{ color: studioColor }}
+            highlightDateNumberStyle={{ color: studioColor }}
         />
           {this.props.isLoading ? <StyledActivityIndicator size='large'/> : <SchedulePageEvents studioColor={studioColor} listings={this.props.events}
             />

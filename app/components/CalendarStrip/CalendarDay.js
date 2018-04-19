@@ -44,6 +44,7 @@ class CalendarDay extends Component {
     }
 
     render() {
+        console.log(this.props)
         let animValue;
         let animObject;
         //The user can disable animation, so that is why I use selection type
@@ -77,6 +78,11 @@ class CalendarDay extends Component {
         if (this.props.isExpiredDate) {
             dateNameStyle = [styles.disabledDateName, this.props.disabledDateNameStyle];
             dateNumberStyle = [styles.disabledDateNumber, this.props.disabledDateNumberStyle];
+        }
+
+        if (this.props.selected) {
+            dateNameStyle = [styles.highlightDateNameStyle, this.props.highlightDateNameStyle];
+            dateNumberStyle = [styles.highlightDateNumberStyle, this.props.highlightDateNumberStyle];
         }
 
         return (
@@ -114,6 +120,9 @@ CalendarDay.propTypes = {
     weekendDateNumberStyle: PropTypes.any,
     disabledDateNameStyle: PropTypes.any,
     disabledDateNumberStyle: PropTypes.any,
+
+    highlightDateNameStyle: PropTypes.any,
+    highlightDateNumberStyle: PropTypes.any,
 
     selection: PropTypes.string,
     selectionAnimation: PropTypes.shape(),
