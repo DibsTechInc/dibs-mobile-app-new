@@ -44,7 +44,6 @@ class CalendarDay extends Component {
     }
 
     render() {
-        console.log(this.props)
         let animValue;
         let animObject;
         //The user can disable animation, so that is why I use selection type

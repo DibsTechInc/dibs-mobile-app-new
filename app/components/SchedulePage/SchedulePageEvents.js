@@ -57,13 +57,8 @@ class SchedulePageEvents extends Component {
       item={item}
       index={index}
       studioColor={this.props.studioColor}
-      onPressItem={this.onPressItem}
     />
   );
-
-  onPressItem = (index) => {
-    console.log("Pressed row: "+index);
-  };
 
   render() {
     return (
@@ -74,22 +69,17 @@ class SchedulePageEvents extends Component {
         renderItem={this.renderItem}
         renderHiddenItem={ (data, rowMap) => (
             <View style={styles.rowBack}>
-              <Text style={styles.rowBackText}>Drop</Text>
-              <Text style={styles.rowBackText}>Book</Text>
+              <Text style={styles.rowBackText}>Drop this Class</Text>
+              <Text style={styles.rowBackText}>Add to Cart</Text>
             </View>
         )}
-        rightOpenValue={-200}
-        disableRightSwipe
+        onRowClose={() => { console.log('action received!') }}
       />
     );
   }
 }
 
 class ListItem extends React.PureComponent {
-  onPress = () => {
-      this.props.onPressItem(this.props.listings);
-    }
-  
   render() {
     const item = this.props.item;
     const price = "$" + item.price;
@@ -129,8 +119,9 @@ const styles = StyleSheet.create({
 		backgroundColor: '#8dc63f',
 		flex: 1,
 		flexDirection: 'row',
-		justifyContent: 'flex-end',
+		justifyContent: 'space-between',
     paddingRight: 20,
+    paddingLeft: 20,
   },
   rowBackText: {
     color: '#fff',

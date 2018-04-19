@@ -64,7 +64,6 @@ class SchedulePage extends Component {
     const studioColor = `#${this.props.studioConfig.color}`;
     const studioFontMedium = this.props.studioConfig.studio_fonts.medium;
 
-    console.log(this.props.studioConfig)
     return (
       <StyledView>
         <CalendarStrip
