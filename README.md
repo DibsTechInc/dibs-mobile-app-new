@@ -46,9 +46,12 @@ Project opened! You can now use the "Share" or "Device" buttons to view your pro
 * Make a simple change to the codebase
 * If Expo is working, your project will rebuild upon saving.
 
+### Troubleshooting
 
-
-
+* If your Expo app is no longer updating upon save, shake the phone and Expo will change to a menu screen. Select 'Restart Build'
+* If your Expo desktop app is not responding, simply restart the build.
+* If you save multiple times while Expo is rebuilding, you will need to save again to trigger another build once the initial build has finished.
+* When React Native gives you the red screen of death due to bugs, you may need to manually select 'Restart Build' at the bottom of the screen once the bugs have been fixed.
 
 
 
