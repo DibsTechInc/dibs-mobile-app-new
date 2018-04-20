@@ -13,8 +13,8 @@ const StyledHiddenItemView = styled.View`
   flex: 1;
   flex-direction: row;
   justify-content: space-between;
-  padding-right: 20;
-  padding-left: 20;
+  padding-right: 40;
+  padding-left: 40;
 `;
 
 const StyledHiddenItemText = styled.Text`
