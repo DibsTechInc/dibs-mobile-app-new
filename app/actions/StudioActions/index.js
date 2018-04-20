@@ -35,16 +35,13 @@ export function setStudioLoadingFalse() {
  */
 export function requestStudioData(cb) {
   return function innerRequestStudioData(dispatch, getState) {
-    // if (getState().studio.loading) return;
-
-    const query = 'http://10.51.110.1:3000/api/studio/?studioid=20456&source=mb';
+    const query = 'http://ondibs.com/api/studio/?studioid=20456&source=mb';
 
     fetch(query)
       .then(res => res.json())
       .then((res) => {
         dispatch(setStudio(res.studio));
         cb();
-        // dispatch(setEventsLoadingFalse());
       })
       .catch(error => {
         // set error here

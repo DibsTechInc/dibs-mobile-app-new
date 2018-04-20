@@ -29,12 +29,17 @@ const StyledColumnContainer = styled.View`
 
 const StyledTitle = styled.Text`
   font-size: 12px;
+  font-family: 'flex-font';
   color: #656565;
+`;
+
+const StyledTitleHeavy = StyledTitle.extend`
+  font-family: 'flex-font-heavy';
 `;
 
 const StyledPrice = styled.Text`
   font-size: 18px;
-  font-weight: bold;
+  font-family: 'flex-font-heavy';
   color: #656565;
 `;
 
@@ -61,7 +66,7 @@ class SchedulePageEventListItem extends PureComponent {
               <StyledTitle>{duration}</StyledTitle>
             </StyledColumnContainer>
             <StyledColumnContainer>
-              <StyledTitle>{item.name}</StyledTitle>
+              <StyledTitleHeavy>{item.name}</StyledTitleHeavy>
               <StyledTitle>{item.instructor.name}</StyledTitle>
             </StyledColumnContainer>
             <StyledColumnContainer>

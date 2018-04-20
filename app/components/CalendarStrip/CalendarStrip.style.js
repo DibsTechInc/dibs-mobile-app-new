@@ -43,43 +43,48 @@ export default StyleSheet.create({
     },
     dateName: {
         fontSize: 10,
+        fontFamily: 'flex-font',
         textAlign: 'center'
     },
     weekendDateName: {
         fontSize: 10,
+        fontFamily: 'flex-font',
         color: '#fff',
         textAlign: 'center'
     },
     dateNumber: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontFamily: 'flex-font-heavy',
         textAlign: 'center'
     },
     weekendDateNumber: {
         fontSize: 18,
+        fontFamily: 'flex-font-heavy',
         color: '#fff',
-        fontWeight: 'bold',
         textAlign: 'center'
     },
     disabledDateName: {
         fontSize: 10,
+        fontFamily: 'flex-font',
         color: 'darkgray',
         textAlign: 'center',
     },
     disabledDateNumber: {
         fontSize: 10,
+        fontFamily: 'flex-font-heavy',
         color: 'darkgray',
-        fontWeight: 'bold',
         textAlign: 'center'
     },
     highlightDateNameStyle: {
         fontSize: 8,
+        fontFamily: 'flex-font',
         color: 'blue',
         fontWeight: 'bold',
         textAlign: 'center',
     },
     highlightDateNumberStyle: {
         fontSize: 16,
+        fontFamily: 'flex-font',
         color: 'blue',
         fontWeight: 'bold',
         textAlign: 'center',

@@ -62,7 +62,6 @@ class SchedulePage extends Component {
     }
 
     const studioColor = `#${this.props.studioConfig.color}`;
-    const studioFontMedium = this.props.studioConfig.studio_fonts.medium;
 
     return (
       <StyledView>
@@ -82,7 +81,11 @@ class SchedulePage extends Component {
             highlightDateNameStyle={{ color: studioColor }}
             highlightDateNumberStyle={{ color: studioColor }}
         />
-          {this.props.isLoading ? <StyledActivityIndicator size='large'/> : <SchedulePageEvents studioColor={studioColor} listings={this.props.events}
+          {this.props.isLoading ?
+            <StyledActivityIndicator size='large'/> :
+            <SchedulePageEvents
+              studioColor={studioColor}
+              listings={this.props.events}
             />
           }
       </StyledView>

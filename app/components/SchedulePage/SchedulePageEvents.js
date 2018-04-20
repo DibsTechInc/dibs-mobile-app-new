@@ -20,6 +20,7 @@ const StyledHiddenItemView = styled.View`
 const StyledHiddenItemText = styled.Text`
   color: #fff;
   justify-content: center;
+  font-family: 'flex-font-heavy';
 `;
 
 class SchedulePageEvents extends Component {

@@ -106,7 +106,6 @@ class CalendarStrip extends Component {
         const me = this;
         let startDate = moment(this.state.startingDate);
         let currentDate = moment(this.state.currentDate);
-        let currentDay = moment().day();
 
         let dateInfos = [];
 
