@@ -1,5 +1,11 @@
 import { combineReducers } from 'redux';
 
-export default combineReducers(Object.assign(
+import events from './EventsReducer';
+import currentDate from './CurrentDateReducer';
+import studio from './StudioReducer';
 
-));
+export default combineReducers({
+  events,
+  currentDate,
+  studio,
+});

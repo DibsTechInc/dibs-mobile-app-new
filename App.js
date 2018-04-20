@@ -1,4 +1,8 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { Provider } from 'react-redux';
+import { createStore, applyMiddleware } from 'redux';
+import { Font } from 'expo';
+import thunk from 'redux-thunk';
 
 import {
   StyleSheet,
@@ -8,20 +12,38 @@ import {
   NavigatorIOS,
 } from 'react-native';
 
-import SchedulePage from './SchedulePage';
+// TODO: App Entry will obviously not be schedule page - will change later
+import { SchedulePage } from './app/components/SchedulePage/';
+import reducers from './app/reducers';
 
-export default class App extends React.Component {
-  render() {
-    console.log('rendered?')
-    return (
-      <NavigatorIOS
-        style={styles.container}
-        initialRoute={{
-          title: 'Flex Studios Schedule',
-          component: SchedulePage,
-        }}/>
-    );
+// Native apps can only load downloaded fronts stored in assets/fonts folder
+import SourceSansProBold from './assets/fonts/SourceSansPro-Bold.ttf';
+import SourceSansProRegular from './assets/fonts/SourceSansPro-Regular.ttf';
+
+const configuredStore = createStore(reducers, applyMiddleware(thunk));
+
+class App extends Component {
+
+  componentDidMount() {
+    Font.loadAsync({
+      'flex-font': SourceSansProRegular,
+      'flex-font-heavy': SourceSansProBold,
+    });
   }
+
+  render() {
+    return (
+      <Provider store={configuredStore}>
+        <NavigatorIOS
+          style={styles.container}
+          initialRoute={{
+            title: '',
+            component: SchedulePage,
+          }}/>
+      </Provider>
+    )
+  }
+  
 }
 
 const styles = StyleSheet.create({
@@ -35,3 +57,5 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+
+export default App;
