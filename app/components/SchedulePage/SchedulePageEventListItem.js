@@ -62,7 +62,7 @@ class SchedulePageEventListItem extends PureComponent {
       <StyledListItemView>
         <StyledRowContainer>
             <StyledColumnContainer>
-              <StyledTitle>{startTime}</StyledTitle>
+              <StyledTitleHeavy>{startTime}</StyledTitleHeavy>
               <StyledTitle>{duration}</StyledTitle>
             </StyledColumnContainer>
             <StyledColumnContainer>
@@ -70,7 +70,7 @@ class SchedulePageEventListItem extends PureComponent {
               <StyledTitle>{item.instructor.name}</StyledTitle>
             </StyledColumnContainer>
             <StyledColumnContainer>
-                <StyledTitle>{item.location.name}</StyledTitle>
+                <StyledTitleHeavy>{item.location.name}</StyledTitleHeavy>
             </StyledColumnContainer>
             <StyledColumnContainer>
                 <StyledPrice>{price}</StyledPrice>

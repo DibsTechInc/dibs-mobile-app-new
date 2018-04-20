@@ -24,6 +24,7 @@ import { getStudioDibsConfig } from '../../selectors/StudioSelectors';
 const StyledView = styled.View`
   padding-top: 65px;
   height: 100%;
+  background-color: ${props => props.studioColor};
 `;
 
 const StyledActivityIndicator = styled.ActivityIndicator`
@@ -64,7 +65,7 @@ class SchedulePage extends Component {
     const studioColor = `#${this.props.studioConfig.color}`;
 
     return (
-      <StyledView>
+      <StyledView studioColor={studioColor}>
         <CalendarStrip
             calendarAnimation={{type: 'parallel', duration: 600}} // animation when switching weeks
             selection={'background'} // type of selection circle
