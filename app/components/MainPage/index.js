@@ -41,8 +41,4 @@ class MainPage extends Component {
   }
 } 
 
-MainPage.navigationOptions = {
-  title: 'Home Screen',
-};
-
 export default MainPage;

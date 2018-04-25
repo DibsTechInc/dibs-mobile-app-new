@@ -3,11 +3,7 @@ import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import { Font } from 'expo';
 import thunk from 'redux-thunk';
-// import { StackNavigator } from 'react-navigation';
-
-// TODO: App Entry will obviously not be schedule page - will change later
 import reducers from './app/reducers';
-// import { SchedulePage } from './app/components/SchedulePage';
 import Router from './app/router';
 
 // Native apps can only load downloaded fronts stored in assets/fonts folder

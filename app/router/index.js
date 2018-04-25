@@ -3,6 +3,7 @@ import { StackNavigator } from 'react-navigation';
 import { SchedulePage } from '../components/SchedulePage';
 import AuthPage from '../components/AuthPage';
 import MainPage from '../components/MainPage';
+import ProfilePage from '../components/ProfilePage';
 
 const Router = StackNavigator(
   {
@@ -11,6 +12,9 @@ const Router = StackNavigator(
     },
     Login: {
       screen: AuthPage,
+    },
+    Profile: {
+      screen: ProfilePage,
     },
   },
   {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
@@ -16,14 +16,26 @@ const styles = StyleSheet.create({
   },
 });
 
-const AuthPage = () => (
-  <View style={styles.container}>
-    <Text>This is the auth page</Text>
-  </View>
-);
+class AuthPage extends Component {
+  constructor() {
+    super();
 
-AuthPage.navigationOptions = {
-  title: 'Register/Login',
-};
+    this.handleOnPress = this.handleOnPress.bind(this);
+  }
+
+  handleOnPress() {
+    this.props.navigation.navigate('Profile');
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <Text>This is the auth page where user either enters password or signs up</Text>
+        <TextInput placeholder="placeholder field" />
+        <Button title="SUBMIT" onPress={this.handleOnPress} />
+      </View>
+    );
+  }
+}  
 
 export default AuthPage;

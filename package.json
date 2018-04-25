@@ -12,6 +12,7 @@
     "qs": "^6.5.1",
     "react": "16.3.0-alpha.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-26.0.0.tar.gz",
+    "react-native-settings-list": "^1.8.0",
     "react-native-svg": "^6.3.1",
     "react-native-swipe-list-view": "^1.0.7",
     "react-navigation": "^1.5.11",
