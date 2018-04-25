@@ -56,7 +56,7 @@ export function requestEventData({ eventids } = {}) {
     // TODO: insert in current start ate
     // TODO: insert studio id in
     // TODO: set up proxy
-    const query = `http://ondibs.com/api/studio/events?studios[0]=${studio.id}&start=${startDate}&end=${endDate}`;
+    const query = `http://www.ondibs.com/api/studio/events?studios[0]=${studio.id}&start=${startDate}&end=${endDate}`;
 
     // let data = { studios: [studio.id] };
 
