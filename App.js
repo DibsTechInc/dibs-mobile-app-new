@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import { Font } from 'expo';
-import thunk from 'redux-thunk';
+import { thunk, navigation } from './app/utils/redux';
 
 import {
   StyleSheet,
@@ -20,7 +20,7 @@ import reducers from './app/reducers';
 import SourceSansProBold from './assets/fonts/SourceSansPro-Bold.ttf';
 import SourceSansProRegular from './assets/fonts/SourceSansPro-Regular.ttf';
 
-const configuredStore = createStore(reducers, applyMiddleware(thunk));
+const configuredStore = createStore(reducers, applyMiddleware(thunk, navigation));
 
 class App extends Component {
 
