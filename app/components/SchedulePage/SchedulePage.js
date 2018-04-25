@@ -22,7 +22,6 @@ import { getEventsOnCurrentDate, getEventsLoading } from '../../selectors/Events
 import { getStudioDibsConfig } from '../../selectors/StudioSelectors';
 
 const StyledView = styled.View`
-  padding-top: 65px;
   height: 100%;
 `;
 

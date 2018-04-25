@@ -22,20 +22,19 @@ class MainPage extends Component {
   constructor() {
     super();
 
-    this.handleOnPress = this.handleOnPress.bind(this);
+    this.handleOnPressSchedule = this.handleOnPress.bind(this, 'Schedule');
+    this.handleOnPressProfile = this.handleOnPress.bind(this, 'Profile');
   }
 
-  handleOnPress() {
-    this.props.navigation.navigate('Login');
+  handleOnPress(route) {
+    this.props.navigation.navigate(route);
   }
 
   render() {
     return (
       <View style={styles.container}>
-        <Text>Welcome to FLEX Studios!</Text>
-        <Text>To login or create an account, please enter your email address</Text>
-        <TextInput placeholder="email address" />
-        <Button title="SUBMIT" accessibilityLabel="SUBMIT" onPress={this.handleOnPress} />
+        <Button title="Click here to view Schedule" accessibilityLabel="Schedule" onPress={this.handleOnPressSchedule} />
+        <Button title="Click here to view Profile" accessibilityLabel="Profile" onPress={this.handleOnPressProfile} />   
       </View>
     );
   }

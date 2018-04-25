@@ -44,13 +44,12 @@ class ProfileScreen extends Component {
             />
             <SettingsList.Item
               title='Transaction History'
-              onPress={() => Alert.alert('Route ToTransaction History Page')}
+              onPress={() => Alert.alert('Route To Transaction History Page')}
             />
             <SettingsList.Item
               title='Packages/Credit'
               onPress={() => Alert.alert('Route To Packages/Credits Page')}
             />
-            <SettingsList.Header headerStyle={{marginTop:15}}/>
             <SettingsList.Item
               title='Refer a Friend Program'
               onPress={() => Alert.alert('Route To RAF Page')}

@@ -1,3 +1,4 @@
+
 import React, { Component } from 'react';
 import {
   StyleSheet,
@@ -6,6 +7,7 @@ import {
   Button,
   TextInput,
 } from 'react-native';
+import { StackNavigator } from 'react-navigation';
 
 const styles = StyleSheet.create({
   container: {
@@ -16,7 +18,7 @@ const styles = StyleSheet.create({
   },
 });
 
-class AuthPage extends Component {
+class LandingPage extends Component {
   constructor() {
     super();
 
@@ -24,18 +26,19 @@ class AuthPage extends Component {
   }
 
   handleOnPress() {
-    this.props.navigation.navigate('Main');
+    this.props.navigation.navigate('Login');
   }
 
   render() {
     return (
       <View style={styles.container}>
-        <Text>This is the auth page where user either enters password or signs up</Text>
-        <TextInput placeholder="placeholder field" />
-        <Button title="SUBMIT" onPress={this.handleOnPress} />
+        <Text>Welcome to FLEX Studios!</Text>
+        <Text>To login or create an account, please enter your email address</Text>
+        <TextInput placeholder="email address" />
+        <Button title="SUBMIT" accessibilityLabel="SUBMIT" onPress={this.handleOnPress} />
       </View>
     );
   }
-}  
+} 
 
-export default AuthPage;
+export default LandingPage;
