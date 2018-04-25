@@ -9,13 +9,13 @@ import {
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import styled from 'styled-components';
-import { lightenDarkColor } from '../../helpers';
+import { lightenDarkenColor } from '../../helpers';
 
 const StyledView = styled.View`
   flex: 1;
   justify-content: center;
   align-items: center;
-  background-color: ${lightenDarkColor('#8dc63f', 45)};
+  background-color: ${lightenDarkenColor('#8dc63f', 90)};
 `;
 
 class LandingPage extends Component {

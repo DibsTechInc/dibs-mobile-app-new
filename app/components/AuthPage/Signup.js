@@ -1,20 +1,19 @@
 import React, { Component } from 'react';
 import {
-  StyleSheet,
   View,
   Text,
   Button,
   TextInput,
 } from 'react-native';
+import styled from 'styled-components';
+import { lightenDarkenColor } from '../../helpers';
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-});
+const StyledView = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  background-color: ${lightenDarkenColor('#8dc63f', 60)};
+`;
 
 class EnterPassword extends Component {
   constructor() {
@@ -30,14 +29,14 @@ class EnterPassword extends Component {
   render() {
     console.log(this.props, '??')
     return (
-      <View style={styles.container}>
+      <StyledView>
         <Text>Welcome!</Text>
         <Text>Just need a few details before we get started:</Text>
         <TextInput placeholder="person@email.com" />
         <TextInput placeholder="Full name" />
         <TextInput placeholder="Password" />
         <Button title="SIGNUP" onPress={this.handleOnPress} />
-      </View>
+      </StyledView>
     );
   }
 }  

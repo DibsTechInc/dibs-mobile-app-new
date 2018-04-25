@@ -1,22 +1,21 @@
 
 import React, { Component } from 'react';
 import {
-  StyleSheet,
   View,
   Text,
   Button,
   TextInput,
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
+import styled from 'styled-components';
+import { lightenDarkenColor } from '../../helpers';
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-});
+const StyledView = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  background-color: ${lightenDarkenColor('#8dc63f', 30)};
+`;
 
 class MainPage extends Component {
   constructor() {
@@ -32,10 +31,10 @@ class MainPage extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
-        <Button title="Click here to view Schedule" accessibilityLabel="Schedule" onPress={this.handleOnPressSchedule} />
-        <Button title="Click here to view Profile" accessibilityLabel="Profile" onPress={this.handleOnPressProfile} />   
-      </View>
+      <StyledView>
+        <Button color="black" title="Click here to view Schedule" accessibilityLabel="Schedule" onPress={this.handleOnPressSchedule} />
+        <Button color="black" title="Click here to view Profile" accessibilityLabel="Profile" onPress={this.handleOnPressProfile} />   
+      </StyledView>
     );
   }
 }

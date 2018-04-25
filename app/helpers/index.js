@@ -1,7 +1,7 @@
 import createUnboundedSelector from './unbounded-selector';
-import lightenDarkColor from './color-lighten-darken';
+import lightenDarkenColor from './lighten-darken-color';
 
 export {
   createUnboundedSelector,
-  lightenDarkColor,
+  lightenDarkenColor,
 }
