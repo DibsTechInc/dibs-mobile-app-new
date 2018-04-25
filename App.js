@@ -2,25 +2,19 @@ import React, { Component } from 'react';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import { Font } from 'expo';
-import { thunk, navigation } from './app/utils/redux';
-
-import {
-  StyleSheet,
-  Text,
-  View,
-  Platform,
-  NavigatorIOS,
-} from 'react-native';
+import thunk from 'redux-thunk';
+// import { StackNavigator } from 'react-navigation';
 
 // TODO: App Entry will obviously not be schedule page - will change later
-import AppWithNavigationState from './app/navigators/AppNavigator';
 import reducers from './app/reducers';
+// import { SchedulePage } from './app/components/SchedulePage';
+import Router from './app/router';
 
 // Native apps can only load downloaded fronts stored in assets/fonts folder
 import SourceSansProBold from './assets/fonts/SourceSansPro-Bold.ttf';
 import SourceSansProRegular from './assets/fonts/SourceSansPro-Regular.ttf';
 
-const configuredStore = createStore(reducers, applyMiddleware(thunk, navigation));
+const configuredStore = createStore(reducers, applyMiddleware(thunk));
 
 class App extends Component {
   componentDidMount() {
@@ -33,7 +27,7 @@ class App extends Component {
   render() {
     return (
       <Provider store={configuredStore}>
-        <AppWithNavigationState />
+        <Router />
       </Provider>
     )
   }
