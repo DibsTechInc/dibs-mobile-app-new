@@ -5,7 +5,8 @@ import {
   Text,
   View,
   Image,
-  Alert
+  Alert,
+  Button,
 } from 'react-native';
 import SettingsList from 'react-native-settings-list';
 
@@ -102,5 +103,15 @@ const styles = StyleSheet.create({
     color: '#8e8e93'
   }
 });
+
+ProfileScreen.navigationOptions = ({ navigation }) => {
+  console.log(navigation, 'wut')
+
+  return {
+    headerRight: (
+      <Button onPress={() => (navigation.replace('Main'))} title="Home" color="darkgray" />
+    ),
+  };
+};
 
 export default ProfileScreen;

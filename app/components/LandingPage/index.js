@@ -35,10 +35,10 @@ class LandingPage extends Component {
         <Text>Welcome to FLEX Studios!</Text>
         <Text>To login or create an account, please enter your email address</Text>
         <TextInput placeholder="email address" />
-        <Button title="SUBMIT" accessibilityLabel="SUBMIT" onPress={this.handleOnPress} />
+        <Button title="CONTINUE" accessibilityLabel="CONTINUE" onPress={this.handleOnPress} />
       </View>
     );
   }
-} 
+}
 
 export default LandingPage;

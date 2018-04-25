@@ -38,6 +38,6 @@ class MainPage extends Component {
       </View>
     );
   }
-} 
+}
 
 export default MainPage;
