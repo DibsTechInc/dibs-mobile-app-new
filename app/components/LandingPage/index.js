@@ -8,35 +8,46 @@ import {
   TextInput,
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
+import styled from 'styled-components';
+import { lightenDarkColor } from '../../helpers';
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-});
+const StyledView = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  background-color: ${lightenDarkColor('#8dc63f', 45)};
+`;
 
 class LandingPage extends Component {
   constructor() {
     super();
 
-    this.handleOnPress = this.handleOnPress.bind(this);
+    this.state = {
+      email: '',
+    }
   }
 
-  handleOnPress() {
-    this.props.navigation.navigate('Login');
+  handleOnPress(email) {
+    switch (true) {
+      case email === 'Old@':
+        return this.props.navigation.navigate('Login');
+      default:
+        return this.props.navigation.navigate('Register', { email });
+    }
   }
 
   render() {
     return (
-      <View style={styles.container}>
+      <StyledView>
         <Text>Welcome to FLEX Studios!</Text>
-        <Text>To login or create an account, please enter your email address</Text>
-        <TextInput placeholder="email address" />
-        <Button title="CONTINUE" accessibilityLabel="CONTINUE" onPress={this.handleOnPress} />
-      </View>
+        <Text>Please enter your email address</Text>
+        <TextInput
+          placeholder="email address"
+          onChangeText={email => this.setState({ email })}
+          value={this.state.email}
+        />
+        <Button title="CONTINUE" accessibilityLabel="CONTINUE" onPress={this.handleOnPress.bind(this, this.state.email)} />
+      </StyledView>
     );
   }
 }
