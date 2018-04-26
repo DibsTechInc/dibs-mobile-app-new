@@ -9,12 +9,15 @@ import {
 import { StackNavigator } from 'react-navigation';
 import styled from 'styled-components';
 import { lightenDarkenColor } from '../../helpers';
+import CalendarPage from './CalendarPage';
 
 const StyledView = styled.View`
   flex: 1;
-  justify-content: center;
-  align-items: center;
   background-color: ${lightenDarkenColor('#8dc63f', 30)};
+`;
+
+const StyledInnerView = styled.View`
+  margin-top: 80;
 `;
 
 class MainPage extends Component {
@@ -33,9 +36,12 @@ class MainPage extends Component {
   render() {
     return (
       <StyledView>
-        <Button color="black" title="Click here to view Schedule" accessibilityLabel="Schedule" onPress={this.handleOnPressSchedule} />
-        <Button color="black" title="Click here to view Profile" accessibilityLabel="Profile" onPress={this.handleOnPressProfile} /> 
-        <Button color="black" title="Logout" accessibilityLabel="Click here to logout" onPress={this.handleOnPressLanding} /> 
+        <CalendarPage />
+        <StyledInnerView>
+          <Button onPress={this.handleOnPressSchedule} title='Buy class' color='black' />
+          <Button onPress={this.handleOnPressProfile} title='Profile Settings' color='black' />
+          <Button onPress={this.handleOnPressLanding} title='Logout' color='black' />
+        </StyledInnerView>
       </StyledView>
     );
   }
