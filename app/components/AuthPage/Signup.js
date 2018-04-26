@@ -30,7 +30,6 @@ class EnterPassword extends Component {
     console.log(this.props, '??')
     return (
       <StyledView>
-        <Text>Welcome!</Text>
         <Text>Just need a few details before we get started:</Text>
         <TextInput placeholder="person@email.com" />
         <TextInput placeholder="Full name" />

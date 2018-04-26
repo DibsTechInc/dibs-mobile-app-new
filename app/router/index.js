@@ -1,7 +1,7 @@
 import { StackNavigator } from 'react-navigation';
 
 import { SchedulePage } from '../components/SchedulePage';
-import { EnterPassword, Signup } from '../components/AuthPage';
+import { EnterPassword, EnterEmail, Signup } from '../components/AuthPage';
 import LandingPage from '../components/LandingPage';
 import MainPage from '../components/MainPage';
 import ProfilePage from '../components/ProfilePage';
@@ -20,6 +20,9 @@ const Router = StackNavigator(
     Profile: {
       screen: ProfilePage,
     },
+    Verify: {
+      screen: EnterEmail,
+    },
     Login: {
       screen: EnterPassword,
     },
@@ -28,7 +31,11 @@ const Router = StackNavigator(
     }
   },
   {
+    headerMode: 'none',
     initialRouteName: 'Landing',
+    navigationOptions: {
+      gesturesEnabled: true,
+    },
   },
 );
 
