@@ -29,8 +29,8 @@ class EnterPassword extends Component {
   render() {
     return (
       <StyledView>
-        <Text>Enter your password</Text>
-        <TextInput placeholder="password" />
+        <Text>What is your password?</Text>
+        <TextInput placeholder="Password" />
         <Button title="SUBMIT" onPress={this.handleOnPress} />
       </StyledView>
     );

@@ -23,6 +23,7 @@ class MainPage extends Component {
 
     this.handleOnPressSchedule = this.handleOnPress.bind(this, 'Schedule');
     this.handleOnPressProfile = this.handleOnPress.bind(this, 'Profile');
+    this.handleOnPressLanding = this.handleOnPress.bind(this, 'Landing');
   }
 
   handleOnPress(route) {
@@ -33,10 +34,15 @@ class MainPage extends Component {
     return (
       <StyledView>
         <Button color="black" title="Click here to view Schedule" accessibilityLabel="Schedule" onPress={this.handleOnPressSchedule} />
-        <Button color="black" title="Click here to view Profile" accessibilityLabel="Profile" onPress={this.handleOnPressProfile} />   
+        <Button color="black" title="Click here to view Profile" accessibilityLabel="Profile" onPress={this.handleOnPressProfile} /> 
+        <Button color="black" title="Logout" accessibilityLabel="Click here to logout" onPress={this.handleOnPressLanding} /> 
       </StyledView>
     );
   }
+}
+
+MainPage.navigationOptions = {
+  gesturesEnabled: false,
 }
 
 export default MainPage;

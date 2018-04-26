@@ -39,9 +39,9 @@ class EnterEmail extends Component {
   render() {
     return (
       <StyledView>
-        <Text>Welcome to FLEX Studios!</Text>
+        <Text>What is your email?</Text>
         <TextInput
-          placeholder="email address"
+          placeholder="Email"
           onChangeText={email => this.setState({ email })}
           value={this.state.email}
         />

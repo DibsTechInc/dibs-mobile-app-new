@@ -9,6 +9,9 @@ import {
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import styled from 'styled-components';
+import Swiper from 'react-native-swiper'
+
+import About from './About';
 
 const StyledView = styled.View`
   flex: 1;
@@ -29,11 +32,14 @@ class LandingPage extends Component {
 
   render() {
     return (
-      <StyledView>
-        <Text>Welcome to FLEX Studios!</Text>
-        <Text>Swipe to learn more</Text>
-        <Button title="CONTINUE" accessibilityLabel="CONTINUE" onPress={this.handleOnPress} />
-      </StyledView>
+      <Swiper loop={false}>
+        <StyledView>
+          <Text>Welcome to FLEX Studios!</Text>
+          <Text>Swipe to learn more</Text>
+          <Button title="CONTINUE" accessibilityLabel="CONTINUE" onPress={this.handleOnPress} />
+        </StyledView>
+        <About />
+      </Swiper>
     );
   }
 }
