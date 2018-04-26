@@ -6,13 +6,11 @@ import {
   TextInput,
 } from 'react-native';
 import styled from 'styled-components';
-import { lightenDarkenColor } from '../../helpers';
 
 const StyledView = styled.View`
   flex: 1;
   justify-content: center;
   align-items: center;
-  background-color: ${lightenDarkenColor('#8dc63f', 60)};
 `;
 
 class EnterPassword extends Component {

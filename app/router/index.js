@@ -6,7 +6,7 @@ import LandingPage from '../components/LandingPage';
 import MainPage from '../components/MainPage';
 import ProfilePage from '../components/ProfilePage';
 
-const Router = StackNavigator(
+const StackNavigatorRouter = StackNavigator(
   {
     Landing: {
       screen: LandingPage,
@@ -39,4 +39,4 @@ const Router = StackNavigator(
   },
 );
 
-export default Router;
+export default StackNavigatorRouter;

@@ -45,10 +45,10 @@ export default class CalendarsScreen extends Component {
 const styles = StyleSheet.create({
   calendar: {
     borderTopWidth: 1,
-    paddingTop: 50,
+    paddingTop: 45,
     borderBottomWidth: 1,
     borderColor: '#eee',
-    height: 350
+    height: 350,
   },
   text: {
     textAlign: 'center',

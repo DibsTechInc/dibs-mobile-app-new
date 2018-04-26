@@ -26,6 +26,10 @@ class LandingPage extends Component {
     this.handleOnPress = this.handleOnPress.bind(this);
   }
 
+  componentDidMount() {
+    
+  }
+
   handleOnPress() {
     this.props.navigation.navigate('Verify');
   }
