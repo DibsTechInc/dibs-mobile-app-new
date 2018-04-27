@@ -19,6 +19,8 @@ export function validateEmail(email, cb = () => {}) {
     const query = 'http://a989a625.ngrok.io/api/user/email/verify';
     const ENTER_PASSWORD_ROUTE = 'Password';
 
+    console.log(query, '??')
+
     try {
       let res = await fetch(query, {
         method: 'POST',
