@@ -36,13 +36,6 @@ class EnterEmail extends Component {
 
   handleOnPress(email) {
     this.props.validateEmail(email);
-
-    // switch (true) {
-    //   case email === 'benjamin@ondibs.com':
-    //     return this.props.navigation.navigate('Login', { email });
-    //   default:
-    //     return this.props.navigation.navigate('Register', { email });
-    // }
   }
 
   render() {

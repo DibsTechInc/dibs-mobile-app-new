@@ -2,6 +2,7 @@ import { AsyncStorage } from 'react-native';
 
 import {
   SET_USER,
+  GET_USER,
   SET_USER_AUTH_STATUS_ROUTE,
 } from '../../constants/UserConstants';
 
@@ -114,6 +115,7 @@ export function userLogin(email, password, cb = () => {}) {
 
       res = await res.json();
       await AsyncStorage.setItem('STORAGE_KEY', res.token);
+      dispatch(setUser(res.user));
       cb();
     } catch (err) {
       console.log(err);
