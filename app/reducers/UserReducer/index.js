@@ -1,4 +1,7 @@
-import { SET_USER } from '../../constants/UserConstants';
+import {
+  SET_USER,
+  SET_USER_AUTH_STATUS_ROUTE,
+} from '../../constants/UserConstants';
 
 /**
  * studio
@@ -6,10 +9,18 @@ import { SET_USER } from '../../constants/UserConstants';
  * @param {object} action on the state
  * @returns {objecr} new state
  */
-export default function user(state = {}, action) {
+
+const initialState = {
+  user: null,
+  authStatusRoute: null,
+}
+
+export default function user(state = initialState, action) {
   switch (action.type) {
     case SET_USER:
-      return action.payload;
+      return { ...state, user: action.payload };
+    case SET_USER_AUTH_STATUS_ROUTE:
+      return { ...state, authStatusRoute: action.payload };
     default:
       return state;
   }

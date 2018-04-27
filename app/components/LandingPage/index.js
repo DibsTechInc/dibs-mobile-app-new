@@ -1,17 +1,24 @@
 
 import React, { Component } from 'react';
+// temp
+import { connect } from 'react-redux';
+import { logOutUser } from '../../actions/UserActions';
+
+
 import {
   StyleSheet,
   View,
   Text,
   TouchableOpacity,
   TextInput,
+  Button,
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import styled from 'styled-components';
 import Swiper from 'react-native-swiper'
 
 import About from './About';
+import { authFetch } from '../../helpers';
 
 const StyledView = styled.View`
   flex: 1;
@@ -27,17 +34,16 @@ const StyledWelcomeView = styled.View`
   justify-content: center;
 `;
 
-const StyledBoldText = styled.Text`
+const StyledWelcomeText = styled.Text`
   font-family: 'flex-font';
 `;
 
-const StyledGrayText = styled.Text`
-  font-family: 'flex-font';
-  color: #b1b1b1;
-`;
-
-const StyledButtonText = styled.Text`
+const StyledButtonText = StyledWelcomeText.extend`
   color: #fff;
+`;
+
+const StyledGrayText = StyledWelcomeText.extend`
+  color: #b1b1b1;
 `;
 
 const StyledContinueButton = styled.TouchableOpacity`
@@ -59,34 +65,48 @@ class LandingPage extends Component {
   }
 
   componentDidMount() {
-    // jwt call here
+    // authFetch('http://a989a625.ngrok.io/api/user', {
+    //   method: 'GET',
+    // })
+    // .then(res => res.json())
+    // .then(res => {
+    //   // auth-based -- in progress
+    //   console.log('-----------------------------')
+    //   console.log(res, 'response')
+    // })
   }
 
   handleOnPress() {
     this.props.navigation.navigate('Verify');
   }
 
+  testLogout() {
+    this.props.logOutUser();
+  }
+
   render() {
     return (
       <Swiper loop={false}>
-        <View style={{ flex: 1 }}>
+        <StyledView>
           <StyledWelcomeView>
-            <StyledBoldText>Welcome to FLEX Studios!</StyledBoldText>
+            <StyledWelcomeText>Welcome to FLEX Studios!</StyledWelcomeText>
             <StyledGrayText>Swipe to learn more</StyledGrayText>
+            <Button title="logouttest" onPress={this.testLogout.bind(this)} />
           </StyledWelcomeView>
-          
           <StyledButtonsView>
             <StyledContinueButton onPress={this.handleOnPress}> 
               <StyledButtonText>Continue</StyledButtonText>
             </StyledContinueButton>
           </StyledButtonsView>
-          
-
-        </View>
+        </StyledView>
         <About />
       </Swiper>
     );
   }
 }
 
-export default LandingPage;
+const mapDispatchToProps = {
+  logOutUser
+} 
+
+export default connect(null, mapDispatchToProps)(LandingPage);

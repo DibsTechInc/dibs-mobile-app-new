@@ -30,10 +30,10 @@ class App extends Component {
       'flex-font': SourceSansProRegular,
       'flex-font-heavy': SourceSansProBold,
     });
-    
+
     this.setState({
       fontsLoaded: true,
-    })
+    });
   }
 
   render() {

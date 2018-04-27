@@ -1,5 +1,6 @@
 
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import {
   StyleSheet,
   View,
@@ -9,6 +10,8 @@ import {
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import styled from 'styled-components';
+
+import { validateEmail } from '../../actions/UserActions';
 
 const StyledView = styled.View`
   flex: 1;
@@ -21,17 +24,25 @@ class EnterEmail extends Component {
     super();
 
     this.state = {
-      email: '',
+      email: 'benjamin@ondibs.com',
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.authRoute !== this.props.authRoute) {
+      this.props.navigation.navigate(this.props.authRoute, { email: prevState.email });
     }
   }
 
   handleOnPress(email) {
-    switch (true) {
-      case email === 'Old@':
-        return this.props.navigation.navigate('Login');
-      default:
-        return this.props.navigation.navigate('Register', { email });
-    }
+    this.props.validateEmail(email);
+
+    // switch (true) {
+    //   case email === 'benjamin@ondibs.com':
+    //     return this.props.navigation.navigate('Login', { email });
+    //   default:
+    //     return this.props.navigation.navigate('Register', { email });
+    // }
   }
 
   render() {
@@ -49,4 +60,13 @@ class EnterEmail extends Component {
   }
 }
 
-export default EnterEmail;
+// refactor to selectors lataa
+const mapStateToProps = state => ({
+  authRoute: state.user.authStatusRoute
+})
+
+const mapDispatchToProps = {
+  validateEmail
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(EnterEmail);

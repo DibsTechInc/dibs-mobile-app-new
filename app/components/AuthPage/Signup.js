@@ -25,7 +25,6 @@ class EnterPassword extends Component {
   }
 
   render() {
-    console.log(this.props, '??')
     return (
       <StyledView>
         <Text>Just need a few details before we get started.</Text>

@@ -61,7 +61,6 @@ class SchedulePage extends Component {
     }
 
     const studioColor = `#${this.props.studioConfig.color}`;
-    console.log(studioColor, '??')
 
     return (
       <StyledView>
