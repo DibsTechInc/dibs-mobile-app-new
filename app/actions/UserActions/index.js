@@ -123,13 +123,10 @@ export function userLogin(email, password, cb = () => {}) {
   }
 }
 
-export function logOutUser() {
+export function logOutUser(cb = () => {}) {
   return async function innerLogOutUser(dispatch, getState) {
     await AsyncStorage.removeItem('STORAGE_KEY');
-
-    const token = await AsyncStorage.getItem('STORAGE_KEY');
-    console.log(token, 'should be gone')
-
-    // dispatch(setUser(null));
+    dispatch(setUser(null));
+    cb();
   }
 }

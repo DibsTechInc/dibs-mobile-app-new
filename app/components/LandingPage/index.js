@@ -1,10 +1,5 @@
 
 import React, { Component } from 'react';
-// temp
-import { connect } from 'react-redux';
-import { logOutUser } from '../../actions/UserActions';
-
-
 import {
   StyleSheet,
   View,
@@ -12,6 +7,7 @@ import {
   TouchableOpacity,
   TextInput,
   Button,
+  AsyncStorage,
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import styled from 'styled-components';
@@ -61,7 +57,15 @@ class LandingPage extends Component {
   constructor() {
     super();
 
+    this.checkAuth();
+
     this.handleOnPress = this.handleOnPress.bind(this);
+  }
+
+  checkAuth = async () => {
+    const userToken = await AsyncStorage.getItem('STORAGE_KEY');
+    console.log(userToken, 'in landing')
+    if (userToken) this.props.navigation.navigate('Main');
   }
 
   componentDidMount() {
@@ -80,10 +84,6 @@ class LandingPage extends Component {
     this.props.navigation.navigate('Verify');
   }
 
-  testLogout() {
-    this.props.logOutUser();
-  }
-
   render() {
     return (
       <Swiper loop={false}>
@@ -91,7 +91,6 @@ class LandingPage extends Component {
           <StyledWelcomeView>
             <StyledWelcomeText>Welcome to FLEX Studios!</StyledWelcomeText>
             <StyledGrayText>Swipe to learn more</StyledGrayText>
-            <Button title="logouttest" onPress={this.testLogout.bind(this)} />
           </StyledWelcomeView>
           <StyledButtonsView>
             <StyledContinueButton onPress={this.handleOnPress}> 
@@ -105,8 +104,4 @@ class LandingPage extends Component {
   }
 }
 
-const mapDispatchToProps = {
-  logOutUser
-} 
-
-export default connect(null, mapDispatchToProps)(LandingPage);
+export default LandingPage;

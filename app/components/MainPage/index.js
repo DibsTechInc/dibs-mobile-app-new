@@ -1,5 +1,8 @@
 
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { logOutUser } from '../../actions/UserActions';
+
 import {
   View,
   Text,
@@ -26,11 +29,18 @@ class MainPage extends Component {
 
     this.handleOnPressSchedule = this.handleOnPress.bind(this, 'Schedule');
     this.handleOnPressProfile = this.handleOnPress.bind(this, 'Profile');
-    this.handleOnPressLanding = this.handleOnPress.bind(this, 'Landing');
+    this.onPressLogout = this.handleOnPress.bind(this, 'Landing');
   }
 
   handleOnPress(route) {
     this.props.navigation.navigate(route);
+  }
+
+  handleLogout() {
+    console.log(this.props, 'props')
+    // this.props.logOutUser(() => {
+    //   this.onPressLogout();
+    // });
   }
 
   render() {
@@ -40,15 +50,21 @@ class MainPage extends Component {
         <StyledInnerView>
           <Button onPress={this.handleOnPressSchedule} title='Buy class' color='black' />
           <Button onPress={this.handleOnPressProfile} title='Profile Settings' color='black' />
-          <Button onPress={this.handleOnPressLanding} title='Logout' color='black' />
+          <Button onPress={this.handleLogout} title='Logout' color='black' />
         </StyledInnerView>
       </StyledView>
     );
   }
 }
 
+// proptypes and selectors
+
 MainPage.navigationOptions = {
   gesturesEnabled: false,
 }
 
-export default MainPage;
+const mapDispatchToProps = {
+  logOutUser,
+}
+
+export default connect(null, mapDispatchToProps)(MainPage);
