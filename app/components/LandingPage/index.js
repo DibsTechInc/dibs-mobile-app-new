@@ -4,7 +4,7 @@ import {
   StyleSheet,
   View,
   Text,
-  Button,
+  TouchableOpacity,
   TextInput,
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
@@ -15,8 +15,40 @@ import About from './About';
 
 const StyledView = styled.View`
   flex: 1;
-  justify-content: center;
+`;
+
+const StyledButtonsView = StyledView.extend`
   align-items: center;
+`;
+
+const StyledWelcomeView = styled.View`
+  flex: 5;
+  align-items: center;
+  justify-content: center;
+`;
+
+const StyledBoldText = styled.Text`
+  font-family: 'flex-font';
+`;
+
+const StyledGrayText = styled.Text`
+  font-family: 'flex-font';
+  color: #b1b1b1;
+`;
+
+const StyledButtonText = styled.Text`
+  color: #fff;
+`;
+
+const StyledContinueButton = styled.TouchableOpacity`
+  padding-left: 50px;
+  padding-right: 50px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: #8fc54b;
+  border-radius: 5px;
+  border-width: 1px;
+  border-color: #8fc54b;
 `;
 
 class LandingPage extends Component {
@@ -27,7 +59,7 @@ class LandingPage extends Component {
   }
 
   componentDidMount() {
-    
+    // jwt call here
   }
 
   handleOnPress() {
@@ -37,11 +69,20 @@ class LandingPage extends Component {
   render() {
     return (
       <Swiper loop={false}>
-        <StyledView>
-          <Text>Welcome to FLEX Studios!</Text>
-          <Text>Swipe to learn more</Text>
-          <Button title="CONTINUE" accessibilityLabel="CONTINUE" onPress={this.handleOnPress} />
-        </StyledView>
+        <View style={{ flex: 1 }}>
+          <StyledWelcomeView>
+            <StyledBoldText>Welcome to FLEX Studios!</StyledBoldText>
+            <StyledGrayText>Swipe to learn more</StyledGrayText>
+          </StyledWelcomeView>
+          
+          <StyledButtonsView>
+            <StyledContinueButton onPress={this.handleOnPress}> 
+              <StyledButtonText>Continue</StyledButtonText>
+            </StyledContinueButton>
+          </StyledButtonsView>
+          
+
+        </View>
         <About />
       </Swiper>
     );

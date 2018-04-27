@@ -13,14 +13,34 @@ import SourceSansProRegular from './assets/fonts/SourceSansPro-Regular.ttf';
 const configuredStore = createStore(reducers, applyMiddleware(thunk));
 
 class App extends Component {
-  componentDidMount() {
-    Font.loadAsync({
+  constructor() {
+    super();
+
+    this.state = {
+      fontsLoaded: false,
+    }
+  }
+
+  componentWillMount() {
+    this.getFonts();
+  }
+
+  async getFonts() {
+    await Font.loadAsync({
       'flex-font': SourceSansProRegular,
       'flex-font-heavy': SourceSansProBold,
     });
+    
+    this.setState({
+      fontsLoaded: true,
+    })
   }
 
   render() {
+    if (!this.state.fontsLoaded) {
+      return null;
+    }
+
     return (
       <Provider store={configuredStore}>
         <Router />
