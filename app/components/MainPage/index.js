@@ -29,7 +29,11 @@ class MainPage extends Component {
 
     this.handleOnPressSchedule = this.handleOnPress.bind(this, 'Schedule');
     this.handleOnPressProfile = this.handleOnPress.bind(this, 'Profile');
-    this.onPressLogout = this.handleOnPress.bind(this, 'Landing');
+    this.handleLogout = this.handleLogout.bind(this);
+  }
+
+  componentDidMount() {
+    console.log(this.props, 'in mounted')
   }
 
   handleOnPress(route) {
@@ -38,9 +42,9 @@ class MainPage extends Component {
 
   handleLogout() {
     console.log(this.props, 'props')
-    // this.props.logOutUser(() => {
-    //   this.onPressLogout();
-    // });
+    this.props.logOutUser(() => {
+      this.props.navigation.navigate('Landing');
+    });
   }
 
   render() {
