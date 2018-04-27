@@ -14,7 +14,7 @@ export function setUserAuthStatusRoute(payload) {
   return { type: SET_USER_AUTH_STATUS_ROUTE, payload }
 }
 
-export function validateEmail(email) {
+export function validateEmail(email, cb = () => {}) {
   return async function innerValidateEmail(dispatch) {
     const query = 'http://a989a625.ngrok.io/api/user/email/verify';
     const ENTER_PASSWORD_ROUTE = 'Password';
@@ -34,14 +34,24 @@ export function validateEmail(email) {
 
       res = await res.json();
 
-      if (res.success) return dispatch(setUserAuthStatusRoute('Login'));
-      if (res.message === 'No user with that email') return dispatch(setUserAuthStatusRoute('Register'));
+      if (res.success) { 
+        dispatch(setUserAuthStatusRoute('Login'));
+        return cb();
+      }
+
+      if (res.message === 'No user with that email') {
+        dispatch(setUserAuthStatusRoute('Register'));
+        return cb();
+      }
+
+      cb();
     } catch (err) {
       console.log(err);
     }
   }
 }
 
+/*** in progress */
 export function signUpUser(payload, cb) {
   return async function innerSignInUser(dispatch, getState) {
     const query = '';
@@ -95,7 +105,6 @@ export function signUpUser(payload, cb) {
   } 
 }
 
-// works tested
 export function userLogin(email, password, cb = () => {}) {
   return async function innerUserLogin(dispatch, getState) {
     const query = 'http://a989a625.ngrok.io/api/user/login';

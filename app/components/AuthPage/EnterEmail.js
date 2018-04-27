@@ -28,14 +28,20 @@ class EnterEmail extends Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevProps.authRoute !== this.props.authRoute) {
-      this.props.navigation.navigate(this.props.authRoute, { email: prevState.email });
-    }
-  }
+  // componentDidUpdate(prevProps, prevState) {
+  //   if ((prevProps.authRoute !== this.props.authRoute) && this.state.email.length) {
+  //     this.setState({
+  //       email: '',
+  //     });
+
+  //     this.props.navigation.navigate(this.props.authRoute, { email: prevState.email });
+  //   }
+  // }
 
   handleOnPress(email) {
-    this.props.validateEmail(email);
+    this.props.validateEmail(email, () => {
+      this.props.navigation.navigate(this.props.authRoute, { email });
+    });
   }
 
   render() {

@@ -32,16 +32,11 @@ class MainPage extends Component {
     this.handleLogout = this.handleLogout.bind(this);
   }
 
-  componentDidMount() {
-    console.log(this.props, 'in mounted')
-  }
-
   handleOnPress(route) {
     this.props.navigation.navigate(route);
   }
 
   handleLogout() {
-    console.log(this.props, 'props')
     this.props.logOutUser(() => {
       this.props.navigation.navigate('Landing');
     });
