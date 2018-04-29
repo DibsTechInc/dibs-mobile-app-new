@@ -15,28 +15,19 @@ export function setUserAuthStatusRoute(payload) {
 }
 
 export function validateEmail(email, cb = () => {}) {
-  return async function innerValidateEmail(dispatch) {
-    const query = 'http://a989a625.ngrok.io/api/user/email/verify';
-    const ENTER_PASSWORD_ROUTE = 'Password';
-
-    console.log(query, '??')
+  return async function innerValidateEmail(dispatch, getState, dibsFetch) {
+    const path = '/api/user/email/verify';
 
     try {
-      let res = await fetch(query, {
+      let res = await dibsFetch(path, {
         method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+        body: {
           email,
           validate: true,
-        })
+        },
       });
 
-      res = await res.json();
-
-      if (res.success) { 
+      if (res.success) {
         dispatch(setUserAuthStatusRoute('Login'));
         return cb();
       }
@@ -104,7 +95,7 @@ export function signUpUser(payload, cb) {
     .catch(err => {
       console.log(err);
     });
-  } 
+  }
 }
 
 export function userLogin(email, password, cb = () => {}) {
