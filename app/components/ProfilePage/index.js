@@ -105,11 +105,9 @@ const styles = StyleSheet.create({
 });
 
 ProfileScreen.navigationOptions = ({ navigation }) => ({
-  {
-    headerRight: (
-      <Button onPress={() => (navigation.replace('Main'))} title="Home" color="darkgray" />
-    ),
-  };
+  headerRight: (
+    <Button onPress={() => (navigation.replace('Main'))} title="Home" color="darkgray" />
+  ),
 });
 
 export default ProfileScreen;
