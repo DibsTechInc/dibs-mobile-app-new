@@ -1,0 +1,115 @@
+import React, { Component } from 'react';
+import {
+  AppRegistry,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  Alert,
+  Button,
+} from 'react-native';
+import SettingsList from 'react-native-settings-list';
+
+class ProfileScreen extends Component {
+  constructor(){
+    super();
+    this.onValueChange = this.onValueChange.bind(this);
+    this.state = {switchValue: false, loggedIn: false};
+  }
+  render() {
+    var bgColor = '#DCE3F4';
+    return (
+      <View style={{backgroundColor:'#EFEFF4',flex:1}}>
+        <View style={{backgroundColor:'#EFEFF4',flex:1}}>
+          <SettingsList borderColor='#fff' defaultItemSize={50}>
+            <SettingsList.Header headerStyle={{ marginTop:15 }} />
+            <SettingsList.Item
+              hasNavArrow={false}
+              title='PERSONAL DETAILS'
+              titleStyle={{ color: 'darkgray' }}
+            />
+            <SettingsList.Item
+              title='John Smith'
+              onPress={() => Alert.alert('Route To Personal Settings')}
+            />
+
+            <SettingsList.Header headerStyle={{ marginTop:15 }}/>
+            <SettingsList.Item
+              hasNavArrow={false}
+              title='ACCOUNT DETAILS'
+              titleStyle={{ color: 'darkgray' }}
+            />
+            <SettingsList.Item
+              title='Upcoming Classes'
+              onPress={() => Alert.alert('Route To Upcoming Classes Page')}
+            />
+            <SettingsList.Item
+              title='Transaction History'
+              onPress={() => Alert.alert('Route To Transaction History Page')}
+            />
+            <SettingsList.Item
+              title='Packages/Credit'
+              onPress={() => Alert.alert('Route To Packages/Credits Page')}
+            />
+            <SettingsList.Item
+              title='Refer a Friend Program'
+              onPress={() => Alert.alert('Route To RAF Page')}
+            />
+            <SettingsList.Item
+              title='Settings'
+              onPress={() => Alert.alert('Route To Settings Page')}
+            />
+
+            <SettingsList.Header headerStyle={{ marginTop:15 }}/>
+            <SettingsList.Item
+              hasNavArrow={false}
+              title='ADDITIONAL'
+              titleStyle={{ color: 'darkgray' }}
+            />
+            <SettingsList.Item
+              title='About'
+              onPress={() => Alert.alert('Route To About Page')}
+            />
+            <SettingsList.Item
+              title='FAQ'
+              onPress={() => Alert.alert('Route To FAQ Page')}
+            />
+            <SettingsList.Item
+              title='Contact'
+              onPress={() => Alert.alert('Route To Contact Page')}
+            />
+          </SettingsList>
+        </View>
+      </View>
+    );
+  }
+  toggleAuthView() {
+    this.setState({toggleAuthView: !this.state.toggleAuthView});
+  }
+  onValueChange(value){
+    this.setState({switchValue: value});
+  }
+}
+
+const styles = StyleSheet.create({
+  imageStyle:{
+    marginLeft:15,
+    alignSelf:'center',
+    height:30,
+    width:30
+  },
+  titleInfoStyle:{
+    fontSize:16,
+    color: '#8e8e93'
+  }
+});
+
+ProfileScreen.navigationOptions = ({ navigation }) => ({
+  {
+    headerRight: (
+      <Button onPress={() => (navigation.replace('Main'))} title="Home" color="darkgray" />
+    ),
+  };
+});
+
+export default ProfileScreen;
