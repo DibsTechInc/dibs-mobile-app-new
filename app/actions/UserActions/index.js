@@ -92,7 +92,7 @@ export function signUpUser(payload, cb) {
  * @param {function} callback on complete
  * @returns {function} thunk
  */
-export function submitLogin(email, password, callback = () => {}) {
+export function submitLogin(email, password) {
   return async function innerUserLogin(dispatch, getState, dibsFetch) {
     try {
       const res = await dibsFetch('/api/user/login', {
@@ -104,10 +104,8 @@ export function submitLogin(email, password, callback = () => {}) {
       });
       await AsyncStorage.setItem('STORAGE_KEY', res.token);
       dispatch(setUser(res.user));
-      return callback();
     } catch (err) {
       console.log(err);
-      return callback();
     }
   };
 }
