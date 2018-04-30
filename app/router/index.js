@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { AsyncStorage } from 'react-native';
 import { StackNavigator } from 'react-navigation';
@@ -57,39 +58,53 @@ const createStackNavigator = token => StackNavigator(
   }
 );
 
+/**
+ * @class Navigator
+ * @extends Component
+ */
 class Navigator extends Component {
-  constructor() {
-    super()
-
+  /**
+   * @constructor
+   * @constructs Navigator
+   * @param {Object} props for component
+   */
+  constructor(props) {
+    super(props);
     this.state = {
       attempted: false,
       token: null,
-    }
+    };
   }
-
+  /**
+   * @returns {undefined}
+   */
   componentDidUpdate() {
     this.checkAuth();
   }
-
+  /**
+   * @returns {undefined}
+   */
   checkAuth = async () => {
     if (this.state.attempted) {
       return;
     }
-
-    const userToken = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
-
     this.setState({
-      token: userToken,
-      attempted: true
+      token: await AsyncStorage.getItem(Config.USER_TOKEN_KEY),
+      attempted: true,
     });
   }
-
+  /**
+   * @returns {JSX} XML
+   */
   render() {
-    const Navigator = createStackNavigator(this.props.user.id);
-
-    return <Navigator />
+    const Nav = createStackNavigator(this.props.user.id);
+    return <Nav />;
   }
 }
+
+Navigator.propTypes = {
+  user: PropTypes.shape(),
+};
 
 const mapStateToProps = state => ({
   user: state.user,
