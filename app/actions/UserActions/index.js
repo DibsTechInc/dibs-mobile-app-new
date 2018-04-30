@@ -1,6 +1,7 @@
 import { AsyncStorage } from 'react-native';
 import { createAction } from 'redux-actions';
 import { LOGIN_ROUTE, REGISTER_ROUTE } from '../../constants/RouteConstants';
+import Config from '../../../config.json';
 
 export const setUser = createAction('SET_USER', payload => payload);
 
@@ -113,8 +114,12 @@ export function submitLogin(email, password) {
 
 export function logOutUser(callback = () => {}) {
   return async function innerLogOutUser(dispatch) {
-    await AsyncStorage.removeItem('STORAGE_KEY');
-    dispatch(setUser({}));
-    callback();
+    try {
+      await AsyncStorage.removeItem(Config.USER_TOKEN_KEY);
+      dispatch(setUser({}));
+      callback();
+    } catch (err) {
+      console.log(err);
+    }
   };
 }
