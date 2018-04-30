@@ -16,6 +16,7 @@ import Swiper from 'react-native-swiper';
 import About from './About';
 import { authFetch } from '../../helpers';
 import { VERIFY_ROUTE } from '../../constants/RouteConstants/index';
+import Config from '../../../config.json';
 
 const StyledView = styled.View`
   flex: 1;
@@ -70,7 +71,7 @@ class LandingPage extends Component {
   }
 
   async checkAuth() {
-    const token = await AsyncStorage.getItem("STORAGE_KEY");
+    const token = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
     if (token) {
       this.props.navigation.navigate('Main');
     }

@@ -103,8 +103,8 @@ export function submitLogin(email, password) {
           password,
         },
       });
-      await AsyncStorage.setItem('STORAGE_KEY', res.token);
-      dispatch(setUser(res.user));
+      if (res.success) dispatch(setUser(res.user));
+      else console.log(res);
     } catch (err) {
       console.log(err);
     }

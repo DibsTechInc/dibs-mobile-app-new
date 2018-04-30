@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { AsyncStorage } from 'react-native';
 import { StackNavigator } from 'react-navigation';
+import Config from '../../config.json';
 
 import {
   LANDING_ROUTE,
@@ -74,7 +75,7 @@ class Navigator extends Component {
       return;
     }
 
-    const userToken = await AsyncStorage.getItem('STORAGE_KEY');
+    const userToken = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
 
     this.setState({
       token: userToken,

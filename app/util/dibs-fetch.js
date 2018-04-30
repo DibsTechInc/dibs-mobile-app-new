@@ -41,14 +41,14 @@ async function refreshUserToken(path, res) {
   try {
     if (/logout|token/.test(path)) return;
     if (/login|register/.test(path) && res.token) {
-      await AsyncStorage.setItem('STORAGE_KEY', res.token);
+      await AsyncStorage.setItem(Config.USER_TOKEN_KEY, res.token);
       return;
     }
     const response = await dibsFetch('/api/user/token', {
       method: 'GET',
       requiresAuth: true,
     });
-    if (response.success) await AsyncStorage.setItem('STORAGE_KEY', response.token);
+    if (response.success) await AsyncStorage.setItem(Config.USER_TOKEN_KEY, response.token);
   } catch (err) {
     console.error(err);
   }
