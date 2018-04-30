@@ -73,7 +73,7 @@ class LandingPage extends Component {
   async checkAuth() {
     const token = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
     if (token) {
-      this.props.navigation.navigate('Main');
+      this.props.navigation.navigate('Drawer');
     }
   }
 
