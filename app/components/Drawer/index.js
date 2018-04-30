@@ -27,14 +27,14 @@ const getDrawerIcon = (iconName, tintColor) => <Icon name={iconName} size={20} c
 const homeDrawerIcon = ({ tintColor }) => getDrawerIcon('home', tintColor);
 const userDrawerIcon = ({ tintColor }) => getDrawerIcon('user', tintColor);
 
-const homeNavOptions = getDrawerNavigationOptions('Main', Colors.primary, 'white', homeDrawerIcon);
-const userNavOptions = getDrawerNavigationOptions('Profile', Colors.primary, 'white', userDrawerIcon);
+const homeNavOptions = getDrawerNavigationOptions('Main', Colors.PRIMARY, 'white', homeDrawerIcon);
+const userNavOptions = getDrawerNavigationOptions('Profile', Colors.PRIMARY, 'white', userDrawerIcon);
 
 const Drawer = DrawerNavigator({
   HomeScreen: { screen: MainPage, navigationOptions: homeNavOptions },
   UserScreen: { screen: ProfilePage, navigationOptions: userNavOptions },
 }, getDrawerConfig(300, 'left', 'HomeScreen'));
 
-Drawer.navigationOptions = ({ navigation }) => getNavigationOptionsWithAction('', Colors.primary, 'white', getDrawerItem(navigation));
+Drawer.navigationOptions = ({ navigation }) => getNavigationOptionsWithAction('', Colors.PRIMARY, 'white', getDrawerItem(navigation));
 
 export default Drawer;

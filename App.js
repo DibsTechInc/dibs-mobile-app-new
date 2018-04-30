@@ -37,8 +37,6 @@ class App extends Component {
       return null;
     }
 
-    // const Navigator = createStackNavigator(null);
-
     return (
       <Provider store={store}>
         <Navigator />
