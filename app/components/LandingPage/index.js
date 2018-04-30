@@ -64,6 +64,17 @@ class LandingPage extends Component {
     this.props.navigation.navigate('Verify');
   }
 
+  componentDidMount() {
+    this.checkAuth();
+  }
+
+  async checkAuth() {
+    const token = await AsyncStorage.getItem("STORAGE_KEY");
+    if (token) {
+      this.props.navigation.navigate('Main');
+    }
+  }
+
   render() {
     return (
       <Swiper loop={false}>
