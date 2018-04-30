@@ -3,22 +3,13 @@ import React, { Component } from 'react';
 import { PropTypes } from 'prop-types';
 import { connect } from 'react-redux';
 import {
-  // StyleSheet,
-  // View,
   Text,
   Button,
   TextInput,
 } from 'react-native';
-// import { StackNavigator } from 'react-navigation';
-import styled from 'styled-components';
+import { FlexCenter } from '../styled';
 
 import { validateEmail } from '../../actions/UserActions';
-
-const StyledView = styled.View`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-`;
 
 /**
  * @class EnterEmail
@@ -39,7 +30,6 @@ class EnterEmail extends Component {
   }
 
   /**
-   * @param {string} email to verify
    * @returns {undefined}
    */
   async handleOnPress() {
@@ -53,7 +43,7 @@ class EnterEmail extends Component {
    */
   render() {
     return (
-      <StyledView>
+      <FlexCenter>
         <Text> What is your email? </Text>
         <TextInput
           placeholder="Email"
@@ -65,7 +55,7 @@ class EnterEmail extends Component {
           accessibilityLabel="CONTINUE"
           onPress={this.handleOnPress}
         />
-      </StyledView>
+      </FlexCenter>
     );
   }
 }

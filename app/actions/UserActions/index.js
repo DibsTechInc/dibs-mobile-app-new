@@ -11,8 +11,7 @@ export const setUser = createAction('SET_USER', payload => payload);
 export function validateEmail(email, callback = () => {}) {
   return async function innerValidateEmail(dispatch, getState, dibsFetch) {
     try {
-      const path = '/api/user/email/verify';
-      const res = await dibsFetch(path, {
+      const res = await dibsFetch('/api/user/email/verify', {
         method: 'POST',
         body: {
           email,
@@ -87,31 +86,30 @@ export function signUpUser(payload, cb) {
   }
 }
 
-export function userLogin(email, password, callback = () => {}) {
+/**
+ * @param {string} email of user
+ * @param {string} password user entered
+ * @param {function} callback on complete
+ * @returns {function} thunk
+ */
+export function submitLogin(email, password, callback = () => {}) {
   return async function innerUserLogin(dispatch, getState, dibsFetch) {
-    const query = 'http://a989a625.ngrok.io/api/user/login';
-
     try {
-      let res = await fetch(query, {
+      const res = await dibsFetch('/api/user/login', {
         method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+        body: {
           email,
           password,
-        })
+        },
       });
-
-      res = await res.json();
       await AsyncStorage.setItem('STORAGE_KEY', res.token);
       dispatch(setUser(res.user));
-      callback();
+      return callback();
     } catch (err) {
       console.log(err);
+      return callback();
     }
-  }
+  };
 }
 
 export function logOutUser(callback = () => {}) {
