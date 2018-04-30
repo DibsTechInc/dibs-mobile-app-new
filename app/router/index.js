@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { AsyncStorage } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 
@@ -45,17 +46,41 @@ const createStackNavigator = token => StackNavigator(
 );
 
 class Navigator extends Component {
+  constructor() {
+    super()
+
+    this.state = {
+      attempted: false,
+      token: null,
+    }
+  }
+
+  componentDidUpdate() {
+    this.checkAuth();
+  }
+
   checkAuth = async () => {
+    if (this.state.attempted) {
+      return;
+    }
+
     const userToken = await AsyncStorage.getItem('STORAGE_KEY');
-    return userToken;
+
+    this.setState({
+      token: userToken,
+      attempted: true
+    });
   }
   
   render() {
-    const userToken = this.checkAuth();
-    const Navigator = createStackNavigator(userToken);
+    const Navigator = createStackNavigator(this.props.user);
 
     return <Navigator />
   }
 }
 
-export default Navigator;
+const mapStateToProps = state => ({
+  user: state.user.user,
+});
+
+export default connect(mapStateToProps)(Navigator);

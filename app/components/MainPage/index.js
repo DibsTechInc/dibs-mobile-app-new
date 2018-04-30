@@ -37,9 +37,7 @@ class MainPage extends Component {
   }
 
   handleLogout() {
-    this.props.logOutUser(() => {
-      this.props.navigation.navigate('Landing');
-    });
+    this.props.logOutUser();
   }
 
   render() {

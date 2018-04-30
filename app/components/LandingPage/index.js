@@ -57,16 +57,8 @@ class LandingPage extends Component {
   constructor() {
     super();
 
-    // this.checkAuth();
-
     this.handleOnPress = this.handleOnPress.bind(this);
   }
-
-  // checkAuth = async () => {
-  //   const userToken = await AsyncStorage.getItem('STORAGE_KEY');
-  //   console.log(userToken, 'in landing')
-  //   if (userToken) this.props.navigation.navigate('Main');
-  // }
 
   handleOnPress() {
     this.props.navigation.navigate('Verify');
@@ -90,6 +82,10 @@ class LandingPage extends Component {
       </Swiper>
     );
   }
+}
+
+LandingPage.navigationOptions = {
+  headerMode: 'none',
 }
 
 export default LandingPage;
