@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import {
   Text,
   View,
@@ -7,52 +8,59 @@ import {
   Animated,
   Easing,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
 import moment from 'moment';
+import { setCurrentDate, addDaysToCurrentDate } from '../../actions';
 import CalendarDay from './CalendarDay';
 import styles from './CalendarStrip.style';
 
 // Just a shallow array of 7 elements
-const arr = [];
-for (let i = 0; i < 7; i += 1) {
-  arr.push(i);
-}
 
 /**
  * @class CalendarStrip
  * @extends Component
  */
 class CalendarStrip extends Component {
-    /**
-     * @constructor
-     * @constructs CalendarStrip
-     * @param {Object} props for component
-     */
+  /**
+   * @static
+   * @returns {number} number of days for the calendar to display
+   */
+  static getNumberOfDaysToDisplay() {
+    const { width } = Dimensions.get('window');
+    return width > 350 ? 7 : 5;
+  }
+  /**
+   * @constructor
+   * @constructs CalendarStrip
+   * @param {Object} props for component
+   */
   constructor(props) {
     super(props);
+
     if (props.locale && props.locale.name && props.locale.config) {
       moment.locale(props.locale.name, props.locale.config);
     } else if (props.locale) {
       throw new Error('Locale prop is not in the correct format. \b Locale has to be in form of object, with params NAME and CONFIG!');
     }
 
-    const startingDate = this.setLocale(moment(this.props.startingDate));
-    const selectedDate = this.setLocale(moment(this.props.selectedDate));
-    const currentDate = this.setLocale(moment(this.props.currentDate));
-
     this.state = {
-      startingDate,
-      selectedDate,
-      currentDate,
+      numberOfDays: CalendarStrip.getNumberOfDaysToDisplay(),
+      startingDate: this.setLocale(moment(this.props.startingDate)),
     };
+
+    // To add for when we handle orientation change
+    // Dimensions.addEventListener('change', () => {
+    //   this.setState({ numberOfDays: CalendarStrip.getNumberOfDaysToDisplay() });
+    // });
 
     this.resetAnimation();
 
     this.componentDidMount = this.componentDidMount.bind(this);
     this.componentWillUpdate = this.componentWillUpdate.bind(this);
     this.getDatesForWeek = this.getDatesForWeek.bind(this);
-    this.getPreviousWeek = this.getPreviousWeek.bind(this);
-    this.getNextWeek = this.getNextWeek.bind(this);
+    this.getPreviousDays = this.getPreviousDays.bind(this);
+    this.getNextDays = this.getNextDays.bind(this);
     this.onDateSelected = this.onDateSelected.bind(this);
     this.isDateSelected = this.isDateSelected.bind(this);
     this.formatCalendarHeader = this.formatCalendarHeader.bind(this);
@@ -79,12 +87,11 @@ class CalendarStrip extends Component {
   }
 
   /**
-   * @param {Object} nextProps component will receive
-   * @param {Object} nextState component will receive
+   * @param {Object} props component will receive
    * @returns {undefined}
    */
-  componentWillUpdate(nextProps, nextState) {
-    if (nextState.selectedDate === this.state.selectedDate) {
+  componentWillUpdate(props) {
+    if (props.currentDate.toISOString() === this.props.currentDate.toISOString()) {
       this.resetAnimation();
       this.animate();
     }
@@ -99,26 +106,27 @@ class CalendarStrip extends Component {
     if (invalidSelection) {
       return;
     }
-    this.setState({ selectedDate: date });
-    if (this.props.onDateSelected) {
-      this.props.onDateSelected(date);
-    }
+    this.props.setCurrentDate(moment(date));
   }
 
   /**
-   * Set startingDate to the previous week
+   * Set startingDate to the previous set of days
    * @returns {undefined}
    */
-  getPreviousWeek() {
-    this.setState({ startingDate: this.state.startingDate.subtract(1, 'w') });
+  async getPreviousDays() {
+    await new Promise(res =>
+      this.setState({ startingDate: this.state.startingDate.subtract(this.state.numberOfDays, 'd') }, res));
+    this.props.addDaysToCurrentDate(-this.state.numberOfDays);
   }
 
   /**
-   * Set startingDate to the next week
+   * Set startingDate to the next set of days
    * @returns {undefined}
    */
-  getNextWeek() {
-    this.setState({ startingDate: this.state.startingDate.add(1, 'w') });
+  async getNextDays() {
+    await new Promise(res =>
+      this.setState({ startingDate: this.state.startingDate.add(this.state.numberOfDays, 'd') }, res));
+    this.props.addDaysToCurrentDate(this.state.numberOfDays);
   }
 
   /**
@@ -129,18 +137,15 @@ class CalendarStrip extends Component {
   getDatesForWeek() {
     const startDate = moment(this.state.startingDate);
     const dateInfos = [];
-
-    arr.forEach((item, index) => {
+    [...Array(this.state.numberOfDays)].forEach((item, index) => {
       const dateInfo = {
         date: null,
         isExpiredDate: null,
       };
       dateInfo.date = this.setLocale(moment(startDate).add(index, 'days'));
-      dateInfo.isExpiredDate = dateInfo.date.isBefore(this.state.currentDate);
-
+      dateInfo.isExpiredDate = dateInfo.date.isBefore(this.props.startingDate);
       dateInfos.push(dateInfo);
     });
-
     return dateInfos;
   }
 
@@ -163,7 +168,7 @@ class CalendarStrip extends Component {
    * @returns {boolean} if they are the same date
    */
   isDateSelected(date) {
-    return date.isSame(this.state.selectedDate, 'day');
+    return date.isSame(this.props.currentDate, 'day');
   }
 
   /**
@@ -172,7 +177,7 @@ class CalendarStrip extends Component {
    */
   resetAnimation() {
     this.animatedValue = [];
-    arr.forEach((value) => {
+    [...Array(this.state.numberOfDays)].forEach((value) => {
       this.animatedValue[value] = new Animated.Value(0);
     });
   }
@@ -184,7 +189,7 @@ class CalendarStrip extends Component {
    */
   animate() {
     if (this.props.calendarAnimation) {
-      const animations = arr.map(item =>
+      const animations = [...Array(this.state.numberOfDays)].map(item =>
         Animated.timing(
           this.animatedValue[item],
           {
@@ -234,8 +239,8 @@ class CalendarStrip extends Component {
    * @returns {JSX} XML
    */
   render() {
-    const oneWeekAgo = this.state.startingDate.clone().subtract(1, 'w').add(1, 'd');
-    const canGoBack = oneWeekAgo.isBefore(this.state.currentDate);
+    const lowerBound = this.state.startingDate.clone().subtract(this.state.numberOfDays, 'd').add(1, 'd');
+    const canGoBack = lowerBound.isBefore(this.props.startingDate);
 
     let opacityAnim = 1;
     const datesRender = this.getDatesForWeek().map(({ date, isExpiredDate }, index) => {
@@ -270,13 +275,13 @@ class CalendarStrip extends Component {
       <View style={[styles.calendarContainer, { backgroundColor: this.props.calendarColor }, this.props.style]}>
         <Text style={[styles.calendarHeader, this.props.calendarHeaderStyle]}>{this.formatCalendarHeader()}</Text>
         <View style={styles.datesStrip}>
-          <TouchableOpacity style={[styles.iconContainer, this.props.iconContainer]} onPress={this.getPreviousWeek} disabled={canGoBack}>
+          <TouchableOpacity style={[styles.iconContainer, this.props.iconContainer]} onPress={this.getPreviousDays} disabled={canGoBack}>
             {!canGoBack && <Image style={[styles.icon, this.props.iconStyle, this.props.iconLeftStyle]} source={this.props.iconLeft} />}
           </TouchableOpacity>
           <View style={styles.calendarDates}>
             {datesRender}
           </View>
-          <TouchableOpacity style={[styles.iconContainer, this.props.iconContainer]} onPress={this.getNextWeek}>
+          <TouchableOpacity style={[styles.iconContainer, this.props.iconContainer]} onPress={this.getNextDays}>
             <Image style={[styles.icon, this.props.iconStyle, this.props.iconRightStyle]} source={this.props.iconRight} />
           </TouchableOpacity>
         </View>
@@ -288,7 +293,6 @@ class CalendarStrip extends Component {
 /* eslint-disable global-require */
 CalendarStrip.defaultProps = {
   startingDate: moment().seconds(0).milliseconds(0),
-  currentDate: moment().seconds(0).milliseconds(0),
   iconLeft: require('./img/left-arrow-black.png'),
   iconRight: require('./img/right-arrow-black.png'),
   calendarHeaderFormat: 'MMMM YYYY',
@@ -299,12 +303,10 @@ CalendarStrip.propTypes = {
   calendarColor: PropTypes.string,
   highlightColor: PropTypes.string,
   borderHighlightColor: PropTypes.string,
-  currentDate: PropTypes.shape(),
   startingDate: PropTypes.shape(),
   selectedDate: PropTypes.shape(),
-  onDateSelected: PropTypes.func,
-  iconLeft: PropTypes.shape(),
-  iconRight: PropTypes.shape(),
+  iconLeft: PropTypes.number,
+  iconRight: PropTypes.number,
   iconStyle: PropTypes.shape(),
   iconLeftStyle: PropTypes.shape(),
   iconRightStyle: PropTypes.shape(),
@@ -321,6 +323,15 @@ CalendarStrip.propTypes = {
   highlightDateNameStyle: PropTypes.shape(),
   highlightDateNumberStyle: PropTypes.shape(),
   locale: PropTypes.shape(),
+  currentDate: PropTypes.shape(),
+  setCurrentDate: PropTypes.func,
+  addDaysToCurrentDate: PropTypes.func,
 };
 
-export default CalendarStrip;
+const mapStateToProps = state => ({ currentDate: state.currentDate });
+const mapDispatchToProps = {
+  setCurrentDate,
+  addDaysToCurrentDate,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(CalendarStrip);

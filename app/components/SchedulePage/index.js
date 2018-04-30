@@ -33,9 +33,7 @@ const StyledActivityIndicator = styled.ActivityIndicator`
 class SchedulePage extends Component {
   constructor(props) {
     super(props);
-
-    this.handleDateSelected = this.handleDateSelected.bind(this);
-  };
+  }
 
   componentDidMount() {
     this.props.requestStudioData(() => {
@@ -44,13 +42,9 @@ class SchedulePage extends Component {
   }
 
   componentDidUpdate(props) {
-    if (!moment(props.currentDate).isSame(moment(this.props.currentDate))) {
-      this.props.requestEventData();
-    }
-  }
-
-  handleDateSelected(selectedDate) {
-    this.props.setCurrentDate(selectedDate);
+    // if (!moment(props.currentDate).isSame(moment(this.props.currentDate))) {
+    //   this.props.requestEventData();
+    // }
   }
 
 
@@ -69,7 +63,6 @@ class SchedulePage extends Component {
           calendarColor={STUDIO_COLOR} // main background color
           highlightColor={'#f4f4f4'} // color of the selection circle
           iconContainer={{ flex: 0.1 }}
-          onDateSelected={this.handleDateSelected}
           dateNumberStyle={{ color: 'white' }}
           dateNameStyle={{ color: 'white' }}
           calendarHeaderStyle={{ color: 'white' }}
@@ -92,7 +85,7 @@ class SchedulePage extends Component {
 SchedulePage.propTypes = {
   // events: PropTypes.arrayOf(PropTypes.shape()),
   studioConfig: PropTypes.shape(),
-  currentDate: PropTypes.string,
+  currentDate: PropTypes.shape(),
   requestEventData: PropTypes.func,
   requestStudioData: PropTypes.func,
   setCurrentDate: PropTypes.func,
