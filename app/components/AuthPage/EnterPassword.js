@@ -29,10 +29,9 @@ class EnterPassword extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      password: '',
+      password: '123',
     };
     this.handleOnPress = this.handleOnPress.bind(this);
-    this.checkAuth = this.checkAuth.bind(this);
   }
 
   /**
