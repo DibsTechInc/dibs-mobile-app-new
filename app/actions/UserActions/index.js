@@ -1,5 +1,6 @@
 import { AsyncStorage } from 'react-native';
 import { createAction } from 'redux-actions';
+import { LOGIN_ROUTE, REGISTER_ROUTE } from '../../constants/RouteConstants';
 
 export const setUser = createAction('SET_USER', payload => payload);
 
@@ -19,10 +20,10 @@ export function validateEmail(email, callback = () => {}) {
         },
       });
       if (res.success) {
-        return callback('Login');
+        return callback(LOGIN_ROUTE);
       }
       if (res.message === 'No user with that email') {
-        return callback('Register');
+        return callback(REGISTER_ROUTE);
       }
       return callback(null);
     } catch (err) {

@@ -1,0 +1,8 @@
+export const LANDING_ROUTE = 'Landing';
+export const MAIN_ROUTE = 'Main';
+export const SCHEDULE_ROUTE = 'Schedule';
+export const PROFILE_ROUTE = 'Profile';
+export const VERIFY_ROUTE = 'Verify';
+export const LOGIN_ROUTE = 'Login';
+export const REGISTER_ROUTE = 'Register';
+export const DRAWER_ROUTE = 'Drawer';

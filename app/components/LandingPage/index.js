@@ -11,10 +11,11 @@ import {
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import styled from 'styled-components';
-import Swiper from 'react-native-swiper'
+import Swiper from 'react-native-swiper';
 
 import About from './About';
 import { authFetch } from '../../helpers';
+import { VERIFY_ROUTE } from '../../constants/RouteConstants/index';
 
 const StyledView = styled.View`
   flex: 1;
@@ -61,7 +62,7 @@ class LandingPage extends Component {
   }
 
   handleOnPress() {
-    this.props.navigation.navigate('Verify');
+    this.props.navigation.navigate(VERIFY_ROUTE);
   }
 
   render() {
@@ -73,7 +74,7 @@ class LandingPage extends Component {
             <StyledGrayText>Swipe to learn more</StyledGrayText>
           </StyledWelcomeView>
           <StyledButtonsView>
-            <StyledContinueButton onPress={this.handleOnPress}> 
+            <StyledContinueButton onPress={this.handleOnPress}>
               <StyledButtonText>Continue</StyledButtonText>
             </StyledContinueButton>
           </StyledButtonsView>

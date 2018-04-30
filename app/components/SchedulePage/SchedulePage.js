@@ -65,23 +65,23 @@ class SchedulePage extends Component {
     return (
       <StyledView>
         <CalendarStrip
-            calendarAnimation={{type: 'parallel', duration: 600}} // animation when switching weeks
-            selection={'background'} // type of selection circle
-            selectionAnimation={{duration: 300, borderWidth: 1}} // animation when selecting a date
-            style={{paddingTop: 20, paddingBottom: 10}}
-            calendarColor={studioColor} // main background color
-            highlightColor={'#f4f4f4'} // color of the selection circle
-            iconContainer={{ flex: 0.1 }}
-            onDateSelected={this.handleDateSelected}
-            dateNumberStyle={{color: 'white'}}
-            dateNameStyle={{ color: 'white' }}
-            calendarHeaderStyle={{ color: 'white'}}
-            borderHighlightColor={'white'}
-            highlightDateNameStyle={{ color: studioColor }}
-            highlightDateNumberStyle={{ color: studioColor }}
+          calendarAnimation={{ type: 'parallel', duration: 600 }} // animation when switching weeks
+          selection={'background'} // type of selection circle
+          selectionAnimation={{duration: 300, borderWidth: 1}} // animation when selecting a date
+          style={{paddingTop: 20, paddingBottom: 10}}
+          calendarColor={studioColor} // main background color
+          highlightColor={'#f4f4f4'} // color of the selection circle
+          iconContainer={{ flex: 0.1 }}
+          onDateSelected={this.handleDateSelected}
+          dateNumberStyle={{color: 'white'}}
+          dateNameStyle={{ color: 'white' }}
+          calendarHeaderStyle={{ color: 'white'}}
+          borderHighlightColor={'white'}
+          highlightDateNameStyle={{ color: studioColor }}
+          highlightDateNumberStyle={{ color: studioColor }}
         />
           {this.props.isLoading ?
-            <StyledActivityIndicator size='large'/> :
+            <StyledActivityIndicator size='large' /> :
             <SchedulePageEvents
               studioColor={studioColor}
               listings={this.props.events}

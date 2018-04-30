@@ -3,6 +3,16 @@ import { connect } from 'react-redux';
 import { AsyncStorage } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 
+import {
+  LANDING_ROUTE,
+  MAIN_ROUTE,
+  SCHEDULE_ROUTE,
+  VERIFY_ROUTE,
+  LOGIN_ROUTE,
+  REGISTER_ROUTE,
+  DRAWER_ROUTE,
+} from '../constants/RouteConstants';
+
 import { SchedulePage } from '../components/SchedulePage';
 import { EnterPassword, EnterEmail, Signup } from '../components/AuthPage';
 import LandingPage from '../components/LandingPage';
@@ -12,37 +22,37 @@ import Drawer from '../components/Drawer';
 
 const createStackNavigator = token => StackNavigator(
   {
-    Landing: {
+    [LANDING_ROUTE]: {
       screen: LandingPage,
     },
-    Main: {
+    [MAIN_ROUTE]: {
       screen: MainPage,
     },
-    Schedule: {
+    [SCHEDULE_ROUTE]: {
       screen: SchedulePage,
     },
-    Profile: {
+    [SCHEDULE_ROUTE]: {
       screen: ProfilePage,
     },
-    Verify: {
+    [VERIFY_ROUTE]: {
       screen: EnterEmail,
     },
-    Login: {
+    [LOGIN_ROUTE]: {
       screen: EnterPassword,
     },
-    Register: {
+    [REGISTER_ROUTE]: {
       screen: Signup,
     },
-    Drawer: {
+    [DRAWER_ROUTE]: {
       screen: Drawer,
-    }
+    },
   },
   {
-    initialRouteName: token ? 'Drawer' : 'Landing',
+    initialRouteName: token ? DRAWER_ROUTE : LANDING_ROUTE,
     navigationOptions: {
       gesturesEnabled: true,
     },
-  },
+  }
 );
 
 class Navigator extends Component {
@@ -71,7 +81,7 @@ class Navigator extends Component {
       attempted: true
     });
   }
-  
+
   render() {
     const Navigator = createStackNavigator(this.props.user);
 

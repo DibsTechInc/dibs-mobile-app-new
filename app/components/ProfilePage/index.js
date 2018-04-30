@@ -9,6 +9,7 @@ import {
   Button,
 } from 'react-native';
 import SettingsList from 'react-native-settings-list';
+import { MAIN_ROUTE } from '../../constants/RouteConstants/index';
 
 class ProfileScreen extends Component {
   constructor(){
@@ -106,7 +107,7 @@ const styles = StyleSheet.create({
 
 ProfileScreen.navigationOptions = ({ navigation }) => ({
   headerRight: (
-    <Button onPress={() => (navigation.replace('Main'))} title="Home" color="darkgray" />
+    <Button onPress={() => (navigation.replace(MAIN_ROUTE))} title="Home" color="darkgray" />
   ),
 });
 

@@ -6,6 +6,7 @@ import {
   TextInput,
 } from 'react-native';
 import styled from 'styled-components';
+import { MAIN_ROUTE } from '../../constants/RouteConstants/index';
 
 const StyledView = styled.View`
   flex: 1;
@@ -21,7 +22,7 @@ class EnterPassword extends Component {
   }
 
   handleOnPress() {
-    this.props.navigation.navigate('Main');
+    this.props.navigation.navigate(MAIN_ROUTE);
   }
 
   render() {
@@ -35,6 +36,6 @@ class EnterPassword extends Component {
       </StyledView>
     );
   }
-}  
+}
 
 export default EnterPassword;

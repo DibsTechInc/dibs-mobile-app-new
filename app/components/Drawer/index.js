@@ -1,6 +1,7 @@
 import React from 'react';
 import { DrawerNavigator } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { MAIN_ROUTE, PROFILE_ROUTE } from '../../constants/RouteConstants';
 import { getNavigationOptionsWithAction, getDrawerNavigationOptions, getDrawerConfig } from '../../util/navigation';
 import DrawerItem from './DrawerItem';
 import MainPage from '../MainPage';
@@ -27,8 +28,8 @@ const getDrawerIcon = (iconName, tintColor) => <Icon name={iconName} size={20} c
 const homeDrawerIcon = ({ tintColor }) => getDrawerIcon('home', tintColor);
 const userDrawerIcon = ({ tintColor }) => getDrawerIcon('user', tintColor);
 
-const homeNavOptions = getDrawerNavigationOptions('Main', Colors.PRIMARY, 'white', homeDrawerIcon);
-const userNavOptions = getDrawerNavigationOptions('Profile', Colors.PRIMARY, 'white', userDrawerIcon);
+const homeNavOptions = getDrawerNavigationOptions(MAIN_ROUTE, Colors.PRIMARY, 'white', homeDrawerIcon);
+const userNavOptions = getDrawerNavigationOptions(PROFILE_ROUTE, Colors.PRIMARY, 'white', userDrawerIcon);
 
 const Drawer = DrawerNavigator({
   HomeScreen: { screen: MainPage, navigationOptions: homeNavOptions },

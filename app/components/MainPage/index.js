@@ -13,6 +13,7 @@ import { StackNavigator } from 'react-navigation';
 import styled from 'styled-components';
 import { lightenDarkenColor } from '../../helpers';
 import CalendarPage from './CalendarPage';
+import { SCHEDULE_ROUTE, PROFILE_ROUTE } from '../../constants/RouteConstants/index';
 
 const StyledView = styled.View`
   flex: 1;
@@ -27,8 +28,8 @@ class MainPage extends Component {
   constructor() {
     super();
 
-    this.handleOnPressSchedule = this.handleOnPress.bind(this, 'Schedule');
-    this.handleOnPressProfile = this.handleOnPress.bind(this, 'Profile');
+    this.handleOnPressSchedule = this.handleOnPress.bind(this, SCHEDULE_ROUTE);
+    this.handleOnPressProfile = this.handleOnPress.bind(this, PROFILE_ROUTE);
     this.handleLogout = this.handleLogout.bind(this);
   }
 
