@@ -1,6 +1,8 @@
 import { AsyncStorage } from 'react-native';
 import Config from '../../config.json';
 
+const testIfAuthPath = /login|register/.test;
+
 /**
  * @param {function} refreshToken when making authenticated requests
  * @param {string} path to route on Dibs server
@@ -28,7 +30,7 @@ async function dibsFetch(refreshToken, path, {
   if (body) options.body = JSON.stringify(body);
   let res = await fetch(`${Config.DIBS_HOST}${path}`, options);
   if (type === 'json') res = await res.json();
-  if ((requiresAuth || path.includes('login')) && res.success) refreshToken(path, res);
+  if ((requiresAuth || testIfAuthPath('login')) && res.success) refreshToken(path, res);
   return res;
 }
 
@@ -40,7 +42,7 @@ async function dibsFetch(refreshToken, path, {
 async function refreshUserToken(path, res) {
   try {
     if (/logout|token/.test(path)) return;
-    if (/login|register/.test(path) && res.token) {
+    if (testIfAuthPath(path) && res.token) {
       await AsyncStorage.setItem(Config.USER_TOKEN_KEY, res.token);
       return;
     }
