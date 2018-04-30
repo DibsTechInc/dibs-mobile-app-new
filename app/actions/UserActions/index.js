@@ -1,47 +1,35 @@
 import { AsyncStorage } from 'react-native';
+import { createAction } from 'redux-actions';
 
-import {
-  SET_USER,
-  GET_USER,
-  SET_USER_AUTH_STATUS_ROUTE,
-} from '../../constants/UserConstants';
+export const setUser = createAction('SET_USER', payload => payload);
 
-export function setUser(payload) {
-  return { type: SET_USER, payload };
-}
-
-export function setUserAuthStatusRoute(payload) {
-  return { type: SET_USER_AUTH_STATUS_ROUTE, payload }
-}
-
-export function validateEmail(email, cb = () => {}) {
+/**
+ * @param {string} email validates email
+ * @param {function} callback on complete
+ * @returns {function} thunk
+ */
+export function validateEmail(email, callback = () => {}) {
   return async function innerValidateEmail(dispatch, getState, dibsFetch) {
-    const path = '/api/user/email/verify';
-
     try {
-      let res = await dibsFetch(path, {
+      const res = await dibsFetch('/api/user/email/verify', {
         method: 'POST',
         body: {
           email,
           validate: true,
         },
       });
-
       if (res.success) {
-        dispatch(setUserAuthStatusRoute('Login'));
-        return cb();
+        return callback('Login');
       }
-
       if (res.message === 'No user with that email') {
-        dispatch(setUserAuthStatusRoute('Register'));
-        return cb();
+        return callback('Register');
       }
-
-      cb();
+      return callback(null);
     } catch (err) {
       console.log(err);
+      return callback(null);
     }
-  }
+  };
 }
 
 /*** in progress */
@@ -98,37 +86,34 @@ export function signUpUser(payload, cb) {
   }
 }
 
-export function userLogin(email, password, cb = () => {}) {
-  return async function innerUserLogin(dispatch, getState) {
-    const query = 'http://4309a424.ngrok.io/api/user/login';
-
+/**
+ * @param {string} email of user
+ * @param {string} password user entered
+ * @param {function} callback on complete
+ * @returns {function} thunk
+ */
+export function submitLogin(email, password) {
+  return async function innerUserLogin(dispatch, getState, dibsFetch) {
     try {
-      let res = await fetch(query, {
+      const res = await dibsFetch('/api/user/login', {
         method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+        body: {
           email,
-          password
-        })
+          password,
+        },
       });
-
-      res = await res.json();
       await AsyncStorage.setItem('STORAGE_KEY', res.token);
       dispatch(setUser(res.user));
-      cb();
     } catch (err) {
       console.log(err);
     }
-  }
+  };
 }
 
-export function logOutUser(cb = () => {}) {
-  return async function innerLogOutUser(dispatch, getState) {
+export function logOutUser(callback = () => {}) {
+  return async function innerLogOutUser(dispatch) {
     await AsyncStorage.removeItem('STORAGE_KEY');
-    dispatch(setUser(null));
-    cb();
-  }
+    dispatch(setUser({}));
+    callback();
+  };
 }

@@ -1,61 +1,71 @@
 
 import React, { Component } from 'react';
+import { PropTypes } from 'prop-types';
 import { connect } from 'react-redux';
 import {
-  StyleSheet,
-  View,
   Text,
   Button,
   TextInput,
 } from 'react-native';
-import { StackNavigator } from 'react-navigation';
-import styled from 'styled-components';
+import { FlexCenter } from '../styled';
 
 import { validateEmail } from '../../actions/UserActions';
 
-const StyledView = styled.View`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-`;
-
+/**
+ * @class EnterEmail
+ * @extends Component
+ */
 class EnterEmail extends Component {
-  constructor() {
-    super();
-
+  /**
+   * @constructor
+   * @constructs EnterEmail
+   * @param {Object} props for component
+   */
+  constructor(props) {
+    super(props);
     this.state = {
-      email: 'benjamin@ondibs.com',
-    }
+      email: '',
+    };
+    this.handleOnPress = this.handleOnPress.bind(this);
   }
 
-  handleOnPress(email) {
-    this.props.validateEmail(email, () => {
-      this.props.navigation.navigate(this.props.authRoute, { email });
-    });
+  /**
+   * @returns {undefined}
+   */
+  async handleOnPress() {
+    const { email } = this.state;
+    const route = await new Promise(res => this.props.validateEmail(email, res));
+    if (route) this.props.navigation.navigate(route, { email });
   }
 
+  /**
+   * @returns {JSX} XML
+   */
   render() {
     return (
-      <StyledView>
-        <Text>What is your email?</Text>
+      <FlexCenter>
+        <Text> What is your email? </Text>
         <TextInput
           placeholder="Email"
           onChangeText={email => this.setState({ email })}
           value={this.state.email}
         />
-        <Button title="CONTINUE" accessibilityLabel="CONTINUE" onPress={this.handleOnPress.bind(this, this.state.email)} />
-      </StyledView>
+        <Button
+          title="CONTINUE"
+          accessibilityLabel="CONTINUE"
+          onPress={this.handleOnPress}
+        />
+      </FlexCenter>
     );
   }
 }
 
-// refactor to selectors lataa
-const mapStateToProps = state => ({
-  authRoute: state.user.authStatusRoute
-})
+EnterEmail.propTypes = {
+  navigation: PropTypes.shape(),
+};
 
 const mapDispatchToProps = {
-  validateEmail
-}
+  validateEmail,
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(EnterEmail);
+export default connect(null, mapDispatchToProps)(EnterEmail);

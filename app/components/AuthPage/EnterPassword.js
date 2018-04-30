@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import {
-  View,
   Text,
   Button,
   TextInput,
   AsyncStorage,
 } from 'react-native';
 import styled from 'styled-components';
-import { userLogin } from '../../actions/UserActions';
+import { submitLogin } from '../../actions/UserActions';
 
 const StyledView = styled.View`
   flex: 1;
@@ -16,27 +16,36 @@ const StyledView = styled.View`
   align-items: center;
 `;
 
+/**
+ * @class EnterPassword
+ * @extends Component
+ */
 class EnterPassword extends Component {
-  constructor() {
-    super();
-
+  /**
+   * @constructor
+   * @constructs EnterPassword
+   * @param {Object} props for component
+   */
+  constructor(props) {
+    super(props);
     this.state = {
-      password: '123',
-    }
+      password: '',
+    };
+    this.handleOnPress = this.handleOnPress.bind(this);
+    this.checkAuth = this.checkAuth.bind(this);
   }
 
-  checkAuth = async () => {
-    const userToken = await AsyncStorage.getItem('STORAGE_KEY');
-    if (userToken) this.props.navigation.navigate('Main');
-  }
-
-  handleOnPress(password) {
+  /**
+   * @returns {undefined}
+   */
+  handleOnPress() {
     const email = this.props.navigation.state.params.email;
-    this.props.userLogin(email, password, () => {
-      // this.checkAuth();
-    });
+    this.props.submitLogin(email, this.state.password);
   }
 
+  /**
+   * @returns {JSX} XML
+   */
   render() {
     return (
       <StyledView>
@@ -48,16 +57,22 @@ class EnterPassword extends Component {
           onChangeText={password => this.setState({ password })}
           value={this.state.password}
         />
-        <Button title="SUBMIT" onPress={this.handleOnPress.bind(this, this.state.password)} />
+        <Button
+          title="SUBMIT"
+          onPress={this.handleOnPress}
+        />
       </StyledView>
     );
   }
 }
 
-// add propTypes
+EnterPassword.propTypes = {
+  navigation: PropTypes.shape(),
+  submitLogin: PropTypes.func,
+};
 
 const mapDispatchToProps = {
-  userLogin,
-}
+  submitLogin,
+};
 
 export default connect(null, mapDispatchToProps)(EnterPassword);
