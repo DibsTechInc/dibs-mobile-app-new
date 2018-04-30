@@ -63,7 +63,7 @@ class SchedulePage extends Component {
       <StyledView>
         <CalendarStrip
           calendarAnimation={{ type: 'parallel', duration: 600 }} // animation when switching weeks
-          selection={'background'} // type of selection circle
+          selection="background" // type of selection circle
           selectionAnimation={{ duration: 300, borderWidth: 1 }} // animation when selecting a date
           style={{ paddingTop: 20, paddingBottom: 10 }}
           calendarColor={STUDIO_COLOR} // main background color
