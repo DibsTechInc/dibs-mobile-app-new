@@ -12,6 +12,7 @@ import {
   LOGIN_ROUTE,
   REGISTER_ROUTE,
   DRAWER_ROUTE,
+  PROFILE_ROUTE,
 } from '../constants/RouteConstants';
 
 import { SchedulePage } from '../components/SchedulePage';
@@ -32,7 +33,7 @@ const createStackNavigator = token => StackNavigator(
     [SCHEDULE_ROUTE]: {
       screen: SchedulePage,
     },
-    [SCHEDULE_ROUTE]: {
+    [PROFILE_ROUTE]: {
       screen: ProfilePage,
     },
     [VERIFY_ROUTE]: {

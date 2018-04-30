@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import _ from 'lodash';
 import styled from 'styled-components';
+import moment from 'moment';
 
 import CalendarStrip from '../CalendarStrip';
 import SchedulePageEvents from './SchedulePageEvents';
@@ -43,7 +44,7 @@ class SchedulePage extends Component {
   }
 
   componentDidUpdate(previousProps) {
-    if (!(previousProps.currentDate.isSame(this.props.currentDate))) {
+    if (!moment(previousProps.currentDate).isSame(moment(this.props.currentDate))) {
       this.props.requestEventData();
     }
   }
@@ -80,30 +81,30 @@ class SchedulePage extends Component {
           highlightDateNameStyle={{ color: studioColor }}
           highlightDateNumberStyle={{ color: studioColor }}
         />
-          {this.props.isLoading ?
+          {/* this.props.isLoading ?
             <StyledActivityIndicator size='large' /> :
             <SchedulePageEvents
               studioColor={studioColor}
               listings={this.props.events}
             />
-          }
+          */}
       </StyledView>
     );
   }
 }
 
 SchedulePage.propTypes = {
-  events: PropTypes.arrayOf(PropTypes.shape()),
+  // events: PropTypes.arrayOf(PropTypes.shape()),
   studioConfig: PropTypes.shape(),
   currentDate: PropTypes.shape(),
   requestEventData: PropTypes.func,
-  requestStudioDate: PropTypes.func,
+  requestStudioData: PropTypes.func,
   setCurrentDate: PropTypes.func,
   isLoading: PropTypes.bool,
 }
 
 const mapStateToProps = state => ({
-  events: getEventsOnCurrentDate(state),
+  // events: getEventsOnCurrentDate(state),
   isLoading: getEventsLoading(state),
   studioConfig: getStudioDibsConfig(state),
   currentDate: state.currentDate,

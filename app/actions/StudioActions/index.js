@@ -1,52 +1,31 @@
-import {
-  SET_STUDIO,
-  SET_STUDIO_LOADING_FALSE,
-  SET_STUDIO_LOADING_TRUE,
-} from '../../constants/StudioConstants';
+import { createAction, createActions } from 'redux-actions';
+import Config from '../../../config.json';
+
+export const setStudio = createAction('SET_STUDIO', payload => payload);
+
+export const { setStudioLoadingTrue, setStudioLoadingFalse } = createActions({
+  SET_STUDIO_LOADING_TRUE: () => true,
+  SET_STUDIO_LOADING_FALSE: () => false,
+});
 
 /**
- * setStudio
- * @param {Object} value the studio
- * @returns {Object} action on the state
- */
-export function setStudio(value) { // eslint-disable-line import/prefer-default-export
-  return { type: SET_STUDIO, value };
-}
-
-/**
- * setEventsLoadingTrue
- * @returns {Object} action on the state
- */
-export function setStudioLoadingTrue() {
-  return { type: SET_STUDIO_LOADING_TRUE };
-}
-
-/**
- * setStudioLoadingFalse
- * @returns {Object} action on the state
- */
-export function setStudioLoadingFalse() {
-  return { type: SET_STUDIO_LOADING_FALSE };
-}
-
-/**
- * requestStudioData from the server
+ * @param {function} callback on complete
  * @returns {function} dispatches actions for async request
  */
-export function requestStudioData(cb) {
-  return function innerRequestStudioData(dispatch, getState) {
-    const query = 'http://www.ondibs.com/api/studio/?studioid=20456&source=mb';
-
-    fetch(query)
-      .then(res => res.json())
-      .then((res) => {
+export function requestStudioData(callback) {
+  return async function innerRequestStudioData(dispatch, getState, dibsFetch) {
+    try {
+      const path = `/api/studio?new_id_format=true&studioid=${Config.DIBS_STUDIO_ID}`;
+      const res = await dibsFetch(path, { method: 'GET' });
+      if (res.success) {
         dispatch(setStudio(res.studio));
-        cb();
-      })
-      .catch(error => {
-        // set error here
-        console.log(error);
-      });
-  }
+        return callback();
+      }
+      return callback(res);
+    } catch (err) {
+      console.log(err);
+      return callback(err);
+    }
+  };
 }
 
