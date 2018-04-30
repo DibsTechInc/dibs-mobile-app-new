@@ -57,27 +57,7 @@ class LandingPage extends Component {
   constructor() {
     super();
 
-    this.checkAuth();
-
     this.handleOnPress = this.handleOnPress.bind(this);
-  }
-
-  checkAuth = async () => {
-    const userToken = await AsyncStorage.getItem('STORAGE_KEY');
-    console.log(userToken, 'in landing')
-    if (userToken) this.props.navigation.navigate('Main');
-  }
-
-  componentDidMount() {
-    // authFetch('http://a989a625.ngrok.io/api/user', {
-    //   method: 'GET',
-    // })
-    // .then(res => res.json())
-    // .then(res => {
-    //   // auth-based -- in progress
-    //   console.log('-----------------------------')
-    //   console.log(res, 'response')
-    // })
   }
 
   handleOnPress() {
@@ -102,6 +82,10 @@ class LandingPage extends Component {
       </Swiper>
     );
   }
+}
+
+LandingPage.navigationOptions = {
+  headerMode: 'none',
 }
 
 export default LandingPage;

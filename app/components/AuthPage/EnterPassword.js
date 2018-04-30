@@ -27,16 +27,14 @@ class EnterPassword extends Component {
 
   checkAuth = async () => {
     const userToken = await AsyncStorage.getItem('STORAGE_KEY');
-    console.log(userToken, 'get here?')
     if (userToken) this.props.navigation.navigate('Main');
   }
 
   handleOnPress(password) {
     const email = this.props.navigation.state.params.email;
     this.props.userLogin(email, password, () => {
-      this.checkAuth();
+      // this.checkAuth();
     });
-
   }
 
   render() {

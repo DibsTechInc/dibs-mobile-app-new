@@ -100,7 +100,7 @@ export function signUpUser(payload, cb) {
 
 export function userLogin(email, password, cb = () => {}) {
   return async function innerUserLogin(dispatch, getState) {
-    const query = 'http://a989a625.ngrok.io/api/user/login';
+    const query = 'http://4309a424.ngrok.io/api/user/login';
 
     try {
       let res = await fetch(query, {
