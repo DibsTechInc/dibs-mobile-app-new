@@ -73,14 +73,14 @@ class Navigator extends Component {
   }
   
   render() {
-    const Navigator = createStackNavigator(this.props.user);
+    const Navigator = createStackNavigator(this.props.user.id);
 
     return <Navigator />
   }
 }
 
 const mapStateToProps = state => ({
-  user: state.user.user,
+  user: state.user,
 });
 
 export default connect(mapStateToProps)(Navigator);
