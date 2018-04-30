@@ -16,7 +16,7 @@ export function requestStudioData() {
   return async function innerRequestStudioData(dispatch, getState, dibsFetch) {
     if (getState().studio.loading) return;
     try {
-      const path = `/api/studio?new_id_format=true&studioid=${Config.DIBS_STUDIO_ID}`;
+      const path = `/api/studio?new_id_format=1&studioid=${Config.DIBS_STUDIO_ID}`;
       dispatch(setStudioLoadingTrue());
       const res = await dibsFetch(path, { method: 'GET' });
       if (res.success) {

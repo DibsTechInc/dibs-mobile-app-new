@@ -73,7 +73,7 @@ class SchedulePage extends Component {
           dateNumberStyle={{ color: 'white' }}
           dateNameStyle={{ color: 'white' }}
           calendarHeaderStyle={{ color: 'white' }}
-          borderHighlightColor={'white'}
+          borderHighlightColor="white"
           highlightDateNameStyle={{ color: STUDIO_COLOR }}
           highlightDateNumberStyle={{ color: STUDIO_COLOR }}
         />
@@ -100,6 +100,7 @@ SchedulePage.propTypes = {
 };
 
 const mapStateToProps = state => ({
+  studio: state.studio,
   // events: getEventsOnCurrentDate(state),
   isLoading: getEventsLoading(state),
   studioConfig: getStudioDibsConfig(state),

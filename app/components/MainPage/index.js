@@ -41,7 +41,7 @@ class MainPage extends Component {
    * @returns {undefined}
    */
   componentDidMount() {
-    this.props.requestStudioData();
+    if (!this.props.hasStudioData) this.props.requestStudioData();
   }
   /**
    * @param {string} route to navigate to
@@ -76,6 +76,7 @@ class MainPage extends Component {
 MainPage.propTypes = {
   navigation: PropTypes.shape(),
   studioIsLoading: PropTypes.bool,
+  hasStudioData: PropTypes.bool,
   requestStudioData: PropTypes.func,
   logOutUser: PropTypes.func,
 };
@@ -86,6 +87,7 @@ MainPage.navigationOptions = {
 
 const mapStateToProps = state => ({
   studioIsLoading: getStudioIsLoading(state),
+  hasStudioData: Boolean(state.studio.data),
 });
 const mapDispatchToProps = {
   logOutUser,
