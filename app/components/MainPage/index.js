@@ -21,7 +21,7 @@ const StyledView = styled.View`
 `;
 
 const StyledInnerView = styled.View`
-  margin-top: 80;
+  margin-top: 10;
 `;
 
 class MainPage extends Component {
