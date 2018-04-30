@@ -1,47 +1,36 @@
 import { AsyncStorage } from 'react-native';
+import { createAction } from 'redux-actions';
 
-import {
-  SET_USER,
-  GET_USER,
-  SET_USER_AUTH_STATUS_ROUTE,
-} from '../../constants/UserConstants';
+export const setUser = createAction('SET_USER', payload => payload);
 
-export function setUser(payload) {
-  return { type: SET_USER, payload };
-}
-
-export function setUserAuthStatusRoute(payload) {
-  return { type: SET_USER_AUTH_STATUS_ROUTE, payload }
-}
-
-export function validateEmail(email, cb = () => {}) {
+/**
+ * @param {string} email validates email
+ * @param {function} callback on complete
+ * @returns {function} thunk
+ */
+export function validateEmail(email, callback = () => {}) {
   return async function innerValidateEmail(dispatch, getState, dibsFetch) {
-    const path = '/api/user/email/verify';
-
     try {
-      let res = await dibsFetch(path, {
+      const path = '/api/user/email/verify';
+      const res = await dibsFetch(path, {
         method: 'POST',
         body: {
           email,
           validate: true,
         },
       });
-
       if (res.success) {
-        dispatch(setUserAuthStatusRoute('Login'));
-        return cb();
+        return callback('Login');
       }
-
       if (res.message === 'No user with that email') {
-        dispatch(setUserAuthStatusRoute('Register'));
-        return cb();
+        return callback('Register');
       }
-
-      cb();
+      return callback(null);
     } catch (err) {
       console.log(err);
+      return callback(null);
     }
-  }
+  };
 }
 
 /*** in progress */
@@ -98,8 +87,8 @@ export function signUpUser(payload, cb) {
   }
 }
 
-export function userLogin(email, password, cb = () => {}) {
-  return async function innerUserLogin(dispatch, getState) {
+export function userLogin(email, password, callback = () => {}) {
+  return async function innerUserLogin(dispatch, getState, dibsFetch) {
     const query = 'http://a989a625.ngrok.io/api/user/login';
 
     try {
@@ -111,24 +100,24 @@ export function userLogin(email, password, cb = () => {}) {
         },
         body: JSON.stringify({
           email,
-          password
+          password,
         })
       });
 
       res = await res.json();
       await AsyncStorage.setItem('STORAGE_KEY', res.token);
       dispatch(setUser(res.user));
-      cb();
+      callback();
     } catch (err) {
       console.log(err);
     }
   }
 }
 
-export function logOutUser(cb = () => {}) {
-  return async function innerLogOutUser(dispatch, getState) {
+export function logOutUser(callback = () => {}) {
+  return async function innerLogOutUser(dispatch) {
     await AsyncStorage.removeItem('STORAGE_KEY');
-    dispatch(setUser(null));
-    cb();
-  }
+    dispatch(setUser({}));
+    callback();
+  };
 }

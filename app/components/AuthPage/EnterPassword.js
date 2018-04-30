@@ -21,7 +21,7 @@ class EnterPassword extends Component {
     super();
 
     this.state = {
-      password: '123',
+      password: '',
     }
   }
 
