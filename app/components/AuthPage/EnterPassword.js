@@ -29,7 +29,7 @@ class EnterPassword extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      password: '123',
+      password: '',
     };
     this.handleOnPress = this.handleOnPress.bind(this);
   }

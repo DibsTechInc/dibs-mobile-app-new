@@ -24,7 +24,7 @@ class EnterEmail extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      email: 'benjamin@ondibs.com',
+      email: '',
     };
     this.handleOnPress = this.handleOnPress.bind(this);
   }
