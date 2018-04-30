@@ -12,20 +12,20 @@ export const { setStudioLoadingTrue, setStudioLoadingFalse } = createActions({
  * @param {function} callback on complete
  * @returns {function} dispatches actions for async request
  */
-export function requestStudioData(callback) {
+export function requestStudioData() {
   return async function innerRequestStudioData(dispatch, getState, dibsFetch) {
+    if (getState().studio.loading) return;
     try {
       const path = `/api/studio?new_id_format=true&studioid=${Config.DIBS_STUDIO_ID}`;
+      dispatch(setStudioLoadingTrue());
       const res = await dibsFetch(path, { method: 'GET' });
       if (res.success) {
         dispatch(setStudio(res.studio));
-        return callback();
       }
-      return callback(res);
     } catch (err) {
       console.log(err);
-      return callback(err);
     }
+    dispatch(setStudioLoadingFalse());
   };
 }
 

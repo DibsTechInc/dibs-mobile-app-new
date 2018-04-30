@@ -15,7 +15,7 @@ import {
   PROFILE_ROUTE,
 } from '../constants/RouteConstants';
 
-import { SchedulePage } from '../components/SchedulePage';
+import SchedulePage from '../components/SchedulePage';
 import { EnterPassword, EnterEmail, Signup } from '../components/AuthPage';
 import LandingPage from '../components/LandingPage';
 import MainPage from '../components/MainPage';

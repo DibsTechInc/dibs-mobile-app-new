@@ -18,6 +18,14 @@ export function getStudioData(state) {
 
 /**
  * @param {Object} state in store
+ * @returns {boolean} true if fetching studio data
+ */
+export function getStudioIsLoading(state) {
+  return getStudio(state).loading;
+}
+
+/**
+ * @param {Object} state in store
  * @returns {Object} config
  */
 export function getStudioDibsConfig(state) {
