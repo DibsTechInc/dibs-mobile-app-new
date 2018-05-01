@@ -3,10 +3,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-
 import CalendarPage from './CalendarPage';
-import { SCHEDULE_ROUTE, PROFILE_ROUTE } from '../../constants/RouteConstants/index';
-import { logOutUser, requestStudioData, syncUserEvents } from '../../actions';
+import { logOutUser, requestStudioData, syncUserEvents, requestUserData } from '../../actions';
 import { getStudioIsLoading } from '../../selectors';
 import Header from '../Header';
 import * as Colors from '../../theme/colors';
@@ -45,7 +43,10 @@ class MainPage extends Component {
    * @returns {undefined}
    */
   async getData() {
-    if (!this.props.hasStudioData) await new Promise(res => this.props.requestStudioData(res));
+    await Promise.all([
+      !this.props.hasUserData && await new Promise(res => this.props.requestUserData(res)),
+      !this.props.hasStudioData && await new Promise(res => this.props.requestStudioData(res)),
+    ]);
     this.props.syncUserEvents();
   }
   /**
@@ -64,7 +65,10 @@ class MainPage extends Component {
 
 MainPage.propTypes = {
   navigation: PropTypes.shape(),
+  hasUserData: PropTypes.bool,
   syncUserEvents: PropTypes.func,
+  requestUserData: PropTypes.func,
+  requestStudioData: PropTypes.func,
 };
 
 MainPage.navigationOptions = {
@@ -74,12 +78,14 @@ MainPage.navigationOptions = {
 const mapStateToProps = state => ({
   studioIsLoading: getStudioIsLoading(state),
   hasStudioData: Boolean(state.studio.data),
+  hasUserData: Boolean(state.user.id),
 });
 
 const mapDispatchToProps = {
   logOutUser,
   requestStudioData,
   syncUserEvents,
+  requestUserData,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(MainPage);

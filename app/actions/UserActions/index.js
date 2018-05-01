@@ -6,6 +6,26 @@ import Config from '../../../config.json';
 export const setUser = createAction('SET_USER', payload => payload);
 
 /**
+ * @param {function} callback on complete
+ * @returns {function} thunk
+ */
+export function requestUserData(callback) {
+  return async function innerRequestUserData(dispatch, getstate, dibsFetch) {
+    try {
+      const res = await dibsFetch('/api/user', {
+        method: 'GET',
+        requiresAuth: true,
+      });
+      if (res.success) dispatch(setUser(res.user));
+      else console.log(res);
+    } catch (err) {
+      console.log(err);
+    }
+    callback();
+  };
+}
+
+/**
  * @param {string} email validates email
  * @param {function} callback on complete
  * @returns {function} thunk
