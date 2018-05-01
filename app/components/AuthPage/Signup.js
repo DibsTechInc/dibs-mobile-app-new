@@ -1,12 +1,17 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import {
-  View,
-  Text,
   Button,
-  TextInput,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Alert,
 } from 'react-native';
 import styled from 'styled-components';
-import { MAIN_ROUTE } from '../../constants/RouteConstants/index';
+import CheckBox from 'react-native-checkbox';
+import Promise from 'bluebird';
+
+import { signUpUser } from '../../actions/UserActions';
 
 const StyledView = styled.View`
   flex: 1;
@@ -14,28 +19,154 @@ const StyledView = styled.View`
   align-items: center;
 `;
 
-class EnterPassword extends Component {
+const StyledTextInput = styled.TextInput`
+  font-family: flex-font;
+  height: 25;
+`;
+
+const StyledInputView = styled.View`
+  border-bottom-width: 1;
+  border-bottom-color: #8fc54b;
+  height: 25;
+  margin-bottom: 15%;
+  width: 50%;
+`;
+
+const StyledText = styled.Text`
+  font-family: flex-font;
+  margin-bottom: 15%;
+`;
+
+/**
+ * @class Signup
+ * @extends Component
+ */
+class Signup extends Component {
+  /**
+   * @constructor
+   * @constructs Signup
+   * @param {Object} props for component
+   */
   constructor() {
     super();
 
+    this.state = {
+      fullName: '',
+      password: '',
+      tAndC: false,
+      errorMessage: '',
+      isSubmitting: false,
+    };
+
     this.handleOnPress = this.handleOnPress.bind(this);
+    this.checkForm = this.checkForm.bind(this);
+    this.handleOnCheck = this.handleOnCheck.bind(this);
   }
 
-  handleOnPress() {
-    this.props.navigation.navigate(MAIN_ROUTE);
+  /**
+   * @returns {Object} object containing canShowButton and canRegister booleans
+   */
+  checkForm() {
+    const nameLength = this.state.fullName.length && this.state.fullName.split(' ').length;
+    const passwordLength = this.state.password.length;
+    const tAndC = this.state.tAndC;
+
+    const isValidFullName = nameLength > 1 && nameLength <= 6;
+    const isValidPassword = passwordLength >= 6;
+
+    return {
+      canShowButton: nameLength && passwordLength && tAndC,
+      canRegister: isValidFullName && isValidPassword && tAndC,
+    };
   }
 
+  /**
+   * @returns {undefined}
+   */
+  async handleOnPress() {
+    const canRegister = this.checkForm().canRegister;
+
+    if (!canRegister) {
+      return Alert.alert('Please check the form and try again');
+    }
+
+    const payload = {
+      email: this.props.navigation.state.params.email,
+      fullname: this.state.fullName,
+      password: this.state.password,
+      signupStudioId: 20456,
+      signupMethod: 'widget',
+      signupStudioSource: 'mb',
+      referredBy: undefined,
+      signupDibsStudioId: 4,
+      attempt: 0,
+    };
+
+    const route = await new Promise(res => this.props.signUpUser(payload, res));
+    if (route) this.props.navigation.navigate(route);
+
+    return null;
+  }
+
+  /**
+   * @returns {undefined}
+   */
+  handleOnCheck() {
+    this.setState({
+      tAndC: !this.state.tAndC,
+    });
+  }
+
+  /**
+   * @returns {JSX} XML
+   */
   render() {
+    const showButton = this.checkForm().canShowButton;
+
     return (
-      <StyledView>
-        <Text>Just need a few details before we get started.</Text>
-        <TextInput placeholder="person@email.com" />
-        <TextInput placeholder="Full name" />
-        <TextInput placeholder="Password" />
-        <Button title="SIGNUP" onPress={this.handleOnPress} />
-      </StyledView>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <StyledView>
+          <StyledText>Just need a few details before we get started</StyledText>
+          <StyledInputView>
+            <StyledTextInput
+              value={this.props.navigation.state.params.email || ''}
+              editable={false}
+            />
+          </StyledInputView>
+          <StyledInputView>
+            <StyledTextInput
+              value={this.state.fullName}
+              onChangeText={fullName => this.setState({ fullName })}
+              placeholder="First and last name"
+            />
+          </StyledInputView>
+          <StyledInputView>
+            <StyledTextInput
+              value={this.state.password}
+              onChangeText={password => this.setState({ password })}
+              placeholder="Password (6 char min)"
+              secureTextEntry
+            />
+          </StyledInputView>
+          <CheckBox
+            label="Terms and Conditions"
+            checked={this.state.tAndC}
+            onChange={this.handleOnCheck}
+          />
+          {showButton && <Button title="SIGNUP" onPress={this.handleOnPress} />}
+        </StyledView>
+      </TouchableWithoutFeedback>
     );
   }
 }
 
-export default EnterPassword;
+Signup.propTypes = {
+  navigation: PropTypes.shape(),
+  signUpUser: PropTypes.func,
+};
+
+const mapDispatchToProps = {
+  signUpUser,
+};
+
+export default connect(null, mapDispatchToProps)(Signup);

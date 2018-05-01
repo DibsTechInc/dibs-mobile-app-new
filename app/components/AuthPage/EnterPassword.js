@@ -5,9 +5,13 @@ import {
   Text,
   Button,
   TextInput,
-  AsyncStorage,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Alert,
 } from 'react-native';
 import styled from 'styled-components';
+import Promise from 'bluebird';
+
 import { submitLogin } from '../../actions/UserActions';
 
 const StyledView = styled.View`
@@ -37,9 +41,13 @@ class EnterPassword extends Component {
   /**
    * @returns {undefined}
    */
-  handleOnPress() {
+  async handleOnPress() {
     const email = this.props.navigation.state.params.email;
-    this.props.submitLogin(email, this.state.password);
+
+    const user = await new Promise(res => this.props.submitLogin(email, this.state.password, res));
+    if (!user) {
+      Alert.alert('Incorrect password');
+    }
   }
 
   /**
@@ -47,20 +55,22 @@ class EnterPassword extends Component {
    */
   render() {
     return (
-      <StyledView>
-        <Text>What is your password?</Text>
-        <TextInput
-          placeholder="Password"
-          secureTextEntry
-          style={{ width: 150 }}
-          onChangeText={password => this.setState({ password })}
-          value={this.state.password}
-        />
-        <Button
-          title="SUBMIT"
-          onPress={this.handleOnPress}
-        />
-      </StyledView>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <StyledView>
+          <Text>What is your password?</Text>
+          <TextInput
+            placeholder="Password"
+            secureTextEntry
+            style={{ width: 150 }}
+            onChangeText={password => this.setState({ password })}
+            value={this.state.password}
+          />
+          <Button
+            title="SUBMIT"
+            onPress={this.handleOnPress}
+          />
+        </StyledView>
+      </TouchableWithoutFeedback>
     );
   }
 }
