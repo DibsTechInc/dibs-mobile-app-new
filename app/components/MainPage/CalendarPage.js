@@ -44,20 +44,16 @@ export default class CalendarsScreen extends Component {
 
 const styles = StyleSheet.create({
   calendar: {
-    borderTopWidth: 1,
-    paddingTop: 45,
-    borderBottomWidth: 1,
-    borderColor: '#eee',
     height: 350,
   },
   text: {
     textAlign: 'center',
     borderColor: '#bbb',
     padding: 10,
-    backgroundColor: '#eee'
+    backgroundColor: '#eee',
   },
   container: {
     flex: 1,
-    backgroundColor: 'gray'
-  }
+    backgroundColor: 'gray',
+  },
 });

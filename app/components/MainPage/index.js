@@ -2,23 +2,23 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import {
-  Button,
-} from 'react-native';
 import styled from 'styled-components';
-import { lightenDarkenColor } from '../../helpers';
+
 import CalendarPage from './CalendarPage';
 import { SCHEDULE_ROUTE, PROFILE_ROUTE } from '../../constants/RouteConstants/index';
 import { logOutUser, requestStudioData, syncUserEvents } from '../../actions';
 import { getStudioIsLoading } from '../../selectors';
+import Header from '../Header';
+import * as Colors from '../../theme/colors';
 
 const StyledView = styled.View`
   flex: 1;
-  background-color: ${lightenDarkenColor('#8dc63f', 30)};
+  background-color: #fff;
 `;
 
-const StyledInnerView = styled.View`
-  margin-top: 10;
+const StyledTempComponent = styled.View`
+  background-color: ${Colors.PRIMARY}
+  height: 100%;
 `;
 
 /**
@@ -58,24 +58,16 @@ class MainPage extends Component {
   handleOnPress(route) {
     this.props.navigation.navigate(route);
   }
-  /**
-   * @returns {undefined}
-   */
-  handleLogout() {
-    this.props.logOutUser();
-  }
+
   /**
    * @returns {JSX} XML
    */
   render() {
     return (
       <StyledView>
+        <Header navigation={this.props.navigation} iconColor={Colors.PRIMARY} backgroundColor={'#fff'} />
         <CalendarPage />
-        <StyledInnerView>
-          {!this.props.studioIsLoading && <Button onPress={this.handleOnPressSchedule} title="Buy class" color="black" />}
-          <Button onPress={this.handleOnPressProfile} title="Profile Settings" color="black" />
-          <Button onPress={this.handleLogout} title="Logout" color="black" />
-        </StyledInnerView>
+        <StyledTempComponent />
       </StyledView>
     );
   }
@@ -83,7 +75,6 @@ class MainPage extends Component {
 
 MainPage.propTypes = {
   navigation: PropTypes.shape(),
-  studioIsLoading: PropTypes.bool,
   hasStudioData: PropTypes.bool,
   requestStudioData: PropTypes.func,
   syncUserEvents: PropTypes.func,
@@ -98,6 +89,7 @@ const mapStateToProps = state => ({
   studioIsLoading: getStudioIsLoading(state),
   hasStudioData: Boolean(state.studio.data),
 });
+
 const mapDispatchToProps = {
   logOutUser,
   requestStudioData,

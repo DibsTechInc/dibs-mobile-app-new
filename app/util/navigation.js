@@ -14,11 +14,16 @@ export const getNavigationOptionsWithAction = (title, backgroundColor, color, he
   title,
   headerStyle: {
     backgroundColor,
+    elevation: 0,
+    borderBottomWidth: 0,
+    shadowColor: 'transparent',
+    shadowOpacity: 0,
   },
   headerTitleStyle: {
     color,
   },
   headerTintColor: color,
+  activeTintColor: 'black',
   headerLeft,
 });
 
@@ -27,20 +32,33 @@ export const getDrawerNavigationOptions = (title, backgroundColor, titleColor, d
   headerTitle: title,
   headerStyle: {
     backgroundColor,
+    elevation: 0,
+    borderBottomWidth: 0,
+    shadowColor: 'transparent',
+    shadowOpacity: 0,
   },
   headerTitleStyle: {
     color: titleColor,
   },
+  activeTintColor: 'black',
   headerTintColor: titleColor,
   drawerLabel: title,
   drawerIcon,
 });
 
-export const getDrawerConfig = (drawerWidth, drawerPosition, initialRouteName) => ({
+export const getDrawerConfig = (drawerWidth, drawerPosition, initialRouteName, contentComponent) => ({
   drawerWidth,
   drawerPosition,
   initialRouteName,
   drawerOpenRoute: 'DrawerOpen',
   drawerCloseRoute: 'DrawerClose',
   drawerToggleRoute: 'DrawerToggle',
+  contentOptions: {
+    activeTintColor: 'black',
+    inactiveTintColor: 'black',
+    labelStyle: {
+      fontFamily: 'flex-font',
+    },
+  },
+  contentComponent,
 });

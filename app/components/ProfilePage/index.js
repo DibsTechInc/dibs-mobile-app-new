@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import {
-  AppRegistry,
   StyleSheet,
-  Text,
   View,
   Image,
   Alert,
@@ -11,19 +10,31 @@ import {
 import SettingsList from 'react-native-settings-list';
 import { MAIN_ROUTE } from '../../constants/RouteConstants/index';
 
+import Header from '../Header';
+import * as Colors from '../../theme/colors';
+
 class ProfileScreen extends Component {
-  constructor(){
+  constructor() {
     super();
     this.onValueChange = this.onValueChange.bind(this);
-    this.state = {switchValue: false, loggedIn: false};
+    this.state = { switchValue: false, loggedIn: false };
   }
+
+  onValueChange(value) {
+    this.setState({ switchValue: value });
+  }
+
+  toggleAuthView() {
+    this.setState({ toggleAuthView: !this.state.toggleAuthView });
+  }
+
   render() {
-    var bgColor = '#DCE3F4';
     return (
-      <View style={{backgroundColor:'#EFEFF4',flex:1}}>
-        <View style={{backgroundColor:'#EFEFF4',flex:1}}>
-          <SettingsList borderColor='#fff' defaultItemSize={50}>
-            <SettingsList.Header headerStyle={{ marginTop:15 }} />
+      <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
+        <Header navigation={this.props.navigation} iconColor={'#000'} backgroundColor={'#EFEFF4'} />
+        <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
+          <SettingsList borderColor="#fff" defaultItemSize={50}>
+            <SettingsList.Header headerStyle={{ marginTop: 15 }} />
             <SettingsList.Item
               hasNavArrow={false}
               title='PERSONAL DETAILS'
@@ -34,7 +45,7 @@ class ProfileScreen extends Component {
               onPress={() => Alert.alert('Route To Personal Settings')}
             />
 
-            <SettingsList.Header headerStyle={{ marginTop:15 }}/>
+            <SettingsList.Header headerStyle={{ marginTop: 15 }} />
             <SettingsList.Item
               hasNavArrow={false}
               title='ACCOUNT DETAILS'
@@ -84,26 +95,11 @@ class ProfileScreen extends Component {
       </View>
     );
   }
-  toggleAuthView() {
-    this.setState({toggleAuthView: !this.state.toggleAuthView});
-  }
-  onValueChange(value){
-    this.setState({switchValue: value});
-  }
 }
 
-const styles = StyleSheet.create({
-  imageStyle:{
-    marginLeft:15,
-    alignSelf:'center',
-    height:30,
-    width:30
-  },
-  titleInfoStyle:{
-    fontSize:16,
-    color: '#8e8e93'
-  }
-});
+ProfileScreen.propTypes = {
+  navigation: PropTypes.shape(),
+};
 
 ProfileScreen.navigationOptions = ({ navigation }) => ({
   headerRight: (

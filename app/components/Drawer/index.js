@@ -16,10 +16,12 @@ import MainPage from '../MainPage';
 import ProfilePage from '../ProfilePage';
 import SchedulePage from '../SchedulePage';
 import * as Colors from '../../theme/colors';
+import SideMenu from './SideMenu';
 
 const getDrawerItem = navigation => (
   <DrawerItem
     iconName="bars"
+    studioColor={Colors.PRIMARY}
     onPress={() => {
       if (navigation.state.index === 0) {
         // check if drawer is not open, then only open it
@@ -32,22 +34,26 @@ const getDrawerItem = navigation => (
   />
 );
 
-const getDrawerIcon = (iconName, tintColor) => <Icon name={iconName} size={20} color={tintColor} />;
+const getDrawerIcon = iconName => <Icon name={iconName} size={20} color={Colors.PRIMARY} />;
 
-const homeDrawerIcon = ({ tintColor }) => getDrawerIcon('home', tintColor);
-const userDrawerIcon = ({ tintColor }) => getDrawerIcon('user', tintColor);
-const scheduleDrawerIcon = ({ tintColor }) => getDrawerIcon('calendar', tintColor);
+const homeDrawerIcon = () => getDrawerIcon('home');
+const userDrawerIcon = () => getDrawerIcon('user');
+const scheduleDrawerIcon = () => getDrawerIcon('calendar');
 
-export const homeNavOptions = getDrawerNavigationOptions(MAIN_ROUTE, Colors.PRIMARY, 'white', homeDrawerIcon);
-export const userNavOptions = getDrawerNavigationOptions(PROFILE_ROUTE, Colors.PRIMARY, 'white', userDrawerIcon);
-export const scheduleNavOptions = getDrawerNavigationOptions(SCHEDULE_ROUTE, Colors.PRIMARY, 'white', scheduleDrawerIcon);
+export const homeNavOptions = getDrawerNavigationOptions(null, 'white', Colors.PRIMARY, homeDrawerIcon);
+export const userNavOptions = getDrawerNavigationOptions(null, '#fff', Colors.PRIMARY, userDrawerIcon);
+export const scheduleNavOptions = getDrawerNavigationOptions(null, Colors.PRIMARY, Colors.PRIMARY, scheduleDrawerIcon);
 
 const Drawer = DrawerNavigator({
   [MAIN_ROUTE]: { screen: MainPage, navigationOptions: homeNavOptions },
   [PROFILE_ROUTE]: { screen: ProfilePage, navigationOptions: userNavOptions },
   [SCHEDULE_ROUTE]: { screen: SchedulePage, navigationOptions: scheduleNavOptions },
-}, getDrawerConfig(300, 'left', MAIN_ROUTE));
+}, getDrawerConfig(300, 'left', MAIN_ROUTE, SideMenu));
 
-Drawer.navigationOptions = ({ navigation }) => getNavigationOptionsWithAction('', Colors.PRIMARY, 'white', getDrawerItem(navigation));
+Drawer.navigationOptions = ({ navigation }) => {
+  const opts = getNavigationOptionsWithAction(null, 'white', 'white', getDrawerItem(navigation));
+
+  return opts;
+};
 
 export default Drawer;

@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import Config from '../../../config.json';
 
+import Config from '../../../config.json';
 import CalendarStrip from './CalendarStrip';
 import SchedulePageEvents from './SchedulePageEvents';
 import { requestEventData, requestStudioData } from '../../actions';
@@ -13,9 +13,12 @@ import {
   getStudioDibsConfig,
   getStudioData,
 } from '../../selectors';
+import Header from '../Header';
+import * as Colors from '../../theme/colors';
 
 const StyledView = styled.View`
   height: 100%;
+  background-color: ${Colors.PRIMARY}
 `;
 
 const StyledActivityIndicator = styled.ActivityIndicator`
@@ -33,6 +36,7 @@ class SchedulePage extends Component {
   componentDidMount() {
     if (this.props.studio.id) this.props.requestEventData();
   }
+
   /**
    * This ensures the data will be fetched only if the studio
    * data has been fetched
@@ -45,12 +49,24 @@ class SchedulePage extends Component {
       || props.currentDate.toISOString() !== this.props.currentDate.toISOString()
     ) this.props.requestEventData();
   }
+
+  /**
+   * @param {object} props react props
+   * @returns {undefined}
+   */
+  componentDidUpdate(props) {
+    if (props.currentDate.toISOString() !== this.props.currentDate.toISOString()) {
+      this.props.requestEventData();
+    }
+  }
+
   /**
    * @returns {JSX} XML
    */
   render() {
     return (
       <StyledView>
+        <Header navigation={this.props.navigation} iconColor={'#fff'} backgroundColor={Colors.PRIMARY} />
         <CalendarStrip
           calendarAnimation={{ type: 'parallel', duration: 600 }} // animation when switching weeks
           selection="background" // type of selection circle
@@ -80,6 +96,7 @@ SchedulePage.propTypes = {
   isLoading: PropTypes.bool,
   currentDate: PropTypes.shape(),
   studio: PropTypes.shape(),
+  navigation: PropTypes.shape(),
 };
 
 const mapStateToProps = state => ({

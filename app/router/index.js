@@ -30,12 +30,21 @@ const createStackNavigator = token => StackNavigator(
     },
     [MAIN_ROUTE]: {
       screen: MainPage,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
     },
     [SCHEDULE_ROUTE]: {
       screen: SchedulePage,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
     },
     [PROFILE_ROUTE]: {
       screen: ProfilePage,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
     },
     [VERIFY_ROUTE]: {
       screen: EnterEmail,
@@ -48,9 +57,13 @@ const createStackNavigator = token => StackNavigator(
     },
     [DRAWER_ROUTE]: {
       screen: Drawer,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
     },
   },
   {
+    headerMode: 'none',
     initialRouteName: token ? DRAWER_ROUTE : LANDING_ROUTE,
     navigationOptions: {
       gesturesEnabled: true,
