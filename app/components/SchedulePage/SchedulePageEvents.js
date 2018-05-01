@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { SwipeListView } from 'react-native-swipe-list-view';
+import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view';
+import { ListView, TouchableHighlight } from 'react-native';
 import EventListItem from './EventListItem';
 import HiddenControls from './EventListItem/HiddenControls';
 import { getScheduleEvents } from '../../selectors';
@@ -23,39 +24,30 @@ class SchedulePageEvents extends Component {
    */
   constructor(props) {
     super(props);
-    this.renderItem = this.renderItem.bind(this);
-    this.renderHiddenControls = this.renderHiddenControls.bind(this);
+    this.renderRow = this.renderRow.bind(this);
+    this.dataSource = new ListView.DataSource({ rowHasChanged: (a, b) => a !== b });
   }
   /**
-   *
-   * @param {Object} item the event
-   * @param {number} index in the array
+   * @param {Object} event, see selectors/EventSelectors for structure
    * @returns {JSX} event list item component
    */
-  renderItem({ item, index }) {
+  renderRow(event) {
     return (
-      <EventListItem
-        index={index}
-        {...item}
-        studioColor={this.props.studioColor}
-      />
-    );
-  }
-  /**
-   *
-   * @param {Object} item the event
-   * @param {number} index in the array
-   * @returns {JSX} hidden swipe controls for event list
-   */
-  renderHiddenControls({ item, index }) {
-    return (
-      <HiddenControls
-        index={index}
-        leftText={item.leftText}
-        leftAction={item.leftAction}
-        rightText={item.rightText}
-        rightAction={item.rightAction}
-      />
+      <SwipeRow
+        // leftOpenValue={180}
+        // rightOpenValue={-180}
+        // swipeToOpenPercent={99}
+        disableRightSwipe={!event.quantity}
+        disableLeftSwipe={event.soldOut || event.maxSeatsReached}
+      >
+        <HiddenControls {...event} />
+        <TouchableHighlight>
+          <EventListItem
+            {...event}
+            studioColor={this.props.studioColor}
+          />
+        </TouchableHighlight>
+      </SwipeRow>
     );
   }
   /**
@@ -64,14 +56,10 @@ class SchedulePageEvents extends Component {
   render() {
     return (
       <SwipeListView
-        useFlatList
-        data={this.props.events}
+        enableEmptySections
+        dataSource={this.dataSource.cloneWithRows(this.props.events)}
         keyExtractor={SchedulePageEvents.keyExtractor}
-        renderItem={this.renderItem}
-        renderHiddenItem={this.renderHiddenControls}
-        leftOpenValue={180}
-        rightOpenValue={-180}
-        swipeToOpenPercent={99}
+        renderRow={this.renderRow}
       />
     );
   }
