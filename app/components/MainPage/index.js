@@ -34,9 +34,6 @@ class MainPage extends Component {
   constructor(props) {
     super(props);
     this.getData = this.getData.bind(this);
-    this.handleOnPressSchedule = this.handleOnPress.bind(this, SCHEDULE_ROUTE);
-    this.handleOnPressProfile = this.handleOnPress.bind(this, PROFILE_ROUTE);
-    this.handleLogout = this.handleLogout.bind(this);
   }
   /**
    * @returns {undefined}
@@ -51,14 +48,6 @@ class MainPage extends Component {
     if (!this.props.hasStudioData) await new Promise(res => this.props.requestStudioData(res));
     this.props.syncUserEvents();
   }
-  /**
-   * @param {string} route to navigate to
-   * @returns {undefined}
-   */
-  handleOnPress(route) {
-    this.props.navigation.navigate(route);
-  }
-
   /**
    * @returns {JSX} XML
    */
@@ -75,10 +64,7 @@ class MainPage extends Component {
 
 MainPage.propTypes = {
   navigation: PropTypes.shape(),
-  hasStudioData: PropTypes.bool,
-  requestStudioData: PropTypes.func,
   syncUserEvents: PropTypes.func,
-  logOutUser: PropTypes.func,
 };
 
 MainPage.navigationOptions = {
