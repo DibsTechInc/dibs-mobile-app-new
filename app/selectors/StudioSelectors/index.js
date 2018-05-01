@@ -1,4 +1,4 @@
-// import { createSelector } from 'reselect';
+import { createSelector } from 'reselect';
 
 /**
  * @param {Object} state in store
@@ -21,7 +21,7 @@ export function getStudioData(state) {
  * @returns {boolean} true if fetching studio data
  */
 export function getStudioIsLoading(state) {
-  return getStudio(state).loading;
+  return Boolean(getStudio(state).loading);
 }
 
 /**
@@ -31,3 +31,16 @@ export function getStudioIsLoading(state) {
 export function getStudioDibsConfig(state) {
   return getStudioData(state).dibs_config || {};
 }
+
+/**
+ * @param {Object} state in store
+ * @returns {string} currency symbol
+ */
+export function getStudioCurrency(state) {
+  return getStudioData(state).currency || 'USD';
+}
+
+export const getStudioCustomTimeFormat = createSelector(
+  getStudioDibsConfig,
+  dibsConfig => (dibsConfig.customTimeFormat || '')
+);

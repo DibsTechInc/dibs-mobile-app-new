@@ -1,21 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-  Button,
-  ActivityIndicator,
-  Image,
-} from 'react-native';
-import _ from 'lodash';
 import styled from 'styled-components';
-import moment from 'moment';
 import Config from '../../../config.json';
 
-import CalendarStrip from '../CalendarStrip';
+import CalendarStrip from './CalendarStrip';
 import SchedulePageEvents from './SchedulePageEvents';
 import { requestEventData, requestStudioData } from '../../actions';
 import {
@@ -33,26 +22,32 @@ const StyledActivityIndicator = styled.ActivityIndicator`
   margin-top: 50%;
 `;
 
+/**
+ * @class SchedulePage
+ * @extends Component
+ */
 class SchedulePage extends Component {
-  constructor(props) {
-    super(props);
-  }
-
+  /**
+   * @returns {undefined}
+   */
   componentDidMount() {
     if (this.props.studio.id) this.props.requestEventData();
   }
-
+  /**
+   * This ensures the data will be fetched only if the studio
+   * data has been fetched
+   * @param {Object} props for component
+   * @returns {undefined}
+   */
   componentWillReceiveProps(props) {
-    if (!this.props.studio.id && props.studio.id) this.props.requestEventData();
+    if (
+      (!this.props.studio.id && props.studio.id)
+      || props.currentDate.toISOString() !== this.props.currentDate.toISOString()
+    ) this.props.requestEventData();
   }
-
-  componentDidUpdate(props) {
-    if (props.currentDate.toISOString() !== this.props.currentDate.toISOString()) {
-      this.props.requestEventData();
-    }
-  }
-
-
+  /**
+   * @returns {JSX} XML
+   */
   render() {
     return (
       <StyledView>

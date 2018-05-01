@@ -39,12 +39,12 @@ async function dibsFetch(refreshToken, path, {
  */
 async function refreshUserToken(path, res) {
   try {
-    if (/logout|token/.test(path)) return;
+    if (/logout/.test(path)) return;
     if (/login|register/.test(path) && res.token) {
       await AsyncStorage.setItem(Config.USER_TOKEN_KEY, res.token);
       return;
     }
-    const response = await dibsFetch('/api/user/token', {
+    const response = await dibsFetch(() => {}, '/api/user/refresh-token', {
       method: 'GET',
       requiresAuth: true,
     });

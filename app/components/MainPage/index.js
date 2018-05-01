@@ -9,7 +9,7 @@ import styled from 'styled-components';
 import { lightenDarkenColor } from '../../helpers';
 import CalendarPage from './CalendarPage';
 import { SCHEDULE_ROUTE, PROFILE_ROUTE } from '../../constants/RouteConstants/index';
-import { logOutUser, requestStudioData } from '../../actions';
+import { logOutUser, requestStudioData, syncUserEvents } from '../../actions';
 import { getStudioIsLoading } from '../../selectors';
 
 const StyledView = styled.View`
@@ -33,6 +33,7 @@ class MainPage extends Component {
    */
   constructor(props) {
     super(props);
+    this.getData = this.getData.bind(this);
     this.handleOnPressSchedule = this.handleOnPress.bind(this, SCHEDULE_ROUTE);
     this.handleOnPressProfile = this.handleOnPress.bind(this, PROFILE_ROUTE);
     this.handleLogout = this.handleLogout.bind(this);
@@ -41,7 +42,14 @@ class MainPage extends Component {
    * @returns {undefined}
    */
   componentDidMount() {
-    if (!this.props.hasStudioData) this.props.requestStudioData();
+    this.getData();
+  }
+  /**
+   * @returns {undefined}
+   */
+  async getData() {
+    if (!this.props.hasStudioData) await new Promise(res => this.props.requestStudioData(res));
+    this.props.syncUserEvents();
   }
   /**
    * @param {string} route to navigate to
@@ -78,6 +86,7 @@ MainPage.propTypes = {
   studioIsLoading: PropTypes.bool,
   hasStudioData: PropTypes.bool,
   requestStudioData: PropTypes.func,
+  syncUserEvents: PropTypes.func,
   logOutUser: PropTypes.func,
 };
 
@@ -92,6 +101,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   logOutUser,
   requestStudioData,
+  syncUserEvents,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(MainPage);

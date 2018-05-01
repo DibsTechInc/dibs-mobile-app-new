@@ -11,7 +11,7 @@ export const { setStudio, setStudioLoadingTrue, setStudioLoadingFalse } = create
  * @param {function} callback on complete
  * @returns {function} dispatches actions for async request
  */
-export function requestStudioData() {
+export function requestStudioData(callback) {
   return async function innerRequestStudioData(dispatch, getState, dibsFetch) {
     if (getState().studio.loading) return;
     try {
@@ -25,6 +25,7 @@ export function requestStudioData() {
       console.log(err);
     }
     dispatch(setStudioLoadingFalse());
+    callback();
   };
 }
 

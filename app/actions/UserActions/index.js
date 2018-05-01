@@ -56,7 +56,7 @@ export function signUpUser(payload, callback) {
       console.log(err);
       return callback(null);
     }
-  }
+  };
 }
 
 /**
@@ -75,8 +75,8 @@ export function submitLogin(email, password, callback) {
           password,
         },
       });
-      if (res.success) { 
-        dispatch(setUser(res.user)); 
+      if (res.success) {
+        dispatch(setUser(res.user));
         callback(res.user);
       } else {
         callback(null);
@@ -87,6 +87,10 @@ export function submitLogin(email, password, callback) {
   };
 }
 
+/**
+ * @param {function} callback on complete
+ * @returns {function} thunk
+ */
 export function logOutUser(callback = () => {}) {
   return async function innerLogOutUser(dispatch) {
     try {

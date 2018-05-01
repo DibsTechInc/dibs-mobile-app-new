@@ -2,25 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { SwipeListView } from 'react-native-swipe-list-view';
-import styled from 'styled-components';
-import SchedulePageEventListItem from './SchedulePageEventListItem';
-import { getEventsOnCurrentDate } from '../../selectors';
-
-const StyledHiddenItemView = styled.View`
-  align-items: center;
-  background-color: #8dc63f;
-  flex: 1;
-  flex-direction: row;
-  justify-content: space-between;
-  padding-right: 40;
-  padding-left: 40;
-`;
-
-const StyledHiddenItemText = styled.Text`
-  color: #fff;
-  justify-content: center;
-  font-family: 'flex-font-heavy';
-`;
+import EventListItem from './EventListItem';
+import HiddenControls from './EventListItem/HiddenControls';
+import { getScheduleEvents } from '../../selectors';
 
 /**
  * @class SchedulePageEvents
@@ -32,7 +16,6 @@ class SchedulePageEvents extends Component {
    * @returns {string} key for React
    */
   static keyExtractor = event => `list-item-${event.id}`
-
   /**
    * @constructor
    * @constructs SchedulePageEvents
@@ -41,8 +24,8 @@ class SchedulePageEvents extends Component {
   constructor(props) {
     super(props);
     this.renderItem = this.renderItem.bind(this);
+    this.renderHiddenControls = this.renderHiddenControls.bind(this);
   }
-
   /**
    *
    * @param {Object} item the event
@@ -51,31 +34,41 @@ class SchedulePageEvents extends Component {
    */
   renderItem({ item, index }) {
     return (
-      <SchedulePageEventListItem
-        item={item}
+      <EventListItem
         index={index}
+        {...item}
         studioColor={this.props.studioColor}
       />
     );
   }
-
+  /**
+   *
+   * @param {Object} item the event
+   * @param {number} index in the array
+   * @returns {JSX} hidden swipe controls for event list
+   */
+  renderHiddenControls({ item, index }) {
+    return (
+      <HiddenControls
+        index={index}
+        leftText={item.leftText}
+        leftAction={item.leftAction}
+        rightText={item.rightText}
+        rightAction={item.rightAction}
+      />
+    );
+  }
   /**
    * @returns {JSX} XML
    */
   render() {
-    console.log(this.props.events)
     return (
       <SwipeListView
         useFlatList
         data={this.props.events}
         keyExtractor={SchedulePageEvents.keyExtractor}
         renderItem={this.renderItem}
-        renderHiddenItem={() => (
-          <StyledHiddenItemView>
-            <StyledHiddenItemText> Drop this Class </StyledHiddenItemText>
-            <StyledHiddenItemText> Add to Cart </StyledHiddenItemText>
-          </StyledHiddenItemView>
-        )}
+        renderHiddenItem={this.renderHiddenControls}
         leftOpenValue={180}
         rightOpenValue={-180}
         swipeToOpenPercent={99}
@@ -90,7 +83,7 @@ SchedulePageEvents.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  events: getEventsOnCurrentDate(state),
+  events: getScheduleEvents(state),
 });
 const mapDispatchToProps = {};
 

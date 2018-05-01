@@ -11,7 +11,7 @@ import {
   Dimensions,
 } from 'react-native';
 import moment from 'moment';
-import { setCurrentDate, addDaysToCurrentDate } from '../../actions';
+import { setCurrentDate, addDaysToCurrentDate } from '../../../actions';
 import CalendarDay from './CalendarDay';
 import styles from './CalendarStrip.style';
 
