@@ -2,9 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import {
-  Text,
-  Button,
-  TextInput,
   TouchableWithoutFeedback,
   Keyboard,
   Alert,
@@ -13,11 +10,24 @@ import styled from 'styled-components';
 import Promise from 'bluebird';
 
 import { submitLogin } from '../../actions/UserActions';
+import FadeInView from '../shared/FadeInView';
 
-const StyledView = styled.View`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
+const StyledTextInput = styled.TextInput`
+  font-family: flex-font;
+  height: 25;
+`;
+
+const StyledInputView = styled.View`
+  border-bottom-width: 1;
+  border-bottom-color: #8fc54b;
+  height: 25;
+  margin-bottom: 15%;
+  margin-top: 15%;
+  width: 50%;
+`;
+
+const StyledText = styled.Text`
+  font-family: flex-font-heavy;
 `;
 
 /**
@@ -34,7 +44,9 @@ class EnterPassword extends Component {
     super(props);
     this.state = {
       password: '123',
+      isLoading: false,
     };
+
     this.handleOnPress = this.handleOnPress.bind(this);
   }
 
@@ -44,8 +56,11 @@ class EnterPassword extends Component {
   async handleOnPress() {
     const email = this.props.navigation.state.params.email;
 
+    await new Promise(res => this.setState({ isLoading: true }, res));
     const user = await new Promise(res => this.props.submitLogin(email, this.state.password, res));
+
     if (!user) {
+      await new Promise(res => this.setState({ isLoading: false }, res));
       Alert.alert('Incorrect password');
     }
   }
@@ -54,29 +69,35 @@ class EnterPassword extends Component {
    * @returns {JSX} XML
    */
   render() {
+    if (this.state.isLoading) {
+      return (
+        <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <StyledText>Loading...</StyledText>
+        </FadeInView>
+      );
+    }
+
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <StyledView>
-          <Text>What is your password?</Text>
-          <TextInput
-            placeholder="Password"
-            secureTextEntry
-            style={{ width: 150 }}
-            onChangeText={password => this.setState({ password })}
-            value={this.state.password}
-          />
-          <Button
-            title="SUBMIT"
-            onPress={this.handleOnPress}
-          />
-        </StyledView>
+        <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <StyledText>What is your password?</StyledText>
+          <StyledInputView>
+            <StyledTextInput
+              placeholder="Password"
+              secureTextEntry
+              autoCapitalize="none"
+              onSubmitEditing={this.handleOnPress}
+              onChangeText={password => this.setState({ password })}
+              value={this.state.password}
+            />
+          </StyledInputView>
+        </FadeInView>
       </TouchableWithoutFeedback>
     );
   }
 }
 
 EnterPassword.propTypes = {
-  navigation: PropTypes.shape(),
   submitLogin: PropTypes.func,
 };
 

@@ -9,6 +9,8 @@ import { getStudioIsLoading } from '../../selectors';
 import Header from '../Header';
 import * as Colors from '../../theme/colors';
 
+import FadeInView from '../shared/FadeInView';
+
 const StyledView = styled.View`
   flex: 1;
   background-color: #fff;
@@ -54,11 +56,11 @@ class MainPage extends Component {
    */
   render() {
     return (
-      <StyledView>
+      <FadeInView style={{ backgroundColor: '#fff' }}>
         <Header navigation={this.props.navigation} iconColor={Colors.PRIMARY} backgroundColor={'#fff'} />
         <CalendarPage />
         <StyledTempComponent />
-      </StyledView>
+      </FadeInView>
     );
   }
 }

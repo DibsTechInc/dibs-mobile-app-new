@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
-  StyleSheet,
   View,
   Image,
   Alert,
@@ -11,26 +10,29 @@ import SettingsList from 'react-native-settings-list';
 import { MAIN_ROUTE } from '../../constants/RouteConstants/index';
 
 import Header from '../Header';
-import * as Colors from '../../theme/colors';
+import FadeInView from '../shared/FadeInView';
 
+/**
+ * @class ProfileScreen
+ * @extends Component
+ */
 class ProfileScreen extends Component {
+  /**
+   * @constructor
+   * @constructs ProfileScreen
+   * @param {Object} props for component
+   */
   constructor() {
     super();
-    this.onValueChange = this.onValueChange.bind(this);
     this.state = { switchValue: false, loggedIn: false };
   }
 
-  onValueChange(value) {
-    this.setState({ switchValue: value });
-  }
-
-  toggleAuthView() {
-    this.setState({ toggleAuthView: !this.state.toggleAuthView });
-  }
-
+  /**
+   * @returns {JSX} XML
+   */
   render() {
     return (
-      <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
+      <FadeInView style={{ backgroundColor: '#EFEFF4' }}>
         <Header navigation={this.props.navigation} iconColor={'#000'} backgroundColor={'#EFEFF4'} />
         <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
           <SettingsList borderColor="#fff" defaultItemSize={50}>
@@ -92,7 +94,7 @@ class ProfileScreen extends Component {
             />
           </SettingsList>
         </View>
-      </View>
+      </FadeInView>
     );
   }
 }
@@ -100,11 +102,5 @@ class ProfileScreen extends Component {
 ProfileScreen.propTypes = {
   navigation: PropTypes.shape(),
 };
-
-ProfileScreen.navigationOptions = ({ navigation }) => ({
-  headerRight: (
-    <Button onPress={() => (navigation.replace(MAIN_ROUTE))} title="Home" color="darkgray" />
-  ),
-});
 
 export default ProfileScreen;

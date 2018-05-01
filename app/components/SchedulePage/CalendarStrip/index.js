@@ -14,6 +14,7 @@ import moment from 'moment';
 import { setCurrentDate, addDaysToCurrentDate } from '../../../actions';
 import CalendarDay from './CalendarDay';
 import styles from './CalendarStrip.style';
+// import FadeInView from '../shared/FadeInView';
 
 // Just a shallow array of 7 elements
 

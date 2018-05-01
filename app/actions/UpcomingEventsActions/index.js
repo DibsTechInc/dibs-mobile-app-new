@@ -31,6 +31,7 @@ export function requestUserEvents() {
         method: 'GET',
         requiresAuth: true,
       });
+
       if (res.success) {
         dispatch(setUpcomingEvents(res.events.upcoming));
         // TODO flash MYFIRST message

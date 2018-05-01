@@ -1,5 +1,6 @@
 
 import React, { Component } from 'react';
+
 import {
   AsyncStorage,
 } from 'react-native';
@@ -10,6 +11,7 @@ import Swiper from 'react-native-swiper';
 import About from './About';
 import { VERIFY_ROUTE } from '../../constants/RouteConstants/index';
 import Config from '../../../config.json';
+import FadeInView from '../shared/FadeInView';
 
 const StyledView = styled.View`
   flex: 1;
@@ -52,15 +54,13 @@ class LandingPage extends Component {
   constructor() {
     super();
 
+    this.checkAuth();
+
     this.handleOnPress = this.handleOnPress.bind(this);
   }
 
   handleOnPress() {
     this.props.navigation.navigate(VERIFY_ROUTE);
-  }
-
-  componentDidMount() {
-    this.checkAuth();
   }
 
   async checkAuth() {
@@ -73,7 +73,7 @@ class LandingPage extends Component {
   render() {
     return (
       <Swiper loop={false}>
-        <StyledView>
+        <FadeInView style={{ flex: 1 }}>
           <StyledWelcomeView>
             <StyledWelcomeText>Welcome to FLEX Studios!</StyledWelcomeText>
             <StyledGrayText>Swipe to learn more</StyledGrayText>
@@ -83,7 +83,7 @@ class LandingPage extends Component {
               <StyledButtonText>Continue</StyledButtonText>
             </StyledContinueButton>
           </StyledButtonsView>
-        </StyledView>
+        </FadeInView>
         <About />
       </Swiper>
     );

@@ -4,15 +4,16 @@ import { PropTypes } from 'prop-types';
 import { connect } from 'react-redux';
 import {
   Text,
-  Button,
   TouchableWithoutFeedback,
   Keyboard,
+  Alert,
 } from 'react-native';
 import styled from 'styled-components';
 import Promise from 'bluebird';
 
-import { FlexCenter } from '../styled';
 import { validateEmail } from '../../actions/UserActions';
+import FadeInView from '../shared/FadeInView';
+
 
 const StyledTextInput = styled.TextInput`
   font-family: flex-font;
@@ -25,6 +26,11 @@ const StyledInputView = styled.View`
   height: 25;
   margin-bottom: 15%;
   margin-top: 15%;
+  width: 50%;
+`;
+
+const StyledText = styled.Text`
+  font-family: flex-font-heavy;
 `;
 
 /**
@@ -40,8 +46,9 @@ class EnterEmail extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      email: 'benjamin@on.com',
+      email: 'benjamin@ondibs.com',
       emailError: '',
+      isLoading: false,
     };
     this.handleOnPress = this.handleOnPress.bind(this);
   }
@@ -62,32 +69,44 @@ class EnterEmail extends Component {
       });
     }
 
+    await new Promise(res => this.setState({ isLoading: true }, res));
     const route = await new Promise(res => this.props.validateEmail(email, res));
-    if (route) this.props.navigation.navigate(route, { email });
+
+    if (!route) {
+      await new Promise(res => this.setState({ isLoading: false }, res));
+      Alert.alert('We could not verify this email');
+    } else {
+      this.props.navigation.navigate(route, { email });
+    }
   }
 
   /**
    * @returns {JSX} XML
    */
   render() {
+    if (this.state.isLoading) {
+      return (
+        <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <StyledText>Loading...</StyledText>
+        </FadeInView>
+      );
+    }
+
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <FlexCenter>
-          <Text> What is your email? </Text>
+        <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <StyledText> What is your email? </StyledText>
           <StyledInputView>
             <StyledTextInput
               placeholder="Email"
+              autoCapitalize="none"
               onChangeText={email => this.setState({ email })}
+              onSubmitEditing={this.handleOnPress}
               value={this.state.email}
             />
           </StyledInputView>
-          <Button
-            title="CONTINUE"
-            accessibilityLabel="CONTINUE"
-            onPress={this.handleOnPress}
-          />
-          {this.state.emailError.length && <Text>{this.state.emailError}</Text>}
-        </FlexCenter>
+          {this.state.emailError.length && <Text style={{ color: 'red' }}>{this.state.emailError}</Text>}
+        </FadeInView>
       </TouchableWithoutFeedback>
     );
   }

@@ -35,7 +35,7 @@ class Header extends Component {
       <StyledView backgroundColor={this.props.backgroundColor}>
         <StyledMenuView>
           <DrawerItem
-            iconName="bars"
+            iconName="align-center"
             iconColor={this.props.iconColor}
             onPress={() => this.props.navigation.navigate('DrawerOpen')}
           />

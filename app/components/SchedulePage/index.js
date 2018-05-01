@@ -15,11 +15,7 @@ import {
 } from '../../selectors';
 import Header from '../Header';
 import * as Colors from '../../theme/colors';
-
-const StyledView = styled.View`
-  height: 100%;
-  background-color: ${Colors.PRIMARY}
-`;
+import FadeInView from '../shared/FadeInView';
 
 const StyledActivityIndicator = styled.ActivityIndicator`
   margin-top: 50%;
@@ -65,12 +61,10 @@ class SchedulePage extends Component {
    */
   render() {
     return (
-      <StyledView>
+      <FadeInView style={{ height: '100%', backgroundColor: Colors.PRIMARY }}>
         <Header navigation={this.props.navigation} iconColor={'#fff'} backgroundColor={Colors.PRIMARY} />
         <CalendarStrip
-          calendarAnimation={{ type: 'parallel', duration: 600 }} // animation when switching weeks
           selection="background" // type of selection circle
-          selectionAnimation={{ duration: 300, borderWidth: 1 }} // animation when selecting a date
           style={{ paddingTop: 20, paddingBottom: 10 }}
           calendarColor={Config.STUDIO_COLOR} // main background color
           highlightColor="#f4f4f4" // color of the selection circle
@@ -86,7 +80,7 @@ class SchedulePage extends Component {
           <StyledActivityIndicator size="large" />
           : <SchedulePageEvents studioColor={Config.STUDIO_COLOR} />
         )}
-      </StyledView>
+      </FadeInView>
     );
   }
 }
