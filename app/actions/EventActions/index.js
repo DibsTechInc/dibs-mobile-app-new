@@ -23,9 +23,9 @@ export function requestEventData() {
       const state = getState();
       const { studio, currentDate } = state;
       if (!getEventsOnCurrentDate(state).length) dispatch(setEventsLoadingTrue());
-      const startDate = moment(currentDate).startOf('day').tz(studio.mainTZ).toISOString();
-      const endDate = moment(currentDate).endOf('day').tz(studio.mainTZ).toISOString();
-      const path = `/api/studio/events?studios[0]=${studio.id}&start=${startDate}&end=${endDate}`;
+      const startDate = moment(currentDate).startOf('day').toISOString();
+      const endDate = moment(currentDate).endOf('day').toISOString();
+      const path = `/api/studio/events?studios[0]=${studio.data.id}&start=${startDate}&end=${endDate}`;
       const res = await dibsFetch(path, { method: 'GET' });
       if (res.success) dispatch(setEvents(res.events));
       else console.log(res);

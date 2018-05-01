@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { SwipeListView } from 'react-native-swipe-list-view';
-import Moment from 'moment';
-import { View, Text } from 'react-native';
 import styled from 'styled-components';
-
 import SchedulePageEventListItem from './SchedulePageEventListItem';
+import { getEventsOnCurrentDate } from '../../selectors';
 
 const StyledHiddenItemView = styled.View`
   align-items: center;
@@ -23,22 +22,52 @@ const StyledHiddenItemText = styled.Text`
   font-family: 'flex-font-heavy';
 `;
 
+/**
+ * @class SchedulePageEvents
+ * @extends Component
+ */
 class SchedulePageEvents extends Component {
-  static keyExtractor = (item, index) => `list-item-${index}`
+  /**
+   * @param {Object} event being rendered
+   * @returns {string} key for React
+   */
+  static keyExtractor = event => `list-item-${event.id}`
 
-  renderItem = ({item, index}) => (
-    <SchedulePageEventListItem
-      item={item}
-      index={index}
-      studioColor={this.props.studioColor}
-    />
-  );
+  /**
+   * @constructor
+   * @constructs SchedulePageEvents
+   * @param {Object} props for component
+   */
+  constructor(props) {
+    super(props);
+    this.renderItem = this.renderItem.bind(this);
+  }
 
+  /**
+   *
+   * @param {Object} item the event
+   * @param {number} index in the array
+   * @returns {JSX} event list item component
+   */
+  renderItem({ item, index }) {
+    return (
+      <SchedulePageEventListItem
+        item={item}
+        index={index}
+        studioColor={this.props.studioColor}
+      />
+    );
+  }
+
+  /**
+   * @returns {JSX} XML
+   */
   render() {
+    console.log(this.props.events)
     return (
       <SwipeListView
         useFlatList
-        data={this.props.listings}
+        data={this.props.events}
         keyExtractor={SchedulePageEvents.keyExtractor}
         renderItem={this.renderItem}
         renderHiddenItem={() => (
@@ -57,7 +86,12 @@ class SchedulePageEvents extends Component {
 
 SchedulePageEvents.propTypes = {
   studioColor: PropTypes.string,
-  listings: PropTypes.arrayOf(PropTypes.shape()),
-}
+  events: PropTypes.arrayOf(PropTypes.shape()),
+};
 
-export default SchedulePageEvents;
+const mapStateToProps = state => ({
+  events: getEventsOnCurrentDate(state),
+});
+const mapDispatchToProps = {};
+
+export default connect(mapStateToProps, mapDispatchToProps)(SchedulePageEvents);

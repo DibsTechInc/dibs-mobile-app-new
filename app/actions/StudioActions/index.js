@@ -1,9 +1,8 @@
-import { createAction, createActions } from 'redux-actions';
+import { createActions } from 'redux-actions';
 import Config from '../../../config.json';
 
-export const setStudio = createAction('SET_STUDIO', payload => payload);
-
-export const { setStudioLoadingTrue, setStudioLoadingFalse } = createActions({
+export const { setStudio, setStudioLoadingTrue, setStudioLoadingFalse } = createActions({
+  SET_STUDIO: payload => payload,
   SET_STUDIO_LOADING_TRUE: () => true,
   SET_STUDIO_LOADING_FALSE: () => false,
 });

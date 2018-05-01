@@ -17,11 +17,13 @@ import Config from '../../../config.json';
 
 import CalendarStrip from '../CalendarStrip';
 import SchedulePageEvents from './SchedulePageEvents';
-import { requestEventData } from '../../actions/EventActions';
-import { requestStudioData } from '../../actions/StudioActions';
-import { setCurrentDate } from '../../actions/CurrentDateActions';
-import { getEventsLoading } from '../../selectors/EventsSelectors';
-import { getStudioDibsConfig } from '../../selectors/StudioSelectors';
+import { requestEventData, requestStudioData } from '../../actions';
+import {
+  setCurrentDate,
+  getEventsLoading,
+  getStudioDibsConfig,
+  getStudioData,
+} from '../../selectors';
 
 const StyledView = styled.View`
   height: 100%;
@@ -37,7 +39,11 @@ class SchedulePage extends Component {
   }
 
   componentDidMount() {
-    this.props.requestEventData();
+    if (this.props.studio.id) this.props.requestEventData();
+  }
+
+  componentWillReceiveProps(props) {
+    if (!this.props.studio.id && props.studio.id) this.props.requestEventData();
   }
 
   componentDidUpdate(props) {
@@ -75,17 +81,17 @@ class SchedulePage extends Component {
 }
 
 SchedulePage.propTypes = {
-  studioConfig: PropTypes.shape(),
   requestEventData: PropTypes.func,
   isLoading: PropTypes.bool,
   currentDate: PropTypes.shape(),
+  studio: PropTypes.shape(),
 };
 
 const mapStateToProps = state => ({
-  studio: state.studio,
   isLoading: getEventsLoading(state),
   studioConfig: getStudioDibsConfig(state),
   currentDate: state.currentDate,
+  studio: getStudioData(state),
 });
 
 const mapDispatchToProps = {

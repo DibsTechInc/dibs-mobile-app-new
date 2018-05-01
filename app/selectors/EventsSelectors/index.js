@@ -1,42 +1,14 @@
 import { createSelector } from 'reselect';
 import moment from 'moment-timezone';
 import { format as formatCurrency } from 'currency-formatter';
-import Decimal from 'decimal.js';
-import { groupBy, sortBy, map } from 'lodash';
 import { createUnboundedSelector } from '../../helpers';
-
-// in progress
-/*
-import {
-  getStudioCurrency,
-  getStudioName,
-  getStudioCustomTimeFormat,
-} from '../studio';
-
-import {
-  getUserPasses,
-} from '../user/passes';
-
-import {
-  getFiltersClassid,
-  getFiltersClassNames,
-  getFilterLocationIdsAsArray,
-  getFiltersInstructorId,
-  getFiltersSearchQuery,
-} from '../filters';
-
-import { getUpcomingEventsData } from '../upcomingEvents';
-import { getConfirmedTransactionsByEvent } from '../confirmation';
-import { getStudioHasMultipleLocations } from '../studio/locations';
-import findLocale from '../../../shared/helpers/locale-helper';
-*/
 
 /**
  * getEventsState
  * @param {Object} state in store
  * @returns {Object} events state
  */
-export function getEventsState(state) {
+export function getEvents(state) {
   return state.events;
 }
 
@@ -46,7 +18,7 @@ export function getEventsState(state) {
  * @returns {Object} events state
  */
 export function getEventsLoading(state) {
-  return getEventsState(state).loading;
+  return Boolean(getEvents(state).loading);
 }
 
 /**
@@ -55,22 +27,14 @@ export function getEventsLoading(state) {
  * @returns {Object} events state
  */
 export function getEventsData(state) {
-  return getEventsState(state).data;
+  return getEvents(state).data || [];
 }
 
-/**
- * getNumberOfEvents
- * @returns {Number} events number of events
- */
 export const getNumberOfEvents = createSelector(
   getEventsData,
   events => events.length
 );
 
-/**
- * getEventsOnCurrentDate
- * @returns {Array} events events on the current date
- */
 export const getEventsOnCurrentDate = createUnboundedSelector(
   [
     getEventsData,
