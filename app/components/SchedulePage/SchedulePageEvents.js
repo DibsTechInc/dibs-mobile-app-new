@@ -24,8 +24,8 @@ const StyledHiddenItemText = styled.Text`
 `;
 
 class SchedulePageEvents extends Component {
-  keyExtractor = (item, index) => `list-item-${index}`
-  
+  static keyExtractor = (item, index) => `list-item-${index}`
+
   renderItem = ({item, index}) => (
     <SchedulePageEventListItem
       item={item}
@@ -39,13 +39,13 @@ class SchedulePageEvents extends Component {
       <SwipeListView
         useFlatList
         data={this.props.listings}
-        keyExtractor={this.keyExtractor}
+        keyExtractor={SchedulePageEvents.keyExtractor}
         renderItem={this.renderItem}
-        renderHiddenItem={ (data, rowMap) => (
-            <StyledHiddenItemView>
-              <StyledHiddenItemText>Drop this Class</StyledHiddenItemText>
-              <StyledHiddenItemText>Add to Cart</StyledHiddenItemText>
-            </StyledHiddenItemView>
+        renderHiddenItem={() => (
+          <StyledHiddenItemView>
+            <StyledHiddenItemText> Drop this Class </StyledHiddenItemText>
+            <StyledHiddenItemText> Add to Cart </StyledHiddenItemText>
+          </StyledHiddenItemView>
         )}
         leftOpenValue={180}
         rightOpenValue={-180}

@@ -1,7 +1,98 @@
-import SchedulePage from './SchedulePage';
-import SchedulePageEvents from './SchedulePageEvents';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  Button,
+  ActivityIndicator,
+  Image,
+} from 'react-native';
+import _ from 'lodash';
+import styled from 'styled-components';
+import moment from 'moment';
+import Config from '../../../config.json';
 
-export {
-  SchedulePage,
-  SchedulePageEvents,
+import CalendarStrip from '../CalendarStrip';
+import SchedulePageEvents from './SchedulePageEvents';
+import { requestEventData } from '../../actions/EventActions';
+import { requestStudioData } from '../../actions/StudioActions';
+import { setCurrentDate } from '../../actions/CurrentDateActions';
+import { getEventsLoading } from '../../selectors/EventsSelectors';
+import { getStudioDibsConfig } from '../../selectors/StudioSelectors';
+
+const StyledView = styled.View`
+  height: 100%;
+`;
+
+const StyledActivityIndicator = styled.ActivityIndicator`
+  margin-top: 50%;
+`;
+
+class SchedulePage extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  componentDidMount() {
+    this.props.requestEventData();
+  }
+
+  componentDidUpdate(props) {
+    if (props.currentDate.toISOString() !== this.props.currentDate.toISOString()) {
+      this.props.requestEventData();
+    }
+  }
+
+
+  render() {
+    return (
+      <StyledView>
+        <CalendarStrip
+          calendarAnimation={{ type: 'parallel', duration: 600 }} // animation when switching weeks
+          selection="background" // type of selection circle
+          selectionAnimation={{ duration: 300, borderWidth: 1 }} // animation when selecting a date
+          style={{ paddingTop: 20, paddingBottom: 10 }}
+          calendarColor={Config.STUDIO_COLOR} // main background color
+          highlightColor="#f4f4f4" // color of the selection circle
+          iconContainer={{ flex: 0.1 }}
+          dateNumberStyle={{ color: 'white' }}
+          dateNameStyle={{ color: 'white' }}
+          calendarHeaderStyle={{ color: 'white' }}
+          borderHighlightColor="white"
+          highlightDateNameStyle={{ color: Config.STUDIO_COLOR }}
+          highlightDateNumberStyle={{ color: Config.STUDIO_COLOR }}
+        />
+        {(this.props.isLoading ?
+          <StyledActivityIndicator size="large" />
+          : <SchedulePageEvents studioColor={Config.STUDIO_COLOR} />
+        )}
+      </StyledView>
+    );
+  }
 }
+
+SchedulePage.propTypes = {
+  studioConfig: PropTypes.shape(),
+  requestEventData: PropTypes.func,
+  isLoading: PropTypes.bool,
+  currentDate: PropTypes.shape(),
+};
+
+const mapStateToProps = state => ({
+  studio: state.studio,
+  isLoading: getEventsLoading(state),
+  studioConfig: getStudioDibsConfig(state),
+  currentDate: state.currentDate,
+});
+
+const mapDispatchToProps = {
+  requestEventData,
+  requestStudioData,
+  setCurrentDate,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(SchedulePage);
+

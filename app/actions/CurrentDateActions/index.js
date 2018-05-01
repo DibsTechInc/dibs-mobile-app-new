@@ -1,14 +1,6 @@
-import {
-  SET_CURRENT_DATE,
-  SET_CURRENT_START_DATE,
-  SET_CURRENT_END_DATE,
-} from '../../constants/CurrentDateConstants';
+import { createActions } from 'redux-actions';
 
-/**
- * setCurrentDate
- * @param {string} value new date
- * @returns {type} action on the state
- */
-export function setCurrentDate(value) {
-  return { type: SET_CURRENT_DATE, value }
-}
+export const { setCurrentDate, addDaysToCurrentDate } = createActions({
+  SET_CURRENT_DATE: payload => payload,
+  ADD_DAYS_TO_CURRENT_DATE: num => num,
+});

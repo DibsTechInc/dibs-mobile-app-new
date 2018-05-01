@@ -1,16 +1,12 @@
-import { SET_STUDIO } from '../../constants/StudioConstants';
+import { handleActions, combineActions } from 'redux-actions';
+import { setStudio, setStudioLoadingTrue, setStudioLoadingFalse } from '../../actions/StudioActions';
 
-/**
- * studio
- * @param {object} [state={}] the studio
- * @param {object} action on the state
- * @returns {objecr} new state
- */
-export default function studio(state = {}, action) {
-  switch (action.type) {
-    case SET_STUDIO:
-      return action.value;
-    default:
-      return state;
-  }
-}
+const initialState = {
+  data: null,
+  loading: false,
+};
+
+export default handleActions({
+  [setStudio]: (state, { payload }) => ({ ...state, data: payload }),
+  [combineActions(setStudioLoadingTrue, setStudioLoadingFalse)]: (state, { payload }) => ({ ...state, loading: payload }),
+}, initialState);

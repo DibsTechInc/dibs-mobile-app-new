@@ -1,24 +1,20 @@
-import {
-  SET_EVENTS,
-  SET_EVENT_SOLD_OUT,
-  SET_EVENTS_LOADING_TRUE,
-  SET_EVENTS_LOADING_FALSE,
-  SETTING_EVENT_VIA_ACTION,
-} from '../../constants/EventConstants';
+import { handleActions, combineActions } from 'redux-actions';
+import { setEvents, setEventsLoadingTrue, setEventsLoadingFalse } from '../../actions/EventActions';
 
 const initialState = {
   loading: false,
-  settingViaAction: false,
   data: [],
 };
+
+// TODO marking event as sold out and updating spot count
 
 /**
  * @param {Object} state of events
  * @param {Object} action on the state
  * @returns {Object} new state
  */
-function handleSetEvents(state, action) {
-  const events = state.data.concat(action.value).reduce((acc, item) => {
+function handleSetEvents(state, { payload }) {
+  const events = state.data.concat(payload).reduce((acc, item) => {
     const index = acc.findIndex(event => event.id === item.id);
     if (index >= 0) {
       acc[index] = item;
@@ -34,38 +30,7 @@ function handleSetEvents(state, action) {
   return { ...state, data: events };
 }
 
-/**
- * @param {Object} state of events
- * @param {Object} action on the state
- * @returns {Object} new state
- */
-function handleSetEventSoldOut(state, action) {
-  const events = state.data.map(event => ({
-    ...event,
-    sold_out: event.sold_out || (event.id === action.event.eventid),
-  }));
-
-  return { ...state, data: events };
-}
-
-/**
- * @param {Object} state of events in feed
- * @param {Object} action on the state
- * @returns {Object} new state
- */
-export default function eventReducer(state = initialState, action) {
-  switch (action.type) {
-    case SET_EVENTS:
-      return handleSetEvents(state, action);
-    case SET_EVENT_SOLD_OUT:
-      return handleSetEventSoldOut(state, action);
-    case SETTING_EVENT_VIA_ACTION:
-      return { ...state, settingViaAction: action.value };
-    case SET_EVENTS_LOADING_TRUE:
-      return { ...state, loading: true };
-    case SET_EVENTS_LOADING_FALSE:
-      return { ...state, loading: false };
-    default:
-      return state;
-  }
-}
+export default handleActions({
+  [combineActions(setEventsLoadingTrue, setEventsLoadingFalse)]: (state, { payload }) => ({ ...state, loading: payload }),
+  [setEvents]: handleSetEvents,
+}, initialState);

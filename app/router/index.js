@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { AsyncStorage } from 'react-native';
 import { StackNavigator } from 'react-navigation';
@@ -12,9 +13,10 @@ import {
   LOGIN_ROUTE,
   REGISTER_ROUTE,
   DRAWER_ROUTE,
+  PROFILE_ROUTE,
 } from '../constants/RouteConstants';
 
-import { SchedulePage } from '../components/SchedulePage';
+import SchedulePage from '../components/SchedulePage';
 import { EnterPassword, EnterEmail, Signup } from '../components/AuthPage';
 import LandingPage from '../components/LandingPage';
 import MainPage from '../components/MainPage';
@@ -32,7 +34,7 @@ const createStackNavigator = token => StackNavigator(
     [SCHEDULE_ROUTE]: {
       screen: SchedulePage,
     },
-    [SCHEDULE_ROUTE]: {
+    [PROFILE_ROUTE]: {
       screen: ProfilePage,
     },
     [VERIFY_ROUTE]: {
@@ -56,39 +58,53 @@ const createStackNavigator = token => StackNavigator(
   }
 );
 
+/**
+ * @class Navigator
+ * @extends Component
+ */
 class Navigator extends Component {
-  constructor() {
-    super()
-
+  /**
+   * @constructor
+   * @constructs Navigator
+   * @param {Object} props for component
+   */
+  constructor(props) {
+    super(props);
     this.state = {
       attempted: false,
       token: null,
-    }
+    };
   }
-
+  /**
+   * @returns {undefined}
+   */
   componentDidUpdate() {
     this.checkAuth();
   }
-
+  /**
+   * @returns {undefined}
+   */
   checkAuth = async () => {
     if (this.state.attempted) {
       return;
     }
-
-    const userToken = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
-
     this.setState({
-      token: userToken,
-      attempted: true
+      token: await AsyncStorage.getItem(Config.USER_TOKEN_KEY),
+      attempted: true,
     });
   }
-
+  /**
+   * @returns {JSX} XML
+   */
   render() {
-    const Navigator = createStackNavigator(this.props.user.id);
-
-    return <Navigator />
+    const Nav = createStackNavigator(this.props.user.id);
+    return <Nav />;
   }
 }
+
+Navigator.propTypes = {
+  user: PropTypes.shape(),
+};
 
 const mapStateToProps = state => ({
   user: state.user,
