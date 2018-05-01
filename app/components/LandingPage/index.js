@@ -1,20 +1,13 @@
 
 import React, { Component } from 'react';
 import {
-  StyleSheet,
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  Button,
   AsyncStorage,
 } from 'react-native';
-import { StackNavigator } from 'react-navigation';
+
 import styled from 'styled-components';
 import Swiper from 'react-native-swiper';
 
 import About from './About';
-import { authFetch } from '../../helpers';
 import { VERIFY_ROUTE } from '../../constants/RouteConstants/index';
 import Config from '../../../config.json';
 

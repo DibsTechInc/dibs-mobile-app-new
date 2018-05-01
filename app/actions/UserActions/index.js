@@ -1,6 +1,6 @@
 import { AsyncStorage } from 'react-native';
 import { createAction } from 'redux-actions';
-import { LOGIN_ROUTE, REGISTER_ROUTE } from '../../constants/RouteConstants';
+import { LOGIN_ROUTE, REGISTER_ROUTE, MAIN_ROUTE } from '../../constants/RouteConstants';
 import Config from '../../../config.json';
 
 export const setUser = createAction('SET_USER', payload => payload);
@@ -34,57 +34,28 @@ export function validateEmail(email, callback = () => {}) {
   };
 }
 
-/*** in progress */
-export function signUpUser(payload, cb) {
-  return async function innerSignInUser(dispatch, getState) {
-    const query = '';
+/**
+ * @param {object} payload user registration data
+ * @param {function} callback on complete
+ * @returns {function} thunk
+ */
+export function signUpUser(payload, callback) {
+  return async function innerSignInUser(dispatch, getState, dibsFetch) {
+    try {
+      const res = await dibsFetch('/api/user/register', {
+        method: 'POST',
+        body: payload,
+      });
 
-    const {
-      email,
-      password,
-      signupMethod,
-      signupStudioId,
-      signupStudioSource,
-      signupDibsStudioId,
-      address,
-      birthday,
-      city,
-      state,
-      zip,
-      referredBy,
-    } = payload;
+      if (res.success) {
+        return callback(MAIN_ROUTE);
+      }
 
-    fetch(query, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: {
-        email,
-        password,
-        signupMethod,
-        signupStudioId,
-        signupStudioSource,
-        signupDibsStudioId,
-        address,
-        birthday,
-        city,
-        state,
-        zip,
-        referredBy,
-      },
-    })
-    .then(res => res.json())
-    .then(res => {
-      // auth-related work in progress
-      // onValueChange('STORAGE_KEY', res.token);
-      dispatch(setUser(res.user))
-      cb();
-    })
-    .catch(err => {
+      return callback(null);
+    } catch (err) {
       console.log(err);
-    });
+      return callback(null);
+    }
   }
 }
 
@@ -94,7 +65,7 @@ export function signUpUser(payload, cb) {
  * @param {function} callback on complete
  * @returns {function} thunk
  */
-export function submitLogin(email, password) {
+export function submitLogin(email, password, callback) {
   return async function innerUserLogin(dispatch, getState, dibsFetch) {
     try {
       const res = await dibsFetch('/api/user/login', {
@@ -104,8 +75,12 @@ export function submitLogin(email, password) {
           password,
         },
       });
-      if (res.success) dispatch(setUser(res.user));
-      else console.log(res);
+      if (res.success) { 
+        dispatch(setUser(res.user)); 
+        callback(res.user);
+      } else {
+        callback(null);
+      }
     } catch (err) {
       console.log(err);
     }
