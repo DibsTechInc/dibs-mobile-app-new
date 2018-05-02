@@ -3,12 +3,15 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Decimal from 'decimal.js';
 import { connect } from 'react-redux';
+import { SwipeRow } from 'react-native-swipe-list-view';
+import { TouchableHighlight } from 'react-native';
 import { format as formatCurrency } from 'currency-formatter';
 import { WHITE, TEXT_GREY, LIGHT_GREY, GREEN, GREY } from '../../../constants';
 import {
   getUsersNextPassValue,
   getUsersNextPassId,
 } from '../../../selectors';
+import HiddenControls from './HiddenControls';
 
 const StyledListItemView = styled.View`
   align-items: center;
@@ -98,32 +101,43 @@ class EventListItem extends PureComponent {
     );
 
     return (
-      <StyledListItemView>
-        <StyledRowContainer>
-          <StyledColumnContainer>
-            <StyledTitleHeavy>
-              {this.props.startTimeInLocalTZ}
-            </StyledTitleHeavy>
-            <StyledTitle>
-              {this.props.timeDuration} min
-            </StyledTitle>
-          </StyledColumnContainer>
-          <StyledColumnContainer>
-            <StyledTitleHeavy>
-              {this.props.name}
-            </StyledTitleHeavy>
-            <StyledTitle>
-              {this.props.instructorName}
-            </StyledTitle>
-          </StyledColumnContainer>
-          <StyledColumnContainer>
-            <StyledTitleHeavy>
-              {this.props.locationName}
-            </StyledTitleHeavy>
-          </StyledColumnContainer>
-          {priceComponent}
-        </StyledRowContainer>
-      </StyledListItemView>
+      <SwipeRow
+        // leftOpenValue={180}
+        // rightOpenValue={-180}
+        // swipeToOpenPercent={99}
+        disableRightSwipe={!event.quantity}
+        disableLeftSwipe={event.soldOut || event.maxSeatsReached}
+      >
+        <HiddenControls {...this.props} />
+        <TouchableHighlight>
+          <StyledListItemView>
+            <StyledRowContainer>
+              <StyledColumnContainer>
+                <StyledTitleHeavy>
+                  {this.props.startTimeInLocalTZ}
+                </StyledTitleHeavy>
+                <StyledTitle>
+                  {this.props.timeDuration} min
+                </StyledTitle>
+              </StyledColumnContainer>
+              <StyledColumnContainer>
+                <StyledTitleHeavy>
+                  {this.props.name}
+                </StyledTitleHeavy>
+                <StyledTitle>
+                  {this.props.instructorName}
+                </StyledTitle>
+              </StyledColumnContainer>
+              <StyledColumnContainer>
+                <StyledTitleHeavy>
+                  {this.props.locationName}
+                </StyledTitleHeavy>
+              </StyledColumnContainer>
+              {priceComponent}
+            </StyledRowContainer>
+          </StyledListItemView>
+        </TouchableHighlight>
+      </SwipeRow>
     );
   }
 }

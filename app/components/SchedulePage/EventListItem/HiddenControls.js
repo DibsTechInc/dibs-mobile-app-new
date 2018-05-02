@@ -1,7 +1,9 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import styled from 'styled-components';
 import Config from '../../../../config.json';
+import { addToCart, removeOneEventItem } from '../../../actions';
 
 const StyledHiddenItemView = styled.View`
   align-items: center;
@@ -17,6 +19,11 @@ const StyledHiddenItemText = styled.Text`
   color: #fff;
   justify-content: center;
   font-family: 'flex-font-heavy';
+  font-size:
+`;
+
+const StyledTouchable = styled.TouchableOpacity`
+  align-items: center;
 `;
 
 /**
@@ -25,23 +32,59 @@ const StyledHiddenItemText = styled.Text`
  */
 class HiddenControls extends React.PureComponent {
   /**
+   * @constructor
+   * @constructs HiddenControls
+   * @param {Object} props for component
+   */
+  constructor(props) {
+    super(props);
+    this.addItemToCart = this.addItemToCart.bind(this);
+  }
+  addItemToCart() {
+    this.props.addToCart({
+      eventid: this.props.eventid,
+      passid: this.props.passid,
+      price: this.props.price,
+      taxRate: this.props.taxRate,
+      name: this.props.name,
+      start_time: this.props.start_time,
+    });
+  }
+  /**
    * render
    * @returns {JSX.Element} HTML
    */
   render() {
     return (
       <StyledHiddenItemView>
-        <StyledHiddenItemText>
-          Drop class
-        </StyledHiddenItemText>
-        <StyledHiddenItemText>
-          Add to cart
-        </StyledHiddenItemText>
+        <StyledTouchable>
+          <StyledHiddenItemText>
+            Drop class
+          </StyledHiddenItemText>
+        </StyledTouchable>
+        <StyledTouchable onPress={this.addItemToCart}>
+          <StyledHiddenItemText>
+            Add to cart
+          </StyledHiddenItemText>
+        </StyledTouchable>
       </StyledHiddenItemView>
     );
   }
 }
 
-HiddenControls.propTypes = {};
+HiddenControls.propTypes = {
+  addToCart: PropTypes.func,
+  eventid: PropTypes.number,
+  passid: PropTypes.number,
+  price: PropTypes.number,
+  taxRate: PropTypes.number,
+  name: PropTypes.string,
+  start_time: PropTypes.string,
+};
 
-export default HiddenControls;
+const mapDispatchToProps = {
+  addToCart,
+  removeOneEventItem,
+};
+
+export default connect(null, mapDispatchToProps)(HiddenControls);
