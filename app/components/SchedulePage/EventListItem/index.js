@@ -111,8 +111,8 @@ class EventListItem extends PureComponent {
 
     return (
       <SwipeRow
-        leftOpenValue={100}
-        rightOpenValue={-100}
+        leftOpenValue={90}
+        rightOpenValue={-90}
         swipeToOpenPercent={99}
         disableRightSwipe={!this.props.quantity}
         disableLeftSwipe={this.props.soldOut || this.props.maxSeatsReached}

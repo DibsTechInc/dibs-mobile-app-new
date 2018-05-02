@@ -11,7 +11,7 @@ import {
   getDrawerConfig,
   getDrawerNavigationOptions,
 } from '../../util/navigation';
-import DrawerItem from './DrawerItem';
+import IconComponent from '../shared/Icon';
 import MainPage from '../MainPage';
 import ProfilePage from '../ProfilePage';
 import SchedulePage from '../SchedulePage';
@@ -19,7 +19,7 @@ import * as Colors from '../../theme/colors';
 import SideMenu from './SideMenu';
 
 const getDrawerItem = navigation => (
-  <DrawerItem
+  <IconComponent
     iconName="bars"
     studioColor={Colors.PRIMARY}
     onPress={() => {

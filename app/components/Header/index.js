@@ -2,15 +2,17 @@ import React, { Component } from 'react';
 import { Alert } from 'react-native';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { connect } from 'react-redux';
+import { getTotalQuantityInCart } from '../../selectors';
 
-import DrawerItem from '../Drawer/DrawerItem';
+import DrawerItem from '../shared/Icon';
 
 const StyledView = styled.View`
   height: 50;
   justify-content: space-between;
   flex-direction: row;
   align-items: center;
-  background-color: ${props => props.backgroundColor ? props.backgroundColor : '#fff'}
+  background-color: ${props => (props.backgroundColor ? props.backgroundColor : '#fff')}
   margin-top: 35;
 `;
 
@@ -45,7 +47,7 @@ class Header extends Component {
             iconName="shopping-cart"
             iconColor={this.props.iconColor}
             onPress={() => Alert.alert('This will take you to the shopping cart page!')}
-            hasNotification
+            notificationCount={this.props.quantityInCart}
           />
         </StyledCartView>
       </StyledView>
@@ -57,7 +59,13 @@ Header.propTypes = {
   navigation: PropTypes.shape(),
   iconColor: PropTypes.string,
   backgroundColor: PropTypes.string,
+  quantityInCart: PropTypes.number,
 };
 
-export default Header;
+const mapStateToProps = state => ({
+  quantityInCart: getTotalQuantityInCart(state),
+});
+const mapDispatchToProps = {};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Header);
 

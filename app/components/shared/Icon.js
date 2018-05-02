@@ -36,16 +36,16 @@ const StyledTouchable = styled.Text`
  * @class DrawerItem
  * @extends PureComponent
  */
-class DrawerItem extends Component {
+class IconComponent extends Component {
   /**
    * @returns {JSX} XML
    */
   render() {
-    if (this.props.hasNotification) {
+    if (this.props.notificationCount) {
       return (
         <StyledView>
           <StyledNotification>
-            <StyledNotificationText>{this.props.cartCount}</StyledNotificationText>
+            <StyledNotificationText>{this.props.notificationCount}</StyledNotificationText>
           </StyledNotification>
           <StyledTouchable
             onPress={this.props.onPress}
@@ -66,20 +66,19 @@ class DrawerItem extends Component {
   }
 }
 
-DrawerItem.defaultProps = {
+IconComponent.defaultProps = {
   iconColor: '#000',
   size: 25,
   hasNotification: false,
   cartCount: 2,
 };
 
-DrawerItem.propTypes = {
+IconComponent.propTypes = {
   iconName: PropTypes.string.isRequired,
   onPress: PropTypes.func.isRequired,
   iconColor: PropTypes.string.isRequired,
   size: PropTypes.number.isRequired,
-  hasNotification: PropTypes.bool,
-  cartCount: PropTypes.number,
+  notificationCount: PropTypes.number,
 };
 
-export default DrawerItem;
+export default IconComponent;

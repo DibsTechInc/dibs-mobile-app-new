@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 import Config from '../../../../config.json';
 import { addToCart, removeOneEventItem } from '../../../actions';
+import { WHITE } from '../../../constants';
 
 const StyledHiddenItemView = styled.View`
   align-items: center;
@@ -15,14 +16,19 @@ const StyledHiddenItemView = styled.View`
 `;
 
 const StyledHiddenItemText = styled.Text`
-  color: #fff;
+  color: ${WHITE};
   justify-content: center;
   font-family: 'flex-font-heavy';
-  font-size: 14px;
+  font-size: 32px;
 `;
 
 const StyledTouchable = styled.TouchableOpacity`
   align-items: center;
+  border: solid 2px ${WHITE}
+  border-radius: 25;
+  height: 50;
+  justify-content: center;
+  width: 50;
 `;
 
 /**
@@ -38,6 +44,7 @@ class HiddenControls extends React.PureComponent {
   constructor(props) {
     super(props);
     this.addItemToCart = this.addItemToCart.bind(this);
+    this.removeItemFromCart = this.removeItemFromCart.bind(this);
   }
   /**
    * @returns {undefined}
@@ -53,20 +60,26 @@ class HiddenControls extends React.PureComponent {
     });
   }
   /**
+   * @returns {undefined}
+   */
+  removeItemFromCart() {
+    this.props.removeOneEventItem(this.props.eventid);
+  }
+  /**
    * render
    * @returns {JSX.Element} HTML
    */
   render() {
     return (
       <StyledHiddenItemView>
-        <StyledTouchable>
+        <StyledTouchable onPress={this.removeItemFromCart}>
           <StyledHiddenItemText>
-            Drop class
+            -
           </StyledHiddenItemText>
         </StyledTouchable>
         <StyledTouchable onPress={this.addItemToCart}>
           <StyledHiddenItemText>
-            Add to cart
+            +
           </StyledHiddenItemText>
         </StyledTouchable>
       </StyledHiddenItemView>
@@ -76,6 +89,7 @@ class HiddenControls extends React.PureComponent {
 
 HiddenControls.propTypes = {
   addToCart: PropTypes.func,
+  removeOneEventItem: PropTypes.func,
   eventid: PropTypes.number,
   passid: PropTypes.number,
   price: PropTypes.number,
