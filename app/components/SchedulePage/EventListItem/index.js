@@ -4,9 +4,8 @@ import styled from 'styled-components';
 import Decimal from 'decimal.js';
 import { connect } from 'react-redux';
 import { SwipeRow } from 'react-native-swipe-list-view';
-import { TouchableHighlight } from 'react-native';
+import { TouchableHighlight, Dimensions } from 'react-native';
 import { format as formatCurrency } from 'currency-formatter';
-import { Dimensions } from 'react-native';
 import { WHITE, TEXT_GREY, LIGHT_GREY, GREEN, GREY } from '../../../constants';
 import {
   getUsersNextPassValue,
