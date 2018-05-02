@@ -11,15 +11,14 @@ const StyledHiddenItemView = styled.View`
   flex: 1;
   flex-direction: row;
   justify-content: space-between;
-  padding-right: 40;
-  padding-left: 40;
+  padding: 0px 20px;
 `;
 
 const StyledHiddenItemText = styled.Text`
   color: #fff;
   justify-content: center;
   font-family: 'flex-font-heavy';
-  font-size:
+  font-size: 14px;
 `;
 
 const StyledTouchable = styled.TouchableOpacity`
@@ -40,6 +39,9 @@ class HiddenControls extends React.PureComponent {
     super(props);
     this.addItemToCart = this.addItemToCart.bind(this);
   }
+  /**
+   * @returns {undefined}
+   */
   addItemToCart() {
     this.props.addToCart({
       eventid: this.props.eventid,

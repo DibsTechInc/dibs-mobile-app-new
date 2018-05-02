@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import { SwipeRow } from 'react-native-swipe-list-view';
 import { TouchableHighlight } from 'react-native';
 import { format as formatCurrency } from 'currency-formatter';
+import { Dimensions } from 'react-native';
 import { WHITE, TEXT_GREY, LIGHT_GREY, GREEN, GREY } from '../../../constants';
 import {
   getUsersNextPassValue,
@@ -45,7 +46,7 @@ const StyledColumnContainer = styled.View`
 `;
 
 const StyledTitle = styled.Text`
-  font-size: 13px;
+  font-size: ${Dimensions.get('window').width > 350 ? '13px' : '10px'};
   font-family: 'flex-font';
   color: ${TEXT_GREY};
   text-align: center;
@@ -110,11 +111,11 @@ class EventListItem extends PureComponent {
 
     return (
       <SwipeRow
-        // leftOpenValue={180}
-        // rightOpenValue={-180}
-        // swipeToOpenPercent={99}
-        disableRightSwipe={!event.quantity}
-        disableLeftSwipe={event.soldOut || event.maxSeatsReached}
+        leftOpenValue={100}
+        rightOpenValue={-100}
+        swipeToOpenPercent={99}
+        disableRightSwipe={!this.props.quantity}
+        disableLeftSwipe={this.props.soldOut || this.props.maxSeatsReached}
       >
         <HiddenControls {...this.props} />
         <TouchableHighlight>
@@ -161,6 +162,8 @@ EventListItem.propTypes = {
   valueBack: PropTypes.number,
   formattedValueBack: PropTypes.string,
   soldOut: PropTypes.bool,
+  quantity: PropTypes.number,
+  maxSeatsReached: PropTypes.bool,
 };
 
 const mapStateToProps = (state, props) => {
