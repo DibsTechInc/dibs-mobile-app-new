@@ -65,7 +65,7 @@ class SchedulePage extends Component {
         <Header navigation={this.props.navigation} iconColor={'#fff'} backgroundColor={Colors.PRIMARY} />
         <CalendarStrip
           selection="background" // type of selection circle
-          style={{ paddingTop: 20, paddingBottom: 10 }}
+          style={{ paddingBottom: 30 }}
           calendarColor={Config.STUDIO_COLOR} // main background color
           highlightColor="#f4f4f4" // color of the selection circle
           iconContainer={{ flex: 0.1 }}
