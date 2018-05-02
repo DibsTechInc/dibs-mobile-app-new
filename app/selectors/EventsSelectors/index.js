@@ -7,6 +7,7 @@ import {
 } from '../StudioSelectors';
 import { getCartData } from '../CartSelectors';
 import { getUpcomingEventsData } from '../UpcomingEventsSelectors';
+import { createUnboundedSelector } from '../../helpers';
 
 /**
  * getEventsState
@@ -54,7 +55,7 @@ export const getEventsOnCurrentDate = createSelector(
   })
 );
 
-export const getScheduleEvents = createSelector(
+export const getScheduleEvents = createUnboundedSelector(
   [
     getEventsOnCurrentDate,
     getStudioCurrency,
