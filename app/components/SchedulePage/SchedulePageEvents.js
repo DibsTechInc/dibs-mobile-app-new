@@ -34,9 +34,9 @@ class SchedulePageEvents extends Component {
   renderRow(event) {
     return (
       <SwipeRow
-        // leftOpenValue={180}
-        // rightOpenValue={-180}
-        // swipeToOpenPercent={99}
+        leftOpenValue={180}
+        rightOpenValue={-180}
+        swipeToOpenPercent={99}
         disableRightSwipe={!event.quantity}
         disableLeftSwipe={event.soldOut || event.maxSeatsReached}
       >

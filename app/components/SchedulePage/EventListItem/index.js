@@ -9,32 +9,40 @@ import {
   getUsersNextPassValue,
   getUsersNextPassId,
 } from '../../../selectors';
+import { lightenDarkenColor } from '../../../helpers';
+import Config from '../../../../config.json';
+
+const shadowColor = lightenDarkenColor(Config.STUDIO_COLOR, -20);
 
 const StyledListItemView = styled.View`
   align-items: center;
   background-color: ${WHITE};
   justify-content: center;
-  border-bottom-width: 1;
-  border-color: ${LIGHT_GREY};
+  border-bottom-width: 6;
+  border-right-width: 3;
+  border-left-width: 1;
+  margin: 6px;
+  border-radius: 20px;
+  border-color: ${shadowColor};
 `;
 
 const StyledRowContainer = styled.View`
   flex-direction: row;
-  padding: 5px;
+  padding: 10px;
   justify-content: space-between;
   align-items: center;
 `;
 
 const StyledColumnContainer = styled.View`
   flex-direction: column;
-  padding: 10px;
+  padding: 15px;
   justify-content: center;
   align-items: center;
   flex-basis: 25%;
 `;
 
 const StyledTitle = styled.Text`
-  font-size: 10px;
+  font-size: 13px;
   font-family: 'flex-font';
   color: ${TEXT_GREY};
   text-align: center;
