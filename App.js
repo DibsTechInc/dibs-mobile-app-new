@@ -1,47 +1,79 @@
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
 import { Font } from 'expo';
+import styled from 'styled-components';
+import { AsyncStorage } from 'react-native';
+import { WHITE } from './app/constants';
 import store from './app/store'; // lol App store...
+import Config from './config.json';
 import Navigator from './app/router';
+import DibsLoader from './app/components/shared/DibsLoader';
+import { requestStudioData, requestUserData } from './app/actions';
 
 // Native apps can only load downloaded fronts stored in assets/fonts folder
 import SourceSansProBold from './assets/fonts/SourceSansPro-Bold.ttf';
 import SourceSansProRegular from './assets/fonts/SourceSansPro-Regular.ttf';
 
+const StyledLoadingPage = styled.View`
+  align-items: center;
+  background: ${Config.STUDIO_COLOR};
+  color ${WHITE};
+  justify-content: center;
+  flex: 5;
+`;
+
+/**
+ * @class App
+ * @extends Component
+ */
 class App extends Component {
+  /**
+   * @constructor
+   * @constructs App
+   */
   constructor() {
     super();
-
     this.state = {
-      fontsLoaded: false,
-    }
+      fetchedAssets: false,
+      userToken: null,
+    };
   }
-
+  /**
+   * @returns {undefined}
+   */
   componentWillMount() {
-    this.getFonts();
+    this.getAssets();
   }
-
-  async getFonts() {
-    await Font.loadAsync({
-      'flex-font': SourceSansProRegular,
-      'flex-font-heavy': SourceSansProBold,
-    });
-
-    this.setState({
-      fontsLoaded: true,
-    });
+  /**
+   * @returns {undefined}
+   */
+  async getAssets() {
+    await Promise.all([
+      Font.loadAsync({
+        'flex-font': SourceSansProRegular,
+        'flex-font-heavy': SourceSansProBold,
+      }),
+      new Promise(res => store.dispatch(requestStudioData(res))),
+      new Promise(res => store.dispatch(requestUserData(res))),
+    ]);
+    const token = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
+    this.setState({ fetchedAssets: true, userToken: token });
   }
-
+  /**
+   * @returns {JSX} XML
+   */
   render() {
-    if (!this.state.fontsLoaded) {
-      return null;
-    }
-
     return (
       <Provider store={store}>
-        <Navigator />
+        {this.state.fetchedAssets ? (
+          <Navigator userToken={this.state.userToken} />
+        ) : (
+          <StyledLoadingPage>
+            <DibsLoader />
+          </StyledLoadingPage>
+        )}
       </Provider>
-    )
+    );
   }
 }
 

@@ -10,7 +10,6 @@ class FadeInView extends React.Component {
   state = {
     fadeAnim: new Animated.Value(0),
   }
-
   /**
    * @returns {undefined}
    */
@@ -23,18 +22,15 @@ class FadeInView extends React.Component {
       }
     ).start();
   }
-
    /**
    * @returns {JSX} XML
    */
   render() {
-    const { fadeAnim } = this.state;
-
     return (
       <Animated.View
         style={{
           ...this.props.style,
-          opacity: fadeAnim,
+          opacity: this.state.fadeAnim,
           flex: 1,
         }}
       >

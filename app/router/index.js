@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import { AsyncStorage } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import Config from '../../config.json';
@@ -118,17 +117,14 @@ class Navigator extends Component {
    * @returns {JSX} XML
    */
   render() {
-    const Nav = createStackNavigator(this.props.user.id);
+    const Nav = createStackNavigator(this.props.userToken);
     return <Nav />;
   }
 }
 
 Navigator.propTypes = {
-  user: PropTypes.shape(),
+  userToken: PropTypes.string,
 };
 
-const mapStateToProps = state => ({
-  user: state.user,
-});
 
-export default connect(mapStateToProps)(Navigator);
+export default Navigator;

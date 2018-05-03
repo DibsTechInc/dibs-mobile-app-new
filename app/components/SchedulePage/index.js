@@ -11,7 +11,6 @@ import {
   setCurrentDate,
   getEventsLoading,
   getStudioDibsConfig,
-  getStudioData,
 } from '../../selectors';
 import Header from '../Header';
 import * as Colors from '../../theme/colors';
@@ -30,22 +29,8 @@ class SchedulePage extends Component {
    * @returns {undefined}
    */
   componentDidMount() {
-    if (this.props.studio.id) this.props.requestEventData();
+    this.props.requestEventData();
   }
-
-  /**
-   * This ensures the data will be fetched only if the studio
-   * data has been fetched
-   * @param {Object} props for component
-   * @returns {undefined}
-   */
-  componentWillReceiveProps(props) {
-    if (
-      (!this.props.studio.id && props.studio.id)
-      || props.currentDate.toISOString() !== this.props.currentDate.toISOString()
-    ) this.props.requestEventData();
-  }
-
   /**
    * @param {object} props react props
    * @returns {undefined}
@@ -91,7 +76,6 @@ SchedulePage.propTypes = {
   requestEventData: PropTypes.func,
   isLoading: PropTypes.bool,
   currentDate: PropTypes.shape(),
-  studio: PropTypes.shape(),
   navigation: PropTypes.shape(),
 };
 
@@ -99,7 +83,6 @@ const mapStateToProps = state => ({
   isLoading: getEventsLoading(state),
   studioConfig: getStudioDibsConfig(state),
   currentDate: state.currentDate,
-  studio: getStudioData(state),
 });
 
 const mapDispatchToProps = {
