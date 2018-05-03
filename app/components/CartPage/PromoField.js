@@ -31,7 +31,7 @@ class PromoField extends PureComponent {
           <Text>Field To Enter Promo Code</Text>
         </View>
         <View>
-          <Text style={{ fontFamily: 'flex-font' }}>
+          <Text style={{ fontSize: 16, fontFamily: 'flex-font' }}>
             Apply a coupon today!
           </Text>
         </View>

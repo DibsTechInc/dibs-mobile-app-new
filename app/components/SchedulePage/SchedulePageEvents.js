@@ -36,6 +36,7 @@ class SchedulePageEvents extends Component {
         dataSource={this.dataSource.cloneWithRows(this.props.events)}
         keyExtractor={SchedulePageEvents.keyExtractor}
         renderRow={event => <EventListItem {...event} />}
+        closeOnRowBeginSwipe
       />
     );
   }

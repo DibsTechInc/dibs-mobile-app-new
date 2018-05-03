@@ -22,12 +22,18 @@ const StyledListItemView = styled.View`
   align-items: center;
   background-color: ${props => (props.soldOut) ? LIGHT_GREY : WHITE};
   justify-content: center;
-  border-bottom-width: ${props => (props.soldOut) ? 0 : 6};
-  border-right-width: ${props => (props.soldOut) ? 0 : 3};
-  border-left-width: ${props => (props.soldOut) ? 0 : 1};
   margin: 6px;
-  border-radius: 20px;
+  border-radius: 3px;
+
+  border-width: ${props => (props.soldOut) ? 0 : 1};
   border-color: ${shadowColor};
+  border-top-color: #fff;
+  border-left-width: 0;
+  shadow-color: #000;
+  shadow-opacity: ${props => (props.soldOut) ? 0 : 0.2};
+  shadow-radius: 3;
+  elevation: 2;
+  min-height: 110px;
 `;
 
 const StyledRowContainer = styled.View`
@@ -111,11 +117,11 @@ class EventListItem extends PureComponent {
 
     return (
       <SwipeRow
-        preview
+        preview={!this.props.soldOut}
         previewOpenValue={-90}
         leftOpenValue={90}
         rightOpenValue={-90}
-        swipeToOpenPercent={99}
+        swipeToOpenPercent={50}
         disableRightSwipe
         disableLeftSwipe={this.props.soldOut}
       >
@@ -129,7 +135,7 @@ class EventListItem extends PureComponent {
           marginRight={0}
         >
           <TouchableHighlight>
-            <StyledListItemView soldOut={this.props.soldOut}>
+            <StyledListItemView soldOut={this.props.soldOut} style={{ shadowOffset: { width: 3, height: 3 } }}>
               <StyledRowContainer>
                 <StyledColumnContainer>
                   <StyledTitleHeavy>
@@ -158,7 +164,7 @@ class EventListItem extends PureComponent {
           </TouchableHighlight>
         </Notification>
         <TouchableHighlight>
-          <StyledListItemView soldOut={this.props.soldOut} maxSeatsReached={this.props.maxSeatsReached}>
+          <StyledListItemView soldOut={this.props.soldOut} style={{ shadowOffset: { width: 10, height: 10 } }}>
             <StyledRowContainer>
               <StyledColumnContainer>
                 <StyledTitleHeavy>

@@ -26,6 +26,11 @@ const StyledTouchable = styled.TouchableOpacity`
   justify-content: center;
   margin-right: 20;
   width: 40;
+  shadow-color: #000;
+  shadow-opacity: 0.3;
+  shadow-radius: 3;
+  elevation: 3;
+  margin-bottom: ${props => props.quantity ? 10 : 0};
 `;
 
 const StyledHiddenItemText = styled.Text`
@@ -79,7 +84,8 @@ class HiddenControls extends React.PureComponent {
         {!this.props.maxSeatsReached && (
           <StyledTouchable
             onPress={this.addItemToCart}
-            style={{ marginBottom: this.props.quantity ? 10 : 0 }}
+            quantity={this.props.quantity}
+            style={{ shadowOffset: { width: 3, height: 3 } }}
           >
             <StyledHiddenItemText>
               <Icon

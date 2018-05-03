@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Dimensions, Text } from 'react-native';
+import { Dimensions, View } from 'react-native';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import FadeInView from '../shared/FadeInView';
 import Header from '../Header';
 import { getSortedCartEvents } from '../../selectors/CartSelectors';
-import { WHITE, TEXT_GREY, LIGHT_GREY, GREEN, GREY } from '../../constants';
+import { WHITE, TEXT_GREY, LIGHT_GREY, GREEN, GREY, SOFT_GREY } from '../../constants';
+import Config from '../../../config.json';
+import { lightenDarkenColor } from '../../helpers';
 import {
   getFormattedCartSubtotalWithPackageClasses,
   getCartPromoCodeAmount,
@@ -34,24 +36,35 @@ import TransactionBreakdown from './TransactionBreakdown';
 import PaymentInfo from './PaymentInfo';
 import PromoField from './PromoField';
 
-const WIDTH = Dimensions.get('window').width - 12;
+const WIDTH = Dimensions.get('window').width - 20;
 
 const StyledScrollView = styled.ScrollView`
   flex: 1;
 `;
 
-const StyledSectionView = styled.View`
+const StyledSectionViewOne = styled.View`
   background-color: #fff;
-  border-width: 1px;
-  border-color: #fff;
-  border-bottom-left-radius: 6px;
-  border-bottom-right-radius: 6px;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
   height: ${props => props.height ? props.height : 'auto'};
   width: ${WIDTH};
   overflow: hidden;
-  margin-left: 6px;
-  margin-right: 6px;
-  margin-bottom: 6px;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  border-width: 1;
+  border-color: #ddd;
+  border-top-width: 0;
+  border-left-width: 0;
+  shadow-color: #000;
+  shadow-opacity: 0.5;
+  shadow-radius: 8;
+  elevation: 3;
+`;
+
+const StyledSectionViewTwo = StyledSectionViewOne.extend`
+  border-radius: 3px;
+  margin: 10px;
 `;
 
 const StyledTopView = styled.View`
@@ -60,12 +73,13 @@ const StyledTopView = styled.View`
   border-top-color: #fff;
   border-left-color: #fff;
   border-right-color: #fff;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
   border-bottom-width: 1px;
   border-bottom-color: ${LIGHT_GREY};
-  margin-left: 6px;
-  margin-right: 6px;
+  margin-top: 30px;
+  margin-left: 10px;
+  margin-right: 10px;
   height: 50;
   justify-content: center;
   align-items: center;
@@ -76,16 +90,37 @@ const StyledCheckoutView = styled.View`
   align-items: center;
   height: 150px;
   margin: 6px;
-  background-color: #454545;
+  background-color: ${SOFT_GREY};
+`;
+
+const StyledContinueButton = styled.TouchableOpacity`
+  padding-left: 100px;
+  padding-right: 100px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  background-color: ${Config.STUDIO_COLOR};
+  border-radius: 5px;
+  border-width: 1px;
+  border-color: ${Config.STUDIO_COLOR};
 `;
 
 const StyledText = styled.Text`
   font-family: 'flex-font';
+  font-size: 16px;
+`;
+
+const StyledButtonText = StyledText.extend`
+  color: #fff;
+`;
+
+const StyledSavingsText = StyledText.extend`
+  color: #000;
 `;
 
 const StyledCenterText = styled.Text`
   font-family: 'flex-font-heavy';
   text-align: center;
+  font-size: 16px;
 `;
 
 /**
@@ -113,36 +148,35 @@ class CartPage extends Component {
     }
 
     return (
-      <FadeInView style={{ backgroundColor: '#454545' }} >
-        <Header
-          navigation={this.props.navigation}
-          iconColor={'#000'}
-          backgroundColor={'#454545'}
-          showCart={false}
-        />
+      <FadeInView style={{ backgroundColor: SOFT_GREY }}>
         <StyledTopView>
           <StyledCenterText>My Cart</StyledCenterText>
         </StyledTopView>
         <StyledScrollView>
-          <StyledSectionView>
+          <StyledSectionViewOne>
             {renderCartItems}
-          </StyledSectionView>
-          <StyledSectionView height={'150'}>
+          </StyledSectionViewOne>
+          <StyledSectionViewTwo height={'150'}>
             <PromoField />
-          </StyledSectionView>
-          <StyledSectionView height={'200'}>
+          </StyledSectionViewTwo>
+          <StyledSectionViewTwo height={'200'}>
             <PaymentInfo />
-          </StyledSectionView>
-          <StyledSectionView>
+          </StyledSectionViewTwo>
+          <StyledSectionViewTwo>
             <TransactionBreakdown
               formattedSubtotal={this.props.formattedSubtotal}
               formattedTaxAmount={this.props.formattedTaxAmount}
               formattedTotal={this.props.formattedTotal}
             />
-          </StyledSectionView>
+          </StyledSectionViewTwo>
         </StyledScrollView>
         <StyledCheckoutView>
-          <StyledText>Checkout box button</StyledText>
+          <View style={{ marginBottom: 30 }}>
+            <StyledSavingsText>Place order to earn $1.09 in credit back.</StyledSavingsText>
+          </View>
+          <StyledContinueButton>
+            <StyledButtonText>Checkout</StyledButtonText>
+          </StyledContinueButton>
         </StyledCheckoutView>
       </FadeInView>
     );

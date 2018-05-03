@@ -40,27 +40,27 @@ class CartItem extends PureComponent {
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
           <View>
             <Text style={{ fontSize: 16, fontFamily: 'flex-font-heavy' }}>{this.props.name}</Text>
-            <Text>Union Square</Text>
+            <Text style={{ fontSize: 16 }}>Union Square</Text>
           </View>
           <View>
-            <Text>Start Date</Text>
-            <Text>{this.props.startTime}</Text>
+            <Text style={{ fontSize: 16 }}>Start Date</Text>
+            <Text style={{ fontSize: 16 }}>{this.props.startTime}</Text>
           </View>
         </View>
 
         <View style={{ borderWidth: 1, borderColor: LIGHT_GREY }}>
           <View style={{ margin: 10 }}>
-            <Text>Nylon Vest</Text>
-            <Text>Color: Black</Text>
-            <Text>Size: L</Text>
+            <Text style={{ fontSize: 16 }}>Nylon Vest</Text>
+            <Text style={{ fontSize: 16 }}>Color: Black</Text>
+            <Text style={{ fontSize: 16 }}>Size: L</Text>
           </View>
           <View style={{ flexDirection: 'row', margin: 10 }}>
             <View style={{ flexDirection: 'row', flex: 1 }}>
-              <Text>Remove</Text>
-              <Text>{this.props.quantity} Quantity</Text>
+              <Text style={{ fontSize: 16 }}>Remove</Text>
+              <Text style={{ fontSize: 16 }}>{this.props.quantity} Quantity</Text>
             </View>
             <View>
-              <Text>${this.props.price}</Text>
+              <Text style={{ fontSize: 16 }}>${this.props.price}</Text>
             </View>
           </View>
         </View>

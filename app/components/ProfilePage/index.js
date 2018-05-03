@@ -11,6 +11,7 @@ import { MAIN_ROUTE } from '../../constants/RouteConstants/index';
 
 import Header from '../Header';
 import FadeInView from '../shared/FadeInView';
+import { SOFT_GREY } from '../../constants/ColorConstants';
 
 /**
  * @class ProfileScreen
@@ -32,9 +33,9 @@ class ProfileScreen extends Component {
    */
   render() {
     return (
-      <FadeInView style={{ backgroundColor: '#EFEFF4' }}>
-        <Header navigation={this.props.navigation} iconColor={'#000'} backgroundColor={'#EFEFF4'} />
-        <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
+      <FadeInView style={{ backgroundColor: SOFT_GREY }}>
+        <Header navigation={this.props.navigation} iconColor={'#000'} backgroundColor={SOFT_GREY} />
+        <View style={{ backgroundColor: SOFT_GREY, flex: 1 }}>
           <SettingsList borderColor="#fff" defaultItemSize={50}>
             <SettingsList.Header headerStyle={{ marginTop: 15 }} />
             <SettingsList.Item

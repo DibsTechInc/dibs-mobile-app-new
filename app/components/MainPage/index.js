@@ -34,7 +34,7 @@ class MainPage extends Component {
   render() {
     return (
       <FadeInView style={{ backgroundColor: '#fff' }}>
-        <Header navigation={this.props.navigation} iconColor={Colors.PRIMARY} backgroundColor={'#fff'} showCart={false} />
+        <Header navigation={this.props.navigation} iconColor={Colors.PRIMARY} backgroundColor={'#fff'} />
         <CalendarPage />
         <StyledTempComponent />
         <CartModal isVisible />

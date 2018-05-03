@@ -9,6 +9,7 @@ const StyledBreakDownView = styled.View`
 
 const StyledText = styled.Text`
   font-family: 'flex-font';
+  font-size: 16;
 `;
 
 /**

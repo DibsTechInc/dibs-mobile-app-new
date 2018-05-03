@@ -29,6 +29,7 @@ const StyledWelcomeView = styled.View`
 
 const StyledWelcomeText = styled.Text`
   font-family: 'flex-font';
+  font-size: 14px;
 `;
 
 const StyledButtonText = StyledWelcomeText.extend`
@@ -40,10 +41,10 @@ const StyledGrayText = StyledWelcomeText.extend`
 `;
 
 const StyledContinueButton = styled.TouchableOpacity`
-  padding-left: 50px;
-  padding-right: 50px;
-  padding-top: 5px;
-  padding-bottom: 5px;
+  padding-left: 100px;
+  padding-right: 100px;
+  padding-top: 15px;
+  padding-bottom: 15px;
   background-color: #8fc54b;
   border-radius: 5px;
   border-width: 1px;
