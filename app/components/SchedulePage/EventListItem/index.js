@@ -15,6 +15,7 @@ import HiddenControls from './HiddenControls';
 import { lightenDarkenColor } from '../../../helpers';
 import Config from '../../../../config.json';
 import Notification from '../../shared/Notification';
+import FadeInView from '../../shared/FadeInView';
 
 const shadowColor = lightenDarkenColor(Config.STUDIO_COLOR, -20);
 
@@ -116,26 +117,56 @@ class EventListItem extends PureComponent {
     );
 
     return (
-      <SwipeRow
-        preview={!this.props.soldOut}
-        previewOpenValue={-90}
-        leftOpenValue={90}
-        rightOpenValue={-90}
-        swipeToOpenPercent={50}
-        disableRightSwipe
-        disableLeftSwipe={this.props.soldOut}
-      >
-        <HiddenControls {...this.props} />
-        <Notification
-          notificationCount={this.props.quantity}
-          radius={12}
-          fontSize={16}
-          top={-0.01} // for some reason native will only render the notif above if this value is negative, but it cuts it off, so i made it negative and rly small
-          right={8}
-          marginRight={0}
+      <FadeInView>
+        <SwipeRow
+          preview={!this.props.soldOut}
+          previewOpenValue={-90}
+          leftOpenValue={90}
+          rightOpenValue={-90}
+          swipeToOpenPercent={50}
+          disableRightSwipe
+          disableLeftSwipe={this.props.soldOut}
         >
+          <HiddenControls {...this.props} />
+          <Notification
+            notificationCount={this.props.quantity}
+            radius={12}
+            fontSize={16}
+            top={-0.01} // for some reason native will only render the notif above if this value is negative, but it cuts it off, so i made it negative and rly small
+            right={8}
+            marginRight={0}
+          >
+            <TouchableHighlight>
+              <StyledListItemView soldOut={this.props.soldOut} style={{ shadowOffset: { width: 3, height: 3 } }}>
+                <StyledRowContainer>
+                  <StyledColumnContainer>
+                    <StyledTitleHeavy>
+                      {this.props.startTimeInLocalTZ}
+                    </StyledTitleHeavy>
+                    <StyledTitle>
+                      {this.props.timeDuration} min
+                    </StyledTitle>
+                  </StyledColumnContainer>
+                  <StyledColumnContainer>
+                    <StyledTitleHeavy>
+                      {this.props.name}
+                    </StyledTitleHeavy>
+                    <StyledTitle>
+                      {this.props.instructorName}
+                    </StyledTitle>
+                  </StyledColumnContainer>
+                  <StyledColumnContainer>
+                    <StyledTitleHeavy>
+                      {this.props.locationName}
+                    </StyledTitleHeavy>
+                  </StyledColumnContainer>
+                  {priceComponent}
+                </StyledRowContainer>
+              </StyledListItemView>
+            </TouchableHighlight>
+          </Notification>
           <TouchableHighlight>
-            <StyledListItemView soldOut={this.props.soldOut} style={{ shadowOffset: { width: 3, height: 3 } }}>
+            <StyledListItemView soldOut={this.props.soldOut} style={{ shadowOffset: { width: 10, height: 10 } }}>
               <StyledRowContainer>
                 <StyledColumnContainer>
                   <StyledTitleHeavy>
@@ -162,36 +193,8 @@ class EventListItem extends PureComponent {
               </StyledRowContainer>
             </StyledListItemView>
           </TouchableHighlight>
-        </Notification>
-        <TouchableHighlight>
-          <StyledListItemView soldOut={this.props.soldOut} style={{ shadowOffset: { width: 10, height: 10 } }}>
-            <StyledRowContainer>
-              <StyledColumnContainer>
-                <StyledTitleHeavy>
-                  {this.props.startTimeInLocalTZ}
-                </StyledTitleHeavy>
-                <StyledTitle>
-                  {this.props.timeDuration} min
-                </StyledTitle>
-              </StyledColumnContainer>
-              <StyledColumnContainer>
-                <StyledTitleHeavy>
-                  {this.props.name}
-                </StyledTitleHeavy>
-                <StyledTitle>
-                  {this.props.instructorName}
-                </StyledTitle>
-              </StyledColumnContainer>
-              <StyledColumnContainer>
-                <StyledTitleHeavy>
-                  {this.props.locationName}
-                </StyledTitleHeavy>
-              </StyledColumnContainer>
-              {priceComponent}
-            </StyledRowContainer>
-          </StyledListItemView>
-        </TouchableHighlight>
-      </SwipeRow>
+        </SwipeRow>
+      </FadeInView> 
     );
   }
 }
