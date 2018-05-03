@@ -1,5 +1,7 @@
-import { createSelector } from 'reselect';
 import { uniq } from 'lodash';
+import Decimal from 'decimal.js';
+import { createSelector } from 'reselect';
+import { getStudioCurrency } from '../StudioSelectors';
 
 /**
  * @param {Object} state in store

@@ -86,6 +86,7 @@ export const getScheduleEvents = createUnboundedSelector(
       seatsSold: event.current_enrollment,
       quantity: quantityInCart,
       maxSeatsReached,
+      taxRate: location.tax_rate,
       seatsUserBooked: bookedEvent ? bookedEvent.quantity : 0,
     };
   })

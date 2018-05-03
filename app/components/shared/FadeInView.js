@@ -1,30 +1,41 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Animated } from 'react-native';
 
+/**
+ * @class CartPage
+ * @extends {Component}
+ */
 class FadeInView extends React.Component {
   state = {
-    fadeAnim: new Animated.Value(0),  // Initial value for opacity: 0
+    fadeAnim: new Animated.Value(0),
   }
 
+  /**
+   * @returns {undefined}
+   */
   componentDidMount() {
-    Animated.timing(                  // Animate over time
-      this.state.fadeAnim,            // The animated value to drive
+    Animated.timing(
+      this.state.fadeAnim,
       {
-        toValue: 1,                   // Animate to opacity: 1 (opaque)
-        duration: 1500,              // Make it take a while
+        toValue: 1,
+        duration: 1500,
       }
-    ).start();                        // Starts the animation
+    ).start();
   }
 
+   /**
+   * @returns {JSX} XML
+   */
   render() {
     const { fadeAnim } = this.state;
 
     return (
-      <Animated.View                 // Special animatable View
+      <Animated.View
         style={{
           ...this.props.style,
           opacity: fadeAnim,
-          flex: 1,     // Bind opacity to animated value
+          flex: 1,
         }}
       >
         {this.props.children}
@@ -32,5 +43,10 @@ class FadeInView extends React.Component {
     );
   }
 }
+
+FadeInView.propTypes = {
+  style: PropTypes.shape(),
+  children: PropTypes.oneOfType([PropTypes.shape(), PropTypes.arrayOf(PropTypes.shape())]),
+};
 
 export default FadeInView;

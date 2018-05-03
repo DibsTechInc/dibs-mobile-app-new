@@ -8,13 +8,9 @@ import { logOutUser, requestStudioData, syncUserEvents, requestUserData } from '
 import { getStudioIsLoading } from '../../selectors';
 import Header from '../Header';
 import * as Colors from '../../theme/colors';
+import CartModal from '../CartPage';
 
 import FadeInView from '../shared/FadeInView';
-
-const StyledView = styled.View`
-  flex: 1;
-  background-color: #fff;
-`;
 
 const StyledTempComponent = styled.View`
   background-color: ${Colors.PRIMARY}
@@ -57,9 +53,10 @@ class MainPage extends Component {
   render() {
     return (
       <FadeInView style={{ backgroundColor: '#fff' }}>
-        <Header navigation={this.props.navigation} iconColor={Colors.PRIMARY} backgroundColor={'#fff'} />
+        <Header navigation={this.props.navigation} iconColor={Colors.PRIMARY} backgroundColor={'#fff'} showCart={false} />
         <CalendarPage />
         <StyledTempComponent />
+        <CartModal isVisible />
       </FadeInView>
     );
   }

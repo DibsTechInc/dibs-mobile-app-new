@@ -29,6 +29,7 @@ class SchedulePageEvents extends Component {
    * @returns {JSX} XML
    */
   render() {
+    // console.log(this.props.events, 'eventz')
     return (
       <SwipeListView
         enableEmptySections

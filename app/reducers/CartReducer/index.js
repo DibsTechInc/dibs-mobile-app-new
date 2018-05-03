@@ -24,22 +24,23 @@ const initialState = {
  */
 function handleAddToCart(
   state,
-  { payload: { start_time: startTime, eventid, passid, price, taxRate, name } }
+  { payload }
 ) {
+  console.log(payload);
   const newData = cloneDeep(state.data);
-  const arrayElem = newData.find(e => (e.eventid === eventid && e.passid === passid));
+  const arrayElem = newData.find(e => (e.eventid === payload.eventid && e.passid === payload.passid));
   if (arrayElem) {
     arrayElem.quantity += 1;
     return { ...state, data: newData };
   }
   newData.push({
     quantity: 1,
-    eventid,
-    start_time: startTime,
-    passid,
-    price,
-    taxRate,
-    name,
+    eventid: payload.eventid,
+    startTime: payload.start_time,
+    passid: payload.passid,
+    price: payload.price,
+    taxRate: payload.taxRate,
+    name: payload.name,
   });
   return { ...state, data: newData };
 }

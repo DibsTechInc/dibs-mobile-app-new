@@ -14,6 +14,7 @@ import {
   REGISTER_ROUTE,
   DRAWER_ROUTE,
   PROFILE_ROUTE,
+  CART_ROUTE,
 } from '../constants/RouteConstants';
 
 import SchedulePage from '../components/SchedulePage';
@@ -22,6 +23,7 @@ import LandingPage from '../components/LandingPage';
 import MainPage from '../components/MainPage';
 import ProfilePage from '../components/ProfilePage';
 import Drawer from '../components/Drawer';
+import CartPage from '../components/CartPage';
 
 const createStackNavigator = token => StackNavigator(
   {
@@ -36,6 +38,12 @@ const createStackNavigator = token => StackNavigator(
     },
     [SCHEDULE_ROUTE]: {
       screen: SchedulePage,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
+    },
+    [CART_ROUTE]: {
+      screen: CartPage,
       navigationOptions: {
         gesturesEnabled: false,
       },

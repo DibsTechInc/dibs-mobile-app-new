@@ -9,27 +9,27 @@ import {
   MAIN_ROUTE,
   PROFILE_ROUTE,
   SCHEDULE_ROUTE,
+  CART_ROUTE,
 } from '../../constants/RouteConstants/index';
-import * as Colors from '../../theme/colors';
 
 const styles = {
   container: {
     paddingTop: 20,
-    flex: 1
+    flex: 1,
   },
   navItemStyle: {
-    padding: 10
+    padding: 10,
   },
   navSectionStyle: {
-    backgroundColor: 'lightgrey'
+    backgroundColor: 'lightgrey',
   },
   sectionHeadingStyle: {
     paddingVertical: 10,
-    paddingHorizontal: 5
+    paddingHorizontal: 5,
   },
   footerContainer: {
     padding: 20,
-    backgroundColor: 'lightgrey'
+    backgroundColor: 'lightgrey',
   }
 };
 
@@ -65,6 +65,11 @@ class SideMenu extends Component {
             <View style={styles.navSectionStyle}>
               <Text style={styles.navItemStyle} onPress={this.navigateToScreen(MAIN_ROUTE)}>
                 Home
+              </Text>
+            </View>
+            <View style={styles.navSectionStyle}>
+              <Text style={styles.navItemStyle} onPress={this.navigateToScreen(CART_ROUTE)}>
+                Cart
               </Text>
             </View>
           </View>

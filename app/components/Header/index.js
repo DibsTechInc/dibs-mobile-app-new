@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { Alert } from 'react-native';
+import { Text } from 'react-native';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { getTotalQuantityInCart } from '../../selectors';
+import { CART_ROUTE, DRAWER_OPEN } from '../../constants/RouteConstants';
 import Icon from '../shared/Icon';
 
 const StyledView = styled.View`
@@ -23,6 +24,15 @@ const StyledCartView = styled.View`
   margin-right: 5;
 `;
 
+const StyledTitleView = styled.View`
+  margin-right: ${props => props.titleWithNoCart ? '15%' : '1%'};
+`;
+
+const StyledText = styled.Text`
+  font-family: flex-font-heavy;
+  color: ${props => props.textColor ? props.textColor : '#000'}
+`;
+
 /**
  * @class Header
  * @extends {Component}
@@ -38,29 +48,44 @@ class Header extends Component {
           <Icon
             iconName="align-center"
             iconColor={this.props.iconColor}
-            onPress={() => this.props.navigation.navigate('DrawerOpen')}
+            onPress={() => this.props.navigation.navigate(DRAWER_OPEN)}
           />
         </StyledMenuView>
+        <StyledTitleView titleWithNoCart={this.props.titleWithNoCart}>
+          {this.props.showTitle && <StyledText textColor={this.props.textColor}>{this.props.titleText}</StyledText>}
+        </StyledTitleView>
         <StyledCartView>
-          <Icon
+          {this.props.showCart && <Icon
             iconName="shopping-cart"
             iconColor={this.props.iconColor}
-            onPress={() => Alert.alert('This will take you to the shopping cart page!')}
+            onPress={() => this.props.navigation.navigate(CART_ROUTE)}
             notification={{
               notificationCount: this.props.quantityInCart,
             }}
           />
+          }
         </StyledCartView>
       </StyledView>
     );
   }
 }
 
+Header.defaultProps = {
+  showCart: true,
+  showTitle: false,
+  titleText: 'Title Text',
+};
+
 Header.propTypes = {
   navigation: PropTypes.shape(),
   iconColor: PropTypes.string,
   backgroundColor: PropTypes.string,
   quantityInCart: PropTypes.number,
+  showCart: PropTypes.bool,
+  titleWithNoCart: PropTypes.bool,
+  showTitle: PropTypes.bool,
+  textColor: PropTypes.string,
+  titleText: PropTypes.string,
 };
 
 const mapStateToProps = state => ({

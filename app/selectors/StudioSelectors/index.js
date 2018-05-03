@@ -44,3 +44,27 @@ export const getStudioCustomTimeFormat = createSelector(
   getStudioDibsConfig,
   dibsConfig => (dibsConfig.customTimeFormat || '')
 );
+
+/**
+ * @param {Object} state in store
+ * @returns {number} Dibs studio id
+ */
+export function getDibsStudioId(state) {
+  return getStudio(state).id || null;
+}
+
+/**
+ * @param {Object} state in store
+ * @returns {Object} studio country
+ */
+export function getStudioCountry(state) {
+  return getStudio(state).country || '';
+}
+
+/**
+ * @param {Object} state in store
+ * @returns {boolean} studio waiver requirements
+ */
+export function getStudioWaiverRequirement(state) {
+  return getStudio(state).requiresWaiverSigned || false;
+}

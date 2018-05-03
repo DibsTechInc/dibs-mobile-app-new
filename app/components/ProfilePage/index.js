@@ -46,7 +46,6 @@ class ProfileScreen extends Component {
               title='John Smith'
               onPress={() => Alert.alert('Route To Personal Settings')}
             />
-
             <SettingsList.Header headerStyle={{ marginTop: 15 }} />
             <SettingsList.Item
               hasNavArrow={false}
@@ -58,16 +57,8 @@ class ProfileScreen extends Component {
               onPress={() => Alert.alert('Route To Upcoming Classes Page')}
             />
             <SettingsList.Item
-              title='Transaction History'
-              onPress={() => Alert.alert('Route To Transaction History Page')}
-            />
-            <SettingsList.Item
               title='Packages/Credit'
               onPress={() => Alert.alert('Route To Packages/Credits Page')}
-            />
-            <SettingsList.Item
-              title='Refer a Friend Program'
-              onPress={() => Alert.alert('Route To RAF Page')}
             />
             <SettingsList.Item
               title='Settings'

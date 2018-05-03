@@ -64,6 +64,8 @@ class SchedulePage extends Component {
       <FadeInView style={{ height: '100%', backgroundColor: Colors.PRIMARY }}>
         <Header navigation={this.props.navigation} iconColor={'#fff'} backgroundColor={Colors.PRIMARY} />
         <CalendarStrip
+          // calendarAnimation={{ type: 'sequence', duration: 30 }}
+          // selectionAnimation={{ duration: 300, borderWidth: 1 }}
           selection="background" // type of selection circle
           style={{ paddingBottom: 30 }}
           calendarColor={Config.STUDIO_COLOR} // main background color
@@ -77,7 +79,7 @@ class SchedulePage extends Component {
           highlightDateNumberStyle={{ color: Config.STUDIO_COLOR }}
         />
         {(this.props.isLoading ?
-          <StyledActivityIndicator size="large" />
+          <StyledActivityIndicator size="large" color="#fff" />
           : <SchedulePageEvents studioColor={Config.STUDIO_COLOR} />
         )}
       </FadeInView>
