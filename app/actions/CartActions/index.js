@@ -14,7 +14,7 @@ export const {
   setCartPurchasingTrue,
   setCartPurchasingFalse,
 } = createActions({
-  ADD_TO_CART: item => { console.log(item); return item },
+  ADD_TO_CART: item => item,
   CLEAR_CART: () => [],
   SET_CART_DATA: payload => payload,
   SET_CART_VISIBLE_TRUE: () => true,
