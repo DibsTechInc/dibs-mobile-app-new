@@ -5,14 +5,8 @@ import styled from 'styled-components';
 import Config from '../../../../config.json';
 import { addToCart, removeOneEventItem } from '../../../actions';
 import { LIGHT_GREY, WHITE } from '../../../constants';
+import FadeInView from '../../shared/FadeInView';
 import Icon from '../../shared/Icon';
-
-const StyledHiddenItemView = styled.View`
-  align-items: flex-end;
-  background-color: ${Config.STUDIO_COLOR};
-  flex: 1;
-  justify-content: center;
-`;
 
 const StyledTouchable = styled.TouchableOpacity`
   align-items: center;
@@ -80,7 +74,7 @@ class HiddenControls extends React.PureComponent {
    */
   render() {
     return (
-      <StyledHiddenItemView>
+      <FadeInView style={{ alignItems: 'flex-end', backgroundColor: Config.STUDIO_COLOR, justifyContent: 'center' }}>
         {!this.props.maxSeatsReached && (
           <StyledTouchable
             onPress={this.addItemToCart}
@@ -97,7 +91,7 @@ class HiddenControls extends React.PureComponent {
           </StyledTouchable>
         )}
         {this.props.quantity && (
-          <StyledTouchable onPress={this.removeItemFromCart}>
+          <StyledTouchable onPress={this.removeItemFromCart} style={{ shadowOffset: { width: 3, height: 3 } }}>
             <StyledHiddenItemText>
               <Icon
                 iconName="minus"
@@ -107,7 +101,7 @@ class HiddenControls extends React.PureComponent {
             </StyledHiddenItemText>
           </StyledTouchable>
         )}
-      </StyledHiddenItemView>
+      </FadeInView>
     );
   }
 }
