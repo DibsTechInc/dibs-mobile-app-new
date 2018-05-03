@@ -4,31 +4,35 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 import Config from '../../../../config.json';
 import { addToCart, removeOneEventItem } from '../../../actions';
-import { WHITE } from '../../../constants';
+import { LIGHT_GREY, WHITE } from '../../../constants';
+import Icon from '../../shared/Icon';
 
 const StyledHiddenItemView = styled.View`
-  align-items: center;
+  align-items: flex-end;
   background-color: ${Config.STUDIO_COLOR};
   flex: 1;
-  flex-direction: row;
-  justify-content: space-between;
-  padding: 0px 20px;
-`;
-
-const StyledHiddenItemText = styled.Text`
-  color: ${WHITE};
   justify-content: center;
-  font-family: 'flex-font-heavy';
-  font-size: 32px;
 `;
 
 const StyledTouchable = styled.TouchableOpacity`
   align-items: center;
-  border: solid 2px ${WHITE}
-  border-radius: 25;
-  height: 50;
+  background-color: ${WHITE};
+  border-radius: 20;
+  border-bottom-width: 3;
+  border-right-width: 2;
+  border-left-width: 1;
+  border-color: ${LIGHT_GREY};
+  height: 40;
   justify-content: center;
-  width: 50;
+  margin-right: 20;
+  width: 40;
+`;
+
+const StyledHiddenItemText = styled.Text`
+  color: ${Config.STUDIO_COLOR};
+  justify-content: center;
+  font-family: 'flex-font-heavy';
+  font-size: 32px;
 `;
 
 /**
@@ -72,16 +76,31 @@ class HiddenControls extends React.PureComponent {
   render() {
     return (
       <StyledHiddenItemView>
-        <StyledTouchable onPress={this.removeItemFromCart}>
-          <StyledHiddenItemText>
-            -
-          </StyledHiddenItemText>
-        </StyledTouchable>
-        <StyledTouchable onPress={this.addItemToCart}>
-          <StyledHiddenItemText>
-            +
-          </StyledHiddenItemText>
-        </StyledTouchable>
+        {!this.props.maxSeatsReached && (
+          <StyledTouchable
+            onPress={this.addItemToCart}
+            style={{ marginBottom: this.props.quantity ? 10 : 0 }}
+          >
+            <StyledHiddenItemText>
+              <Icon
+                iconName="plus"
+                size={15}
+                iconColor={Config.STUDIO_COLOR}
+              />
+            </StyledHiddenItemText>
+          </StyledTouchable>
+        )}
+        {this.props.quantity && (
+          <StyledTouchable onPress={this.removeItemFromCart}>
+            <StyledHiddenItemText>
+              <Icon
+                iconName="minus"
+                size={15}
+                iconColor={Config.STUDIO_COLOR}
+              />
+            </StyledHiddenItemText>
+          </StyledTouchable>
+        )}
       </StyledHiddenItemView>
     );
   }
@@ -96,6 +115,8 @@ HiddenControls.propTypes = {
   taxRate: PropTypes.number,
   name: PropTypes.string,
   start_time: PropTypes.string,
+  quantity: PropTypes.number,
+  maxSeatsReached: PropTypes.bool,
 };
 
 const mapDispatchToProps = {

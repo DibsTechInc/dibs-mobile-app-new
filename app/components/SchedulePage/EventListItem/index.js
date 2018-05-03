@@ -14,6 +14,7 @@ import {
 import HiddenControls from './HiddenControls';
 import { lightenDarkenColor } from '../../../helpers';
 import Config from '../../../../config.json';
+import Notification from '../../shared/Notification';
 
 const shadowColor = lightenDarkenColor(Config.STUDIO_COLOR, -20);
 
@@ -113,38 +114,47 @@ class EventListItem extends PureComponent {
         leftOpenValue={90}
         rightOpenValue={-90}
         swipeToOpenPercent={99}
-        disableRightSwipe={!this.props.quantity}
-        disableLeftSwipe={this.props.soldOut || this.props.maxSeatsReached}
+        disableRightSwipe
+        disableLeftSwipe={this.props.soldOut}
       >
         <HiddenControls {...this.props} />
-        <TouchableHighlight>
-          <StyledListItemView>
-            <StyledRowContainer>
-              <StyledColumnContainer>
-                <StyledTitleHeavy>
-                  {this.props.startTimeInLocalTZ}
-                </StyledTitleHeavy>
-                <StyledTitle>
-                  {this.props.timeDuration} min
-                </StyledTitle>
-              </StyledColumnContainer>
-              <StyledColumnContainer>
-                <StyledTitleHeavy>
-                  {this.props.name}
-                </StyledTitleHeavy>
-                <StyledTitle>
-                  {this.props.instructorName}
-                </StyledTitle>
-              </StyledColumnContainer>
-              <StyledColumnContainer>
-                <StyledTitleHeavy>
-                  {this.props.locationName}
-                </StyledTitleHeavy>
-              </StyledColumnContainer>
-              {priceComponent}
-            </StyledRowContainer>
-          </StyledListItemView>
-        </TouchableHighlight>
+        <Notification
+          notificationCount={this.props.quantity}
+          radius={12}
+          fontSize={16}
+          top={-0.01} // for some reason native will only render the notif above if this value is negative, but it cuts it off, so i made it negative and rly small
+          right={8}
+          marginRight={0}
+        >
+          <TouchableHighlight>
+            <StyledListItemView>
+              <StyledRowContainer>
+                <StyledColumnContainer>
+                  <StyledTitleHeavy>
+                    {this.props.startTimeInLocalTZ}
+                  </StyledTitleHeavy>
+                  <StyledTitle>
+                    {this.props.timeDuration} min
+                  </StyledTitle>
+                </StyledColumnContainer>
+                <StyledColumnContainer>
+                  <StyledTitleHeavy>
+                    {this.props.name}
+                  </StyledTitleHeavy>
+                  <StyledTitle>
+                    {this.props.instructorName}
+                  </StyledTitle>
+                </StyledColumnContainer>
+                <StyledColumnContainer>
+                  <StyledTitleHeavy>
+                    {this.props.locationName}
+                  </StyledTitleHeavy>
+                </StyledColumnContainer>
+                {priceComponent}
+              </StyledRowContainer>
+            </StyledListItemView>
+          </TouchableHighlight>
+        </Notification>
       </SwipeRow>
     );
   }

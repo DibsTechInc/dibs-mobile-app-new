@@ -4,8 +4,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { getTotalQuantityInCart } from '../../selectors';
-
-import DrawerItem from '../shared/Icon';
+import Icon from '../shared/Icon';
 
 const StyledView = styled.View`
   height: 50;
@@ -36,18 +35,20 @@ class Header extends Component {
     return (
       <StyledView backgroundColor={this.props.backgroundColor}>
         <StyledMenuView>
-          <DrawerItem
+          <Icon
             iconName="align-center"
             iconColor={this.props.iconColor}
             onPress={() => this.props.navigation.navigate('DrawerOpen')}
           />
         </StyledMenuView>
         <StyledCartView>
-          <DrawerItem
+          <Icon
             iconName="shopping-cart"
             iconColor={this.props.iconColor}
             onPress={() => Alert.alert('This will take you to the shopping cart page!')}
-            notificationCount={this.props.quantityInCart}
+            notification={{
+              notificationCount: this.props.quantityInCart,
+            }}
           />
         </StyledCartView>
       </StyledView>
