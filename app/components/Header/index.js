@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text } from 'react-native';
+import { NavigationActions } from 'react-navigation';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
@@ -35,9 +35,35 @@ const StyledText = styled.Text`
 
 /**
  * @class Header
+ * @param {string} route the navigation route
  * @extends {Component}
  */
 class Header extends Component {
+  /**
+   * @constructor
+   * @constructs Header
+   */
+  constructor() {
+    super();
+
+    this.navigateToDrawer = this.navigateToDrawer.bind(this);
+  }
+
+  navigateToDrawer = () => {
+    const navigateAction = NavigationActions.navigate({
+      routeName: DRAWER_OPEN,
+    });
+
+    const keyType = this.props.navigation.state.key.split('-')[0];
+    const popTop = NavigationActions.popToTop();
+
+    if (keyType === 'id') {
+      this.props.navigation.dispatch(popTop);
+    } else {
+      this.props.navigation.dispatch(navigateAction);
+    }
+  }
+
   /**
    * @returns {JSX} XML
    */
@@ -48,7 +74,7 @@ class Header extends Component {
           <Icon
             iconName="align-center"
             iconColor={this.props.iconColor}
-            onPress={() => this.props.navigation.navigate(DRAWER_OPEN)}
+            onPress={this.navigateToDrawer}
           />
         </StyledMenuView>
         <StyledTitleView titleWithNoCart={this.props.titleWithNoCart}>

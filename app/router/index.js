@@ -28,6 +28,9 @@ const createStackNavigator = token => StackNavigator(
   {
     [LANDING_ROUTE]: {
       screen: LandingPage,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
     },
     [MAIN_ROUTE]: {
       screen: MainPage,
