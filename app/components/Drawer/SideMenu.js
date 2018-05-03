@@ -10,6 +10,7 @@ import {
   PROFILE_ROUTE,
   SCHEDULE_ROUTE,
   CART_ROUTE,
+  VERIFY_ROUTE,
 } from '../../constants/RouteConstants/index';
 
 const styles = {
@@ -50,8 +51,10 @@ class SideMenu extends Component {
    /**
    * @returns {undefined}
    */
-  handleLogout() {
-    this.props.logOutUser();
+  async handleLogout() {
+    console.log('pressed?')
+    await new Promise(res => this.props.logOutUser(res));
+    this.props.navigation.navigate(VERIFY_ROUTE);
   }
 
   render() {

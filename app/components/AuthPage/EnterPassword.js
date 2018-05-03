@@ -12,6 +12,10 @@ import Promise from 'bluebird';
 import { submitLogin } from '../../actions/UserActions';
 import FadeInView from '../shared/FadeInView';
 
+import {
+  MAIN_ROUTE,
+} from '../../constants/RouteConstants/index';
+
 const StyledTextInput = styled.TextInput`
   font-family: flex-font;
   height: 25;
@@ -63,6 +67,8 @@ class EnterPassword extends Component {
       await new Promise(res => this.setState({ isLoading: false }, res));
       Alert.alert('Incorrect password');
     }
+
+    this.props.navigation.navigate(MAIN_ROUTE);
   }
 
   /**
@@ -98,6 +104,7 @@ class EnterPassword extends Component {
 }
 
 EnterPassword.propTypes = {
+  navigation: PropTypes.shape(),
   submitLogin: PropTypes.func,
 };
 
