@@ -1,8 +1,9 @@
 import { handleActions, combineActions } from 'redux-actions';
-import { setEvents, setEventsLoadingTrue, setEventsLoadingFalse } from '../../actions/EventActions';
+import { setEvents, setEventsLoadingTrue, setEventsLoadingFalse, previewEvents } from '../../actions/EventActions';
 
 const initialState = {
   loading: false,
+  previewed: false,
   data: [],
 };
 
@@ -33,4 +34,5 @@ function handleSetEvents(state, { payload }) {
 export default handleActions({
   [combineActions(setEventsLoadingTrue, setEventsLoadingFalse)]: (state, { payload }) => ({ ...state, loading: payload }),
   [setEvents]: handleSetEvents,
+  [previewEvents]: state => ({ ...state, previewed: true }),
 }, initialState);

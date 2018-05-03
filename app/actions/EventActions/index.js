@@ -6,10 +6,12 @@ export const {
   setEvents,
   setEventsLoadingTrue,
   setEventsLoadingFalse,
+  previewEvents,
 } = createActions({
   SET_EVENTS: payload => payload,
   SET_EVENTS_LOADING_TRUE: () => true,
   SET_EVENTS_LOADING_FALSE: () => false,
+  PREVIEW_EVENTS: () => {},
 });
 
 /**

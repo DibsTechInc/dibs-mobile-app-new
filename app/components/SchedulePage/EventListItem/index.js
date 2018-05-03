@@ -77,7 +77,7 @@ const StyledValueBack = styled.Text`
 `;
 
 const StyledSoldOut = styled.Text`
-  color: ${TEXT_GREY};  
+  color: ${TEXT_GREY};
   font-size: 16px;
   font-family: 'flex-font-heavy';
   text-align: center;
@@ -119,7 +119,7 @@ class EventListItem extends PureComponent {
     return (
       <FadeInView>
         <SwipeRow
-          preview={!this.props.soldOut}
+          preview={!this.props.soldOut && !this.props.alreadyPreviewed}
           previewOpenValue={-90}
           leftOpenValue={90}
           rightOpenValue={-90}
@@ -194,7 +194,7 @@ class EventListItem extends PureComponent {
             </StyledListItemView>
           </TouchableHighlight>
         </SwipeRow>
-      </FadeInView> 
+      </FadeInView>
     );
   }
 }
@@ -221,6 +221,7 @@ const mapStateToProps = (state, props) => {
     passid: getUsersNextPassId(state)(props.eventid),
     valueBack,
     formattedValueBack: valueBack ? formatCurrency(valueBack, { precision: (valueBack % 1 && 2), code: props.currency }) : null,
+    alreadyPreviewed: state.events.previewed,
   };
 };
 const mapDispatchToProps = {};

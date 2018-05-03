@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import styled from 'styled-components';
-
 import Config from '../../../config.json';
 import CalendarStrip from './CalendarStrip';
 import SchedulePageEvents from './SchedulePageEvents';
-import { requestEventData, requestStudioData } from '../../actions';
+import { requestEventData, requestStudioData, previewEvents } from '../../actions';
 import {
   setCurrentDate,
   getEventsLoading,
@@ -15,9 +13,11 @@ import {
 import Header from '../Header';
 import * as Colors from '../../theme/colors';
 import FadeInView from '../shared/FadeInView';
+import DibsLoader from '../shared/DibsLoader';
+import { FlexCenter } from '../styled';
 
-const StyledActivityIndicator = styled.ActivityIndicator`
-  margin-top: 50%;
+const StyledLoaderContainer = FlexCenter.extend`
+  margin-top: 25%;
 `;
 
 /**
@@ -38,6 +38,9 @@ class SchedulePage extends Component {
   componentDidUpdate(props) {
     if (props.currentDate.toISOString() !== this.props.currentDate.toISOString()) {
       this.props.requestEventData();
+    }
+    if (props.isLoading && !this.props.isLoading) {
+      setTimeout(this.props.previewEvents, 2e3);
     }
   }
 
@@ -64,7 +67,9 @@ class SchedulePage extends Component {
           highlightDateNumberStyle={{ color: Config.STUDIO_COLOR }}
         />
         {(this.props.isLoading ?
-          <StyledActivityIndicator size="large" color="#fff" />
+          <StyledLoaderContainer>
+            <DibsLoader />
+          </StyledLoaderContainer>
           : <SchedulePageEvents studioColor={Config.STUDIO_COLOR} />
         )}
       </FadeInView>
@@ -77,6 +82,7 @@ SchedulePage.propTypes = {
   isLoading: PropTypes.bool,
   currentDate: PropTypes.shape(),
   navigation: PropTypes.shape(),
+  previewEvents: PropTypes.func,
 };
 
 const mapStateToProps = state => ({
@@ -89,6 +95,7 @@ const mapDispatchToProps = {
   requestEventData,
   requestStudioData,
   setCurrentDate,
+  previewEvents,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SchedulePage);
