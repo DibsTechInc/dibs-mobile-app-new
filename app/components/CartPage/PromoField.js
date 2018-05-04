@@ -1,13 +1,12 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { MaterialPanelView } from '../styled';
+import MaterialPanel from '../shared/MaterialPanel';
 
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 
 const StyledPromoView = styled.View`
   justify-content: space-between;
-  margin: 20px;
   height: 100px;
   flex: 2;
 `;
@@ -26,16 +25,12 @@ class PromoField extends PureComponent {
    */
   render() {
     return (
-      <MaterialPanelView
+      <MaterialPanel
         height={150}
         style={{ shadowOffset: { width: 3, height: 3 } }}
+        heading="Promo Code"
       >
         <StyledPromoView>
-          <View>
-            <Text style={{ fontSize: 16, fontFamily: 'flex-font-heavy' }}>
-              Promo Code
-            </Text>
-          </View>
           <View style={{ justifyContent: 'flex-start', alignItems: 'flex-start', flexDirection: 'row' }}>
             <TextInput style={{ height: 40, width: 250, borderWidth: 1 }} />
             <TouchableOpacity style={{ height: 40, width: 80, borderWidth: 1, justifyContent: 'center', alignItems: 'center', borderLeftWidth: 0 }}>
@@ -50,7 +45,7 @@ class PromoField extends PureComponent {
             </Text>
           </View>
         </StyledPromoView>
-      </MaterialPanelView>
+      </MaterialPanel>
     );
   }
 }

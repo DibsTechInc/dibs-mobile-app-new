@@ -16,16 +16,19 @@ export const SpaceBetweenRow = styled.View`
 export const MaterialPanelView = styled.View`
   background-color: ${WHITE};
   border-radius: ${props => (props.borderRadius || '3px')};
-  height: ${props => (props.height ? props.height : 'auto')};
-  width: ${props => (props.width || (Dimensions.get('window').width - 20))};
-  margin: 10px;
-  border-width: 0.3;
   border-color: #ddd;
-  border-top-width: 0;
   border-left-width: 0;
+  border-top-width: 0;
+  border-width: 0.3;
+  elevation: 3;
+  height: ${props => (props.height ? props.height : 'auto')};
+  margin: 10px;
+  padding-horizontal: 10px;
+  padding-top: 15px;
+  padding-bottom: 20px;
   shadow-color: #000;
   shadow-opacity: 0.2;
   shadow-radius: 4;
-  elevation: 3;
+  width: ${props => (props.width || (Dimensions.get('window').width - 20))};
 `;
 
