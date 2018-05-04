@@ -8,9 +8,7 @@ const StyledMaterial = styled.TouchableHighlight`
   align-items: center;
   background-color: ${Config.STUDIO_COLOR};
   border-radius: 5px;
-  height: ${props => (props.height || (props.fontSize ? props.fontSize + 30 : 45))}
   justify-content: center;
-  width: ${props => (props.width || 280)}
 `;
 
 const StyledText = styled.Text`
@@ -44,6 +42,9 @@ class MaterialButton extends React.PureComponent {
 
 MaterialButton.defaultProps = {
   fontSize: 16,
+  style: {
+    height: 50,
+  },
 };
 
 const stringOrNum = PropTypes.oneOfType([
@@ -55,8 +56,6 @@ MaterialButton.propTypes = {
   style: PropTypes.shape(),
   text: PropTypes.string.isRequired,
   onPress: PropTypes.func.isRequired,
-  width: stringOrNum,
-  height: stringOrNum,
   fontSize: stringOrNum,
 };
 

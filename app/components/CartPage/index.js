@@ -36,7 +36,7 @@ import CartItem from './CartItem';
 import TransactionBreakdown from './TransactionBreakdown';
 import PaymentInfo from './PaymentInfo';
 import PromoField from './PromoField';
-import { MaterialPanelView } from '../styled';
+import { MaterialPanelView, FlexRow } from '../styled';
 import MaterialButton from '../shared/MaterialButton';
 
 const StyledScrollView = styled.ScrollView`
@@ -172,11 +172,13 @@ class CartPage extends Component {
           <View style={{ marginBottom: 30 }}>
             <StyledSavingsText>Place order to earn $1.09 in credit back.</StyledSavingsText>
           </View>
-          <MaterialButton
-            text="Checkout"
-            onPress={() => {}}
-            width="280"
-          />
+          <FlexRow>
+            <MaterialButton
+              text="Checkout"
+              onPress={() => { }}
+              style={{ flex: 1, height: 50 }}
+            />
+          </FlexRow>
         </StyledCheckoutView>
       </FadeInView>
     );
