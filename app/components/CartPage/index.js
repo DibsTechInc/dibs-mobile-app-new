@@ -129,14 +129,14 @@ class CartPage extends Component {
     }
 
     if (keyType === 'id') {
-      return this.props.navigation.popToTop();
+      previousRoute = 'Main';
     }
 
     const navigateAction = NavigationActions.navigate({
       routeName: previousRoute,
     });
 
-    return this.props.navigation.dispatch(navigateAction);
+    this.props.navigation.dispatch(navigateAction);
   }
 
   /**
@@ -150,7 +150,7 @@ class CartPage extends Component {
         <FadeInView>
           <StyledTopView>
             <Icon
-              iconName="arrow-left"
+              iconName="user-circle"
               iconColor={BLACK}
               onPress={this.toPreviousPage}
               style={{ position: 'absolute', left: 0, fontSize: 11 }}

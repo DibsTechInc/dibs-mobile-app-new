@@ -74,7 +74,7 @@ class SideMenu extends React.PureComponent {
   render() {
     return (
       <StyledContainer>
-        <StyledCloseButtonContainer>
+        <StyledCloseButtonContainer style={{ justifyContent: 'flex-start' }}>
           <TouchableOpacity onPress={this.close}>
             <Svg height={30} width={30}>
               <Path

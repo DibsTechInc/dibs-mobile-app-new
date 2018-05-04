@@ -36,6 +36,7 @@ class MainPage extends Component {
    */
   componentDidMount() {
     this.props.syncUserEvents();
+    this.props.navigation.popToTop();
   }
 
     /**

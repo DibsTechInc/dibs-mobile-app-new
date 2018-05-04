@@ -71,6 +71,7 @@ class EnterEmail extends Component {
 
     await new Promise(res => this.setState({ isLoading: true }, res));
     const route = await new Promise(res => this.props.validateEmail(email, res));
+    await new Promise(res => this.setState({ isLoading: false }, res));
 
     if (!route) {
       await new Promise(res => this.setState({ isLoading: false }, res));
