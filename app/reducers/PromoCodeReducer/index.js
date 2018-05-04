@@ -4,39 +4,28 @@ import {
   setPackagePromoCode,
   clearPromoCodeData,
   clearPackagePromoCodeData,
+  setPromoCodeError,
+  clearPromoCodeError,
+  setPromoCodeNotice,
+  clearPromoCodeNotice,
 } from '../../actions/PromoCodeActions';
 
-const initialState = {};
-
-/**
- * promoCodeReducer
- *
- * @param {Object} [state=initialState] promo code state
- * @param {Object} action on the state
- *
- * @returns {Object} new state
- */
-// export default function promoCodeReducer(state = initialState, action) {
-//   switch (action.type) {
-//     case SET_PROMO_CODE:
-//       return action.value;
-//     case CLEAR_PROMO_CODE:
-//       return {};
-//     case SET_PACKAGE_PROMOCODE:
-//       return action.value;
-//     case CLEAR_PACKAGE_PROMO_CODE:
-//       return {};
-//     default:
-//       return state;
-//   }
-// }
+const initialState = {
+  data: {},
+  errorMessage: '',
+  noticeMessage: '',
+};
 
 export default handleActions({
-  [combineActions(clearPromoCodeData, clearPackagePromoCodeData)]: state => ({ state }),
-  [combineActions(setPromoCode, setPackagePromoCode)]: (state, { payload }) => ({ ...state, payload }),
+  [combineActions(
+    setPromoCode,
+    clearPromoCodeData,
+    setPackagePromoCode,
+    clearPackagePromoCodeData)]: (state, { payload }) => ({ ...state, data: payload }),
+  [combineActions(
+    setPromoCodeError,
+    clearPromoCodeError)]: (state, { payload }) => ({ ...state, errorMessage: payload }),
+  [combineActions(
+    setPromoCodeNotice,
+    clearPromoCodeNotice)]: (state, { payload }) => ({ ...state, noticeMessage: payload }),
 }, initialState);
-
-// export default handleActions({
-//   [combineActions(setEventsLoadingTrue, setEventsLoadingFalse)]: (state, { payload }) => ({ ...state, loading: payload }),
-//   [setEvents]: handleSetEvents,
-// }, initialState);

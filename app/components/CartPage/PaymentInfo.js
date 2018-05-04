@@ -2,6 +2,7 @@ import React, { PureComponent, TextInput, View } from 'react';
 import { CreditCardInput } from 'react-native-credit-card-input';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { MaterialPanelView } from '../styled';
 
 const StyledPaymentView = styled.View`
   margin: 20px;
@@ -31,23 +32,28 @@ class PaymentInfo extends PureComponent {
     };
 
     return (
-      <StyledPaymentView>
-        <CreditCardInput
-          requiresCVC
+      <MaterialPanelView
+        height={280}
+        style={{ shadowOffset: { width: 3, height: 3 } }}
+      >
+        <StyledPaymentView>
+          <CreditCardInput
+            requiresCVC
 
-          cardFontFamily="flex-font"
+            cardFontFamily="flex-font"
 
-          cardScale={0.8}
-          labels={labels}
+            cardScale={0.8}
+            labels={labels}
 
-          validColor="black"
-          invalidColor="red"
-          placeholderColor="darkgray"
+            validColor="black"
+            invalidColor="red"
+            placeholderColor="darkgray"
 
-          onFocus={this.onFocus}
-          onChange={this.onChange}
-        />
-      </StyledPaymentView>
+            onFocus={this.onFocus}
+            onChange={this.onChange}
+          />
+        </StyledPaymentView>
+      </MaterialPanelView>
     );
   }
 }

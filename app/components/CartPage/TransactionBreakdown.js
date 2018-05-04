@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { MaterialPanelView } from '../styled';
 
 const StyledBreakDownView = styled.View`
   margin: 20px;
@@ -22,11 +23,13 @@ class TransactionBreakdown extends PureComponent {
    */
   render() {
     return (
-      <StyledBreakDownView>
-        <StyledText>Subtotal...............${this.props.formattedSubtotal}</StyledText>
-        <StyledText>Tax Amount...............${this.props.formattedTaxAmount}</StyledText>
-        <StyledText>Total...............${this.props.formattedTotal}</StyledText>
-      </StyledBreakDownView>
+      <MaterialPanelView>
+        <StyledBreakDownView>
+          <StyledText>Subtotal...............${this.props.formattedSubtotal}</StyledText>
+          <StyledText>Tax Amount...............${this.props.formattedTaxAmount}</StyledText>
+          <StyledText>Total...............${this.props.formattedTotal}</StyledText>
+        </StyledBreakDownView>
+      </MaterialPanelView>
     );
   }
 }

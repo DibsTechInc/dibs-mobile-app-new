@@ -36,35 +36,10 @@ import CartItem from './CartItem';
 import TransactionBreakdown from './TransactionBreakdown';
 import PaymentInfo from './PaymentInfo';
 import PromoField from './PromoField';
-
-const WIDTH = Dimensions.get('window').width - 20;
+import { MaterialPanelView } from '../styled';
 
 const StyledScrollView = styled.ScrollView`
   flex: 1;
-`;
-
-const StyledSectionViewOne = styled.View`
-  background-color: ${WHITE};
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
-  height: ${props => props.height ? props.height : 'auto'};
-  width: ${WIDTH};
-  margin-left: 10px;
-  margin-right: 10px;
-  margin-bottom: 10px;
-  border-width: 0.3;
-  border-color: #ddd;
-  border-top-width: 0;
-  border-left-width: 0;
-  shadow-color: #000;
-  shadow-opacity: 0.2;
-  shadow-radius: 4;
-  elevation: 3;
-`;
-
-const StyledSectionViewTwo = StyledSectionViewOne.extend`
-  border-radius: 3px;
-  margin: 10px;
 `;
 
 const StyledTopView = styled.View`
@@ -186,25 +161,21 @@ class CartPage extends Component {
             onPress={this.toPreviousPage}
             style={{ position: 'absolute', left: 0, fontSize: 11 }}
           />
-          <StyledCenterText>My Cart</StyledCenterText>
+          <StyledCenterText>
+            My Cart
+          </StyledCenterText>
         </StyledTopView>
         <StyledScrollView >
-          <StyledSectionViewOne style={{ shadowOffset: { width: 3, height: 3 } }}>
+          <MaterialPanelView style={{ shadowOffset: { width: 3, height: 3 } }}>
             {renderCartItems}
-          </StyledSectionViewOne>
-          <StyledSectionViewTwo height={'150'} style={{ shadowOffset: { width: 3, height: 3 } }}>
-            <PromoField />
-          </StyledSectionViewTwo>
-          <StyledSectionViewTwo height={'280'} style={{ shadowOffset: { width: 3, height: 3 } }}>
-            <PaymentInfo />
-          </StyledSectionViewTwo>
-          <StyledSectionViewTwo>
-            <TransactionBreakdown
-              formattedSubtotal={this.props.formattedSubtotal}
-              formattedTaxAmount={this.props.formattedTaxAmount}
-              formattedTotal={this.props.formattedTotal}
-            />
-          </StyledSectionViewTwo>
+          </MaterialPanelView>
+          <PromoField />
+          <PaymentInfo />
+          <TransactionBreakdown
+            formattedSubtotal={this.props.formattedSubtotal}
+            formattedTaxAmount={this.props.formattedTaxAmount}
+            formattedTotal={this.props.formattedTotal}
+          />
         </StyledScrollView>
         <StyledCheckoutView>
           <View style={{ marginBottom: 30 }}>

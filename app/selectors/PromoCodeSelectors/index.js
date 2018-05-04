@@ -1,10 +1,19 @@
 /**
  * getPromoCode
  * @param {Object} state in redux store
- * @returns {Object} current promo code to be applied
+ * @returns {Object} promo code state tree
  */
 export function getPromoCode(state) {
   return state.promoCode || {};
+}
+
+/**
+ * getPromoCode
+ * @param {Object} state in redux store
+ * @returns {Object} current promo code to be applied
+ */
+export function getPromoCodeData(state) {
+  return getPromoCode(state).data || {};
 }
 
 /**
