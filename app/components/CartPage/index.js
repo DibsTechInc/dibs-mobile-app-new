@@ -111,7 +111,6 @@ class CartPage extends Component {
    */
   toPreviousPage() {
     let previousRoute = this.props.navigation.state.params && this.props.navigation.state.params.previousRoute;
-    // console.log(previousRoute, 'what this')
 
     if (!previousRoute) {
       const navigateAction = NavigationActions.navigate({
@@ -150,7 +149,7 @@ class CartPage extends Component {
         <FadeInView>
           <StyledTopView>
             <Icon
-              iconName="user-circle"
+              iconName="arrow-left"
               iconColor={BLACK}
               onPress={this.toPreviousPage}
               style={{ position: 'absolute', left: 0, fontSize: 11 }}
@@ -160,7 +159,7 @@ class CartPage extends Component {
             </StyledCenterText>
           </StyledTopView>
           <StyledScrollView>
-            <MaterialPanelView style={{ shadowOffset: { width: 3, height: 3 } }}>
+            <MaterialPanelView style={{ shadowOffset: { width: 3, height: 3 }, marginTop: 0 }}>
               {renderCartItems}
             </MaterialPanelView>
           </StyledScrollView>
