@@ -74,7 +74,7 @@ class SideMenu extends React.PureComponent {
   render() {
     return (
       <StyledContainer>
-        <StyledCloseButtonContainer>
+        <StyledCloseButtonContainer style={{ justifyContent: 'flex-start' }}>
           <TouchableOpacity onPress={this.close}>
             <Svg height={30} width={30}>
               <Path
@@ -130,11 +130,6 @@ class SideMenu extends React.PureComponent {
           iconName="calendar"
           label="Schedule"
           route={SCHEDULE_ROUTE}
-        />
-        <NavLink
-          iconName="cog"
-          label="Settings"
-          route={SETTINGS_ROUTE} // TODO settings route
         />
       </StyledContainer>
     );

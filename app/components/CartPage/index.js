@@ -128,14 +128,14 @@ class CartPage extends Component {
     }
 
     if (keyType === 'id') {
-      previousRoute = 'MAIN_ROUTE';
+      previousRoute = 'Main';
     }
 
     const navigateAction = NavigationActions.navigate({
       routeName: previousRoute,
     });
 
-    return this.props.navigation.dispatch(navigateAction);
+    this.props.navigation.dispatch(navigateAction);
   }
 
   /**
@@ -159,7 +159,7 @@ class CartPage extends Component {
             </StyledCenterText>
           </StyledTopView>
           <StyledScrollView>
-            <MaterialPanelView style={{ shadowOffset: { width: 3, height: 3 } }}>
+            <MaterialPanelView style={{ shadowOffset: { width: 3, height: 3 }, marginTop: 0 }}>
               {renderCartItems}
             </MaterialPanelView>
           </StyledScrollView>

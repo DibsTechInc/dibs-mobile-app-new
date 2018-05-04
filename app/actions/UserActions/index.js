@@ -116,7 +116,7 @@ export function logOutUser(callback = () => {}) {
     try {
       await AsyncStorage.removeItem(Config.USER_TOKEN_KEY);
       dispatch(setUser({}));
-      dispatch(removeCreditCard());
+      // dispatch(removeCreditCard());
       callback();
     } catch (err) {
       console.log(err);

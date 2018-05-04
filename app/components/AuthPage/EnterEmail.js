@@ -72,6 +72,7 @@ class EnterEmail extends Component {
 
     await new Promise(res => this.setState({ isLoading: true }, res));
     const route = await new Promise(res => this.props.validateEmail(email, res));
+    await new Promise(res => this.setState({ isLoading: false }, res));
 
     if (!route) {
       await new Promise(res => this.setState({ isLoading: false }, res));
@@ -99,6 +100,8 @@ class EnterEmail extends Component {
           <StyledText> What is your email? </StyledText>
           <StyledInputView>
             <StyledTextInput
+              autoFocus
+              returnKeyType="go"
               placeholder="Email"
               autoCapitalize="none"
               onChangeText={email => this.setState({ email })}

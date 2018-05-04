@@ -6,70 +6,45 @@ import Config from '../../config.json';
 
 import {
   LANDING_ROUTE,
-  MAIN_ROUTE,
-  SCHEDULE_ROUTE,
   VERIFY_ROUTE,
   LOGIN_ROUTE,
   REGISTER_ROUTE,
   DRAWER_ROUTE,
-  PROFILE_ROUTE,
-  CART_ROUTE,
-  CONFIRMATION_ROUTE,
 } from '../constants/RouteConstants';
 
-import SchedulePage from '../components/SchedulePage';
 import { EnterPassword, EnterEmail, Signup } from '../components/AuthPage';
 import LandingPage from '../components/LandingPage';
-import MainPage from '../components/MainPage';
-import ProfilePage from '../components/ProfilePage';
 import Drawer from '../components/Drawer';
-import CartPage from '../components/CartPage';
-import ConfirmationPage from '../components/ConfirmationPage';
 
 const createStackNavigator = token => StackNavigator(
   {
     [LANDING_ROUTE]: {
       screen: LandingPage,
-    },
-    [MAIN_ROUTE]: {
-      screen: MainPage,
-    },
-    [SCHEDULE_ROUTE]: {
-      screen: SchedulePage,
-    },
-    [CART_ROUTE]: {
-      screen: CartPage,
-    },
-    [CONFIRMATION_ROUTE]: {
-      screen: ConfirmationPage,
-    },
-    [PROFILE_ROUTE]: {
-      screen: ProfilePage,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
     },
     [VERIFY_ROUTE]: {
       screen: EnterEmail,
-      navigationOptions: {
-        gesturesEnabled: true,
-      },
     },
     [LOGIN_ROUTE]: {
       screen: EnterPassword,
-      navigationOptions: {
-        gesturesEnabled: true,
-      },
     },
     [REGISTER_ROUTE]: {
       screen: Signup,
     },
     [DRAWER_ROUTE]: {
       screen: Drawer,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
     },
   },
   {
     headerMode: 'none',
     initialRouteName: token ? DRAWER_ROUTE : LANDING_ROUTE,
     navigationOptions: {
-      gesturesEnabled: false,
+      gesturesEnabled: true,
     },
   }
 );

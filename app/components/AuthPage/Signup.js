@@ -10,7 +10,7 @@ import {
 import styled from 'styled-components';
 import CheckBox from 'react-native-checkbox';
 import Promise from 'bluebird';
-
+import FadeInView from '../shared/FadeInView';
 import { signUpUser } from '../../actions/UserActions';
 
 const StyledView = styled.View`
@@ -124,38 +124,40 @@ class Signup extends Component {
     const showButton = this.checkForm().canShowButton;
 
     return (
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <StyledView>
-          <StyledText>Just need a few details before we get started</StyledText>
-          <StyledInputView>
-            <StyledTextInput
-              value={this.props.navigation.state.params.email || ''}
-              editable={false}
+      <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          <StyledView>
+            <StyledText>Just need a few details before we get started</StyledText>
+            <StyledInputView>
+              <StyledTextInput
+                value={this.props.navigation.state.params.email || ''}
+                editable={false}
+              />
+            </StyledInputView>
+            <StyledInputView>
+              <StyledTextInput
+                value={this.state.fullName}
+                onChangeText={fullName => this.setState({ fullName })}
+                placeholder="First and last name"
+              />
+            </StyledInputView>
+            <StyledInputView>
+              <StyledTextInput
+                value={this.state.password}
+                onChangeText={password => this.setState({ password })}
+                placeholder="Password (6 char min)"
+                secureTextEntry
+              />
+            </StyledInputView>
+            <CheckBox
+              label="Terms and Conditions"
+              checked={this.state.tAndC}
+              onChange={this.handleOnCheck}
             />
-          </StyledInputView>
-          <StyledInputView>
-            <StyledTextInput
-              value={this.state.fullName}
-              onChangeText={fullName => this.setState({ fullName })}
-              placeholder="First and last name"
-            />
-          </StyledInputView>
-          <StyledInputView>
-            <StyledTextInput
-              value={this.state.password}
-              onChangeText={password => this.setState({ password })}
-              placeholder="Password (6 char min)"
-              secureTextEntry
-            />
-          </StyledInputView>
-          <CheckBox
-            label="Terms and Conditions"
-            checked={this.state.tAndC}
-            onChange={this.handleOnCheck}
-          />
-          {showButton && <Button title="SIGNUP" onPress={this.handleOnPress} />}
-        </StyledView>
-      </TouchableWithoutFeedback>
+            {showButton && <Button title="SIGNUP" onPress={this.handleOnPress} />}
+          </StyledView>
+        </TouchableWithoutFeedback>
+      </FadeInView>
     );
   }
 }

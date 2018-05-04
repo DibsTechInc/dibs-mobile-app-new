@@ -89,6 +89,8 @@ class EnterPassword extends Component {
           <StyledText>What is your password?</StyledText>
           <StyledInputView>
             <StyledTextInput
+              autoFocus
+              returnKeyType="go"
               placeholder="Password"
               secureTextEntry
               autoCapitalize="none"
