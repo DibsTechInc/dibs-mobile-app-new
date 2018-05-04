@@ -139,7 +139,7 @@ class ConfirmationPage extends Component {
 
     return (
       <FadeInView style={{ backgroundColor: SOFT_GREY }}>
-        <StyledTopView>
+        <StyledTopView style={{ marginBottom: -10 }}>
           <Icon
             iconName="arrow-left"
             iconColor={BLACK}
@@ -150,7 +150,7 @@ class ConfirmationPage extends Component {
             Confirm Checkout
           </StyledCenterText>
         </StyledTopView>
-        <StyledScrollView>
+        <StyledScrollView style={{ marginTop: 0 }}>
           <TransactionBreakdown
             formattedSubtotal={this.props.formattedSubtotal}
             formattedTaxAmount={this.props.formattedTaxAmount}

@@ -40,7 +40,6 @@ class CartItem extends PureComponent {
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
           <View>
             <Text style={{ fontSize: 16, fontFamily: 'flex-font-heavy' }}>{this.props.name}</Text>
-            <Text style={{ fontSize: 16 }}>Union Square</Text>
           </View>
           <View>
             <Text style={{ fontSize: 16 }}>Start Date</Text>
