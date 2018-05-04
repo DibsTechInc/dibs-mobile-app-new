@@ -5,7 +5,8 @@ import currentDate from './CurrentDateReducer';
 import studio from './StudioReducer';
 import user from './UserReducer';
 import cart from './CartReducer';
-import upcomingEvents from './UpcomingEvents';
+import upcomingEvents from './UpcomingEventsReducer';
+import creditCard from './CreditCardReducer';
 
 export default combineReducers({
   events,
@@ -14,4 +15,5 @@ export default combineReducers({
   user,
   cart,
   upcomingEvents,
+  creditCard,
 });

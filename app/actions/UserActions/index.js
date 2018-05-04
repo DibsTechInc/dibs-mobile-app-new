@@ -2,6 +2,7 @@ import { AsyncStorage } from 'react-native';
 import { createAction } from 'redux-actions';
 import { LOGIN_ROUTE, REGISTER_ROUTE, MAIN_ROUTE } from '../../constants/RouteConstants';
 import Config from '../../../config.json';
+import { requestCreditCardInfo, removeCreditCard } from '../index';
 
 export const setUser = createAction('SET_USER', payload => payload);
 
@@ -66,11 +67,9 @@ export function signUpUser(payload, callback) {
         method: 'POST',
         body: payload,
       });
-
       if (res.success) {
         return callback(MAIN_ROUTE);
       }
-
       return callback(null);
     } catch (err) {
       console.log(err);
@@ -97,6 +96,7 @@ export function submitLogin(email, password, callback) {
       });
       if (res.success) {
         dispatch(setUser(res.user));
+        dispatch(requestCreditCardInfo());
         callback(res.user);
       } else {
         callback(null);
@@ -116,6 +116,7 @@ export function logOutUser(callback = () => {}) {
     try {
       await AsyncStorage.removeItem(Config.USER_TOKEN_KEY);
       dispatch(setUser({}));
+      dispatch(removeCreditCard());
       callback();
     } catch (err) {
       console.log(err);

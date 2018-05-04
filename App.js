@@ -8,7 +8,7 @@ import store from './app/store'; // lol App store...
 import Config from './config.json';
 import Navigator from './app/router';
 import DibsLoader from './app/components/shared/DibsLoader';
-import { requestStudioData, requestUserData } from './app/actions';
+import { requestStudioData, requestUserData, requestCreditCardInfo } from './app/actions';
 
 // Native apps can only load downloaded fronts stored in assets/fonts folder
 import SourceSansProBold from './assets/fonts/SourceSansPro-Bold.ttf';
@@ -48,15 +48,16 @@ class App extends Component {
    * @returns {undefined}
    */
   async getAssets() {
+    const token = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
     await Promise.all([
       Font.loadAsync({
         'flex-font': SourceSansProRegular,
         'flex-font-heavy': SourceSansProBold,
       }),
       new Promise(res => store.dispatch(requestStudioData(res))),
-      new Promise(res => store.dispatch(requestUserData(res))),
+      token && new Promise(res => store.dispatch(requestUserData(res))),
+      token && new Promise(res => store.dispatch(requestCreditCardInfo(res))),
     ]);
-    const token = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
     this.setState({ fetchedAssets: true, userToken: token });
   }
   /**
