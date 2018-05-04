@@ -98,6 +98,8 @@ class EnterEmail extends Component {
           <StyledText> What is your email? </StyledText>
           <StyledInputView>
             <StyledTextInput
+              autoFocus
+              returnKeyType="go"
               placeholder="Email"
               autoCapitalize="none"
               onChangeText={email => this.setState({ email })}
