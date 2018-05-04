@@ -131,11 +131,6 @@ class SideMenu extends React.PureComponent {
           label="Schedule"
           route={SCHEDULE_ROUTE}
         />
-        <NavLink
-          iconName="cog"
-          label="Settings"
-          route={SETTINGS_ROUTE} // TODO settings route
-        />
       </StyledContainer>
     );
   }
