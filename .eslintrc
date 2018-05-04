@@ -61,7 +61,8 @@
     "react/prefer-stateless-function": 0,
     "react/jsx-filename-extension": 0,
     "react/require-default-props": 0,
-    "import/extensions": 0
+    "import/extensions": 0,
+    "no-bitwise": 0,
   },
   "globals": {
     "$": true,

@@ -36,7 +36,8 @@ import CartItem from './CartItem';
 import TransactionBreakdown from './TransactionBreakdown';
 import PaymentInfo from './PaymentInfo';
 import PromoField from './PromoField';
-import { MaterialPanelView } from '../styled';
+import { MaterialPanelView, FlexRow } from '../styled';
+import MaterialButton from '../shared/MaterialButton';
 
 const StyledScrollView = styled.ScrollView`
   flex: 1;
@@ -70,24 +71,9 @@ const StyledCheckoutView = styled.View`
   background-color: ${SOFT_GREY};
 `;
 
-const StyledContinueButton = styled.TouchableOpacity`
-  padding-left: 100px;
-  padding-right: 100px;
-  padding-top: 15px;
-  padding-bottom: 15px;
-  background-color: ${Config.STUDIO_COLOR};
-  border-radius: 5px;
-  border-width: 1px;
-  border-color: ${Config.STUDIO_COLOR};
-`;
-
 const StyledText = styled.Text`
   font-family: 'flex-font';
   font-size: 16px;
-`;
-
-const StyledButtonText = StyledText.extend`
-  color: #fff;
 `;
 
 const StyledSavingsText = StyledText.extend`
@@ -186,9 +172,13 @@ class CartPage extends Component {
           <View style={{ marginBottom: 30 }}>
             <StyledSavingsText>Place order to earn $1.09 in credit back.</StyledSavingsText>
           </View>
-          <StyledContinueButton>
-            <StyledButtonText>Checkout</StyledButtonText>
-          </StyledContinueButton>
+          <FlexRow>
+            <MaterialButton
+              text="Checkout"
+              onPress={() => { }}
+              style={{ flex: 1, height: 50 }}
+            />
+          </FlexRow>
         </StyledCheckoutView>
       </FadeInView>
     );
