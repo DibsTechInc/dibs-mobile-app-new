@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { View } from 'react-native';
+import { Dimensions, View } from 'react-native';
 import { withNavigation, NavigationActions } from 'react-navigation';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import FadeInView from '../shared/FadeInView';
-import { FlexRow } from '../styled/Views';
 import { getSortedCartEvents } from '../../selectors/CartSelectors';
 import { WHITE, LIGHT_GREY, SOFT_GREY, BLACK } from '../../constants';
+import Config from '../../../config.json';
 import Icon from '../shared/Icon';
 
 import {
@@ -32,17 +32,11 @@ import {
   getUserFlashCreditAmount,
   getFormattedUserFlashCreditAmount,
 } from '../../selectors/UserSelectors';
-import CartItem from './CartItem';
-import TransactionBreakdown from './TransactionBreakdown';
-import PromoField from './PromoField';
-
+import CartItem from '../CartPage/CartItem';
+import TransactionBreakdown from '../CartPage/TransactionBreakdown';
+import PaymentInfo from './PaymentInfo';
+import PromoField from '../CartPage/PromoField';
 import { MaterialPanelView } from '../styled';
-import {
-  SCHEDULE_ROUTE,
-  CONFIRMATION_ROUTE,
-} from '../../constants/RouteConstants';
-
-import MaterialButton from '../shared/MaterialButton';
 
 const StyledScrollView = styled.ScrollView`
   flex: 1;
@@ -76,13 +70,28 @@ const StyledCheckoutView = styled.View`
   background-color: ${SOFT_GREY};
 `;
 
+const StyledContinueButton = styled.TouchableOpacity`
+  padding-left: 100px;
+  padding-right: 100px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  background-color: ${Config.STUDIO_COLOR};
+  border-radius: 5px;
+  border-width: 1px;
+  border-color: ${Config.STUDIO_COLOR};
+`;
+
 const StyledText = styled.Text`
   font-family: 'flex-font';
   font-size: 16px;
 `;
 
+const StyledButtonText = StyledText.extend`
+  color: #fff;
+`;
+
 const StyledSavingsText = StyledText.extend`
-  color: ${BLACK};
+  color: #000;
 `;
 
 const StyledCenterText = styled.Text`
@@ -95,7 +104,7 @@ const StyledCenterText = styled.Text`
  * @class CartPage
  * @extends {Component}
  */
-class CartPage extends Component {
+class ConfirmationPage extends Component {
   /**
    * @constructor
    * @constructs CartPage
@@ -110,74 +119,14 @@ class CartPage extends Component {
    * @returns {undefined}
    */
   toPreviousPage() {
-    let previousRoute = this.props.navigation.state.params && this.props.navigation.state.params.previousRoute;
-
-    if (!previousRoute) {
-      const navigateAction = NavigationActions.navigate({
-        routeName: 'DrawerOpen',
-      });
-
-      return this.props.navigation.dispatch(navigateAction);
-    }
-
-    const keyType = this.props.navigation.state.key.split('-')[0];
-    const previousRouteKeyType = previousRoute.split('-')[0];
-
-    if (previousRouteKeyType === 'id') {
-      previousRoute = 'DrawerOpen';
-    }
-
-    if (keyType === 'id') {
-      previousRoute = 'MAIN_ROUTE';
-    }
-
-    const navigateAction = NavigationActions.navigate({
-      routeName: previousRoute,
-    });
-
-    return this.props.navigation.dispatch(navigateAction);
+    this.props.navigation.navigate('Cart');
   }
 
   /**
    * @returns {JSX} XML
    */
   render() {
-    let renderCartItems = <CartItem hasEmptyCart />;
-
-    if (!this.props.cart.length) {
-      return (
-        <FadeInView>
-          <StyledTopView>
-            <Icon
-              iconName="arrow-left"
-              iconColor={BLACK}
-              onPress={this.toPreviousPage}
-              style={{ position: 'absolute', left: 0, fontSize: 11 }}
-            />
-            <StyledCenterText>
-              My Cart
-            </StyledCenterText>
-          </StyledTopView>
-          <StyledScrollView>
-            <MaterialPanelView style={{ shadowOffset: { width: 3, height: 3 } }}>
-              {renderCartItems}
-            </MaterialPanelView>
-          </StyledScrollView>
-          <StyledCheckoutView>
-            <FlexRow>
-              <MaterialButton
-                text="Class Schedule"
-                onPress={() => { this.props.navigation.navigate(SCHEDULE_ROUTE); }}
-                style={{ flex: 1, height: 50 }}
-              />
-            </FlexRow>
-          </StyledCheckoutView>
-        </FadeInView>
-      );
-    }
-
-    if (this.props.cart.length) {
-      renderCartItems = this.props.cart.map(cart =>
+    const renderCartItems = this.props.cart.map(cart =>
         (<CartItem
           key={cart.eventid}
           eventid={cart.eventid}
@@ -187,7 +136,6 @@ class CartPage extends Component {
           price={cart.price}
         />)
       );
-    }
 
     return (
       <FadeInView style={{ backgroundColor: SOFT_GREY }}>
@@ -199,40 +147,37 @@ class CartPage extends Component {
             style={{ position: 'absolute', left: 0, fontSize: 11 }}
           />
           <StyledCenterText>
-            My Cart
+            Confirm Checkout
           </StyledCenterText>
         </StyledTopView>
         <StyledScrollView>
-          <MaterialPanelView style={{ shadowOffset: { width: 3, height: 3 }, marginTop: 0 }}>
-            {renderCartItems}
-          </MaterialPanelView>
-          <PromoField />
           <TransactionBreakdown
             formattedSubtotal={this.props.formattedSubtotal}
             formattedTaxAmount={this.props.formattedTaxAmount}
             formattedTotal={this.props.formattedTotal}
           />
+          <PaymentInfo creditCard={this.props.creditCard} />
+          <MaterialPanelView style={{ shadowOffset: { width: 3, height: 3 } }}>
+            {renderCartItems}
+          </MaterialPanelView>
         </StyledScrollView>
         <StyledCheckoutView>
           <View style={{ marginBottom: 30 }}>
             <StyledSavingsText>Place order to earn $1.09 in credit back.</StyledSavingsText>
           </View>
-          <FlexRow>
-            <MaterialButton
-              text="Checkout"
-              onPress={() => { this.props.navigation.navigate(CONFIRMATION_ROUTE); }}
-              style={{ flex: 1, height: 50 }}
-            />
-          </FlexRow>
+          <StyledContinueButton>
+            <StyledButtonText>Purchase</StyledButtonText>
+          </StyledContinueButton>
         </StyledCheckoutView>
       </FadeInView>
     );
   }
 }
 
-CartPage.propTypes = {
+ConfirmationPage.propTypes = {
   navigation: PropTypes.shape(),
   cart: PropTypes.arrayOf(PropTypes.shape()),
+  creditCard: PropTypes.shape(),
   formattedSubtotal: PropTypes.string,
   formattedTaxAmount: PropTypes.string,
   formattedTotal: PropTypes.string,
@@ -258,6 +203,7 @@ const mapStateToProps = state => ({
   formattedTotal: getFormattedCartTotal(state),
   valueBack: getCartValueBack(state),
   formattedValueBack: getFormattedCartValueBack(state),
+  creditCard: state.creditCard,
 });
 
-export default withNavigation(connect(mapStateToProps)(CartPage));
+export default withNavigation(connect(mapStateToProps)(ConfirmationPage));

@@ -7,5 +7,6 @@ export const LOGIN_ROUTE = 'Login';
 export const REGISTER_ROUTE = 'Register';
 export const DRAWER_ROUTE = 'Drawer';
 export const CART_ROUTE = 'Cart';
+export const CONFIRMATION_ROUTE = 'Confirmation';
 export const DRAWER_OPEN = 'DrawerOpen';
 export const SETTINGS_ROUTE = 'Settings';
