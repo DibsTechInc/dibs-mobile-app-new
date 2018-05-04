@@ -6,3 +6,8 @@ export const FlexCenter = styled.View`
   align-items: center;
 `;
 
+export const SpaceBetweenRow = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+`;
+

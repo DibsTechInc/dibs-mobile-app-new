@@ -1,10 +1,7 @@
 import { createSelector } from 'reselect';
-import moment from 'moment';
 import { format as formatCurrency } from 'currency-formatter';
 import Decimal from 'decimal.js';
-
-import { getDibsStudioId, getStudioCurrency, getStudioCountry } from '../StudioSelectors';
-// import getDateFormatFromCountry from '../../../../lib/helpers/get-date-format-from-country';
+import { getDibsStudioId, getStudioCurrency } from '../StudioSelectors';
 
 /**
  * @param {Object} state in store
@@ -51,7 +48,7 @@ export function getUserSuppressionList(state) {
  * @returns {string} user first name
  */
 export function getUserFirstName(state) {
-  return getUser(state).firstName;
+  return getUser(state).firstName || '';
 }
 
 /**
@@ -59,7 +56,7 @@ export function getUserFirstName(state) {
  * @returns {string} user last name
  */
 export function getUserLastName(state) {
-  return getUser(state).lastName;
+  return getUser(state).lastName || '';
 }
 
 /**
@@ -69,6 +66,14 @@ export function getUserLastName(state) {
 export function getUserCredits(state) {
   return getUser(state).credits || [];
 }
+
+export const getUsersFullName = createSelector(
+  [
+    getUserFirstName,
+    getUserLastName,
+  ],
+  (firstName, lastName) => `${firstName} ${lastName}`
+);
 
 export const getUserStudioCredits = createSelector(
   [

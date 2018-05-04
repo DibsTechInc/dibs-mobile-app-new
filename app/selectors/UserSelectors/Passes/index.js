@@ -70,6 +70,12 @@ export const getDetailedUserPasses = createSelector(
   })).sort((a, b) => (moment(a.expiresAt) - moment(b.expiresAt)))
 );
 
+/*
+
+PASS FOR APPLYING TO CART
+
+*/
+
 export const getUsersNextPass = createSelector(
   [
     getDetailedUserPasses,
@@ -120,16 +126,24 @@ export const getUsersNextPassValue = createSelector(
     return ((pass && pass.passValue && !pass.studioPackage.unlimited) ? pass.passValue : 0);
   }
 );
+
 /*
 
-TODO
-
-getUserStudioPassesLeft
-getUserStudioPassesInCart
-getUserHasPasses
-getDetailedUserPasses
-getUsersNextPass
-getUsersNextPassId
-getUsersNextPassValue
+PASS FOR SIDEBAR
 
 */
+
+export const getUsersFirstActivePass = createSelector(
+  getDetailedUserPasses,
+  passes => (passes[0] || {})
+);
+
+export const getUsersFirstActivePassId = createSelector(
+  getUsersFirstActivePass,
+  pass => (pass.id || null)
+);
+
+export const getUsersFirstPassName = createSelector(
+  getUsersFirstActivePass,
+  pass => (pass.name || '')
+);

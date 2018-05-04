@@ -6,3 +6,4 @@ export const GREY = '#999';
 export const GREEN = '#00c853';
 export const RED = '#f00';
 export const SOFT_GREY = '#EFEFF4';
+export const DARK_TEXT_GREY = '#444';
