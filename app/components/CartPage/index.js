@@ -111,6 +111,7 @@ class CartPage extends Component {
    */
   toPreviousPage() {
     let previousRoute = this.props.navigation.state.params && this.props.navigation.state.params.previousRoute;
+    // console.log(previousRoute, 'what this')
 
     if (!previousRoute) {
       const navigateAction = NavigationActions.navigate({
@@ -128,7 +129,7 @@ class CartPage extends Component {
     }
 
     if (keyType === 'id') {
-      previousRoute = 'MAIN_ROUTE';
+      return this.props.navigation.popToTop();
     }
 
     const navigateAction = NavigationActions.navigate({
