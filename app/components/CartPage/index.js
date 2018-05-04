@@ -121,6 +121,11 @@ class CartPage extends Component {
   toPreviousPage() {
     let previousRoute = this.props.navigation.state.params && this.props.navigation.state.params.previousRoute;
     const keyType = this.props.navigation.state.key.split('-')[0];
+    const previousRouteKeyType = previousRoute.split('-')[0];
+
+    if (previousRouteKeyType === 'id') {
+      previousRoute = 'DrawerOpen';
+    }
 
     if (keyType === 'id') {
       previousRoute = 'MAIN_ROUTE';
