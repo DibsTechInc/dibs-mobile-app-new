@@ -49,14 +49,8 @@ class CartItem extends PureComponent {
         </View>
 
         <View style={{ borderWidth: 1, borderColor: LIGHT_GREY }}>
-          <View style={{ margin: 10 }}>
-            <Text style={{ fontSize: 16 }}>Nylon Vest</Text>
-            <Text style={{ fontSize: 16 }}>Color: Black</Text>
-            <Text style={{ fontSize: 16 }}>Size: L</Text>
-          </View>
           <View style={{ flexDirection: 'row', margin: 10 }}>
             <View style={{ flexDirection: 'row', flex: 1 }}>
-              <Text style={{ fontSize: 16 }}>Remove</Text>
               <Text style={{ fontSize: 16 }}>{this.props.quantity} Quantity</Text>
             </View>
             <View>

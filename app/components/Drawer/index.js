@@ -4,6 +4,7 @@ import {
   PROFILE_ROUTE,
   SCHEDULE_ROUTE,
   CART_ROUTE,
+  CONFIRMATION_ROUTE,
 } from '../../constants/RouteConstants/index';
 import {
   getDrawerConfig,
@@ -13,12 +14,14 @@ import ProfilePage from '../ProfilePage';
 import SchedulePage from '../SchedulePage';
 import CartPage from '../CartPage';
 import SideMenu from './SideMenu';
+import ConfirmationPage from '../ConfirmationPage';
 
 const Drawer = DrawerNavigator({
   [MAIN_ROUTE]: { screen: MainPage },
   [PROFILE_ROUTE]: { screen: ProfilePage },
   [SCHEDULE_ROUTE]: { screen: SchedulePage },
   [CART_ROUTE]: { screen: CartPage },
+  [CONFIRMATION_ROUTE]: { screen: ConfirmationPage },
 }, getDrawerConfig(300, 'left', MAIN_ROUTE, SideMenu));
 
 export default Drawer;
