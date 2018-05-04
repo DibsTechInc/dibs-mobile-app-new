@@ -1,10 +1,11 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, TextInput, View } from 'react';
+import { CreditCardInput } from 'react-native-credit-card-input';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 const StyledPaymentView = styled.View`
   margin: 20px;
-  height: 185px;
+  flex: 1;
 `;
 
 const StyledText = styled.Text`
@@ -17,13 +18,35 @@ const StyledText = styled.Text`
  * @extends {Component}
  */
 class PaymentInfo extends PureComponent {
+  onChange = (formData) => console.log(JSON.stringify(formData, null, " "));
+  onFocus = (field) => console.log("focusing", field);
   /**
    * @returns {JSX} XML
    */
   render() {
+    const labels = {
+      number: 'Card Number',
+      expiry: 'Expiration',
+      cvc: 'CVC',
+    };
+
     return (
       <StyledPaymentView>
-        <StyledText>Payment Info</StyledText>
+        <CreditCardInput
+          requiresCVC
+
+          cardFontFamily="flex-font"
+
+          cardScale={0.8}
+          labels={labels}
+
+          validColor="black"
+          invalidColor="red"
+          placeholderColor="darkgray"
+
+          onFocus={this.onFocus}
+          onChange={this.onChange}
+        />
       </StyledPaymentView>
     );
   }

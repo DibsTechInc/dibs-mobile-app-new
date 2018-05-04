@@ -71,7 +71,7 @@ class Header extends Component {
       <StyledView backgroundColor={this.props.backgroundColor}>
         <StyledMenuView>
           <Icon
-            iconName="align-center"
+            iconName="user-circle"
             iconColor={this.props.iconColor}
             onPress={this.navigateToDrawer}
           />

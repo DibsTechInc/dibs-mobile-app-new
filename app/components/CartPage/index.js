@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Dimensions, View } from 'react-native';
+import { withNavigation, NavigationActions } from 'react-navigation';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import FadeInView from '../shared/FadeInView';
-import Header from '../Header';
 import { getSortedCartEvents } from '../../selectors/CartSelectors';
-import { WHITE, TEXT_GREY, LIGHT_GREY, GREEN, GREY, SOFT_GREY } from '../../constants';
+import { WHITE, LIGHT_GREY, SOFT_GREY, BLACK } from '../../constants';
 import Config from '../../../config.json';
-import { lightenDarkenColor } from '../../helpers';
+import Icon from '../shared/Icon';
+
 import {
   getFormattedCartSubtotalWithPackageClasses,
   getCartPromoCodeAmount,
@@ -43,22 +44,21 @@ const StyledScrollView = styled.ScrollView`
 `;
 
 const StyledSectionViewOne = styled.View`
-  background-color: #fff;
+  background-color: ${WHITE};
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
   height: ${props => props.height ? props.height : 'auto'};
   width: ${WIDTH};
-  overflow: hidden;
   margin-left: 10px;
   margin-right: 10px;
   margin-bottom: 10px;
-  border-width: 1;
+  border-width: 0.3;
   border-color: #ddd;
   border-top-width: 0;
   border-left-width: 0;
   shadow-color: #000;
-  shadow-opacity: 0.5;
-  shadow-radius: 8;
+  shadow-opacity: 0.2;
+  shadow-radius: 4;
   elevation: 3;
 `;
 
@@ -68,6 +68,8 @@ const StyledSectionViewTwo = StyledSectionViewOne.extend`
 `;
 
 const StyledTopView = styled.View`
+  flex-direction: row;
+  position: relative;
   backgroundColor: #fff;
   border-width: 1px;
   border-top-color: #fff;
@@ -129,9 +131,38 @@ const StyledCenterText = styled.Text`
  */
 class CartPage extends Component {
   /**
+   * @constructor
+   * @constructs CartPage
+   */
+  constructor() {
+    super();
+
+    this.toPreviousPage = this.toPreviousPage.bind(this);
+  }
+
+  /**
+   * @returns {undefined}
+   */
+  toPreviousPage() {
+    let previousRoute = this.props.navigation.state.params && this.props.navigation.state.params.previousRoute;
+    const keyType = this.props.navigation.state.key.split('-')[0];
+
+    if (keyType === 'id') {
+      previousRoute = 'MAIN_ROUTE';
+    }
+
+    const navigateAction = NavigationActions.navigate({
+      routeName: previousRoute,
+    });
+
+    this.props.navigation.dispatch(navigateAction);
+  }
+
+  /**
    * @returns {JSX} XML
    */
   render() {
+    console.log(this.props, 'wut')
     let renderCartItems = <CartItem hasEmptyCart />;
 
     if (this.props.cart.length) {
@@ -150,16 +181,22 @@ class CartPage extends Component {
     return (
       <FadeInView style={{ backgroundColor: SOFT_GREY }}>
         <StyledTopView>
+          <Icon
+            iconName="arrow-left"
+            iconColor={BLACK}
+            onPress={this.toPreviousPage}
+            style={{ position: 'absolute', left: 0, fontSize: 11 }}
+          />
           <StyledCenterText>My Cart</StyledCenterText>
         </StyledTopView>
-        <StyledScrollView>
-          <StyledSectionViewOne>
+        <StyledScrollView >
+          <StyledSectionViewOne style={{ shadowOffset: { width: 3, height: 3 } }}>
             {renderCartItems}
           </StyledSectionViewOne>
-          <StyledSectionViewTwo height={'150'}>
+          <StyledSectionViewTwo height={'150'} style={{ shadowOffset: { width: 3, height: 3 } }}>
             <PromoField />
           </StyledSectionViewTwo>
-          <StyledSectionViewTwo height={'200'}>
+          <StyledSectionViewTwo height={'280'} style={{ shadowOffset: { width: 3, height: 3 } }}>
             <PaymentInfo />
           </StyledSectionViewTwo>
           <StyledSectionViewTwo>
@@ -213,4 +250,4 @@ const mapStateToProps = state => ({
   formattedValueBack: getFormattedCartValueBack(state),
 });
 
-export default connect(mapStateToProps)(CartPage);
+export default withNavigation(connect(mapStateToProps)(CartPage));

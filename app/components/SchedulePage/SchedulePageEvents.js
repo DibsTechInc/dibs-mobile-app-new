@@ -29,7 +29,6 @@ class SchedulePageEvents extends Component {
    * @returns {JSX} XML
    */
   render() {
-    // console.log(this.props.events, 'eventz')
     return (
       <SwipeListView
         enableEmptySections
@@ -37,6 +36,7 @@ class SchedulePageEvents extends Component {
         keyExtractor={SchedulePageEvents.keyExtractor}
         renderRow={event => <EventListItem {...event} />}
         closeOnRowBeginSwipe
+        onScrollEnabled={() => console.log('log')}
       />
     );
   }
