@@ -64,9 +64,10 @@ class EnterEmail extends Component {
     const isValidEmail = validEmail.test(email);
 
     if (!isValidEmail) {
-      return this.setState({
+      this.setState({
         emailError: 'Invalid Email',
       });
+      return;
     }
 
     await new Promise(res => this.setState({ isLoading: true }, res));
