@@ -19,7 +19,7 @@ class CartIcon extends React.PureComponent {
    */
   constructor(props) {
     super(props);
-    this.openCart = () => props.navigation.navigate(CART_ROUTE);
+    this.openCart = () => props.navigation.navigate(CART_ROUTE, { previousRoute: this.props.navigation.state.key });
   }
   /**
    * render
