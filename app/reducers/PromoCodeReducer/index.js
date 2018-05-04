@@ -3,17 +3,20 @@ import {
   setPromoCode,
   setPackagePromoCode,
   clearPromoCodeData,
-  clearPackagePromoCodeData,
+  clearPackagePromoCode,
   setPromoCodeError,
   clearPromoCodeError,
   setPromoCodeNotice,
   clearPromoCodeNotice,
+  setPromoCodeSubmittingTrue,
+  setPromoCodeSubmittingFalse,
 } from '../../actions/PromoCodeActions';
 
 const initialState = {
   data: {},
   errorMessage: '',
   noticeMessage: '',
+  submitting: false,
 };
 
 export default handleActions({
@@ -21,11 +24,14 @@ export default handleActions({
     setPromoCode,
     clearPromoCodeData,
     setPackagePromoCode,
-    clearPackagePromoCodeData)]: (state, { payload }) => ({ ...state, data: payload }),
+    clearPackagePromoCode)]: (state, { payload }) => ({ ...state, data: payload }),
   [combineActions(
     setPromoCodeError,
     clearPromoCodeError)]: (state, { payload }) => ({ ...state, errorMessage: payload }),
   [combineActions(
     setPromoCodeNotice,
     clearPromoCodeNotice)]: (state, { payload }) => ({ ...state, noticeMessage: payload }),
+  [combineActions(
+    setPromoCodeSubmittingTrue,
+    setPromoCodeSubmittingFalse)]: (state, { payload }) => ({ ...state, submitting: payload }),
 }, initialState);

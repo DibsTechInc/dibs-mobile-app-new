@@ -7,6 +7,7 @@ import { WHITE } from '../../constants';
 const LoaderView = styled.View`
   align-items: center;
   flex-direction: row;
+  height: ${props => (2 * props.maxDotRadius)};
   width: ${props => props.width};
 `;
 

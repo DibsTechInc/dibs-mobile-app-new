@@ -60,3 +60,27 @@ export function getPromoCodeAmount(state) {
 export function getAppliedPromoCode(state) {
   return getPromoCode(state).code || '';
 }
+
+/**
+ * @param {Object} state in store
+ * @returns {boolean} if promo code is being submitted for verification
+ */
+export function getPromoCodeIsSubmitting(state) {
+  return Boolean(getPromoCode(state).submitting);
+}
+
+/**
+ * @param {Object} state in store
+ * @returns {string} error message
+ */
+export function getPromoCodeError(state) {
+  return getPromoCode(state).errorMessage || '';
+}
+
+/**
+ * @param {Object} state in store
+ * @returns {string} notice message
+ */
+export function getPromoCodeNotice(state) {
+  return getPromoCode(state).noticeMessage || '';
+}

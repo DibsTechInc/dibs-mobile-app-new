@@ -1,23 +1,15 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import styled from 'styled-components';
-<<<<<<< Updated upstream
-import { View, Text, TouchableOpacity } from 'react-native';
-=======
-import { View, Text } from 'react-native';
->>>>>>> Stashed changes
+import Config from '../../../config.json';
+import { RED } from '../../constants';
+import { getPromoCodeName, getPromoCodeIsSubmitting, getPromoCodeError } from '../../selectors';
+import { verifyPromoCode, clearPromoCodeError } from '../../actions';
 import MaterialPanel from '../shared/MaterialPanel';
 import MaterialButton from '../shared/MaterialButton';
-
-
-const StyledPromoView = styled.View`
-  justify-content: space-between;
-  flex: 2;
-`;
-
-const StyledText = styled.Text`
-  font-family: 'flex-font';
-`;
+import DibsLoader from '../shared/DibsLoader';
+import { FlexRow } from '../styled';
 
 const PromoCodeInput = styled.TextInput`
   border-bottom-width: 1px;
@@ -25,6 +17,18 @@ const PromoCodeInput = styled.TextInput`
   height: 40px;
   margin-right: 10px;
   padding: 3px;
+`;
+
+const LoaderContainer = styled.View`
+  align-items: center;
+  padding-vertical: 10;
+`;
+
+const ErrorMessage = styled.Text`
+  color: ${RED};
+  font-family: 'flex-font';
+  font-size: 14;
+  margin-top: 10;
 `;
 
 /**
@@ -44,13 +48,28 @@ class PromoField extends PureComponent {
     this.handlePromoCodeSubmit = this.handlePromoCodeSubmit.bind(this);
   }
   /**
+   * @param {Object} props component will receive
+   * @returns {undefined}
+   */
+  componentWillReceiveProps(props) {
+    if (!this.props.errorMessage && props.errorMessage) {
+      if (this.clearErrorTimer) clearTimeout(this.clearErrorTimer);
+      this.clearErrorTimer = setTimeout(() => this.props.clearPromoCodeError(), 5e3);
+    }
+  }
+  /**
    * @param {string} value in input
    * @returns {undefined}
    */
   handlePromoCodeChange(value) {
     this.setState({ promoCode: value.toUpperCase() });
   }
-  handlePromoCodeSubmit() {}
+  /**
+   * @returns {undefined}
+   */
+  handlePromoCodeSubmit() {
+    this.props.verifyPromoCode(this.state.promoCode);
+  }
   /**
    * @returns {JSX} XML
    */
@@ -58,12 +77,19 @@ class PromoField extends PureComponent {
     // TODO handle scrolling
     return (
       <MaterialPanel
-        height={150}
         style={{ shadowOffset: { width: 3, height: 3 } }}
         heading="Promo Code"
       >
-        <StyledPromoView>
-          <View style={{ justifyContent: 'flex-start', alignItems: 'flex-start', flexDirection: 'row' }}>
+        {this.props.submitting ? (
+          <LoaderContainer>
+            <DibsLoader
+              dotColor={Config.STUDIO_COLOR}
+              width={150}
+            />
+          </LoaderContainer>
+        ) : null}
+        {!this.props.currentPromoCode && !this.props.submitting ? (
+          <FlexRow>
             <PromoCodeInput
               onChangeText={this.handlePromoCodeChange}
               value={this.state.promoCode}
@@ -73,14 +99,36 @@ class PromoField extends PureComponent {
               fontSize="14"
               style={{ width: 80, height: 40 }}
               onPress={this.handlePromoCodeSubmit}
+              disabled={!this.state.promoCode}
             />
-          </View>
-        </StyledPromoView>
+          </FlexRow>
+        ) : null}
+        {this.props.errorMessage ? (
+          <ErrorMessage>
+            {this.props.errorMessage}
+          </ErrorMessage>
+        ) : null}
       </MaterialPanel>
     );
   }
 }
 
-PromoField.propTypes = {};
+PromoField.propTypes = {
+  submitting: PropTypes.bool.isRequired,
+  currentPromoCode: PropTypes.string.isRequired,
+  errorMessage: PropTypes.string.isRequired,
+  verifyPromoCode: PropTypes.func.isRequired,
+  clearPromoCodeError: PropTypes.func.isRequired,
+};
 
-export default PromoField;
+const mapStateToProps = state => ({
+  currentPromoCode: getPromoCodeName(state),
+  submitting: getPromoCodeIsSubmitting(state),
+  errorMessage: getPromoCodeError(state),
+});
+const mapDispatchToProps = {
+  verifyPromoCode,
+  clearPromoCodeError,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(PromoField);

@@ -8,8 +8,11 @@ export const FlexCenter = styled.View`
   align-items: center;
 `;
 
-export const SpaceBetweenRow = styled.View`
+export const FlexRow = styled.View`
   flex-direction: row;
+`;
+
+export const SpaceBetweenRow = FlexRow.extend`
   justify-content: space-between;
 `;
 
