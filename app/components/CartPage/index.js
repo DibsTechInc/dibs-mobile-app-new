@@ -162,7 +162,6 @@ class CartPage extends Component {
    * @returns {JSX} XML
    */
   render() {
-    console.log(this.props, 'wut')
     let renderCartItems = <CartItem hasEmptyCart />;
 
     if (this.props.cart.length) {

@@ -36,7 +36,6 @@ class SchedulePageEvents extends Component {
         keyExtractor={SchedulePageEvents.keyExtractor}
         renderRow={event => <EventListItem {...event} />}
         closeOnRowBeginSwipe
-        onScrollEnabled={() => console.log('log')}
       />
     );
   }
