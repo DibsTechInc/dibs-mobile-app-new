@@ -1,13 +1,17 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+<<<<<<< Updated upstream
 import { View, Text, TouchableOpacity } from 'react-native';
+=======
+import { View, Text } from 'react-native';
+>>>>>>> Stashed changes
 import MaterialPanel from '../shared/MaterialPanel';
+import MaterialButton from '../shared/MaterialButton';
 
 
 const StyledPromoView = styled.View`
   justify-content: space-between;
-  height: 100px;
   flex: 2;
 `;
 
@@ -17,7 +21,7 @@ const StyledText = styled.Text`
 
 const PromoCodeInput = styled.TextInput`
   border-bottom-width: 1px;
-  flex: 1;
+  flex: 2;
   height: 40px;
   margin-right: 10px;
   padding: 3px;
@@ -37,6 +41,7 @@ class PromoField extends PureComponent {
     super(props);
     this.state = { promoCode: '' };
     this.handlePromoCodeChange = this.handlePromoCodeChange.bind(this);
+    this.handlePromoCodeSubmit = this.handlePromoCodeSubmit.bind(this);
   }
   /**
    * @param {string} value in input
@@ -45,6 +50,7 @@ class PromoField extends PureComponent {
   handlePromoCodeChange(value) {
     this.setState({ promoCode: value.toUpperCase() });
   }
+  handlePromoCodeSubmit() {}
   /**
    * @returns {JSX} XML
    */
@@ -62,16 +68,12 @@ class PromoField extends PureComponent {
               onChangeText={this.handlePromoCodeChange}
               value={this.state.promoCode}
             />
-            <TouchableOpacity style={{ height: 40, width: 80, borderWidth: 1, justifyContent: 'center', alignItems: 'center', borderLeftWidth: 0 }}>
-              <StyledText>
-                Apply
-              </StyledText>
-            </TouchableOpacity>
-          </View>
-          <View>
-            <Text style={{ fontSize: 16, fontFamily: 'flex-font' }}>
-              Apply a coupon today!
-            </Text>
+            <MaterialButton
+              text="Apply"
+              fontSize="14"
+              style={{ width: 80, height: 40 }}
+              onPress={this.handlePromoCodeSubmit}
+            />
           </View>
         </StyledPromoView>
       </MaterialPanel>

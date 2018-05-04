@@ -62,6 +62,7 @@
     "react/jsx-filename-extension": 0,
     "react/require-default-props": 0,
     "import/extensions": 0,
+    "no-bitwise": 0,
     "react/no-string-refs": 0
   },
   "globals": {
