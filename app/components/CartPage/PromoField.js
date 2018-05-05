@@ -90,9 +90,8 @@ class PromoField extends PureComponent {
    * @returns {undefined}
    */
   handlePress() {
-    this.setState({ promoCode: '' });
     return this.props.currentPromoCode ?
-      this.props.clearPromoCode() :
+      this.setState({ promoCode: '' }, () => this.props.clearPromoCode()) :
       this.props.verifyPromoCode(this.state.promoCode);
   }
   /**
