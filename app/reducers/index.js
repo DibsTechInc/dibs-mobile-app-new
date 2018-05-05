@@ -7,6 +7,7 @@ import user from './UserReducer';
 import cart from './CartReducer';
 import upcomingEvents from './UpcomingEventsReducer';
 import creditCard from './CreditCardReducer';
+import promoCode from './PromoCodeReducer';
 
 export default combineReducers({
   events,
@@ -16,4 +17,5 @@ export default combineReducers({
   cart,
   upcomingEvents,
   creditCard,
+  promoCode,
 });

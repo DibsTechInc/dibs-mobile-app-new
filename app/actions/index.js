@@ -5,3 +5,4 @@ export * from './EventActions';
 export * from './StudioActions';
 export * from './UserActions';
 export * from './UpcomingEventsActions';
+export * from './PromoCodeActions';

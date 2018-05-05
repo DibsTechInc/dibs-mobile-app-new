@@ -5,3 +5,4 @@ export * from './UserSelectors';
 export * from './UserSelectors/Passes';
 export * from './UpcomingEventsSelectors';
 export * from './CartSelectors';
+export * from './PromoCodeSelectors';

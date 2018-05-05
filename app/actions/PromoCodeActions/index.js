@@ -16,27 +16,31 @@ import {
   setCartVisibleFalse,
 } from '../CartActions';
 import { getStudioCurrency } from '../../selectors/StudioSelectors';
-import { getSortedCartEvents, getCartEventIds, getCartEventNames } from '../../selectors/EventsSelectors';
+import { getSortedCartEvents, getCartEventIds, getCartEventNames } from '../../selectors';
 import { getUsersNextPassId } from '../../selectors/UserSelectors/Passes';
 
 export const {
   setPromoCode,
   setPackagePromoCode,
   clearPromoCodeData,
-  clearPackagePromoCodeData,
+  clearPackagePromoCode,
   setPromoCodeError,
   clearPromoCodeError,
   setPromoCodeNotice,
   clearPromoCodeNotice,
+  setPromoCodeSubmittingTrue,
+  setPromoCodeSubmittingFalse,
 } = createActions({
   SET_PROMO_CODE: payload => payload,
-  SET_PACKAGE_PROMOCODE: payload => payload,
-  CLEAR_PROMO_CODE_DATA: () => {},
-  CLEAR_PACKAGE_PROMO_CODE: () => {},
+  SET_PACKAGE_PROMO_CODE: payload => payload,
+  CLEAR_PROMO_CODE_DATA: () => ({}),
+  CLEAR_PACKAGE_PROMO_CODE: () => ({}),
   SET_PROMO_CODE_ERROR: errorMsg => errorMsg,
   CLEAR_PROMO_CODE_ERROR: () => '',
   SET_PROMO_CODE_NOTICE: msg => msg,
   CLEAR_PROMO_CODE_NOTICE: () => '',
+  SET_PROMO_CODE_SUBMITTING_TRUE: () => true,
+  SET_PROMO_CODE_SUBMITTING_FALSE: () => false,
 });
 
 /**
@@ -59,7 +63,7 @@ export function clearPromoCode() {
     }
 
     if (promoCode.product === PROMO_PRODUCT_PACKAGE) {
-      dispatch(clearPackagePromoCodeData());
+      dispatch(clearPackagePromoCode());
     } else {
       dispatch(clearPromoCodeData());
     }
@@ -88,6 +92,8 @@ export function reverifyPromoCode() {
 export function verifyPromoCode(promoCodeAttempt, product = PROMO_PRODUCT_CLASS) {
   return async function innerVerifyPromoCode(dispatch, getState, dibsFetch) {
     try {
+      if (getState().promoCode.submitting) return;
+      dispatch(setPromoCodeSubmittingTrue());
       const state = getState();
       const { source, studioid } = state.studio.data;
       const eventids = getCartEventIds(state);
@@ -107,6 +113,7 @@ export function verifyPromoCode(promoCodeAttempt, product = PROMO_PRODUCT_CLASS)
         } else {
           if (res.promoCode.type === PROMO_TYPE_FREE_CLASS) dispatch(applyFreeClassPromoToCart());
           dispatch(setPromoCode({ ...res.promoCode, source, studioid }));
+          dispatch(setPromoCodeNotice(`Successfully applied ${promoCodeAttempt} to your cart.`));
         }
       } else if (res.success) {
         const currency = getStudioCurrency(getState());
@@ -121,5 +128,6 @@ export function verifyPromoCode(promoCodeAttempt, product = PROMO_PRODUCT_CLASS)
       console.log(err);
       dispatch(setPromoCodeError('Something went wrong applying that promo code to your cart.'));
     }
+    dispatch(setPromoCodeSubmittingFalse());
   };
 }

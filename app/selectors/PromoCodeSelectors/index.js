@@ -17,21 +17,12 @@ export function getPromoCodeData(state) {
 }
 
 /**
- * getPromoCodeName
- * @param {Object} state in redux store
- * @returns {String} current promo code name
- */
-export function getPromoCodeName(state) {
-  return getPromoCode(state).code || '';
-}
-
-/**
  * getPromoCodeType
  * @param {Object} state in redux store
  * @returns {Object} current promo code to be applied
  */
 export function getPromoCodeType(state) {
-  return getPromoCode(state).type || '';
+  return getPromoCodeData(state).type || '';
 }
 
 /**
@@ -40,7 +31,7 @@ export function getPromoCodeType(state) {
  * @returns {Object} current promo code to be applied
  */
 export function getPromoCodeProduct(state) {
-  return getPromoCode(state).product || '';
+  return getPromoCodeData(state).product || '';
 }
 
 /**
@@ -49,7 +40,7 @@ export function getPromoCodeProduct(state) {
  * @returns {Object} current promo code to be applied
  */
 export function getPromoCodeAmount(state) {
-  return getPromoCode(state).amount || 0;
+  return getPromoCodeData(state).amount || 0;
 }
 
 /**
@@ -58,5 +49,29 @@ export function getPromoCodeAmount(state) {
  * @returns {Object} current promo code to be applied
  */
 export function getAppliedPromoCode(state) {
-  return getPromoCode(state).code || '';
+  return getPromoCodeData(state).code || '';
+}
+
+/**
+ * @param {Object} state in store
+ * @returns {boolean} if promo code is being submitted for verification
+ */
+export function getPromoCodeIsSubmitting(state) {
+  return Boolean(getPromoCode(state).submitting);
+}
+
+/**
+ * @param {Object} state in store
+ * @returns {string} error message
+ */
+export function getPromoCodeError(state) {
+  return getPromoCode(state).errorMessage || '';
+}
+
+/**
+ * @param {Object} state in store
+ * @returns {string} notice message
+ */
+export function getPromoCodeNotice(state) {
+  return getPromoCode(state).noticeMessage || '';
 }
