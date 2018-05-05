@@ -2,7 +2,7 @@ import { createActions } from 'redux-actions';
 
 export const { setCreditCard, removeCreditCard } = createActions({
   SET_CREDIT_CARD: payload => payload,
-  REMOVE_CREDIT_CARD: () => {},
+  REMOVE_CREDIT_CARD: () => ({}),
 });
 
 /**

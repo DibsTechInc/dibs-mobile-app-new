@@ -33,8 +33,8 @@ export const {
 } = createActions({
   SET_PROMO_CODE: payload => payload,
   SET_PACKAGE_PROMO_CODE: payload => payload,
-  CLEAR_PROMO_CODE_DATA: () => {},
-  CLEAR_PACKAGE_PROMO_CODE: () => {},
+  CLEAR_PROMO_CODE_DATA: () => ({}),
+  CLEAR_PACKAGE_PROMO_CODE: () => ({}),
   SET_PROMO_CODE_ERROR: errorMsg => errorMsg,
   CLEAR_PROMO_CODE_ERROR: () => '',
   SET_PROMO_CODE_NOTICE: msg => msg,
@@ -113,6 +113,7 @@ export function verifyPromoCode(promoCodeAttempt, product = PROMO_PRODUCT_CLASS)
         } else {
           if (res.promoCode.type === PROMO_TYPE_FREE_CLASS) dispatch(applyFreeClassPromoToCart());
           dispatch(setPromoCode({ ...res.promoCode, source, studioid }));
+          dispatch(setPromoCodeNotice(`Successfully applied ${promoCodeAttempt} to your cart.`));
         }
       } else if (res.success) {
         const currency = getStudioCurrency(getState());

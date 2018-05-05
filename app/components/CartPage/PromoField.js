@@ -3,13 +3,18 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import Config from '../../../config.json';
-import { RED } from '../../constants';
-import { getPromoCodeName, getPromoCodeIsSubmitting, getPromoCodeError } from '../../selectors';
-import { verifyPromoCode, clearPromoCodeError } from '../../actions';
+import { RED, DARK_TEXT_GREY } from '../../constants';
+import { getAppliedPromoCode, getPromoCodeIsSubmitting, getPromoCodeError, getPromoCodeNotice } from '../../selectors';
+import { verifyPromoCode, clearPromoCodeError, clearPromoCodeNotice, clearPromoCode } from '../../actions';
 import MaterialPanel from '../shared/MaterialPanel';
 import MaterialButton from '../shared/MaterialButton';
 import DibsLoader from '../shared/DibsLoader';
 import { FlexRow } from '../styled';
+
+const PromoCodeText = styled.Text`
+  flex: 2;
+  margin-right: 10px;
+`;
 
 const PromoCodeInput = styled.TextInput`
   border-bottom-width: 1px;
@@ -31,6 +36,13 @@ const ErrorMessage = styled.Text`
   margin-top: 10;
 `;
 
+const NoticeMessage = styled.Text`
+  color: ${DARK_TEXT_GREY};
+  font-family: 'flex-font';
+  font-size: 14;
+  margin-top: 10;
+`;
+
 /**
  * @class TransactionBreakdown
  * @extends {Component}
@@ -45,7 +57,7 @@ class PromoField extends PureComponent {
     super(props);
     this.state = { promoCode: '' };
     this.handlePromoCodeChange = this.handlePromoCodeChange.bind(this);
-    this.handlePromoCodeSubmit = this.handlePromoCodeSubmit.bind(this);
+    this.handlePress = this.handlePress.bind(this);
   }
   /**
    * @param {Object} props component will receive
@@ -54,7 +66,17 @@ class PromoField extends PureComponent {
   componentWillReceiveProps(props) {
     if (!this.props.errorMessage && props.errorMessage) {
       if (this.clearErrorTimer) clearTimeout(this.clearErrorTimer);
-      this.clearErrorTimer = setTimeout(() => this.props.clearPromoCodeError(), 5e3);
+      this.clearErrorTimer = setTimeout(() => {
+        this.props.clearPromoCodeError();
+        this.clearErrorTimer = null;
+      }, 5e3);
+    }
+    if (!this.props.noticeMessage && props.noticeMessage) {
+      if (this.clearNoticeTimer) clearTimeout(this.clearNoticeTimer);
+      this.clearNoticeTimer = setTimeout(() => {
+        this.props.clearPromoCodeNotice();
+        this.clearNoticeTimer = null;
+      }, 5e3);
     }
   }
   /**
@@ -67,8 +89,11 @@ class PromoField extends PureComponent {
   /**
    * @returns {undefined}
    */
-  handlePromoCodeSubmit() {
-    this.props.verifyPromoCode(this.state.promoCode);
+  handlePress() {
+    this.setState({ promoCode: '' });
+    return this.props.currentPromoCode ?
+      this.props.clearPromoCode() :
+      this.props.verifyPromoCode(this.state.promoCode);
   }
   /**
    * @returns {JSX} XML
@@ -87,26 +112,36 @@ class PromoField extends PureComponent {
               width={150}
             />
           </LoaderContainer>
-        ) : null}
-        {!this.props.currentPromoCode && !this.props.submitting ? (
-          <FlexRow>
-            <PromoCodeInput
-              onChangeText={this.handlePromoCodeChange}
-              value={this.state.promoCode}
-            />
+        ) : (
+          <FlexRow style={{ alignItems: 'center' }}>
+            {this.props.currentPromoCode ? (
+              <PromoCodeText>
+                {this.props.currentPromoCode}
+              </PromoCodeText>
+            ) : (
+              <PromoCodeInput
+                onChangeText={this.handlePromoCodeChange}
+                value={this.state.promoCode}
+              />
+            )}
             <MaterialButton
-              text="Apply"
+              text={this.props.currentPromoCode ? 'Clear' : 'Apply'}
               fontSize="14"
               style={{ width: 80, height: 40 }}
-              onPress={this.handlePromoCodeSubmit}
+              onPress={this.handlePress}
               disabled={!this.state.promoCode}
             />
           </FlexRow>
-        ) : null}
+        )}
         {this.props.errorMessage ? (
           <ErrorMessage>
             {this.props.errorMessage}
           </ErrorMessage>
+        ) : null}
+        {this.props.noticeMessage ? (
+          <NoticeMessage>
+            {this.props.noticeMessage}
+          </NoticeMessage>
         ) : null}
       </MaterialPanel>
     );
@@ -117,18 +152,24 @@ PromoField.propTypes = {
   submitting: PropTypes.bool.isRequired,
   currentPromoCode: PropTypes.string.isRequired,
   errorMessage: PropTypes.string.isRequired,
+  noticeMessage: PropTypes.string.isRequired,
   verifyPromoCode: PropTypes.func.isRequired,
   clearPromoCodeError: PropTypes.func.isRequired,
+  clearPromoCodeNotice: PropTypes.func.isRequired,
+  clearPromoCode: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
-  currentPromoCode: getPromoCodeName(state),
+  currentPromoCode: getAppliedPromoCode(state),
   submitting: getPromoCodeIsSubmitting(state),
   errorMessage: getPromoCodeError(state),
+  noticeMessage: getPromoCodeNotice(state),
 });
 const mapDispatchToProps = {
   verifyPromoCode,
   clearPromoCodeError,
+  clearPromoCodeNotice,
+  clearPromoCode,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(PromoField);
