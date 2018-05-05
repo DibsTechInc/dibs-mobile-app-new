@@ -15,7 +15,16 @@ import { createUnboundedSelector } from '../../helpers';
  * @returns {Object} events state
  */
 export function getEvents(state) {
-  return state.events;
+  return state.events || {};
+}
+
+/**
+ * getEventsState
+ * @param {Object} state in store
+ * @returns {Object} map to what events are being loaded
+ */
+export function getEventsFetching(state) {
+  return getEvents(state).fetching || {};
 }
 
 /**
@@ -23,9 +32,11 @@ export function getEvents(state) {
  * @param {Object} state in store
  * @returns {Object} events state
  */
-export function getEventsLoading(state) {
-  return Boolean(getEvents(state).loading);
-}
+export const getEventsLoading = createSelector(
+  getEventsFetching,
+  state => state.currentDate,
+  (fetchingEvents, currentDate) => Boolean(fetchingEvents[currentDate.toISOString()])
+);
 
 /**
  * getEventsData

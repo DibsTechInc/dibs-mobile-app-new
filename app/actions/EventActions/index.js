@@ -2,14 +2,20 @@ import moment from 'moment';
 import { createActions } from 'redux-actions';
 import { getEventsOnCurrentDate } from '../../selectors/EventsSelectors';
 
+const getDateAsString = date => (
+  typeof date.toISOString === 'function' ? date.toISOString() : date.toString()
+);
+
 export const {
   setEvents,
-  setEventsLoadingTrue,
+  addKeyToFetchingEvents,
+  removeKeyFromFetchingEvents,
   setEventsLoadingFalse,
   previewEvents,
 } = createActions({
   SET_EVENTS: payload => payload,
-  SET_EVENTS_LOADING_TRUE: () => true,
+  ADD_KEY_TO_FETCHING_EVENTS: getDateAsString,
+  REMOVE_KEY_FROM_FETCHING_EVENTS: getDateAsString,
   SET_EVENTS_LOADING_FALSE: () => false,
   PREVIEW_EVENTS: () => {},
 });
@@ -20,11 +26,13 @@ export const {
  */
 export function requestEventData() {
   return async function innerRequestEventData(dispatch, getState, dibsFetch) {
+    let currentDate;
     try {
-      if (getState().events.loading) return;
       const state = getState();
-      const { studio, currentDate } = state;
-      if (!getEventsOnCurrentDate(state).length) dispatch(setEventsLoadingTrue());
+      const { studio, currentDate: tmp } = state;
+      currentDate = tmp;
+      if (getState().events.fetching[currentDate.toISOString()]) return;
+      if (!getEventsOnCurrentDate(state).length) dispatch(addKeyToFetchingEvents(currentDate));
       const startDate = moment(currentDate).startOf('day').toISOString();
       const endDate = moment(currentDate).endOf('day').toISOString();
       const path = `/api/studio/events?studios[0]=${studio.data.id}&start=${startDate}&end=${endDate}`;
@@ -34,6 +42,6 @@ export function requestEventData() {
     } catch (err) {
       console.log(err);
     }
-    dispatch(setEventsLoadingFalse());
+    dispatch(removeKeyFromFetchingEvents(currentDate));
   };
 }

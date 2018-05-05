@@ -1,8 +1,14 @@
-import { handleActions, combineActions } from 'redux-actions';
-import { setEvents, setEventsLoadingTrue, setEventsLoadingFalse, previewEvents } from '../../actions/EventActions';
+import { handleActions } from 'redux-actions';
+import { omit } from 'lodash';
+import {
+  setEvents,
+  previewEvents,
+  addKeyToFetchingEvents,
+  removeKeyFromFetchingEvents,
+} from '../../actions/EventActions';
 
 const initialState = {
-  loading: false,
+  fetching: {},
   previewed: false,
   data: [],
 };
@@ -32,7 +38,11 @@ function handleSetEvents(state, { payload }) {
 }
 
 export default handleActions({
-  [combineActions(setEventsLoadingTrue, setEventsLoadingFalse)]: (state, { payload }) => ({ ...state, loading: payload }),
   [setEvents]: handleSetEvents,
   [previewEvents]: state => ({ ...state, previewed: true }),
+  [addKeyToFetchingEvents]: (state, { payload }) => ({
+    ...state,
+    fetching: { ...state.fetching, [payload]: true },
+  }),
+  [removeKeyFromFetchingEvents]: (state, { payload }) => ({ ...state, fetching: omit(state.fetching, payload) }),
 }, initialState);
