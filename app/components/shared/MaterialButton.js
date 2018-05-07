@@ -1,18 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { WHITE } from '../../constants';
 import Config from '../../../config.json';
 import { lightenDarkenColor } from '../../helpers';
 
 const StyledMaterial = styled.TouchableHighlight`
   align-items: center;
-  background-color: ${Config.STUDIO_COLOR};
+  background-color: ${props => props.backgroundColor};
   border-radius: 5px;
   justify-content: center;
 `;
 
 const StyledText = styled.Text`
-  color: #fff;
+  color: ${props => props.textColor};
   font-family: 'flex-font';
   font-size: ${props => (props.fontSize || 16)};
 `;
@@ -27,12 +28,16 @@ class MaterialButton extends React.PureComponent {
    * @returns {JSX.Element} HTML
    */
   render() {
+    const underlayColor = lightenDarkenColor(this.props.backgroundColor, 15);
     return (
       <StyledMaterial
-        underlayColor={lightenDarkenColor(Config.STUDIO_COLOR, 15)}
         {...this.props}
+        underlayColor={underlayColor}
       >
-        <StyledText fontSize={this.props.fontSize}>
+        <StyledText
+          fontSize={this.props.fontSize}
+          textColor={this.props.textColor}
+        >
           {this.props.text}
         </StyledText>
       </StyledMaterial>
@@ -45,18 +50,22 @@ MaterialButton.defaultProps = {
   style: {
     height: 50,
   },
+  backgroundColor: Config.STUDIO_COLOR,
+  textColor: WHITE,
 };
 
 const stringOrNum = PropTypes.oneOfType([
   PropTypes.string,
   PropTypes.number,
-]);
+]).isRequired;
 
 MaterialButton.propTypes = {
   style: PropTypes.shape(),
   text: PropTypes.string.isRequired,
   onPress: PropTypes.func.isRequired,
   fontSize: stringOrNum,
+  backgroundColor: PropTypes.string.isRequired,
+  textColor: PropTypes.string.isRequired,
 };
 
 export default MaterialButton;

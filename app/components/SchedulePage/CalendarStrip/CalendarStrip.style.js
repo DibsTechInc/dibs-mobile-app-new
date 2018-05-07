@@ -41,12 +41,12 @@ export default StyleSheet.create({
     borderRadius: 43 / 2,
   },
   dateName: {
-    fontSize: 10,
+    fontSize: 12,
     fontFamily: 'flex-font',
     textAlign: 'center',
   },
   weekendDateName: {
-    fontSize: 10,
+    fontSize: 12,
     fontFamily: 'flex-font',
     color: '#fff',
     textAlign: 'center',
@@ -75,7 +75,7 @@ export default StyleSheet.create({
     textAlign: 'center',
   },
   highlightDateNameStyle: {
-    fontSize: 8,
+    fontSize: 12,
     fontFamily: 'flex-font',
     color: 'blue',
     fontWeight: 'bold',

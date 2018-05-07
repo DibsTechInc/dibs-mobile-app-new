@@ -32,7 +32,7 @@ export function getEventsFetching(state) {
  * @param {Object} state in store
  * @returns {Object} events state
  */
-export const getEventsLoading = createSelector(
+export const getEventsAreLoading = createSelector(
   getEventsFetching,
   state => state.currentDate,
   (fetchingEvents, currentDate) => Boolean(fetchingEvents[currentDate.toISOString()])
@@ -59,38 +59,44 @@ export const getEventsOnCurrentDate = createSelector(
   ],
   (events, currentDate) => events.filter((event) => {
     const start = moment(event.start_time).tz(event.mainTZ);
-    return (
-      start.isSame(currentDate, 'day')
-      && start.isAfter(moment().local())
-    );
+    return start.isSame(currentDate, 'day');
   })
+);
+
+export const getNumberOfEventsOnCurrentDate = createSelector(
+  getEventsOnCurrentDate,
+  events => events.length
+);
+
+export const getEventsOnCurrentDateAfterNow = createSelector(
+  getEventsOnCurrentDate,
+  events => events.filter(event => moment(event.start_time).isAfter(moment()))
 );
 
 export const getScheduleEvents = createUnboundedSelector(
   [
-    getEventsOnCurrentDate,
+    getEventsOnCurrentDateAfterNow,
     getStudioCurrency,
     getStudioCustomTimeFormat,
     getCartData,
     getUpcomingEventsData,
   ],
   (events, currency, timeFormat, cartItems, upcomingEvents) => events.map(({ instructor, location, ...event }) => {
-    const localeTimeInTZ = moment(event.start_time).tz(event.mainTZ);
+    const formatLocalTime = time => moment(time).tz(event.mainTZ).format(timeFormat || 'LT')
     const eventItemsInCart = cartItems.filter(cartEvent => cartEvent.eventid === event.id);
     const quantityInCart = eventItemsInCart.map(({ quantity }) => quantity)
                                            .reduce((acc, quantity) => acc + quantity, 0);
     const maxSeatsReached = Boolean(
-      eventItemsInCart.length && (
-        (quantityInCart + event.current_enrollment) === event.maximum_enrollment
-        || quantityInCart === 4
-      ));
+      (quantityInCart + event.current_enrollment) === event.maximum_enrollment
+      || quantityInCart === 4
+    );
     const bookedEvent = upcomingEvents.find(userEvent => userEvent.eventid === event.id);
     return {
       ...event,
       eventid: event.id,
-      startTimeInLocalTZ: localeTimeInTZ.format(timeFormat || 'LT'),
+      startTimeInLocalTZ: formatLocalTime(event.start_time),
+      endTimeInLocalTZ: formatLocalTime(event.end_time),
       formattedRoundedPrice: formatCurrency(event.price, { precision: 0, code: currency }),
-      timeDuration: moment.duration(moment(event.end_time).diff(moment(event.start_time))).asMinutes(),
       instructorName: instructor.name,
       locationName: location.name,
       soldOut: event.seats_remaining <= 0,
@@ -99,6 +105,7 @@ export const getScheduleEvents = createUnboundedSelector(
       maxSeatsReached,
       taxRate: location.tax_rate,
       seatsUserBooked: bookedEvent ? bookedEvent.quantity : 0,
+      waitlisted: bookedEvent ? bookedEvent.isWaitlist : false,
     };
   })
 );

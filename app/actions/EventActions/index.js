@@ -1,5 +1,6 @@
 import moment from 'moment';
 import { createActions } from 'redux-actions';
+import { stringify } from 'qs';
 import { getEventsOnCurrentDate } from '../../selectors/EventsSelectors';
 
 const getDateAsString = date => (
@@ -24,7 +25,7 @@ export const {
  * requestEventData from the server
  * @returns {function} dispatches actions for async request
  */
-export function requestEventData() {
+export function requestEventData({ eventids } = {}) {
   return async function innerRequestEventData(dispatch, getState, dibsFetch) {
     let currentDate;
     try {
@@ -33,9 +34,17 @@ export function requestEventData() {
       currentDate = tmp;
       if (getState().events.fetching[currentDate.toISOString()]) return;
       if (!getEventsOnCurrentDate(state).length) dispatch(addKeyToFetchingEvents(currentDate));
-      const startDate = moment(currentDate).startOf('day').toISOString();
-      const endDate = moment(currentDate).endOf('day').toISOString();
-      const path = `/api/studio/events?studios[0]=${studio.data.id}&start=${startDate}&end=${endDate}`;
+
+      let path = '/api/studio/events?';
+      let data = { studios: [studio.data.id] };
+      if (eventids) data.eventids = eventids;
+      else {
+        data.start = moment.tz(moment(currentDate), studio.mainTZ).startOf('day').format('YYYY-MM-DD HH:mm:ss');
+        data.end = moment.tz(moment(currentDate), studio.mainTZ).endOf('day').format('YYYY-MM-DD HH:mm:ss');
+      }
+      data = stringify(data, { encode: false });
+      path += data;
+
       const res = await dibsFetch(path, { method: 'GET' });
       if (res.success) dispatch(setEvents(res.events));
       else console.log(res);

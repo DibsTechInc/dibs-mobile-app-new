@@ -10,6 +10,7 @@ function lightenDarkenColor(color, amount) {
     color = color.slice(1);
     usePound = true;
   }
+  if (color.length === 3) color = color.split('').map(s => s + s).join('');
 
   const num = parseInt(color, 16);
 

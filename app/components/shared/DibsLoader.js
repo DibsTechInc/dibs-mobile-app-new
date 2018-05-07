@@ -135,10 +135,15 @@ DibsLoader.defaultProps = {
   duration: 500,
 };
 
+const stringOrNum = PropTypes.oneOfType([
+  PropTypes.string,
+  PropTypes.number,
+]);
+
 DibsLoader.propTypes = {
-  maxDotRadius: PropTypes.number,
+  maxDotRadius: stringOrNum,
   dotColor: PropTypes.string,
-  width: PropTypes.number,
+  width: stringOrNum,
   duration: PropTypes.number,
 };
 

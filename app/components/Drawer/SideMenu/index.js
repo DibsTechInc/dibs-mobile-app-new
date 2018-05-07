@@ -8,7 +8,6 @@ import {
   MAIN_ROUTE,
   PROFILE_ROUTE,
   SCHEDULE_ROUTE,
-  SETTINGS_ROUTE,
   WHITE,
   DARK_TEXT_GREY,
 } from '../../../constants';

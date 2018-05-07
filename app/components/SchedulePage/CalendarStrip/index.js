@@ -4,17 +4,17 @@ import { connect } from 'react-redux';
 import {
   Text,
   View,
-  Image,
   Animated,
   Easing,
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
 import moment from 'moment';
+import { Svg, Path } from 'react-native-svg';
 import { setCurrentDate, addDaysToCurrentDate } from '../../../actions';
 import CalendarDay from './CalendarDay';
 import styles from './CalendarStrip.style';
-// import FadeInView from '../shared/FadeInView';
+import { WHITE } from '../../../constants';
 
 // Just a shallow array of 7 elements
 
@@ -277,13 +277,31 @@ class CalendarStrip extends Component {
         <Text style={[styles.calendarHeader, this.props.calendarHeaderStyle]}>{this.formatCalendarHeader()}</Text>
         <View style={styles.datesStrip}>
           <TouchableOpacity style={[styles.iconContainer, this.props.iconContainer]} onPress={this.getPreviousDays} disabled={canGoBack}>
-            {!canGoBack && <Image style={[styles.icon, this.props.iconStyle, this.props.iconLeftStyle]} source={this.props.iconLeft} />}
+            {!canGoBack && (
+              <Svg width="20" height="20">
+                <Path
+                  stroke={WHITE}
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  fill="none"
+                  d="M 18 1 L 10 10 L 18 18"
+                />
+              </Svg>
+            )}
           </TouchableOpacity>
           <View style={styles.calendarDates}>
             {datesRender}
           </View>
           <TouchableOpacity style={[styles.iconContainer, this.props.iconContainer]} onPress={this.getNextDays}>
-            <Image style={[styles.icon, this.props.iconStyle, this.props.iconRightStyle]} source={this.props.iconRight} />
+            <Svg width="20" height="20">
+              <Path
+                stroke={WHITE}
+                strokeWidth="2"
+                strokeLinecap="round"
+                fill="none"
+                d="M 2 2 L 10 10 L 2 18"
+              />
+            </Svg>
           </TouchableOpacity>
         </View>
       </View>
@@ -294,8 +312,6 @@ class CalendarStrip extends Component {
 /* eslint-disable global-require */
 CalendarStrip.defaultProps = {
   startingDate: moment().seconds(0).milliseconds(0),
-  iconLeft: require('./img/left-arrow-black.png'),
-  iconRight: require('./img/right-arrow-black.png'),
   calendarHeaderFormat: 'MMMM YYYY',
 };
 
@@ -306,11 +322,7 @@ CalendarStrip.propTypes = {
   borderHighlightColor: PropTypes.string,
   startingDate: PropTypes.shape(),
   selectedDate: PropTypes.shape(),
-  iconLeft: PropTypes.number,
-  iconRight: PropTypes.number,
   iconStyle: PropTypes.shape(),
-  iconLeftStyle: PropTypes.shape(),
-  iconRightStyle: PropTypes.shape(),
   iconContainer: PropTypes.shape(),
   calendarHeaderStyle: PropTypes.shape(),
   calendarHeaderFormat: PropTypes.string,

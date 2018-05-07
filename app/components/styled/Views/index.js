@@ -12,6 +12,10 @@ export const FlexRow = styled.View`
   flex-direction: row;
 `;
 
+export const RightAlignedColumn = styled.View`
+  align-items: flex-end;
+`;
+
 export const SpaceBetweenRow = FlexRow.extend`
   justify-content: space-between;
 `;
@@ -33,5 +37,13 @@ export const MaterialPanelView = styled.View`
   shadow-opacity: 0.2;
   shadow-radius: 4;
   width: ${props => (props.width || (Dimensions.get('window').width - 20))};
+`;
+
+export const Overlay = styled.View`
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
 `;
 

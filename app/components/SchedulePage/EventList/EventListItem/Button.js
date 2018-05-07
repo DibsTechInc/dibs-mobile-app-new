@@ -1,0 +1,145 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { promisify } from 'bluebird';
+import { Alert } from 'react-native';
+import Config from '../../../../../config.json';
+import MaterialButton from '../../../shared/MaterialButton';
+import { GREY, SOLD_OUT_GREY, WHITE, TEXT_GREY } from '../../../../constants/index';
+import DibsLoader from '../../../shared/DibsLoader';
+import { addToCart, addToWaitlist } from '../../../../actions';
+
+/**
+ * @class Button
+ * @extends {React.PureComponent}
+ */
+class Button extends React.PureComponent {
+  /**
+   * @constructor
+   * @constructs Button
+   * @param {Object} props for component
+   */
+  constructor(props) {
+    super(props);
+    this.state = { waitlisting: false };
+    this.addToWaitlist = this.addToWaitlist.bind(this);
+    this.onPress = this.onPress.bind(this);
+    this.getBackgroundColor = this.getBackgroundColor.bind(this);
+    this.getText = this.getText.bind(this);
+    this.getTextColor = this.getTextColor.bind(this);
+  }
+  /**
+   * @returns {undefined}
+   */
+  onPress() {
+    if (this.props.maxSeatsReached) {
+      return Alert.alert(
+        'Add to Waitlist',
+        `Do you want to be added to the waitlist for ${this.props.name}?`,
+        [
+          { text: 'Yes', onPress: this.addToWaitlist },
+          { text: 'No', onPress: () => {} },
+        ]
+      );
+    }
+    return this.props.addToCart({
+      eventid: this.props.eventid,
+      passid: this.props.passid,
+      price: this.props.price,
+      taxRate: this.props.taxRate,
+      name: this.props.name,
+      start_time: this.props.start_time,
+    });
+  }
+  /**
+   * @returns {string} color for button
+   */
+  getBackgroundColor() {
+    if (this.props.waitlisted) return WHITE;
+    if (this.props.maxSeatsReached && this.props.has_waitlist) return SOLD_OUT_GREY;
+    if (this.props.soldOut) return WHITE;
+    return Config.STUDIO_COLOR;
+  }
+  /**
+   * @returns {string} text for button
+   */
+  getText() {
+    if (this.props.waitlisted) return 'Waitlisted';
+    if (this.props.soldOut && this.props.has_waitlist) return 'Waitlist';
+    if (this.props.soldOut) return 'Sold Out';
+    return 'Book';
+  }
+  /**
+   * @returns {string} text color
+   */
+  getTextColor() {
+    if (this.props.waitlisted) return GREY;
+    if (this.props.soldOut && !this.props.has_waitlist) return TEXT_GREY;
+    return WHITE;
+  }
+  /**
+   * @returns {undefined}
+   */
+  async addToWaitlist() {
+    await promisify(this.setState.bind(this))({ waitlisting: true });
+    const { success, message } = await promisify(this.props.addToWaitlist.bind(this))(this.props.eventid);
+    Alert.alert(
+      success ? 'Success!' : 'Uh oh!',
+      success ? `You're on the waitlist for ${this.props.name}!` : message
+    );
+    await promisify(this.setState.bind(this))({ waitlisting: false });
+  }
+  /**
+   * render
+   * @returns {JSX.Element} HTML
+   */
+  render() {
+    if (this.state.waitlisting) {
+      return (
+        <DibsLoader
+          width={80}
+          maxDotRadius={10}
+          dotColor={Config.STUDIO_COLOR}
+        />
+      );
+    }
+    return (
+      <MaterialButton
+        style={{
+          width: 80,
+          height: 40,
+          borderWidth: Number(this.props.waitlisted),
+          borderColor: SOLD_OUT_GREY,
+        }}
+        backgroundColor={this.getBackgroundColor()}
+        text={this.getText()}
+        textColor={this.getTextColor()}
+        fontSize={this.props.waitlisted ? 14 : 16}
+        onPress={this.onPress}
+        disabled={this.props.waitlisted}
+      />
+    );
+  }
+}
+
+Button.propTypes = {
+  maxSeatsReached: PropTypes.bool.isRequired,
+  has_waitlist: PropTypes.bool,
+  addToCart: PropTypes.func.isRequired,
+  eventid: PropTypes.number.isRequired,
+  passid: PropTypes.number,
+  price: PropTypes.number.isRequired,
+  taxRate: PropTypes.number.isRequired,
+  name: PropTypes.string.isRequired,
+  start_time: PropTypes.string.isRequired,
+  waitlisted: PropTypes.bool.isRequired,
+  soldOut: PropTypes.bool.isRequired,
+};
+
+const mapStateToProps = null; // state => ({});
+const mapDispatchToProps = {
+  addToCart,
+  addToWaitlist,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Button);

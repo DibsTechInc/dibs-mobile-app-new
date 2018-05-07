@@ -68,3 +68,11 @@ export function getStudioCountry(state) {
 export function getStudioWaiverRequirement(state) {
   return getStudio(state).requiresWaiverSigned || false;
 }
+
+/**
+ * @param {Object} state in store
+ * @returns {number} of days to show
+ */
+export function getStudioInterval(state) {
+  return getStudioDibsConfig(state).interval_end || 14;
+}
