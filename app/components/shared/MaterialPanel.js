@@ -24,7 +24,7 @@ class MaterialPanel extends React.PureComponent {
     return (
       <MaterialPanelView height={this.props.height} style={this.props.style}>
         {this.props.heading && (
-          <Heading>
+          <Heading style={this.props.headerStyle}>
             {this.props.heading}
           </Heading>
         )}
@@ -37,6 +37,7 @@ class MaterialPanel extends React.PureComponent {
 MaterialPanel.propTypes = {
   height: PropTypes.number,
   style: PropTypes.shape(),
+  headerStyle: PropTypes.shape(),
   heading: PropTypes.string,
   children: PropTypes.oneOfType([
     PropTypes.element,

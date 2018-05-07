@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Dimensions, View } from 'react-native';
-import { withNavigation, NavigationActions } from 'react-navigation';
+import { View, Text, ActivityIndicator } from 'react-native';
+import { withNavigation } from 'react-navigation';
 import PropTypes from 'prop-types';
+import Swipeable from 'react-native-swipeable';
 import styled from 'styled-components';
 import FadeInView from '../shared/FadeInView';
 import { getSortedCartEvents } from '../../selectors/CartSelectors';
-import { WHITE, LIGHT_GREY, SOFT_GREY, BLACK } from '../../constants';
+import { LIGHT_GREY, SOFT_GREY, BLACK, GREY } from '../../constants';
 import Config from '../../../config.json';
 import Icon from '../shared/Icon';
 
@@ -35,7 +36,6 @@ import {
 import CartItem from '../CartPage/CartItem';
 import TransactionBreakdown from '../CartPage/TransactionBreakdown';
 import PaymentInfo from './PaymentInfo';
-import PromoField from '../CartPage/PromoField';
 import { MaterialPanelView } from '../styled';
 
 const StyledScrollView = styled.ScrollView`
@@ -65,20 +65,20 @@ const StyledTopView = styled.View`
 const StyledCheckoutView = styled.View`
   justify-content: center;
   align-items: center;
-  height: 150px;
+  height: 100px;
   margin: 6px;
   background-color: ${SOFT_GREY};
 `;
 
 const StyledContinueButton = styled.TouchableOpacity`
-  padding-left: 100px;
-  padding-right: 100px;
+  padding-left: 10px;
+  padding-right: 10px;
   padding-top: 15px;
   padding-bottom: 15px;
-  background-color: ${Config.STUDIO_COLOR};
+  background-color: ${props => props.hasDisabledColor ? GREY : Config.STUDIO_COLOR};
   border-radius: 5px;
   border-width: 1px;
-  border-color: ${Config.STUDIO_COLOR};
+  border-color: ${props => props.hasDisabledColor ? GREY : Config.STUDIO_COLOR};;
 `;
 
 const StyledText = styled.Text`
@@ -112,20 +112,41 @@ class ConfirmationPage extends Component {
   constructor() {
     super();
 
+    this.state = {
+      isLoading: false,
+      isProcessingPayment: false,
+    };
+
     this.toPreviousPage = this.toPreviousPage.bind(this);
+    this.setLoading = this.setLoading.bind(this);
   }
 
   /**
+   * @param {bool} bool the state of the loading
+   * @returns {undefined}
+   */
+  setLoading(bool) {
+    this.setState({
+      isLoading: bool,
+    });
+  }
+
+    /**
    * @returns {undefined}
    */
   toPreviousPage() {
     this.props.navigation.navigate('Cart');
   }
 
+
   /**
    * @returns {JSX} XML
    */
   render() {
+    const purchaseButton = [
+      <StyledContinueButton />,
+    ];
+
     const renderCartItems = this.props.cart.map(cart =>
         (<CartItem
           key={cart.eventid}
@@ -136,6 +157,29 @@ class ConfirmationPage extends Component {
           price={cart.price}
         />)
       );
+
+    const renderPurchaseButton = (<View style={{ width: 390, overflow: 'hidden', backgroundColor: Config.STUDIO_COLOR, borderRadius: 5 }}>
+      <Swipeable
+        contentContainerStyle={
+        { backgroundColor: (!(this.props.creditCard.expMonth) || this.state.isLoading) ? GREY : Config.STUDIO_COLOR,
+          paddingLeft: 100,
+          paddingRight: 100,
+          paddingTop: 15,
+          paddingBottom: 15,
+          borderRadius: 5,
+          borderWidth: 1,
+          borderColor: (!(this.props.creditCard.expMonth) || this.state.isLoading) ? GREY : Config.STUDIO_COLOR,
+        }}
+        rightButtons={purchaseButton}
+        onRightButtonsActivate={() => this.setState({ isProcessingPayment: true })}
+        rightButtonsActivationDistance={300}
+      >
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={{ color: 'white' }}>{'<<'}</Text>
+          <Text style={{ textAlign: 'center', color: 'white', flex: 1 }}>Swipe to pay</Text>
+        </View>
+      </Swipeable>
+    </View>);
 
     return (
       <FadeInView style={{ backgroundColor: SOFT_GREY }}>
@@ -156,18 +200,13 @@ class ConfirmationPage extends Component {
             formattedTaxAmount={this.props.formattedTaxAmount}
             formattedTotal={this.props.formattedTotal}
           />
-          <PaymentInfo creditCard={this.props.creditCard} />
+          <PaymentInfo isLoading={this.state.isLoading} setLoading={this.setLoading} />
           <MaterialPanelView style={{ shadowOffset: { width: 3, height: 3 } }}>
             {renderCartItems}
           </MaterialPanelView>
         </StyledScrollView>
         <StyledCheckoutView>
-          <View style={{ marginBottom: 30 }}>
-            <StyledSavingsText>Place order to earn $1.09 in credit back.</StyledSavingsText>
-          </View>
-          <StyledContinueButton>
-            <StyledButtonText>Purchase</StyledButtonText>
-          </StyledContinueButton>
+          {this.state.isProcessingPayment ? <ActivityIndicator /> : renderPurchaseButton}
         </StyledCheckoutView>
       </FadeInView>
     );
@@ -176,8 +215,8 @@ class ConfirmationPage extends Component {
 
 ConfirmationPage.propTypes = {
   navigation: PropTypes.shape(),
-  cart: PropTypes.arrayOf(PropTypes.shape()),
   creditCard: PropTypes.shape(),
+  cart: PropTypes.arrayOf(PropTypes.shape()),
   formattedSubtotal: PropTypes.string,
   formattedTaxAmount: PropTypes.string,
   formattedTotal: PropTypes.string,

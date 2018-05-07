@@ -37,6 +37,7 @@ class MaterialButton extends React.PureComponent {
         <StyledText
           fontSize={this.props.fontSize}
           textColor={this.props.textColor}
+          style={this.props.textStyle}
         >
           {this.props.text}
         </StyledText>
@@ -50,6 +51,7 @@ MaterialButton.defaultProps = {
   style: {
     height: 50,
   },
+  disabled: false,
   backgroundColor: Config.STUDIO_COLOR,
   textColor: WHITE,
 };
@@ -61,9 +63,11 @@ const stringOrNum = PropTypes.oneOfType([
 
 MaterialButton.propTypes = {
   style: PropTypes.shape(),
+  textStyle: PropTypes.shape(),
   text: PropTypes.string.isRequired,
   onPress: PropTypes.func.isRequired,
   fontSize: stringOrNum,
+  disabled: PropTypes.bool,
   backgroundColor: PropTypes.string.isRequired,
   textColor: PropTypes.string.isRequired,
 };

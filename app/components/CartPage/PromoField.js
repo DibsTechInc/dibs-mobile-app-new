@@ -102,6 +102,7 @@ class PromoField extends PureComponent {
     return (
       <MaterialPanel
         style={{ shadowOffset: { width: 3, height: 3 } }}
+        headerStyle={{ marginLeft: 10 }}
         heading="Promo Code"
       >
         {this.props.submitting ? (
