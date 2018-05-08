@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Config from '../../../config.json';
-import { requestEventData, requestStudioData, previewEvents } from '../../actions';
+import { requestEventData, requestStudioData } from '../../actions';
 import {
   setCurrentDate,
   getStudioDibsConfig,
@@ -33,11 +33,7 @@ class SchedulePage extends Component {
     if (props.currentDate.toISOString() !== this.props.currentDate.toISOString()) {
       this.props.requestEventData();
     }
-    if (props.isLoading && !this.props.isLoading) {
-      setTimeout(this.props.previewEvents, 2e3);
-    }
   }
-
   /**
    * @returns {JSX} XML
    */
@@ -75,7 +71,6 @@ SchedulePage.propTypes = {
   isLoading: PropTypes.bool,
   currentDate: PropTypes.shape(),
   navigation: PropTypes.shape(),
-  previewEvents: PropTypes.func,
 };
 
 const mapStateToProps = state => ({
@@ -88,7 +83,6 @@ const mapDispatchToProps = {
   requestEventData,
   requestStudioData,
   setCurrentDate,
-  previewEvents,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SchedulePage);

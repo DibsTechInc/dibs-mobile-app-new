@@ -2,14 +2,12 @@ import { handleActions } from 'redux-actions';
 import { omit } from 'lodash';
 import {
   setEvents,
-  previewEvents,
   addKeyToFetchingEvents,
   removeKeyFromFetchingEvents,
 } from '../../actions/EventActions';
 
 const initialState = {
   fetching: {},
-  previewed: false,
   data: [],
 };
 
@@ -39,7 +37,6 @@ function handleSetEvents(state, { payload }) {
 
 export default handleActions({
   [setEvents]: handleSetEvents,
-  [previewEvents]: state => ({ ...state, previewed: true }),
   [addKeyToFetchingEvents]: (state, { payload }) => ({
     ...state,
     fetching: { ...state.fetching, [payload]: true },
