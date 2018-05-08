@@ -1,37 +1,6 @@
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
-  // CALENDAR STYLES
-  calendarContainer: {
-    overflow: 'hidden',
-  },
-  datesStrip: {
-    flexDirection: 'row',
-  },
-  calendarDates: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  calendarHeader: {
-    fontSize: 14,
-    textAlign: 'center',
-    fontWeight: 'bold',
-    marginBottom: 8,
-    marginTop: 4,
-  },
-  iconContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  icon: {
-    width: 20,
-    height: 20,
-    resizeMode: 'contain',
-  },
-
-  // CALENDAR DAY
   dateContainer: {
     justifyContent: 'center',
     alignItems: 'center',

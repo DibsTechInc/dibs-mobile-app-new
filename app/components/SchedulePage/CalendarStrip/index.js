@@ -2,10 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import {
-  View,
   Animated,
   Easing,
-  TouchableOpacity,
   Dimensions,
 } from 'react-native';
 import styled from 'styled-components';
@@ -13,7 +11,7 @@ import moment from 'moment';
 import { Svg, Path } from 'react-native-svg';
 import { setCurrentDate, addDaysToCurrentDate } from '../../../actions';
 import CalendarDay from './CalendarDay';
-import { WHITE, OFF_WHITE } from '../../../constants';
+import { WHITE } from '../../../constants';
 import Config from '../../../../config.json';
 import { FlexRow, FlexCenter } from '../../styled';
 
@@ -100,18 +98,6 @@ class CalendarStrip extends Component {
   componentDidMount() {
     this.animate();
   }
-
-  /**
-   * @param {Object} props that component will receive
-   * @returns {undefined}
-   */
-  componentWillReceiveProps(props) {
-    if (props.selectedDate !== this.props.selectedDate) {
-      const selectedDate = this.setLocale(moment(props.selectedDate));
-      this.setState({ selectedDate });
-    }
-  }
-
   /**
    * @param {Object} props component will receive
    * @returns {undefined}
@@ -122,7 +108,6 @@ class CalendarStrip extends Component {
       this.animate();
     }
   }
-
   /**
    * @param {Object} date selected
    * @returns {undefined}
@@ -134,7 +119,6 @@ class CalendarStrip extends Component {
     }
     this.props.setCurrentDate(moment(date));
   }
-
   /**
    * Set startingDate to the previous set of days
    * @returns {undefined}
@@ -144,7 +128,6 @@ class CalendarStrip extends Component {
       this.setState({ startingDate: this.state.startingDate.subtract(this.state.numberOfDays, 'd') }, res));
     this.props.addDaysToCurrentDate(-this.state.numberOfDays);
   }
-
   /**
    * Set startingDate to the next set of days
    * @returns {undefined}
@@ -154,7 +137,6 @@ class CalendarStrip extends Component {
       this.setState({ startingDate: this.state.startingDate.add(this.state.numberOfDays, 'd') }, res));
     this.props.addDaysToCurrentDate(this.state.numberOfDays);
   }
-
   /**
    * Get dates for the week based on the startingDate
    * Using isoWeekday so that it will start from Monday
@@ -174,7 +156,6 @@ class CalendarStrip extends Component {
     });
     return dateInfos;
   }
-
   /**
    * Function that checks if the locale is passed to the component and sets it to the passed moment instance
    * @param {Object} momentInstance set locale of moment instance
@@ -186,7 +167,6 @@ class CalendarStrip extends Component {
     }
     return momentInstance;
   }
-
   /**
    * Function to check if provided date is the same as selected one, hence date is selected
    * using isSame moment query with 'day' param so that it check years, months and day
@@ -196,7 +176,6 @@ class CalendarStrip extends Component {
   isDateSelected(date) {
     return date.isSame(this.props.currentDate, 'day');
   }
-
   /**
    * Function for reseting animations
    * @returns {undefined}
@@ -207,7 +186,6 @@ class CalendarStrip extends Component {
       this.animatedValue[value] = new Animated.Value(0);
     });
   }
-
   /**
    * Function to animate showing the CalendarDay elements.
    * Possible cases for animations are sequence and parallel
@@ -291,29 +269,18 @@ class CalendarStrip extends Component {
             )}
           </ArrowContainer>
           <DatesContainer>
-            {this.getDatesForWeek().map(({ date, isExpiredDate }, index) => {
+            {this.getDatesForWeek().map(({ date }, index) => {
               if (this.props.calendarAnimation) {
                 opacityAnim = this.animatedValue[index];
               }
               return (
                 <Animated.View key={date} style={{ opacity: opacityAnim, flex: 1 }}>
                   <CalendarDay
-                    date={date}
-                    isExpiredDate={isExpiredDate}
                     key={date}
+                    date={date}
                     selected={this.isDateSelected(date)}
-                    onDateSelected={this.onDateSelected}
-                    calendarColor={Config.STUDIO_COLOR}
-                    highlightColor={OFF_WHITE}
-                    dateNameStyle={this.props.dateNameStyle}
-                    dateNumberStyle={this.props.dateNumberStyle}
-                    weekendDateNameStyle={this.props.weekendDateNameStyle}
-                    weekendDateNumberStyle={this.props.weekendDateNumberStyle}
-                    selection="background"
+                    onDateSelected={() => this.onDateSelected(date)}
                     selectionAnimation={this.props.selectionAnimation}
-                    borderHighlightColor={WHITE}
-                    highlightDateNameStyle={this.props.highlightDateNameStyle}
-                    highlightDateNumberStyle={this.props.highlightDateNumberStyle}
                   />
                 </Animated.View>
               );
@@ -344,16 +311,9 @@ CalendarStrip.defaultProps = {
 
 CalendarStrip.propTypes = {
   startingDate: PropTypes.shape(),
-  selectedDate: PropTypes.shape(),
   calendarHeaderFormat: PropTypes.string,
   calendarAnimation: PropTypes.shape(),
   selectionAnimation: PropTypes.shape(),
-  dateNameStyle: PropTypes.shape(),
-  dateNumberStyle: PropTypes.shape(),
-  weekendDateNameStyle: PropTypes.shape(),
-  weekendDateNumberStyle: PropTypes.shape(),
-  highlightDateNameStyle: PropTypes.shape(),
-  highlightDateNumberStyle: PropTypes.shape(),
   locale: PropTypes.shape(),
   currentDate: PropTypes.shape(),
   setCurrentDate: PropTypes.func,

@@ -47,11 +47,6 @@ class SchedulePage extends Component {
         />
         <CalendarStrip
           iconContainer={{ flex: 0.1 }}
-          dateNumberStyle={{ color: WHITE }}
-          dateNameStyle={{ color: WHITE }}
-          calendarHeaderStyle={{ color: WHITE }}
-          highlightDateNameStyle={{ color: Config.STUDIO_COLOR }}
-          highlightDateNumberStyle={{ color: Config.STUDIO_COLOR }}
         />
         <EventList />
       </FadeInView>
