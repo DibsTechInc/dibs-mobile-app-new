@@ -46,17 +46,10 @@ class SchedulePage extends Component {
           backgroundColor={Config.STUDIO_COLOR}
         />
         <CalendarStrip
-          // calendarAnimation={{ type: 'sequence', duration: 30 }}
-          // selectionAnimation={{ duration: 300, borderWidth: 1 }}
-          selection="background" // type of selection circle
-          style={{ paddingBottom: 10 }}
-          calendarColor={Config.STUDIO_COLOR} // main background color
-          highlightColor="#f4f4f4" // color of the selection circle
           iconContainer={{ flex: 0.1 }}
           dateNumberStyle={{ color: WHITE }}
           dateNameStyle={{ color: WHITE }}
           calendarHeaderStyle={{ color: WHITE }}
-          borderHighlightColor="white"
           highlightDateNameStyle={{ color: Config.STUDIO_COLOR }}
           highlightDateNumberStyle={{ color: Config.STUDIO_COLOR }}
         />
@@ -68,7 +61,6 @@ class SchedulePage extends Component {
 
 SchedulePage.propTypes = {
   requestEventData: PropTypes.func,
-  isLoading: PropTypes.bool,
   currentDate: PropTypes.shape(),
   navigation: PropTypes.shape(),
 };

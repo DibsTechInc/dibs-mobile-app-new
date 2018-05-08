@@ -2,21 +2,46 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import {
-  Text,
   View,
   Animated,
   Easing,
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
+import styled from 'styled-components';
 import moment from 'moment';
 import { Svg, Path } from 'react-native-svg';
 import { setCurrentDate, addDaysToCurrentDate } from '../../../actions';
 import CalendarDay from './CalendarDay';
-import styles from './CalendarStrip.style';
-import { WHITE } from '../../../constants';
+import { WHITE, OFF_WHITE } from '../../../constants';
+import Config from '../../../../config.json';
+import { FlexRow, FlexCenter } from '../../styled';
 
 // Just a shallow array of 7 elements
+
+const Container = styled.View`
+  background: ${Config.STUDIO_COLOR};
+  overflow: hidden;
+  padding-bottom: 10;
+`;
+
+const CalendarHeader = styled.Text`
+  color: ${WHITE};
+  font-size: 14;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 8;
+  margin-top: 4;
+`;
+
+const ArrowContainer = FlexCenter.extend`
+  flex: 0.1;
+`;
+
+const DatesContainer = FlexCenter.extend`
+  flex-direction: row;
+  flex: 1;
+`;
 
 /**
  * @class CalendarStrip
@@ -242,41 +267,17 @@ class CalendarStrip extends Component {
   render() {
     const lowerBound = this.state.startingDate.clone().subtract(this.state.numberOfDays, 'd').add(1, 'd');
     const canGoBack = lowerBound.isBefore(this.props.startingDate);
-
     let opacityAnim = 1;
-    const datesRender = this.getDatesForWeek().map(({ date, isExpiredDate }, index) => {
-      if (this.props.calendarAnimation) {
-        opacityAnim = this.animatedValue[index];
-      }
-
-      return (
-        <Animated.View key={date} style={{ opacity: opacityAnim, flex: 1 }}>
-          <CalendarDay
-            date={date}
-            isExpiredDate={isExpiredDate}
-            key={date}
-            selected={this.isDateSelected(date)}
-            onDateSelected={this.onDateSelected}
-            calendarColor={this.props.calendarColor}
-            highlightColor={this.props.highlightColor}
-            dateNameStyle={this.props.dateNameStyle}
-            dateNumberStyle={this.props.dateNumberStyle}
-            weekendDateNameStyle={this.props.weekendDateNameStyle}
-            weekendDateNumberStyle={this.props.weekendDateNumberStyle}
-            selection={this.props.selection}
-            selectionAnimation={this.props.selectionAnimation}
-            borderHighlightColor={this.props.borderHighlightColor}
-            highlightDateNameStyle={this.props.highlightDateNameStyle}
-            highlightDateNumberStyle={this.props.highlightDateNumberStyle}
-          />
-        </Animated.View>
-      );
-    });
     return (
-      <View style={[styles.calendarContainer, { backgroundColor: this.props.calendarColor }, this.props.style]}>
-        <Text style={[styles.calendarHeader, this.props.calendarHeaderStyle]}>{this.formatCalendarHeader()}</Text>
-        <View style={styles.datesStrip}>
-          <TouchableOpacity style={[styles.iconContainer, this.props.iconContainer]} onPress={this.getPreviousDays} disabled={canGoBack}>
+      <Container>
+        <CalendarHeader>
+          {this.formatCalendarHeader()}
+        </CalendarHeader>
+        <FlexRow>
+          <ArrowContainer
+            onPress={this.getPreviousDays}
+            disabled={canGoBack}
+          >
             {!canGoBack && (
               <Svg width="20" height="20">
                 <Path
@@ -288,11 +289,37 @@ class CalendarStrip extends Component {
                 />
               </Svg>
             )}
-          </TouchableOpacity>
-          <View style={styles.calendarDates}>
-            {datesRender}
-          </View>
-          <TouchableOpacity style={[styles.iconContainer, this.props.iconContainer]} onPress={this.getNextDays}>
+          </ArrowContainer>
+          <DatesContainer>
+            {this.getDatesForWeek().map(({ date, isExpiredDate }, index) => {
+              if (this.props.calendarAnimation) {
+                opacityAnim = this.animatedValue[index];
+              }
+              return (
+                <Animated.View key={date} style={{ opacity: opacityAnim, flex: 1 }}>
+                  <CalendarDay
+                    date={date}
+                    isExpiredDate={isExpiredDate}
+                    key={date}
+                    selected={this.isDateSelected(date)}
+                    onDateSelected={this.onDateSelected}
+                    calendarColor={Config.STUDIO_COLOR}
+                    highlightColor={OFF_WHITE}
+                    dateNameStyle={this.props.dateNameStyle}
+                    dateNumberStyle={this.props.dateNumberStyle}
+                    weekendDateNameStyle={this.props.weekendDateNameStyle}
+                    weekendDateNumberStyle={this.props.weekendDateNumberStyle}
+                    selection="background"
+                    selectionAnimation={this.props.selectionAnimation}
+                    borderHighlightColor={WHITE}
+                    highlightDateNameStyle={this.props.highlightDateNameStyle}
+                    highlightDateNumberStyle={this.props.highlightDateNumberStyle}
+                  />
+                </Animated.View>
+              );
+            })}
+          </DatesContainer>
+          <ArrowContainer onPress={this.getNextDays}>
             <Svg width="20" height="20">
               <Path
                 stroke={WHITE}
@@ -302,9 +329,9 @@ class CalendarStrip extends Component {
                 d="M 2 2 L 10 10 L 2 18"
               />
             </Svg>
-          </TouchableOpacity>
-        </View>
-      </View>
+          </ArrowContainer>
+        </FlexRow>
+      </Container>
     );
   }
 }
@@ -316,18 +343,10 @@ CalendarStrip.defaultProps = {
 };
 
 CalendarStrip.propTypes = {
-  style: PropTypes.shape(),
-  calendarColor: PropTypes.string,
-  highlightColor: PropTypes.string,
-  borderHighlightColor: PropTypes.string,
   startingDate: PropTypes.shape(),
   selectedDate: PropTypes.shape(),
-  iconStyle: PropTypes.shape(),
-  iconContainer: PropTypes.shape(),
-  calendarHeaderStyle: PropTypes.shape(),
   calendarHeaderFormat: PropTypes.string,
   calendarAnimation: PropTypes.shape(),
-  selection: PropTypes.string,
   selectionAnimation: PropTypes.shape(),
   dateNameStyle: PropTypes.shape(),
   dateNumberStyle: PropTypes.shape(),
