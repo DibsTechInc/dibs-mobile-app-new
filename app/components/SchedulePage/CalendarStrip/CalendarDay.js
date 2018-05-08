@@ -68,20 +68,16 @@ class CalendarDay extends Component {
   render() {
     const animValue = this.animValue.interpolate({
       inputRange: [0, 1],
-      outputRange: [Config.STUDIO_COLOR, OFF_WHITE],
+      outputRange: [Config.STUDIO_COLOR, Config.STUDIO_HIGHLIGHT_COLOR],
     });
     const animObject = { backgroundColor: animValue };
 
     let dateNameStyle = [styles.dateName, { color: WHITE }];
     let dateNumberStyle = [styles.dateNumber, { color: WHITE }];
-    if (this.props.date.isoWeekday() === 6 || this.props.date.isoWeekday() === 7) {
-      dateNameStyle = [styles.weekendDateName];
-      dateNumberStyle = [styles.weekendDateNumber];
-    }
 
     if (this.props.selected) {
-      dateNameStyle = [styles.highlightDateNameStyle, { color: Config.STUDIO_COLOR }];
-      dateNumberStyle = [styles.highlightDateNumberStyle, { color: Config.STUDIO_COLOR }];
+      dateNameStyle = [styles.highlightDateNameStyle, { color: Config.STUDIO_TEXT_COLOR }];
+      dateNumberStyle = [styles.highlightDateNumberStyle, { color: Config.STUDIO_TEXT_COLOR }];
     }
 
     return (

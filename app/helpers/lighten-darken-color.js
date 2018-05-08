@@ -29,7 +29,10 @@ function lightenDarkenColor(color, amount) {
   if (g > 255) g = 255;
   else if (g < 0) g = 0;
 
-  return (usePound ? '#' : '') + (g | (b << 8) | (r << 16)).toString(16);
+  let colorStr = (g | (b << 8) | (r << 16)).toString(16);
+  if (colorStr.length < 6) colorStr = `${[...Array(6 - colorStr.length)].map(() => '0').join('')}${colorStr}`;
+
+  return (usePound ? '#' : '') + colorStr;
 }
 
 export default lightenDarkenColor;
