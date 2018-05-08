@@ -1,5 +1,6 @@
 
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 import {
   AsyncStorage,
@@ -12,6 +13,8 @@ import About from './About';
 import { VERIFY_ROUTE } from '../../constants/RouteConstants/index';
 import Config from '../../../config.json';
 import FadeInView from '../shared/FadeInView';
+import { FlexCenter } from '../styled';
+import MaterialButton from '../shared/MaterialButton';
 
 const StyledView = styled.View`
   flex: 1;
@@ -21,10 +24,8 @@ const StyledButtonsView = StyledView.extend`
   align-items: center;
 `;
 
-const StyledWelcomeView = styled.View`
+const StyledWelcomeView = FlexCenter.extend`
   flex: 5;
-  align-items: center;
-  justify-content: center;
 `;
 
 const StyledWelcomeText = styled.Text`
@@ -32,45 +33,43 @@ const StyledWelcomeText = styled.Text`
   font-size: 14px;
 `;
 
-const StyledButtonText = StyledWelcomeText.extend`
-  color: #fff;
-`;
-
 const StyledGrayText = StyledWelcomeText.extend`
   color: #b1b1b1;
 `;
 
-const StyledContinueButton = styled.TouchableOpacity`
-  padding-left: 100px;
-  padding-right: 100px;
-  padding-top: 15px;
-  padding-bottom: 15px;
-  background-color: #8fc54b;
-  border-radius: 5px;
-  border-width: 1px;
-  border-color: #8fc54b;
-`;
-
+/**
+ * @class LandingPage
+ * @extends Component
+ */
 class LandingPage extends Component {
-  constructor() {
-    super();
-
+  /**
+   * @constructor
+   * @constructs LandingPage
+   * @param {Object} props for component
+   */
+  constructor(props) {
+    super(props);
     this.checkAuth();
-
     this.handleOnPress = this.handleOnPress.bind(this);
   }
-
+  /**
+   * @returns {undefined}
+   */
   handleOnPress() {
     this.props.navigation.navigate(VERIFY_ROUTE);
   }
-
+  /**
+   * @returns {undefined}
+   */
   async checkAuth() {
     const token = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
     if (token) {
       this.props.navigation.navigate('Drawer');
     }
   }
-
+  /**
+   * @returns {JSX} XML
+   */
   render() {
     return (
       <Swiper loop={false}>
@@ -80,9 +79,11 @@ class LandingPage extends Component {
             <StyledGrayText>Swipe to learn more</StyledGrayText>
           </StyledWelcomeView>
           <StyledButtonsView>
-            <StyledContinueButton onPress={this.handleOnPress}>
-              <StyledButtonText>Continue</StyledButtonText>
-            </StyledContinueButton>
+            <MaterialButton
+              onPress={this.handleOnPress}
+              text="Continue"
+              style={{ width: '75%', height: 40 }}
+            />
           </StyledButtonsView>
         </FadeInView>
         <About />
@@ -91,8 +92,12 @@ class LandingPage extends Component {
   }
 }
 
+LandingPage.propTypes = {
+  navigation: PropTypes.shape(),
+};
+
 LandingPage.navigationOptions = {
   headerMode: 'none',
-}
+};
 
 export default LandingPage;

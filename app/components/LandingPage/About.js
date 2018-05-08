@@ -1,13 +1,6 @@
 
 import React, { Component } from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  Button,
-  TextInput,
-} from 'react-native';
-import { StackNavigator } from 'react-navigation';
+import { Text } from 'react-native';
 import styled from 'styled-components';
 
 const StyledView = styled.View`
@@ -16,7 +9,14 @@ const StyledView = styled.View`
   align-items: center;
 `;
 
+/**
+ * @class About
+ * @extends Component
+ */
 class About extends Component {
+  /**
+   * @returns {JSX} XML
+   */
   render() {
     return (
       <StyledView>
