@@ -8,30 +8,13 @@ import {
   Keyboard,
   Alert,
 } from 'react-native';
-import styled from 'styled-components';
 import Promise from 'bluebird';
 
 import { validateEmail } from '../../actions/UserActions';
 import FadeInView from '../shared/FadeInView';
-
-
-const StyledTextInput = styled.TextInput`
-  font-family: flex-font;
-  height: 25;
-`;
-
-const StyledInputView = styled.View`
-  border-bottom-width: 1;
-  border-bottom-color: #8fc54b;
-  height: 25;
-  margin-bottom: 15%;
-  margin-top: 15%;
-  width: 50%;
-`;
-
-const StyledText = styled.Text`
-  font-family: flex-font-heavy;
-`;
+import InputField from '../shared/InputField';
+import DibsLoader from '../shared/DibsLoader';
+import Config from '../../../config.json';
 
 /**
  * @class EnterEmail
@@ -46,7 +29,7 @@ class EnterEmail extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      email: 'benjamin@ondibs.com',
+      email: '',
       emailError: '',
       isLoading: false,
     };
@@ -89,7 +72,7 @@ class EnterEmail extends Component {
     if (this.state.isLoading) {
       return (
         <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <StyledText>Loading...</StyledText>
+          <DibsLoader dotColor={Config.STUDIO_COLOR} />
         </FadeInView>
       );
     }
@@ -97,19 +80,21 @@ class EnterEmail extends Component {
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <StyledText> What is your email? </StyledText>
-          <StyledInputView>
-            <StyledTextInput
-              autoFocus
-              returnKeyType="go"
-              placeholder="Email"
-              autoCapitalize="none"
-              onChangeText={email => this.setState({ email })}
-              onSubmitEditing={this.handleOnPress}
-              value={this.state.email}
-            />
-          </StyledInputView>
-          {this.state.emailError.length && <Text style={{ color: 'red' }}>{this.state.emailError}</Text>}
+          <InputField
+            label="What is your email?"
+            autoFocus
+            returnKeyType="go"
+            placeholder="Email"
+            autoCapitalize="none"
+            onChangeText={email => this.setState({ email })}
+            onSubmitEditing={this.handleOnPress}
+            value={this.state.email}
+            containerStyle={{ marginBottom: '25%' }}
+            labelStyle={{ marginBottom: 20 }}
+          />
+          {this.state.emailError.length && <Text style={{ color: 'red', marginTop: 5 }}>
+            {this.state.emailError}
+          </Text>}
         </FadeInView>
       </TouchableWithoutFeedback>
     );

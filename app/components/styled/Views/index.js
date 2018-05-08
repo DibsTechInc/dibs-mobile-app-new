@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { Dimensions } from 'react-native';
 import { WHITE } from '../../../constants';
+import Config from '../../../../config.json';
 
 export const FlexCenter = styled.View`
   flex: 1;
@@ -18,6 +19,11 @@ export const RightAlignedColumn = styled.View`
 
 export const SpaceBetweenRow = FlexRow.extend`
   justify-content: space-between;
+`;
+
+export const StudioColorBottomBorder = styled.View`
+  border-bottom-width: 1;
+  border-color: ${Config.STUDIO_COLOR}
 `;
 
 export const MaterialPanelView = styled.View`
