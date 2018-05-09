@@ -17,11 +17,6 @@ import InputField from '../shared/InputField';
 import DibsLoader from '../shared/DibsLoader';
 import Config from '../../../config.json';
 
-const ErrorText = styled.Text`
-  color: ${RED};
-  margin-bottom: 30;
-`;
-
 /**
  * @class EnterEmail
  * @extends Component
@@ -36,12 +31,10 @@ class EnterEmail extends Component {
     super(props);
     this.state = {
       email: '',
-      emailError: '',
       isLoading: false,
     };
     this.handleOnPress = this.handleOnPress.bind(this);
   }
-
   /**
    * @returns {undefined}
    */
@@ -53,9 +46,7 @@ class EnterEmail extends Component {
     const isValidEmail = validEmail.test(email);
 
     if (!isValidEmail) {
-      this.setState({
-        emailError: 'That email is not valid.',
-      });
+      Alert.alert('Please enter a valid email address.');
       return;
     }
 
@@ -65,7 +56,7 @@ class EnterEmail extends Component {
 
     if (!route) {
       await new Promise(res => this.setState({ isLoading: false }, res));
-      Alert.alert('We could not verify this email.');
+      Alert.alert('Uh oh, we could not verify this email.');
     } else {
       this.props.navigation.navigate(route, { email }); // last key for PW reset
     }
@@ -101,11 +92,6 @@ class EnterEmail extends Component {
             }}
             labelStyle={{ marginBottom: 5, textAlign: 'center' }}
           />
-          {this.state.emailError ? (
-            <ErrorText>
-              {this.state.emailError}
-            </ErrorText>
-          ) : null}
         </FadeInView>
       </TouchableWithoutFeedback>
     );
