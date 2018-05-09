@@ -17,7 +17,6 @@ import EventListItem from './EventListItem';
 
 const ScrollContainer = styled.ScrollView`
   background: ${WHITE};
-  flex: 1;
 `;
 
 const ContainerWithMargin = styled.View`

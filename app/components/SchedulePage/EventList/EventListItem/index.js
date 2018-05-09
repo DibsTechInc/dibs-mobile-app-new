@@ -5,7 +5,7 @@ import Decimal from 'decimal.js';
 import { format as formatCurrency } from 'currency-formatter';
 import styled from 'styled-components';
 import { View } from 'react-native';
-import { LIGHT_GREY, TEXT_GREY } from '../../../../constants';
+import { LIGHT_GREY, DARK_TEXT_GREY } from '../../../../constants';
 import {
   getUsersNextPassValue,
   getUsersNextPassId,
@@ -17,6 +17,7 @@ import Overlay from './Overlay';
 const Container = FlexRow.extend`
   border-bottom-width: 1;
   border-bottom-color: ${LIGHT_GREY};
+  overflow: hidden;
   padding-vertical: 10;
   position: relative;
 `;
@@ -35,21 +36,23 @@ const ButtonColumn = FlexCenter.extend`
 `;
 
 const Price = styled.Text`
+  color: ${DARK_TEXT_GREY};
   font-size: 20;
   font-family: 'flex-font-heavy';
 `;
 
 const ScheduleText = styled.Text`
-  color: ${TEXT_GREY};
+  color: ${DARK_TEXT_GREY};
   font-size: 12;
 `;
 
 const HeavyText = ScheduleText.extend`
   font-family: 'flex-font-heavy';
+  font-size: 14;
 `;
 
 const ClassTime = HeavyText.extend`
-  font-size: 16;
+  font-size: 14;
 `;
 
 /**
@@ -74,7 +77,7 @@ class EventListItem extends React.PureComponent {
           {this.props.passid ? (
             <RightAlignedColumn>
               <ScheduleText>
-                Value back:
+                Credit back
               </ScheduleText>
               <Price style={{ fontSize: 16 }}>
                 +{this.props.formattedValueBack}
@@ -87,10 +90,13 @@ class EventListItem extends React.PureComponent {
           )}
         </PriceColumn>
         <CenterColumn>
-          <View style={{ marginBottom: 5 }}>
+          <View style={{ marginBottom: 10 }}>
             <ClassTime>
               {this.props.startTimeInLocalTZ} - {this.props.endTimeInLocalTZ}
             </ClassTime>
+            <ScheduleText>
+              {this.props.locationName}
+            </ScheduleText>
           </View>
           <View>
             <HeavyText>
@@ -98,9 +104,6 @@ class EventListItem extends React.PureComponent {
             </HeavyText>
             <ScheduleText>
               {this.props.instructorName}
-            </ScheduleText>
-            <ScheduleText>
-              {this.props.locationName}
             </ScheduleText>
           </View>
         </CenterColumn>

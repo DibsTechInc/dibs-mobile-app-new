@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { Dimensions } from 'react-native';
-import { WHITE } from '../../../constants';
+import { WHITE, BLACK, LIGHT_GREY } from '../../../constants';
 import Config from '../../../../config.json';
 
 export const FlexCenter = styled.View`
@@ -29,7 +29,7 @@ export const StudioColorBottomBorder = styled.View`
 export const MaterialPanelView = styled.View`
   background-color: ${WHITE};
   border-radius: ${props => (props.borderRadius || '3px')};
-  border-color: #ddd;
+  border-color: ${LIGHT_GREY};
   border-left-width: 0;
   border-top-width: 0;
   border-width: 0.3;
@@ -39,7 +39,7 @@ export const MaterialPanelView = styled.View`
   padding-horizontal: 10px;
   padding-top: 15px;
   padding-bottom: 20px;
-  shadow-color: #000;
+  shadow-color: ${BLACK};
   shadow-opacity: 0.2;
   shadow-radius: 4;
   width: ${props => (props.width || (Dimensions.get('window').width - 20))};

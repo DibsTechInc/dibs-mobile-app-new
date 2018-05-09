@@ -3,11 +3,13 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { promisify } from 'bluebird';
 import { Alert } from 'react-native';
+
 import Config from '../../../../../config.json';
-import MaterialButton from '../../../shared/MaterialButton';
-import { GREY, SOLD_OUT_GREY, WHITE, TEXT_GREY } from '../../../../constants/index';
-import DibsLoader from '../../../shared/DibsLoader';
+import { GREY, WHITE } from '../../../../constants/index';
 import { addToCart, addToWaitlist } from '../../../../actions';
+import { lightenDarkenColor } from '../../../../helpers';
+import DibsLoader from '../../../shared/DibsLoader';
+import MaterialButton from '../../../shared/MaterialButton';
 
 /**
  * @class Button
@@ -56,7 +58,7 @@ class Button extends React.PureComponent {
    */
   getBackgroundColor() {
     if (this.props.waitlisted) return WHITE;
-    if (this.props.maxSeatsReached && this.props.has_waitlist) return SOLD_OUT_GREY;
+    if (this.props.maxSeatsReached && this.props.has_waitlist) return lightenDarkenColor(GREY, 16);
     if (this.props.soldOut) return WHITE;
     return Config.STUDIO_COLOR;
   }
@@ -73,8 +75,9 @@ class Button extends React.PureComponent {
    * @returns {string} text color
    */
   getTextColor() {
-    if (this.props.waitlisted) return GREY;
-    if (this.props.soldOut && !this.props.has_waitlist) return TEXT_GREY;
+    if (this.props.waitlisted || (this.props.soldOut && !this.props.has_waitlist)) {
+      return GREY;
+    }
     return WHITE;
   }
   /**
@@ -103,13 +106,16 @@ class Button extends React.PureComponent {
         />
       );
     }
+    const shouldHaveBorder =
+      this.props.waitlisted
+      || (this.props.soldOut && !this.props.has_waitlist);
     return (
       <MaterialButton
         style={{
           width: 80,
           height: 40,
-          borderWidth: Number(this.props.waitlisted),
-          borderColor: SOLD_OUT_GREY,
+          borderWidth: Number(shouldHaveBorder),
+          borderColor: GREY,
         }}
         backgroundColor={this.getBackgroundColor()}
         text={this.getText()}
