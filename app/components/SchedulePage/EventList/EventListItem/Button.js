@@ -3,12 +3,13 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { promisify } from 'bluebird';
 import { Alert } from 'react-native';
+
 import Config from '../../../../../config.json';
-import MaterialButton from '../../../shared/MaterialButton';
 import { GREY, WHITE } from '../../../../constants/index';
+import { addToCart, addToWaitlist } from '../../../../actions';
 import { lightenDarkenColor } from '../../../../helpers';
 import DibsLoader from '../../../shared/DibsLoader';
-import { addToCart, addToWaitlist } from '../../../../actions';
+import MaterialButton from '../../../shared/MaterialButton';
 
 /**
  * @class Button
