@@ -24,6 +24,7 @@ import {
 
 const ForgotPasswordText = styled.Text`
   font-family: flex-font;
+  font-size: 12;
 `;
 
 /**
