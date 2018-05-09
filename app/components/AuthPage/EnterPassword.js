@@ -53,6 +53,7 @@ class EnterPassword extends Component {
    */
   async handleOnPress() {
     const { email } = this.props.navigation.state.params;
+    console.log(email, this.state.password);
 
     await new Promise(res => this.setState({ isLoading: true }, res));
     const user = await new Promise(res => this.props.submitLogin(email, this.state.password, res));
@@ -60,6 +61,7 @@ class EnterPassword extends Component {
     if (!user) {
       await new Promise(res => this.setState({ isLoading: false }, res));
       Alert.alert('Incorrect password');
+      return;
     }
 
     this.props.navigation.navigate(MAIN_ROUTE);
@@ -70,7 +72,7 @@ class EnterPassword extends Component {
    */
   navigateToPasswordReset() {
     const { email } = this.props.navigation.state.params;
-    this.props.navigation.navigate(PASSWORD_RESET_ROUTE, { email, openTo: 'Email' });
+    this.props.navigation.navigate(PASSWORD_RESET_ROUTE, { email });
   }
 
   /**
@@ -89,7 +91,10 @@ class EnterPassword extends Component {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
           <InputField
-            label="Please enter your password."
+            label={(
+              this.props.navigation.state.params.fromReset ?
+                'What is your new password?' : 'What is your password?'
+            )}
             autoFocus
             returnKeyType="go"
             placeholder="Password"

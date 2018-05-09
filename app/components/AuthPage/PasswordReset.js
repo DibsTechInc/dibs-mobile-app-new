@@ -3,18 +3,17 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { promisify } from 'bluebird';
 import styled from 'styled-components';
+import {
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native';
 
 import Config from '../../../config.json';
 import { LOGIN_ROUTE } from '../../constants';
 import { getStudioDomain } from '../../selectors';
 import { createPasswordResetLink } from '../../actions';
-import { FlexCenter, HeavyText } from '../styled';
-import { DibsLoader, MaterialButton } from '../shared';
-
-const Container = FlexCenter.extend`
-  flex: 2;
-  width: 100%;
-`;
+import { HeavyText } from '../styled';
+import { DibsLoader, MaterialButton, FadeInView } from '../shared';
 
 const MessageContainer = styled.View`
   align-items: center;
@@ -72,7 +71,7 @@ class PasswordReset extends React.Component {
    */
   navigateToEnterPassword() {
     const { email } = this.props.navigation.state.params;
-    this.props.navigation.navigate(LOGIN_ROUTE, { email, openTo: 'Email' });
+    this.props.navigation.navigate(LOGIN_ROUTE, { email, fromReset: true });
   }
   /**
    * render
@@ -81,25 +80,27 @@ class PasswordReset extends React.Component {
   render() {
     const successMessage = `An email was sent to ${this.props.navigation.state.params.email} with instructions to reset your password at ${this.props.studioDomain}.`;
     return (
-      <Container>
-        {this.state.loading ? (
-          <DibsLoader dotColor={Config.STUDIO_COLOR} />
-        ) : (
-          <MessageContainer>
-            <Header>
-              {this.state.success ? 'Password Reset Link Sent!' : 'Uh oh!'}
-            </Header>
-            <Message>
-              {this.state.success ? successMessage : this.state.message}
-            </Message>
-            <MaterialButton
-              text="Log in"
-              style={{ height: 40, width: 120, marginTop: 25 }}
-              onPress={this.navigateToEnterPassword}
-            />
-          </MessageContainer>
-        )}
-      </Container>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
+          {this.state.loading ? (
+            <DibsLoader dotColor={Config.STUDIO_COLOR} />
+          ) : (
+            <MessageContainer>
+              <Header>
+                {this.state.success ? 'Password Reset Link Sent!' : 'Uh oh!'}
+              </Header>
+              <Message>
+                {this.state.success ? successMessage : this.state.message}
+              </Message>
+              <MaterialButton
+                text="Log in"
+                style={{ height: 40, width: 120, marginTop: 25 }}
+                onPress={this.navigateToEnterPassword}
+              />
+            </MessageContainer>
+          )}
+        </FadeInView>
+      </TouchableWithoutFeedback>
     );
   }
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { TextInput, View } from 'react-native';
+import { TextInput, View, ScrollView } from 'react-native';
 import { StudioColorBottomBorder, DefaultInput, HeavyText } from '../styled';
 
 const Label = HeavyText.extend`
@@ -13,22 +13,55 @@ const Label = HeavyText.extend`
  */
 class InputField extends React.PureComponent {
   /**
+   * @constructor
+   * @constructs InputField
+   * @param {Object} props for component
+   */
+  constructor(props) {
+    super(props);
+    this.state = { focused: false };
+    this.onFocus = this.onFocus.bind(this);
+    this.onBlur = this.onBlur.bind(this);
+  }
+  /**
+   * @returns {undefined}
+   */
+  onFocus() {
+    this.setState({ focused: true });
+    if (typeof this.props.onFocus === 'function') this.props.onFocus();
+  }
+  /**
+   * @returns {undefined}
+   */
+  onBlur() {
+    this.setState({ focused: false });
+    if (typeof this.props.onBlur === 'function') this.props.onBlur();
+  }
+  /**
    * render
    * @returns {JSX.Element} HTML
    */
   render() {
     return (
       <View>
-        <StudioColorBottomBorder style={this.props.containerStyle}>
+        <StudioColorBottomBorder
+          style={{
+            ...this.props.containerStyle,
+            borderBottomWidth: 1 + Boolean(this.state.focused),
+          }}
+        >
           {this.props.label ? (
             <Label style={this.props.labelStyle}>
               {this.props.label}
             </Label>
           ) : null}
-          <DefaultInput
-            autoFocus
-            {...this.props}
-          />
+          <ScrollView keyboardShouldPersistTaps="never">
+            <DefaultInput
+              onFocus={this.onFocus}
+              onBlur={this.onBlur}
+              {...this.props}
+            />
+          </ScrollView>
         </StudioColorBottomBorder>
       </View>
     );

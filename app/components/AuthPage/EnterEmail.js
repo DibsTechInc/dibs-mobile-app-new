@@ -3,18 +3,24 @@ import React, { Component } from 'react';
 import { PropTypes } from 'prop-types';
 import { connect } from 'react-redux';
 import {
-  Text,
   TouchableWithoutFeedback,
   Keyboard,
   Alert,
 } from 'react-native';
+import styled from 'styled-components';
 import Promise from 'bluebird';
 
+import { RED } from '../../constants';
 import { validateEmail } from '../../actions/UserActions';
 import FadeInView from '../shared/FadeInView';
 import InputField from '../shared/InputField';
 import DibsLoader from '../shared/DibsLoader';
 import Config from '../../../config.json';
+
+const ErrorText = styled.Text`
+  color: ${RED};
+  margin-bottom: 30;
+`;
 
 /**
  * @class EnterEmail
@@ -48,7 +54,7 @@ class EnterEmail extends Component {
 
     if (!isValidEmail) {
       this.setState({
-        emailError: 'Invalid Email',
+        emailError: 'That email is not valid.',
       });
       return;
     }
@@ -59,9 +65,9 @@ class EnterEmail extends Component {
 
     if (!route) {
       await new Promise(res => this.setState({ isLoading: false }, res));
-      Alert.alert('We could not verify this email');
+      Alert.alert('We could not verify this email.');
     } else {
-      this.props.navigation.navigate(route, { email, openTo: 'Email' }); // last key for PW reset
+      this.props.navigation.navigate(route, { email }); // last key for PW reset
     }
   }
 
@@ -81,20 +87,25 @@ class EnterEmail extends Component {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
           <InputField
-            label="What is your email?"
             autoFocus
+            label="What is your email?"
             returnKeyType="go"
             placeholder="Email"
             autoCapitalize="none"
             onChangeText={email => this.setState({ email })}
             onSubmitEditing={this.handleOnPress}
             value={this.state.email}
-            containerStyle={{ marginBottom: '25%', width: 200 }}
-            labelStyle={{ marginBottom: 20, textAlign: 'center' }}
+            containerStyle={{
+              marginBottom: this.state.emailError ? 10 : 50,
+              width: 200,
+            }}
+            labelStyle={{ marginBottom: 5, textAlign: 'center' }}
           />
-          {this.state.emailError.length && <Text style={{ color: 'red', marginTop: 5 }}>
-            {this.state.emailError}
-          </Text>}
+          {this.state.emailError ? (
+            <ErrorText>
+              {this.state.emailError}
+            </ErrorText>
+          ) : null}
         </FadeInView>
       </TouchableWithoutFeedback>
     );

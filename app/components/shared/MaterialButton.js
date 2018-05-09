@@ -15,7 +15,7 @@ const StyledMaterial = styled.TouchableHighlight`
 const StyledText = styled.Text`
   color: ${props => props.textColor};
   font-family: 'flex-font';
-  font-size: ${props => (props.fontSize || 16)};
+  font-size: ${props => (props.fontSize || 12)};
 `;
 
 /**
