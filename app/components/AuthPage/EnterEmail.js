@@ -61,7 +61,7 @@ class EnterEmail extends Component {
       await new Promise(res => this.setState({ isLoading: false }, res));
       Alert.alert('We could not verify this email');
     } else {
-      this.props.navigation.navigate(route, { email });
+      this.props.navigation.navigate(route, { email, openTo: 'Email' }); // last key for PW reset
     }
   }
 

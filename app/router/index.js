@@ -11,9 +11,10 @@ import {
   REGISTER_ROUTE,
   DRAWER_ROUTE,
   PROFILE_INFO_ROUTE,
+  PASSWORD_RESET_ROUTE,
 } from '../constants/RouteConstants';
 
-import { EnterPassword, EnterEmail, Signup } from '../components/AuthPage';
+import { EnterPassword, EnterEmail, Signup, PasswordReset } from '../components/AuthPage';
 import LandingPage from '../components/LandingPage';
 import Drawer from '../components/Drawer';
 import ProfileInfo from '../components/ProfilePage/ProfileInfo';
@@ -34,6 +35,9 @@ const createStackNavigator = token => StackNavigator(
     },
     [REGISTER_ROUTE]: {
       screen: Signup,
+    },
+    [PASSWORD_RESET_ROUTE]: {
+      screen: PasswordReset,
     },
     [DRAWER_ROUTE]: {
       screen: Drawer,

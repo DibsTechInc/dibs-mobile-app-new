@@ -76,3 +76,11 @@ export function getStudioWaiverRequirement(state) {
 export function getStudioInterval(state) {
   return getStudioDibsConfig(state).interval_end || 14;
 }
+
+/**
+ * @param {Object} state in store
+ * @returns {string} studio's domain
+ */
+export function getStudioDomain(state) {
+  return getStudioData(state).domain || 'www.ondibs.com';
+}

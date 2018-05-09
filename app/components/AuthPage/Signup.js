@@ -127,7 +127,6 @@ class Signup extends Component {
             />
             <InputField
               value={this.state.fullName}
-              autoFocus
               onChangeText={fullName => this.setState({ fullName })}
               placeholder="First and last name"
               style={{ width: 200 }}

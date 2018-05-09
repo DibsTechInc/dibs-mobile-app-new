@@ -4,6 +4,7 @@ export const VERIFY_ROUTE = 'Verify';
 
 export const LOGIN_ROUTE = 'Login';
 export const REGISTER_ROUTE = 'Register';
+export const PASSWORD_RESET_ROUTE = 'PasswordReset';
 
 export const DRAWER_ROUTE = 'Drawer';
 

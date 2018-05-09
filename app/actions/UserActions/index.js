@@ -1,6 +1,11 @@
 import { AsyncStorage } from 'react-native';
 import { createAction } from 'redux-actions';
-import { LOGIN_ROUTE, REGISTER_ROUTE, MAIN_ROUTE } from '../../constants/RouteConstants';
+import {
+  LOGIN_ROUTE,
+  REGISTER_ROUTE,
+  MAIN_ROUTE,
+  PASSWORD_RESET_ROUTE,
+} from '../../constants/RouteConstants';
 import Config from '../../../config.json';
 import { requestCreditCardInfo, removeCreditCard } from '../index';
 
@@ -43,6 +48,9 @@ export function validateEmail(email, callback = () => {}) {
       });
       if (res.success) {
         return callback(LOGIN_ROUTE);
+      }
+      if (res.message === 'Needs to reset password') {
+        return callback(PASSWORD_RESET_ROUTE);
       }
       if (res.message === 'No user with that email') {
         return callback(REGISTER_ROUTE);
@@ -120,6 +128,26 @@ export function logOutUser(callback = () => {}) {
       callback();
     } catch (err) {
       console.log(err);
+    }
+  };
+}
+
+/**
+ * @param {String} email of user
+ * @param {function} callback on complete
+ * @returns {function} thunk
+ */
+export function createPasswordResetLink(email, callback = () => {}) {
+  return async function innerCreatePasswordResetLink(dispatch, getState, dibsFetch) {
+    try {
+      const { success, message } = await dibsFetch('/api/user/password/reset', {
+        method: 'POST',
+        body: { email, fromWidget: true, studioId: Config.DIBS_STUDIO_ID },
+      });
+      return callback(null, { success, message });
+    } catch (err) {
+      console.log(err);
+      return callback(null, { success: false, message: 'Something went wrong sending your password reset email.' });
     }
   };
 }
