@@ -11,11 +11,13 @@ export const {
   setEvents,
   addKeyToFetchingEvents,
   removeKeyFromFetchingEvents,
+  setEventSoldOut,
   setEventsLoadingFalse,
 } = createActions({
   SET_EVENTS: payload => payload,
   ADD_KEY_TO_FETCHING_EVENTS: getDateAsString,
   REMOVE_KEY_FROM_FETCHING_EVENTS: getDateAsString,
+  SET_EVENT_SOLD_OUT: payload => payload,
   SET_EVENTS_LOADING_FALSE: () => false,
 });
 

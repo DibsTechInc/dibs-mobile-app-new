@@ -1,7 +1,22 @@
 import { createActions } from 'redux-actions';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, uniq } from 'lodash';
 import moment from 'moment';
-import { getUsersNextPassId, getSortedCartEvents } from '../../selectors';
+import {
+  getUsersNextPassId,
+  getSortedCartEvents,
+  getUserHasPasses,
+  getCanUseCardToPurchase,
+} from '../../selectors';
+
+import {
+  clearPromoCodeData,
+  clearPackagePromoCode,
+  setEventSoldOut,
+  requestEventData,
+  setUser,
+  setTransactionsConfirmed,
+  requestUpcomingEvents,
+} from '../';
 
 const range = n => [...Array(n)]; // JS implementation of Python's range() fn
 
@@ -168,5 +183,69 @@ export function updateQuantity({ eventid, quantity }) {
       const cartItem = state.cart.data.find(event => event.eventid === eventid);
       return dispatch(addToCart({ ...cartItem, passid: nextPassId }));
     });
+  };
+}
+
+/**
+ * submitCartForPurchase to the server
+ * @param {function} callback on compleition, node style
+ * @returns {function} redux thunk makes request
+ */
+export function submitCartForPurchase(callback) {
+  return async function innerSubmitCartForPurchase(dispatch, getState, dibsFetch) {
+    const state = getState();
+    const { promoCode, cart, studio } = state;
+    dispatch(setCartPurchasingTrue());
+
+    if (!getCanUseCardToPurchase(state) && !getUserHasPasses(state)) {
+      dispatch(setCartPurchasingFalse());
+      return;
+    }
+
+    const cartData = cart.data.map(item => ({
+      ...item,
+      source: studio.source,
+      studioid: studio.studioid,
+    }));
+
+    try {
+      const res = await dibsFetch('/api/buy', {
+        method: 'POST',
+        requiresAuth: true,
+        body: {
+          cart: cartData,
+          promoCode,
+          purchasePlace: 'widget',
+        },
+      });
+
+      if (res.success) {
+        dispatch(setUser(res.user));
+        dispatch(setTransactionsConfirmed(res.transactions));
+        callback(null);
+        dispatch(requestUpcomingEvents()); // implement with upcomming classes
+        // dispatch(requestUserTransactions()); implement with transaction history
+        // dispatch(performTransactionAnalytics(resp.transactions)); not sure works with native
+        dispatch(clearPromoCodeData());
+        dispatch(clearPackagePromoCode());
+      } else if (res.experimentalRoute) {
+        if (res.user) dispatch(setUser(res.user));
+        callback(res);
+      } else {
+        // let message = res.message;
+        // if (res.removedEvents.every(r => r.reason === 'SOLD_OUT')) {
+        //   message = 'Oh dang! The classes you chose were just recently sold out…. please pick another option.';
+        //   res.removedEvents.map(event => dispatch(setEventSoldOut({ eventid: event.eventid })));
+        // }
+        // if (res.removedEvents.every(r => r.reason === 'PRICE_CHANGE')) {
+        //   message = 'Oh dang! The classes you chose had their price increase more than 5 minutes ago. Please refresh and try again';
+        // }
+        // console.log(message, 'message'); // add dispatch to messages reducer?
+        callback(res);
+      }
+    } catch (err) {
+      console.log(err);
+      callback(null);
+    }
   };
 }

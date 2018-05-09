@@ -4,6 +4,7 @@ import {
   setEvents,
   addKeyToFetchingEvents,
   removeKeyFromFetchingEvents,
+  setEventSoldOut,
 } from '../../actions/EventActions';
 
 const initialState = {
@@ -35,6 +36,20 @@ function handleSetEvents(state, { payload }) {
   return { ...state, data: events };
 }
 
+/**
+ * @param {Object} state of events
+ * @param {Object} action on the state
+ * @returns {Object} new state
+ */
+function handleSetEventSoldOut(state, action) {
+  const events = state.data.map(event => ({
+    ...event,
+    sold_out: event.sold_out || (event.id === action.event.eventid),
+  }));
+
+  return { ...state, data: events };
+}
+
 export default handleActions({
   [setEvents]: handleSetEvents,
   [addKeyToFetchingEvents]: (state, { payload }) => ({
@@ -42,4 +57,5 @@ export default handleActions({
     fetching: { ...state.fetching, [payload]: true },
   }),
   [removeKeyFromFetchingEvents]: (state, { payload }) => ({ ...state, fetching: omit(state.fetching, payload) }),
+  [setEventSoldOut]: handleSetEventSoldOut,
 }, initialState);

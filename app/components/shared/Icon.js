@@ -26,6 +26,7 @@ class IconComponent extends Component {
             name={this.props.iconName}
             size={this.props.size}
             color={this.props.iconColor}
+            padding={this.props.padding}
             {...this.props}
           />
         </IconText>

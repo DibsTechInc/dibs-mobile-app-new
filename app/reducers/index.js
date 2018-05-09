@@ -8,6 +8,7 @@ import cart from './CartReducer';
 import upcomingEvents from './UpcomingEventsReducer';
 import creditCard from './CreditCardReducer';
 import promoCode from './PromoCodeReducer';
+import confirmation from './ConfirmationReducer';
 
 export default combineReducers({
   events,
@@ -18,4 +19,5 @@ export default combineReducers({
   upcomingEvents,
   creditCard,
   promoCode,
+  confirmation,
 });

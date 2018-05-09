@@ -7,31 +7,13 @@ import styled from 'styled-components';
 import FadeInView from '../shared/FadeInView';
 import { FlexRow } from '../styled/Views';
 import { getSortedCartEvents } from '../../selectors/CartSelectors';
-import { WHITE, LIGHT_GREY, SOFT_GREY, BLACK } from '../../constants';
-import Icon from '../shared/Icon';
-
 import {
-  getFormattedCartSubtotalWithPackageClasses,
-  getCartPromoCodeAmount,
-  getFormattedPromoCodeAmount,
-  getCartPassesValue,
-  getFormattedCartPassesValue,
-  getCartTaxAmount,
-  getFormattedCartTaxAmount,
-  getCartStudioCreditsApplied,
-  getFormattedCartStudioCreditsApplied,
-  getCartRAFCreditApplied,
-  getFormattedCartRAFCreditApplied,
-  getCartGlobalCreditApplied,
-  getFormattedCartGlobalCreditApplied,
-  getFormattedCartTotal,
-  getCartValueBack,
   getFormattedCartValueBack,
+  getCartValueBack,
+  getFormattedCartTotal,
 } from '../../selectors/CartSelectors/PurchaseBreakdown';
-import {
-  getUserFlashCreditAmount,
-  getFormattedUserFlashCreditAmount,
-} from '../../selectors/UserSelectors';
+import { LIGHT_GREY, SOFT_GREY, BLACK } from '../../constants';
+import Icon from '../shared/Icon';
 import CartItem from './CartItem';
 import TransactionBreakdown from './TransactionBreakdown';
 import PromoField from './PromoField';
@@ -117,7 +99,8 @@ class CartPage extends Component {
         routeName: 'DrawerOpen',
       });
 
-      return this.props.navigation.dispatch(navigateAction);
+      this.props.navigation.dispatch(navigateAction);
+      return;
     }
 
     const keyType = this.props.navigation.state.key.split('-')[0];
@@ -142,6 +125,8 @@ class CartPage extends Component {
    * @returns {JSX} XML
    */
   render() {
+    const renderValueBackMessage = this.props.valueBack > 0 ? `Place your order to earn ${this.props.formattedValueBack} in credit back` : `Place your order for ${this.props.formattedCartTotal}`;
+
     let renderCartItems = <CartItem hasEmptyCart />;
 
     if (!this.props.cart.length) {
@@ -177,14 +162,16 @@ class CartPage extends Component {
     }
 
     if (this.props.cart.length) {
-      renderCartItems = this.props.cart.map(cart =>
+      renderCartItems = this.props.cart.map(item =>
         (<CartItem
-          key={cart.eventid}
-          eventid={cart.eventid}
-          name={cart.name}
-          quantity={cart.quantity}
-          startTime={cart.startTime}
-          price={cart.price}
+          key={item.eventid}
+          eventid={item.eventid}
+          name={item.name}
+          quantity={item.quantity}
+          startTime={item.startTime}
+          price={item.price}
+          taxRate={item.taxRate}
+          passid={item.passid}
         />)
       );
     }
@@ -207,15 +194,11 @@ class CartPage extends Component {
             {renderCartItems}
           </MaterialPanelView>
           <PromoField />
-          <TransactionBreakdown
-            formattedSubtotal={this.props.formattedSubtotal}
-            formattedTaxAmount={this.props.formattedTaxAmount}
-            formattedTotal={this.props.formattedTotal}
-          />
+          <TransactionBreakdown />
         </StyledScrollView>
         <StyledCheckoutView>
           <View style={{ marginBottom: 30 }}>
-            <StyledSavingsText>Place order to earn $1.09 in credit back.</StyledSavingsText>
+            <StyledSavingsText>{renderValueBackMessage}</StyledSavingsText>
           </View>
           <FlexRow>
             <MaterialButton
@@ -231,33 +214,18 @@ class CartPage extends Component {
 }
 
 CartPage.propTypes = {
-  navigation: PropTypes.shape(),
-  cart: PropTypes.arrayOf(PropTypes.shape()),
-  formattedSubtotal: PropTypes.string,
-  formattedTaxAmount: PropTypes.string,
-  formattedTotal: PropTypes.string,
+  navigation: PropTypes.shape().isRequired,
+  cart: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+  formattedValueBack: PropTypes.string.isRequired,
+  valueBack: PropTypes.number.isRequired,
+  formattedCartTotal: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = state => ({
   cart: getSortedCartEvents(state),
-  formattedSubtotal: getFormattedCartSubtotalWithPackageClasses(state),
-  promoCodeAmount: getCartPromoCodeAmount(state),
-  formattedPromoCodeAmount: getFormattedPromoCodeAmount(state),
-  flashCreditAmount: getUserFlashCreditAmount(state),
-  formattedFlashCreditAmount: getFormattedUserFlashCreditAmount(state),
-  passValueAmount: getCartPassesValue(state),
-  formattedPassValueAmount: getFormattedCartPassesValue(state),
-  taxAmount: getCartTaxAmount(state),
-  formattedTaxAmount: getFormattedCartTaxAmount(state),
-  studioCreditAmount: getCartStudioCreditsApplied(state),
-  formattedStudioCreditAmount: getFormattedCartStudioCreditsApplied(state),
-  rafCreditAmount: getCartRAFCreditApplied(state),
-  formattedRAFCreditAmount: getFormattedCartRAFCreditApplied(state),
-  globalCreditAmount: getCartGlobalCreditApplied(state),
-  formattedGlobalCreditAmount: getFormattedCartGlobalCreditApplied(state),
-  formattedTotal: getFormattedCartTotal(state),
-  valueBack: getCartValueBack(state),
   formattedValueBack: getFormattedCartValueBack(state),
+  valueBack: getCartValueBack(state),
+  formattedCartTotal: getFormattedCartTotal(state),
 });
 
 export default withNavigation(connect(mapStateToProps)(CartPage));

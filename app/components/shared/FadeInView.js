@@ -18,7 +18,7 @@ class FadeInView extends React.Component {
       this.state.fadeAnim,
       {
         toValue: 1,
-        duration: 1000,
+        duration: 500,
       }
     ).start();
   }

@@ -7,3 +7,4 @@ export * from './UserActions';
 export * from './UpcomingEventsActions';
 export * from './PromoCodeActions';
 export * from './WaitlistActions';
+export * from './ConfirmationActions';

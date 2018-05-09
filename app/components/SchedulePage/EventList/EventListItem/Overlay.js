@@ -92,7 +92,7 @@ class Overlay extends React.PureComponent {
                 size={15}
                 iconName={this.props.quantity > 1 ? 'minus' : 'trash'}
                 iconColor={TEXT_GREY}
-                padding={0}
+                padding={10}
                 onPress={this.removeFromCart}
               />
               <Quantity>
@@ -105,7 +105,7 @@ class Overlay extends React.PureComponent {
                   size={15}
                   iconName="plus"
                   iconColor={TEXT_GREY}
-                  padding={0}
+                  padding={10}
                   onPress={this.addToCart}
                 />
               )}
