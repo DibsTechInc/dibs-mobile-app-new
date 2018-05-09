@@ -28,7 +28,7 @@ const Header = HeavyText.extend`
 const Message = styled.Text`
   font-family: flex-font;
   text-align: center;
-  width: 75%;
+  width: 300;
 `;
 
 /**

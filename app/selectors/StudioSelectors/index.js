@@ -82,5 +82,6 @@ export function getStudioInterval(state) {
  * @returns {string} studio's domain
  */
 export function getStudioDomain(state) {
-  return getStudioData(state).domain || 'www.ondibs.com';
+  const { domain } = getStudioData(state);
+  return (domain && domain.slice(0, -1)) || 'www.ondibs.com';
 }
