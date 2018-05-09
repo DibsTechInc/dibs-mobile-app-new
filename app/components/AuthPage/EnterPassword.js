@@ -5,20 +5,25 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
 import styled from 'styled-components';
 import Promise from 'bluebird';
 
+import Config from '../../../config.json';
+
 import { submitLogin } from '../../actions/UserActions';
 import FadeInView from '../shared/FadeInView';
 import InputField from '../shared/InputField';
+import DibsLoader from '../shared/DibsLoader';
 
 import {
   MAIN_ROUTE,
+  PASSWORD_RESET_ROUTE,
 } from '../../constants/RouteConstants/index';
 
-const StyledText = styled.Text`
-  font-family: flex-font-heavy;
+const ForgotPasswordText = styled.Text`
+  font-family: flex-font;
 `;
 
 /**
@@ -39,13 +44,14 @@ class EnterPassword extends Component {
     };
 
     this.handleOnPress = this.handleOnPress.bind(this);
+    this.navigateToPasswordReset = this.navigateToPasswordReset.bind(this);
   }
 
   /**
    * @returns {undefined}
    */
   async handleOnPress() {
-    const email = this.props.navigation.state.params.email;
+    const { email } = this.props.navigation.state.params;
 
     await new Promise(res => this.setState({ isLoading: true }, res));
     const user = await new Promise(res => this.props.submitLogin(email, this.state.password, res));
@@ -59,13 +65,21 @@ class EnterPassword extends Component {
   }
 
   /**
+   * @returns {undefined}
+   */
+  navigateToPasswordReset() {
+    const { email } = this.props.navigation.state.params;
+    this.props.navigation.navigate(PASSWORD_RESET_ROUTE, { email, openTo: 'Email' });
+  }
+
+  /**
    * @returns {JSX} XML
    */
   render() {
     if (this.state.isLoading) {
       return (
         <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <StyledText>Loading...</StyledText>
+          <DibsLoader dotColor={Config.STUDIO_COLOR} />
         </FadeInView>
       );
     }
@@ -83,10 +97,18 @@ class EnterPassword extends Component {
             onSubmitEditing={this.handleOnPress}
             onChangeText={password => this.setState({ password })}
             value={this.state.password}
-            containerStyle={{ marginBottom: '25%', width: 200 }}
+            containerStyle={{ marginBottom: 10, width: 200 }}
             labelStyle={{ marginBottom: 20, textAlign: 'center' }}
             style={{ minWidth: 200 }}
           />
+          <TouchableOpacity
+            onPress={this.navigateToPasswordReset}
+            style={{ marginBottom: 20 }}
+          >
+            <ForgotPasswordText>
+              Forgot your password?
+            </ForgotPasswordText>
+          </TouchableOpacity>
         </FadeInView>
       </TouchableWithoutFeedback>
     );

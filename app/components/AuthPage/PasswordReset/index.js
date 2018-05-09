@@ -1,7 +1,6 @@
 import React from 'react';
 // import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { WHITE } from '../../../constants';
 import { FlexCenter } from '../../styled';
 import EmailOption from './Email';
 
@@ -12,7 +11,6 @@ const PasswordResetPrefence = {
 };
 
 const Container = FlexCenter.extend`
-  background: ${WHITE},
   flex: 2;
   width: 100%;
 `;
