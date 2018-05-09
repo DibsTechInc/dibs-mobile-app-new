@@ -11,24 +11,11 @@ import Promise from 'bluebird';
 
 import { submitLogin } from '../../actions/UserActions';
 import FadeInView from '../shared/FadeInView';
+import InputField from '../shared/InputField';
 
 import {
   MAIN_ROUTE,
 } from '../../constants/RouteConstants/index';
-
-const StyledTextInput = styled.TextInput`
-  font-family: flex-font;
-  height: 25;
-`;
-
-const StyledInputView = styled.View`
-  border-bottom-width: 1;
-  border-bottom-color: #8fc54b;
-  height: 25;
-  margin-bottom: 15%;
-  margin-top: 15%;
-  width: 50%;
-`;
 
 const StyledText = styled.Text`
   font-family: flex-font-heavy;
@@ -47,7 +34,7 @@ class EnterPassword extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      password: '123',
+      password: '',
       isLoading: false,
     };
 
@@ -86,19 +73,20 @@ class EnterPassword extends Component {
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <StyledText>What is your password?</StyledText>
-          <StyledInputView>
-            <StyledTextInput
-              autoFocus
-              returnKeyType="go"
-              placeholder="Password"
-              secureTextEntry
-              autoCapitalize="none"
-              onSubmitEditing={this.handleOnPress}
-              onChangeText={password => this.setState({ password })}
-              value={this.state.password}
-            />
-          </StyledInputView>
+          <InputField
+            label="Please enter your password."
+            autoFocus
+            returnKeyType="go"
+            placeholder="Password"
+            secureTextEntry
+            autoCapitalize="none"
+            onSubmitEditing={this.handleOnPress}
+            onChangeText={password => this.setState({ password })}
+            value={this.state.password}
+            containerStyle={{ marginBottom: '25%', width: 200 }}
+            labelStyle={{ marginBottom: 20, textAlign: 'center' }}
+            style={{ minWidth: 200 }}
+          />
         </FadeInView>
       </TouchableWithoutFeedback>
     );

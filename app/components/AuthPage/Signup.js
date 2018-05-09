@@ -10,26 +10,15 @@ import {
 import styled from 'styled-components';
 import CheckBox from 'react-native-checkbox';
 import Promise from 'bluebird';
-import FadeInView from '../shared/FadeInView';
 import { signUpUser } from '../../actions/UserActions';
+import FadeInView from '../shared/FadeInView';
+import InputField from '../shared/InputField';
+import MaterialButton from '../shared/MaterialButton';
 
 const StyledView = styled.View`
   flex: 1;
   justify-content: center;
   align-items: center;
-`;
-
-const StyledTextInput = styled.TextInput`
-  font-family: flex-font;
-  height: 25;
-`;
-
-const StyledInputView = styled.View`
-  border-bottom-width: 1;
-  border-bottom-color: #8fc54b;
-  height: 25;
-  margin-bottom: 15%;
-  width: 50%;
 `;
 
 const StyledText = styled.Text`
@@ -127,34 +116,43 @@ class Signup extends Component {
       <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <StyledView>
-            <StyledText>Just need a few details before we get started</StyledText>
-            <StyledInputView>
-              <StyledTextInput
-                value={this.props.navigation.state.params.email || ''}
-                editable={false}
-              />
-            </StyledInputView>
-            <StyledInputView>
-              <StyledTextInput
-                value={this.state.fullName}
-                onChangeText={fullName => this.setState({ fullName })}
-                placeholder="First and last name"
-              />
-            </StyledInputView>
-            <StyledInputView>
-              <StyledTextInput
-                value={this.state.password}
-                onChangeText={password => this.setState({ password })}
-                placeholder="Password (6 char min)"
-                secureTextEntry
-              />
-            </StyledInputView>
+            <StyledText>
+              Just need a few details before we get started
+            </StyledText>
+            <InputField
+              value={this.props.navigation.state.params.email || ''}
+              editable={false}
+              style={{ width: 200 }}
+              containerStyle={{ marginBottom: 20 }}
+            />
+            <InputField
+              value={this.state.fullName}
+              autoFocus
+              onChangeText={fullName => this.setState({ fullName })}
+              placeholder="First and last name"
+              style={{ width: 200 }}
+              containerStyle={{ marginBottom: 20 }}
+            />
+            <InputField
+              value={this.state.password}
+              secureTextEntry
+              onChangeText={password => this.setState({ password })}
+              placeholder="Password (6 char min)"
+              style={{ width: 200 }}
+              containerStyle={{ marginBottom: 25 }}
+            />
             <CheckBox
               label="Terms and Conditions"
               checked={this.state.tAndC}
               onChange={this.handleOnCheck}
             />
-            {showButton && <Button title="SIGNUP" onPress={this.handleOnPress} />}
+            {showButton && (
+              <MaterialButton
+                text="Sign up"
+                onPress={this.handleOnPress}
+                style={{ marginTop: 15, width: 200, height: 40 }}
+              />
+            )}
           </StyledView>
         </TouchableWithoutFeedback>
       </FadeInView>

@@ -89,8 +89,8 @@ class EnterEmail extends Component {
             onChangeText={email => this.setState({ email })}
             onSubmitEditing={this.handleOnPress}
             value={this.state.email}
-            containerStyle={{ marginBottom: '25%' }}
-            labelStyle={{ marginBottom: 20 }}
+            containerStyle={{ marginBottom: '25%', width: 200 }}
+            labelStyle={{ marginBottom: 20, textAlign: 'center' }}
           />
           {this.state.emailError.length && <Text style={{ color: 'red', marginTop: 5 }}>
             {this.state.emailError}

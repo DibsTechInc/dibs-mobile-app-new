@@ -20,9 +20,11 @@ class InputField extends React.PureComponent {
     return (
       <View>
         <StudioColorBottomBorder style={this.props.containerStyle}>
-          <Label style={this.props.labelStyle}>
-            {this.props.label}
-          </Label>
+          {this.props.label ? (
+            <Label style={this.props.labelStyle}>
+              {this.props.label}
+            </Label>
+          ) : null}
           <DefaultInput
             autoFocus
             {...this.props}
