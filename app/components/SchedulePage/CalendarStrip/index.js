@@ -21,6 +21,7 @@ const Container = styled.View`
   background: ${Config.STUDIO_COLOR};
   overflow: hidden;
   padding-bottom: 10;
+  z-index: 5;
 `;
 
 const CalendarHeader = styled.Text`
