@@ -33,8 +33,10 @@ const CalendarHeader = styled.Text`
   margin-top: 4;
 `;
 
-const ArrowContainer = FlexCenter.extend`
+const ArrowContainer = styled.TouchableOpacity`
+  align-items: center;
   flex: 0.1;
+  justify-content: center;
 `;
 
 const DatesContainer = FlexCenter.extend`
