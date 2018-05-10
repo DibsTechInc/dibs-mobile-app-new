@@ -46,6 +46,15 @@ Project opened! You can now use the "Share" or "Device" buttons to view your pro
 * Make a simple change to the codebase
 * If Expo is working, your project will rebuild upon saving.
 
+### Debugging
+
+* The [React Native Debugger](https://github.com/jhen0409/react-native-debugger) is a nice tool which lets you access the console, Redux devtools, and React devtools
+* You can find instructions on how to integrate RND with Expo [here](https://www.gravitywell.co.uk/latest/rd/posts/react-native-debugger-expo-awesome/).
+* Once you finish following instructions to integrate RND with Expo, you can press `ctrl + cmd + z` to toggle the inspector
+which will reveal components in the React component tree and will also show the CSS box
+* To start the debugger (before launching Expo) run the following command: `open "rndebugger://set-debugger-loc?host=localhost&port=19001"`
+
+
 ### Troubleshooting
 
 * If your Expo app is no longer updating upon save, shake the phone and Expo will change to a menu screen. Select 'Restart Build'
