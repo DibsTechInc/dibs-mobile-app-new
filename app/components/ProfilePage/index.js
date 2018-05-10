@@ -34,7 +34,7 @@ class ProfileScreen extends Component {
   render() {
     return (
       <FadeInView style={{ backgroundColor: SOFT_GREY }}>
-        <Header navigation={this.props.navigation} iconColor={'#000'} backgroundColor={SOFT_GREY} />
+        <Header iconColor={'#000'} backgroundColor={SOFT_GREY} />
         <View style={{ backgroundColor: SOFT_GREY, flex: 1 }}>
           <SettingsList borderColor="#fff" defaultItemSize={50}>
             <SettingsList.Header headerStyle={{ marginTop: 15 }} />

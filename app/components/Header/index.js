@@ -1,17 +1,17 @@
 import React, { Component } from 'react';
-import { NavigationActions } from 'react-navigation';
+import { NavigationActions, withNavigation } from 'react-navigation';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { DRAWER_OPEN } from '../../constants/RouteConstants';
+import { DRAWER_OPEN, WHITE, DARK_TEXT_GREY } from '../../constants';
 import CartIcon from '../shared/CartIcon';
 import Icon from '../shared/Icon';
 
 const StyledView = styled.View`
+  background-color: ${props => props.backgroundColor};
   height: 50;
   justify-content: space-between;
   flex-direction: row;
   align-items: center;
-  background-color: ${props => (props.backgroundColor ? props.backgroundColor : '#fff')}
   margin-top: 35;
 `;
 
@@ -29,7 +29,7 @@ const StyledTitleView = styled.View`
 
 const StyledText = styled.Text`
   font-family: flex-font-heavy;
-  color: ${props => (props.textColor ? props.textColor : '#000')}
+  color: ${props => (props.textColor ? props.textColor : DARK_TEXT_GREY)}
 `;
 
 /**
@@ -47,8 +47,10 @@ class Header extends Component {
 
     this.navigateToDrawer = this.navigateToDrawer.bind(this);
   }
-
-  navigateToDrawer = () => {
+  /**
+   * @returns {undefined}
+   */
+  navigateToDrawer() {
     const navigateAction = NavigationActions.navigate({
       routeName: DRAWER_OPEN,
     });
@@ -62,7 +64,6 @@ class Header extends Component {
       this.props.navigation.dispatch(navigateAction);
     }
   }
-
   /**
    * @returns {JSX} XML
    */
@@ -77,7 +78,11 @@ class Header extends Component {
           />
         </StyledMenuView>
         <StyledTitleView titleWithNoCart={this.props.titleWithNoCart}>
-          {this.props.showTitle && <StyledText textColor={this.props.textColor}>{this.props.titleText}</StyledText>}
+          {this.props.showTitle && (
+            <StyledText textColor={this.props.textColor}>
+              {this.props.titleText}
+            </StyledText>
+          )}
         </StyledTitleView>
         <StyledCartView>
           {this.props.showCart && <CartIcon iconColor={this.props.iconColor} />}
@@ -91,6 +96,7 @@ Header.defaultProps = {
   showCart: true,
   showTitle: false,
   titleText: 'Title Text',
+  backgroundColor: WHITE,
 };
 
 Header.propTypes = {
@@ -104,5 +110,5 @@ Header.propTypes = {
   titleText: PropTypes.string,
 };
 
-export default Header;
+export default withNavigation(Header);
 

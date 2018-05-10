@@ -15,10 +15,17 @@ export function getUpcomingEventsLoading(state) {
 }
 
 /**
- *
  * @param {Object} state in store
- * @returns {Array<Object>}
+ * @returns {Array<Object>} the user's upcoming events
  */
 export function getUpcomingEventsData(state) {
   return getUpcomingEvents(state).data || [];
+}
+
+/**
+ * @param {OBject} state in store
+ * @returns {boolean} if user has upcoming events booked
+ */
+export function getUserHasUpcomingEvents(state) {
+  return Boolean(getUpcomingEventsData(state).length);
 }

@@ -9,4 +9,4 @@ export const SOFT_GREY = '#EFEFF4';
 export const BLACK = '#000';
 export const DARK_TEXT_GREY = '#444';
 export const SOLD_OUT_GREY = '#ccc';
-
+export const TRANSPARENT = 'transparent';

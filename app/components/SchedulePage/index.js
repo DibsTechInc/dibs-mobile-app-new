@@ -53,7 +53,6 @@ class SchedulePage extends Component {
     return (
       <FadeInView style={{ height: '100%', backgroundColor: Config.STUDIO_COLOR }}>
         <Header
-          navigation={this.props.navigation}
           iconColor={WHITE}
           backgroundColor={Config.STUDIO_COLOR}
         />

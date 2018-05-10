@@ -85,3 +85,11 @@ export function getStudioDomain(state) {
   const { domain } = getStudioData(state);
   return (domain && domain.slice(0, -1)) || 'www.ondibs.com';
 }
+
+/**
+ * @param {Object} state in store
+ * @returns {string} studio name
+ */
+export function getStudioName(state) {
+  return getStudioData(state).name || 'Dibs';
+}
