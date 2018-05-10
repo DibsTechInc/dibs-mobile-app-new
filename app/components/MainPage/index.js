@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { Dimensions } from 'react-native';
 
-import Config from '../../../config.json';
 import backgroundImg from '../../../assets/img/main-page.jpg';
 import { BLACK, WHITE, TRANSPARENT, LIGHT_GREY, SCHEDULE_ROUTE, PROFILE_ROUTE } from '../../constants';
 import {
@@ -12,10 +11,11 @@ import {
   getStudioName,
   getUserHasUpcomingEvents,
 } from '../../selectors';
-import { FadeInView, UpcomingClassSlider } from '../shared';
+import { FadeInView } from '../shared';
 import Header from '../Header';
 import { HeavyText, FlexRow } from '../styled';
 import IconLink from './IconLink';
+import UpcomingEventSlider from './UpcomingEventSlider';
 
 const BackgroundImage = styled.Image`
   left: 0;
@@ -94,7 +94,7 @@ class MainPage extends React.PureComponent {
             />
           </IconRow>
         </Content>
-        {this.props.hasUpcomingClasses ? <UpcomingClassSlider /> : null}
+        {this.props.hasUpcomingClasses ? <UpcomingEventSlider /> : null}
       </FadeInView>
     );
   }

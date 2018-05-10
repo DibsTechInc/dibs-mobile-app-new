@@ -15,7 +15,7 @@ const StyledMaterial = styled.TouchableHighlight`
 const StyledText = styled.Text`
   color: ${props => props.textColor};
   font-family: 'flex-font';
-  font-size: ${props => (props.fontSize || 12)};
+  font-size: ${props => props.fontSize};
 `;
 
 /**
@@ -47,7 +47,7 @@ class MaterialButton extends React.PureComponent {
 }
 
 MaterialButton.defaultProps = {
-  fontSize: 16,
+  fontSize: 12,
   style: {
     height: 50,
   },

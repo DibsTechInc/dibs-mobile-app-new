@@ -94,15 +94,15 @@ class EventListItem extends React.PureComponent {
             <ClassTime>
               {this.props.startTimeInLocalTZ} - {this.props.endTimeInLocalTZ}
             </ClassTime>
-            <ScheduleText>
+            <ScheduleText numberOfLines={1}>
               {this.props.locationName}
             </ScheduleText>
           </View>
           <View>
-            <HeavyText>
+            <HeavyText numberOfLines={1}>
               {this.props.name}
             </HeavyText>
-            <ScheduleText>
+            <ScheduleText numberOfLines={1}>
               {this.props.instructorName}
             </ScheduleText>
           </View>
@@ -140,7 +140,7 @@ const mapStateToProps = (state, props) => {
   return {
     passid: getUsersNextPassId(state)(props.eventid),
     valueBack,
-    formattedValueBack: formatCurrency(valueBack, { precision: (valueBack % 1 && 2), code: props.currency }),
+    formattedValueBack: formatCurrency(valueBack, { code: props.currency }),
     alreadyPreviewed: state.events.previewed,
   };
 };

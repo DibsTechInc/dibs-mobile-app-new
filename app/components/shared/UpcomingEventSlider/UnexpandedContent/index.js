@@ -6,6 +6,7 @@ import { Svg, Path } from 'react-native-svg';
 
 import { GREY, TEXT_GREY, DARK_TEXT_GREY, SCHEDULE_ROUTE } from '../../../../constants';
 import { SpaceBetweenRow, HeavyText } from '../../../styled';
+import EventListItem from './EventListItem';
 
 const Container = styled.View`
   align-items: center;
@@ -22,7 +23,7 @@ const SwipeInstructions = styled.Text`
 
 const TopRow = SpaceBetweenRow.extend`
   align-items: center;
-  margin-top: 5;
+  margin-vertical: 5;
   padding-horizontal: 15;
   width: 100%;
 `;
@@ -99,6 +100,9 @@ class Unexpanded extends React.PureComponent {
             </Svg>
           </UpcomingClassLink>
         </TopRow>
+        {this.props.events.map(event => (
+          <EventListItem key={event.eventid} {...event} />
+        ))}
       </Container>
     );
   }
@@ -106,6 +110,7 @@ class Unexpanded extends React.PureComponent {
 
 Unexpanded.propTypes = {
   navigation: PropTypes.shape().isRequired,
+  events: PropTypes.arrayOf(PropTypes.shape()).isRequired,
 };
 
 export default withNavigation(Unexpanded);
