@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Svg } from 'react-native';
+import { Svg, Path } from 'react-native-svg';
 import SlidingUpPanel from 'rn-sliding-up-panel';
 import styled from 'styled-components';
 import { promisify } from 'bluebird';
 
-import { WHITE, HEIGHT } from '../../../constants';
+import { WHITE, HEIGHT, LIGHT_GREY, GREY } from '../../../constants';
+import UnexpandedContent from './UnexpandedContent';
 
 const FULL_HEIGHT = HEIGHT - 30;
 const SHORTENED_HEIGHT = (HEIGHT / 2) - 20;
@@ -37,9 +38,11 @@ class UpcomingClassSlider extends React.PureComponent {
       dragTop: SHORTENED_HEIGHT,
       dragBottom: SHORTENED_HEIGHT,
       expanded: false,
+      expanding: false,
     };
     this.onDragStart = this.onDragStart.bind(this);
     this.onDragEnd = this.onDragEnd.bind(this);
+    this.getArrowPathStr = this.getArrowPathStr.bind(this);
   }
   /**
    * @returns {undefined}
@@ -60,26 +63,36 @@ class UpcomingClassSlider extends React.PureComponent {
     else this.handleDragUp();
   }
   /**
+   * @returns {string} path for arrow icon
+   */
+  getArrowPathStr() {
+    if (this.state.expanding) return '';
+    if (this.state.expanded) return 'M 5 2 L 20 10 L 35 2';
+    return 'M 2 2 L 38 2';
+  }
+  /**
    * @returns {undefined}
    */
   async handleDragUp() {
+    await new Promise(res => this.setState({ expanding: true }, res));
     await new Promise(res => this.slider.transitionTo({
       toValue: FULL_HEIGHT,
       duration: 100,
       onAnimationEnd: res,
     }));
-    this.setState({ expanded: true });
+    this.setState({ expanded: true, expanding: false });
   }
   /**
    * @returns {undefined}
    */
   async handleDragDown() {
+    await new Promise(res => this.setState({ expanding: true }, res));
     await new Promise(res => this.slider.transitionTo({
       toValue: SHORTENED_HEIGHT,
       duration: 100,
       onAnimationEnd: res,
     }));
-    this.setState({ expanded: false });
+    this.setState({ expanded: false, expanding: false });
   }
   /**
    * render
@@ -97,6 +110,18 @@ class UpcomingClassSlider extends React.PureComponent {
         allowMomentum={false}
       >
         <Panel>
+          <Svg style={{ marginTop: 5 }} width={40} height={12}>
+            <Path
+              stroke={LIGHT_GREY}
+              strokeWidth={2}
+              strokeLinecap="round"
+              fill="none"
+              d={this.getArrowPathStr()}
+            />
+          </Svg>
+          {this.state.expanded || this.state.expanding ? null : (
+            <UnexpandedContent />
+          )}
         </Panel>
       </SlidingUpPanel>
     );

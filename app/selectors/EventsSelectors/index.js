@@ -82,7 +82,7 @@ export const getScheduleEvents = createUnboundedSelector(
     getUpcomingEventsData,
   ],
   (events, currency, timeFormat, cartItems, upcomingEvents) => events.map(({ instructor, location, ...event }) => {
-    const formatLocalTime = time => moment(time).tz(event.mainTZ).format(timeFormat || 'LT')
+    const formatLocalTime = time => moment(time).tz(event.mainTZ).format(timeFormat || 'LT');
     const eventItemsInCart = cartItems.filter(cartEvent => cartEvent.eventid === event.id);
     const quantityInCart = eventItemsInCart.map(({ quantity }) => quantity)
                                            .reduce((acc, quantity) => acc + quantity, 0);

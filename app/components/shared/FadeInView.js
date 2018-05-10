@@ -42,7 +42,7 @@ class FadeInView extends React.Component {
 
 FadeInView.propTypes = {
   style: PropTypes.shape(),
-  // children: PropTypes.oneOfType([PropTypes.shape(), PropTypes.arrayOf(PropTypes.shape())]),
+  children: PropTypes.oneOfType([PropTypes.node, PropTypes.arrayOf(PropTypes.node)]),
 };
 
 export default FadeInView;
