@@ -52,7 +52,7 @@ Project opened! You can now use the "Share" or "Device" buttons to view your pro
 * You can find instructions on how to integrate RND with Expo [here](https://www.gravitywell.co.uk/latest/rd/posts/react-native-debugger-expo-awesome/).
 * Once you finish following instructions to integrate RND with Expo, you can press `ctrl + cmd + z` to toggle the inspector
 which will reveal components in the React component tree and will also show the CSS box
-* To start the debugger (before launching Expo) run the following command: `open "rndebugger://set-debugger-loc?host=localhost&port=19001"`
+* To start the debugger (before launching Expo) run the following command: `open "rndebugger://set-debugger-loc?host=localhost&port=PORT"` (the port may vary)
 
 
 ### Troubleshooting

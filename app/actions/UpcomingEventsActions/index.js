@@ -19,9 +19,10 @@ export const {
 });
 
 /**
+ * @param {function} callback on complete
  * @returns {function} thunk
  */
-export function requestUserEvents() {
+export function requestUserEvents(callback = () => {}) {
   return async function innerRequestUserEvents(dispatch, getState, dibsFetch) {
     const state = getState();
     if (state.upcomingEvents.loading) return;
@@ -40,13 +41,15 @@ export function requestUserEvents() {
       console.log(err);
     }
     dispatch(setUpcomingEventsLoadingFalse());
+    callback();
   };
 }
 
 /**
+ * @param {function} callback on complete
  * @returns {function} thunk
  */
-export function syncUserEvents() {
+export function syncUserEvents(callback = () => {}) {
   return async function innerSyncUserEvents(dispatch, getState, dibsFetch) {
     const state = getState();
     if (state.upcomingEvents.syncing) return;
@@ -61,6 +64,6 @@ export function syncUserEvents() {
       console.log(err);
     }
     dispatch(setSyncingEventsFalse());
-    dispatch(requestUserEvents());
+    dispatch(requestUserEvents(callback));
   };
 }
