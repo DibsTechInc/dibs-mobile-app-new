@@ -4,14 +4,18 @@ import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { Dimensions } from 'react-native';
 
-import Config from '../../../config.json';
 import backgroundImg from '../../../assets/img/main-page.jpg';
 import { BLACK, WHITE, TRANSPARENT, LIGHT_GREY, SCHEDULE_ROUTE, PROFILE_ROUTE } from '../../constants';
-import { getUserFirstName, getStudioName } from '../../selectors';
+import {
+  getUserFirstName,
+  getStudioName,
+  getUserHasUpcomingEvents,
+} from '../../selectors';
 import { FadeInView } from '../shared';
 import Header from '../Header';
 import { HeavyText, FlexRow } from '../styled';
 import IconLink from './IconLink';
+import UpcomingEventSlider from './UpcomingEventSlider';
 
 const BackgroundImage = styled.Image`
   left: 0;
@@ -24,7 +28,8 @@ const BackgroundImage = styled.Image`
 
 const Content = styled.View`
   flex: 1;
-  margin-bottom: 100;
+  justify-content: ${props => (props.hasUpcomingClasses ? 'center' : 'flex-end')}
+  margin-bottom: ${props => (props.hasUpcomingClasses ? 200 : 150)};
 `;
 
 const Greeting = HeavyText.extend`
@@ -63,7 +68,7 @@ class MainPage extends React.PureComponent {
           iconColor={WHITE}
           backgroundColor={TRANSPARENT}
         />
-        <Content style={{ justifyContent: 'flex-end' }}>
+        <Content hasUpcomingClasses={this.props.hasUpcomingClasses}>
           <Greeting>
             Hi {this.props.userFirstName}!
           </Greeting>
@@ -89,6 +94,7 @@ class MainPage extends React.PureComponent {
             />
           </IconRow>
         </Content>
+        {this.props.hasUpcomingClasses ? <UpcomingEventSlider /> : null}
       </FadeInView>
     );
   }
@@ -97,11 +103,13 @@ class MainPage extends React.PureComponent {
 MainPage.propTypes = {
   userFirstName: PropTypes.string.isRequired,
   studioName: PropTypes.string.isRequired,
+  hasUpcomingClasses: PropTypes.bool.isRequired,
 };
 
 const mapStateToProps = state => ({
   userFirstName: getUserFirstName(state),
   studioName: getStudioName(state),
+  hasUpcomingClasses: getUserHasUpcomingEvents(state),
 });
 const mapDispatchToProps = {};
 

@@ -42,7 +42,7 @@ export function getStudioCurrency(state) {
 
 export const getStudioCustomTimeFormat = createSelector(
   getStudioDibsConfig,
-  dibsConfig => (dibsConfig.customTimeFormat || '')
+  dibsConfig => (dibsConfig.customTimeFormat || 'LT')
 );
 
 /**
@@ -50,7 +50,7 @@ export const getStudioCustomTimeFormat = createSelector(
  * @returns {number} Dibs studio id
  */
 export function getDibsStudioId(state) {
-  return getStudio(state).id || null;
+  return getStudioData(state).id || null;
 }
 
 /**
@@ -58,7 +58,7 @@ export function getDibsStudioId(state) {
  * @returns {Object} studio country
  */
 export function getStudioCountry(state) {
-  return getStudio(state).country || '';
+  return getStudioData(state).country || 'US';
 }
 
 /**
@@ -66,7 +66,7 @@ export function getStudioCountry(state) {
  * @returns {boolean} studio waiver requirements
  */
 export function getStudioWaiverRequirement(state) {
-  return getStudio(state).requiresWaiverSigned || false;
+  return getStudioData(state).requiresWaiverSigned || false;
 }
 
 /**
@@ -93,3 +93,8 @@ export function getStudioDomain(state) {
 export function getStudioName(state) {
   return getStudioData(state).name || 'Dibs';
 }
+
+export const getStudioShortDateFormat = createSelector(
+  getStudioCountry,
+  country => ({ US: 'M/D', UK: 'D/M' })[country]
+);

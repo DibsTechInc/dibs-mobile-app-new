@@ -6,5 +6,6 @@ export { default as InputField } from './InputField';
 export { default as MaterialButton } from './MaterialButton';
 export { default as MaterialPanel } from './MaterialPanel';
 export { default as Notification } from './Notification';
+export { default as UpcomingEventSlider } from './UpcomingEventSlider';
 export { default as UpcomingClasses } from './UpcomingClasses';
 export { default as TransactionBreakdown } from './TransactionBreakdown';

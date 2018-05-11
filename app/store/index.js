@@ -5,9 +5,9 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import { dibsFetch } from '../util';
 import reducers from '../reducers';
 
-console.log(process.env.NODE_ENV);
+const dibsThunk = thunk.withExtraArgument(dibsFetch);
 
 export default createStore(
   reducers,
-  composeWithDevTools(applyMiddleware(thunk.withExtraArgument(dibsFetch)))
+  composeWithDevTools(applyMiddleware(dibsThunk))
 );

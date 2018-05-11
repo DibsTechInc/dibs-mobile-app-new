@@ -3,12 +3,13 @@ import { Provider } from 'react-redux';
 import { Font } from 'expo';
 import styled from 'styled-components';
 import { AsyncStorage } from 'react-native';
+import Promise from 'bluebird';
 import { WHITE } from './app/constants';
 import store from './app/store'; // lol App store...
 import Config from './config.json';
 import Navigator from './app/router';
 import DibsLoader from './app/components/shared/DibsLoader';
-import { requestStudioData, requestUserData, requestCreditCardInfo } from './app/actions';
+import { requestStudioData, requestUserData, requestCreditCardInfo, syncUserEvents } from './app/actions';
 
 // Native apps can only load downloaded fronts stored in assets/fonts folder
 import SourceSansProBold from './assets/fonts/SourceSansPro-Bold.ttf';
@@ -49,14 +50,15 @@ class App extends Component {
    */
   async getAssets() {
     const token = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
+    await new Promise(res => store.dispatch(requestStudioData(res)));
     await Promise.all([
       Font.loadAsync({
         'flex-font': SourceSansProRegular,
         'flex-font-heavy': SourceSansProBold,
       }),
-      new Promise(res => store.dispatch(requestStudioData(res))),
       token && new Promise(res => store.dispatch(requestUserData(res))),
       token && new Promise(res => store.dispatch(requestCreditCardInfo(res))),
+      token && new Promise(res => store.dispatch(syncUserEvents(res))),
     ]);
     this.setState({ fetchedAssets: true, userToken: token });
   }
