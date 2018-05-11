@@ -1,9 +1,8 @@
 import React, { PureComponent } from 'react';
-import { ActivityIndicator, View, Image } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { connect } from 'react-redux';
 import Promise from 'bluebird';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 import { CreditCardInput } from 'react-native-credit-card-input';
 import FadeInView from '../shared/FadeInView';
 import GreenCard from './greencc.png';
@@ -209,7 +208,7 @@ class PaymentInfo extends PureComponent {
       displayHeight = 350;
     } else if (this.state.valid || hasCC) {
       creditCardDisplay = paymentDisplay;
-      displayHeight = 180;
+      displayHeight = 120;
     }
 
     const editLabel = this.props.isUpdatingCard ? 'Cancel' : 'Change';
@@ -224,7 +223,7 @@ class PaymentInfo extends PureComponent {
           headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}
           headerStyle={{ marginLeft: 10 }}
         >
-          <View style={{ justifyContent: 'center', alignItems: 'center', margin: 10, height: 250 }}>
+          <View style={{ justifyContent: 'center', alignItems: 'center', margin: 10, height: 220 }}>
             <ActivityIndicator />
           </View>
         </MaterialPanel>

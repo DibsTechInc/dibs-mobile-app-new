@@ -12,8 +12,8 @@ import {
   getCartValueBack,
   getFormattedCartTotal,
 } from '../../selectors/CartSelectors/PurchaseBreakdown';
-import { LIGHT_GREY, SOFT_GREY, BLACK } from '../../constants';
-import Icon from '../shared/Icon';
+import { LIGHT_GREY, SOFT_GREY, BLACK, WHITE } from '../../constants';
+import { Icon, CustomStatusBar } from '../shared';
 import CartItem from './CartItem';
 import CartTransaction from './CartTransaction';
 import PromoField from './PromoField';
@@ -25,6 +25,7 @@ import {
 } from '../../constants/RouteConstants';
 
 import MaterialButton from '../shared/MaterialButton';
+import Config from '../../../config.json';
 
 const StyledScrollView = styled.ScrollView`
   flex: 1;
@@ -33,19 +34,14 @@ const StyledScrollView = styled.ScrollView`
 const StyledTopView = styled.View`
   flex-direction: row;
   position: relative;
-  backgroundColor: #fff;
+  backgroundColor: ${Config.STUDIO_COLOR};
   border-width: 1px;
-  border-top-color: #fff;
-  border-left-color: #fff;
-  border-right-color: #fff;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
+  border-top-color: ${Config.STUDIO_COLOR};
+  border-left-color: ${Config.STUDIO_COLOR};
+  border-right-color: ${Config.STUDIO_COLOR};
   border-bottom-width: 1px;
-  border-bottom-color: ${LIGHT_GREY};
-  margin-top: 30px;
-  margin-left: 10px;
-  margin-right: 10px;
-  height: 50;
+  border-bottom-color: ${Config.STUDIO_COLOR};
+  height: 80;
   justify-content: center;
   align-items: center;
 `;
@@ -53,7 +49,6 @@ const StyledTopView = styled.View`
 const StyledCheckoutView = styled.View`
   justify-content: space-between;
   align-items: center;
-  height: 100px;
   margin: 6px;
   marginBottom: 30px;
   background-color: ${SOFT_GREY};
@@ -72,6 +67,7 @@ const StyledCenterText = styled.Text`
   font-family: 'flex-font-heavy';
   text-align: center;
   font-size: 16px;
+  color: ${WHITE}
 `;
 
 /**
@@ -133,10 +129,11 @@ class CartPage extends Component {
     if (!this.props.cart.length) {
       return (
         <FadeInView>
+          <CustomStatusBar backgroundColor={Config.STUDIO_COLOR} barStyle="light-content" />
           <StyledTopView>
             <Icon
               iconName="arrow-left"
-              iconColor={BLACK}
+              iconColor={WHITE}
               onPress={this.toPreviousPage}
               style={{ position: 'absolute', left: 0, fontSize: 11 }}
             />
@@ -179,10 +176,11 @@ class CartPage extends Component {
 
     return (
       <FadeInView style={{ backgroundColor: SOFT_GREY }}>
+        <CustomStatusBar backgroundColor={Config.STUDIO_COLOR} barStyle="light-content" />
         <StyledTopView>
           <Icon
             iconName="arrow-left"
-            iconColor={BLACK}
+            iconColor={WHITE}
             onPress={this.toPreviousPage}
             style={{ position: 'absolute', left: 0, fontSize: 11 }}
           />
@@ -198,7 +196,7 @@ class CartPage extends Component {
           <CartTransaction />
         </StyledScrollView>
         <StyledCheckoutView>
-          <View>
+          <View style={{ marginBottom: 30 }}>
             <StyledSavingsText>{renderValueBackMessage}</StyledSavingsText>
           </View>
           <FlexRow>

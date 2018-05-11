@@ -6,6 +6,7 @@ import { Dimensions } from 'react-native';
 
 import backgroundImg from '../../../assets/img/main-page.jpg';
 import { BLACK, WHITE, TRANSPARENT, LIGHT_GREY, SCHEDULE_ROUTE, PROFILE_ROUTE } from '../../constants';
+import { FadeInView, CustomStatusBar } from '../shared';
 import {
   getUserFirstName,
   getStudioName,
@@ -63,6 +64,7 @@ class MainPage extends React.PureComponent {
   render() {
     return (
       <FadeInView style={{ position: 'relative', backgroundColor: BLACK }}>
+        <CustomStatusBar backgroundColor={'transparent'} barStyle="light-content" />
         <BackgroundImage source={backgroundImg} />
         <Header
           iconColor={WHITE}

@@ -40,7 +40,7 @@ export const MaterialPanelView = styled.View`
   padding-bottom: 20px;
   shadow-color: ${BLACK};
   shadow-opacity: 0.2;
-  shadow-radius: 4;
+  shadow-radius: 2;
   width: ${props => (props.width || (Dimensions.get('window').width))};
 `;
 

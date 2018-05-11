@@ -16,7 +16,7 @@ import {
 } from '../../constants';
 import { getSortedCartEvents, getConfirmationState } from '../../selectors';
 import Config from '../../../config.json';
-import Icon from '../shared/Icon';
+import { Icon, CustomStatusBar, DibsLoader } from '../shared';
 import CartItem from '../CartPage/CartItem';
 import CartTransaction from '../CartPage/CartTransaction';
 import PaymentInfo from './PaymentInfo';
@@ -24,25 +24,20 @@ import { MaterialPanelView } from '../styled';
 import { submitCartForPurchase } from '../../actions';
 
 const StyledScrollView = styled.ScrollView`
-  flex: 1;
+  flex: 2;
 `;
 
 const StyledTopView = styled.View`
   flex-direction: row;
   position: relative;
-  backgroundColor: #fff;
+  backgroundColor: ${Config.STUDIO_COLOR};
   border-width: 1px;
-  border-top-color: #fff;
-  border-left-color: #fff;
-  border-right-color: #fff;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
+  border-top-color: ${Config.STUDIO_COLOR};
+  border-left-color: ${Config.STUDIO_COLOR};
+  border-right-color: ${Config.STUDIO_COLOR};
   border-bottom-width: 1px;
-  border-bottom-color: ${LIGHT_GREY};
-  margin-top: 30px;
-  margin-left: 10px;
-  margin-right: 10px;
-  height: 50;
+  border-bottom-color: ${Config.STUDIO_COLOR};
+  height: 80;
   justify-content: center;
   align-items: center;
 `;
@@ -70,6 +65,7 @@ const StyledCenterText = styled.Text`
   font-family: 'flex-font-heavy';
   text-align: center;
   font-size: 16px;
+  color: ${WHITE};
 `;
 
 /**
@@ -145,7 +141,6 @@ class ConfirmationPage extends Component {
    * @returns {JSX} XML
    */
   render() {
-    console.log(this.props.confirmedPurchases, 'confirmed?')
     const purchaseButton = [
       <StyledContinueButton />,
     ];
@@ -180,7 +175,7 @@ class ConfirmationPage extends Component {
         }}
         leftButtons={renderLeftButtons}
         onLeftButtonsActivate={this.handlePurchase}
-        leftButtonsActivationDistance={200}
+        leftButtonsActivationDistance={150}
       >
         <View style={{ flexDirection: 'row' }}>
           <Text style={{ textAlign: 'center', color: WHITE, flex: 1 }}>Swipe to pay</Text>
@@ -189,12 +184,17 @@ class ConfirmationPage extends Component {
       </Swipeable>
     </View>);
 
+    if (this.state.isProcessingPayment) {
+      return <FadeInView style={{ backgroundColor: Config.STUDIO_COLOR }}><DibsLoader showText /></FadeInView>;
+    }
+
     return (
       <FadeInView style={{ backgroundColor: SOFT_GREY }}>
-        <StyledTopView style={{ marginBottom: -10 }}>
+        <CustomStatusBar backgroundColor={Config.STUDIO_COLOR} barStyle="light-content" />
+        <StyledTopView>
           <Icon
             iconName="arrow-left"
-            iconColor={BLACK}
+            iconColor={WHITE}
             onPress={this.toPreviousPage}
             style={{ position: 'absolute', left: 0, fontSize: 11 }}
           />
@@ -215,7 +215,7 @@ class ConfirmationPage extends Component {
           </MaterialPanelView>
         </StyledScrollView>
         <StyledCheckoutView>
-          {this.state.isProcessingPayment ? <ActivityIndicator /> : renderPurchaseButton}
+          {renderPurchaseButton}
         </StyledCheckoutView>
       </FadeInView>
     );

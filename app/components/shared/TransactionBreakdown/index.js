@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import MaterialPanel from '../../shared/MaterialPanel';
+import { MaterialPanel } from '../../shared';
 import { LIGHT_GREY } from '../../../constants/ColorConstants';
 
 import BreakdownRow from './BreakdownRow';
@@ -34,6 +34,7 @@ class TransactionBreakdown extends Component {
         headerStyle={{ marginLeft: 10 }}
       >
         <StyledBreakDownView>
+          {this.props.className && <BreakdownRow label="Name" value={this.props.className} />}
           <BreakdownRow label="Subtotal" value={this.props.formattedSubtotal} />
           {this.props.promoCodeAmount > 0 && <BreakdownRow label="Promo Code" value={this.props.formattedPromoCodeAmount} />}
           {this.props.flashCreditAmount > 0 && <BreakdownRow label="Flash Credit" value={this.props.formattedFlashCreditAmount} />}
@@ -42,6 +43,7 @@ class TransactionBreakdown extends Component {
           {this.props.studioCreditAmount > 0 && <BreakdownRow label="Studio Credit" value={this.props.formattedStudioCreditAmount} />}
           {this.props.rafCreditAmount > 0 && <BreakdownRow label="Refer a Friend Credit" value={this.props.formattedRAFCreditAmount} />}
           {this.props.globalCreditAmount > 0 && <BreakdownRow label="Global Credit" value={this.props.formattedGlobalCreditAmount} />}
+          {this.props.classDiscountAmount > 0 && <BreakdownRow label="Global Credit" value={this.props.formattedClassDiscountAmount} />}
           <StyledLine />
           <BreakdownRow
             label="Total"
@@ -72,6 +74,9 @@ TransactionBreakdown.propTypes = {
   formattedGlobalCreditAmount: PropTypes.string,
   taxAmount: PropTypes.number,
   formattedTaxAmount: PropTypes.string,
+  classDiscountAmount: PropTypes.number,
+  formattedClassDiscountAmount: PropTypes.string,
+  className: PropTypes.string,
 };
 
 export default TransactionBreakdown;

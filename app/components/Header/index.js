@@ -12,7 +12,7 @@ const StyledView = styled.View`
   justify-content: space-between;
   flex-direction: row;
   align-items: center;
-  margin-top: 35;
+  margin-top: 15;
 `;
 
 const StyledMenuView = styled.View`

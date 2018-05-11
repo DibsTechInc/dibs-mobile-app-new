@@ -4,10 +4,15 @@ import { connect } from 'react-redux';
 import { FadeInView, UpcomingClasses } from '../shared';
 import { getConfirmedTransactionsByEvent } from '../../selectors';
 
+/**
+ * @class ReceiptPage
+ * @extends {Component}
+ */
 class ReceiptPage extends Component {
+  /**
+   * @returns {JSX} XML
+   */
   render() {
-    // const confirmedPurchases = this.props.navigation.state && this.props.navigation.state.params.confirmedPurchases;
-
     return (
       <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
         <UpcomingClasses confirmedPurchases={this.props.purchasedTransactions} />
@@ -17,11 +22,7 @@ class ReceiptPage extends Component {
 }
 
 ReceiptPage.propTypes = {
-  navigation: PropTypes.shape(),
-};
-
-ReceiptPage.propTypes = {
-  navigation: PropTypes.shape(),
+  purchasedTransactions: PropTypes.arrayOf(PropTypes.shape()),
 };
 
 const mapStateToProps = state => ({

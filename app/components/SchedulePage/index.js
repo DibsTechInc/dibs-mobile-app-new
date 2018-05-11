@@ -14,6 +14,7 @@ import { WHITE, SOFT_GREY, BLACK } from '../../constants';
 import FadeInView from '../shared/FadeInView';
 import CalendarStrip from './CalendarStrip';
 import EventList from './EventList';
+import { CustomStatusBar } from '../shared';
 
 const Shadow = styled.View`
   background: ${SOFT_GREY};
@@ -52,6 +53,7 @@ class SchedulePage extends Component {
   render() {
     return (
       <FadeInView style={{ height: '100%', backgroundColor: Config.STUDIO_COLOR }}>
+        <CustomStatusBar backgroundColor={Config.STUDIO_COLOR} barStyle="light-content" />
         <Header
           iconColor={WHITE}
           backgroundColor={Config.STUDIO_COLOR}

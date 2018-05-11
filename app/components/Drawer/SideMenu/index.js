@@ -10,6 +10,7 @@ import {
   SCHEDULE_ROUTE,
   WHITE,
   DARK_TEXT_GREY,
+  LANDING_ROUTE,
 } from '../../../constants';
 import {
   getUsersFullName,
@@ -17,6 +18,7 @@ import {
   getFormattedUserFlashCreditAmount,
   getUsersFirstPassName,
 } from '../../../selectors';
+import { logOutUser } from '../../../actions';
 import CartIcon from '../../shared/CartIcon';
 import { SpaceBetweenRow } from '../../styled';
 import BalanceDisplay from './BalanceDisplay';
@@ -130,6 +132,14 @@ class SideMenu extends React.PureComponent {
           label="Schedule"
           route={SCHEDULE_ROUTE}
         />
+        <NavLink
+          iconName="times"
+          label="Logout"
+          route={LANDING_ROUTE}
+          loggingOut
+          logOutUser={this.props.logOutUser}
+
+        />
       </StyledContainer>
     );
   }
@@ -141,6 +151,11 @@ SideMenu.propTypes = {
   flashCreditBalance: PropTypes.string,
   nextPassName: PropTypes.string,
   navigation: PropTypes.shape(),
+  logOutUser: PropTypes.func,
+};
+
+const mapDispatchToProps = {
+  logOutUser,
 };
 
 const mapStateToProps = state => ({
@@ -150,4 +165,4 @@ const mapStateToProps = state => ({
   nextPassName: getUsersFirstPassName(state),
 });
 
-export default connect(mapStateToProps)(SideMenu);
+export default connect(mapStateToProps, mapDispatchToProps)(SideMenu);

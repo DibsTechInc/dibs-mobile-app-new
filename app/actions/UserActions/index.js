@@ -64,6 +64,24 @@ export function validateEmail(email, callback = () => {}) {
 }
 
 /**
+ * @returns {function} thunk
+ */
+export function recordStudioVisit() {
+  return async function innerRecordStudioVisit(dispatch, getState, dibsFetch) {
+    const { user, studio } = getState();
+    if (!user || !user.id) return;
+    console.log(studio.data.id, 'studioid')
+    try {
+      await dibsFetch(`/api/user/visit/${studio.data.id}`, {
+        method: 'POST',
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+}
+
+/**
  * @param {object} payload user registration data
  * @param {function} callback on complete
  * @returns {function} thunk
@@ -76,6 +94,8 @@ export function signUpUser(payload, callback) {
         body: payload,
       });
       if (res.success) {
+        dispatch(setUser(res.user));
+        dispatch(recordStudioVisit());
         return callback(MAIN_ROUTE);
       }
       return callback(null);
@@ -104,6 +124,7 @@ export function submitLogin(email, password, callback) {
       });
       if (res.success) {
         dispatch(setUser(res.user));
+        dispatch(recordStudioVisit());
         dispatch(requestCreditCardInfo());
         callback(res.user);
       } else {

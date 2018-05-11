@@ -36,6 +36,7 @@ export const getConfirmedTransactionsByEvent = createSelector(
         valueBack,
         amount,
         classDescription: confirmedEvent.description,
+        className: confirmedEvent.name,
         studioAddress: confirmedEvent.address,
       };
 

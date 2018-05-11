@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Animated } from 'react-native';
+import { Animated, Text } from 'react-native';
 import styled from 'styled-components';
 import { WHITE } from '../../constants';
+import FadeInView from './FadeInView';
 
 const LoaderView = styled.View`
   align-items: center;
@@ -119,11 +120,14 @@ class DibsLoader extends React.Component {
    */
   render() {
     return (
-      <LoaderView {...this.props}>
-        <DibsLoaderDot {...this.props} style={this.getFirstDotStyle()} />
-        <DibsLoaderDot {...this.props} style={this.getSecondDotStyle()} />
-        <DibsLoaderDot {...this.props} style={this.getThirdDotStyle()} />
-      </LoaderView>
+      <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
+        {this.props.showText && <Text style={{ marginBottom: 50, color: '#fff', fontSize: 13, fontFamily: 'flex-font' }}>If only taking vitamins could be classified as working out</Text>}
+        <LoaderView {...this.props}>
+          <DibsLoaderDot {...this.props} style={this.getFirstDotStyle()} />
+          <DibsLoaderDot {...this.props} style={this.getSecondDotStyle()} />
+          <DibsLoaderDot {...this.props} style={this.getThirdDotStyle()} />
+        </LoaderView>
+      </FadeInView>
     );
   }
 }
@@ -133,6 +137,7 @@ DibsLoader.defaultProps = {
   dotColor: WHITE,
   width: 200,
   duration: 500,
+  showText: false,
 };
 
 const stringOrNum = PropTypes.oneOfType([
@@ -145,6 +150,8 @@ DibsLoader.propTypes = {
   dotColor: PropTypes.string,
   width: stringOrNum,
   duration: PropTypes.number,
+  showText: PropTypes.bool,
+  backgroundColor: PropTypes.string,
 };
 
 export default DibsLoader;

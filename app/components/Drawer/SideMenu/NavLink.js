@@ -49,6 +49,14 @@ class NavLink extends React.PureComponent {
     const navigateAction = NavigationActions.navigate({
       routeName: this.props.route,
     });
+
+    if (this.props.loggingOut) {
+      this.props.logOutUser(() => {
+        this.props.navigation.dispatch(navigateAction);
+      });
+      return;
+    }
+
     this.props.navigation.dispatch(navigateAction);
   }
   /**
@@ -80,6 +88,8 @@ NavLink.propTypes = {
   label: PropTypes.string.isRequired,
   route: PropTypes.string.isRequired,
   navigation: PropTypes.shape().isRequired,
+  loggingOut: PropTypes.bool,
+  logOutUser: PropTypes.func,
 };
 
 export default withNavigation(NavLink);

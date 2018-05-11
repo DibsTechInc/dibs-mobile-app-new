@@ -1,8 +1,11 @@
 import React, { PureComponent } from 'react';
-import { View, Text } from 'react-native';
+import PropTypes from 'prop-types';
+import { View, Text, Alert } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import FadeInView from '../FadeInView';
 import TransactionBreakdown from '../TransactionBreakdown';
+import { MaterialButton } from '../../shared';
+import Config from '../../../../config.json';
 
 const LATITUDE = 40.726920;
 const LONGITUDE = -73.995358;
@@ -26,8 +29,16 @@ class UpcomingClass extends PureComponent {
    */
   render() {
     return (
-      <FadeInView style={{ marginTop: 30 }}>
-        {/* <TransactionBreakdown /> */}
+      <FadeInView style={{ marginTop: 20 }}>
+        <TransactionBreakdown
+          className={this.props.class.className}
+          formattedSubtotal={`$${this.props.class.original_price}`}
+          taxAmount={this.props.class.tax_amount}
+          formattedTaxAmount={`${this.props.class.tax_amount}`}
+          classDiscountAmount={this.props.class.discount_amount}
+          formattedClassDicountAmount={`$${this.props.class.discount_amount}`}
+          formattedTotal={`$${this.props.class.chargeAmount}`}
+        />
         <MapView
           ref={(ref) => { this.map = ref; }}
           style={{ flex: 1, marginBottom: 30 }}
@@ -47,16 +58,20 @@ class UpcomingClass extends PureComponent {
         <View style={{ flex: 1, margin: 10, marginTop: 10, marginLeft: 10 }}>
           <View>
             <Text style={{ fontFamily: 'flex-font-heavy' }}>Class Description:</Text>
-            <Text style={{ fontFamily: 'flex-font' }}>blah blah blah</Text>
+            <Text style={{ fontFamily: 'flex-font' }}>{this.props.class.classDescription.length ? this.props.class.classDescription : 'No Class Description.'}</Text>
           </View>
           <View style={{ marginTop: 20 }}>
             <Text style={{ fontFamily: 'flex-font-heavy' }}>Drop Policy:</Text>
-            <Text style={{ fontFamily: 'flex-font' }}>blah blah blah</Text>
+            <Text style={{ fontFamily: 'flex-font' }}>{Config.STUDIO_DROP_POLICY}</Text>
           </View>
         </View>
       </FadeInView>
     );
   }
 }
+
+UpcomingClass.propTypes = {
+  class: PropTypes.shape(),
+};
 
 export default UpcomingClass;
