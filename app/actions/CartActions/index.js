@@ -15,7 +15,7 @@ import {
   requestEventData,
   setUser,
   setTransactionsConfirmed,
-  requestUpcomingEvents,
+  requestUserEvents,
 } from '../';
 
 const range = n => [...Array(n)]; // JS implementation of Python's range() fn
@@ -223,7 +223,7 @@ export function submitCartForPurchase(callback) {
         dispatch(setUser(res.user));
         dispatch(setTransactionsConfirmed(res.transactions));
         callback(null);
-        dispatch(requestUpcomingEvents()); // implement with upcomming classes
+        dispatch(requestUserEvents()); // implement with upcomming classes
         // dispatch(requestUserTransactions()); implement with transaction history
         // dispatch(performTransactionAnalytics(resp.transactions)); not sure works with native
         dispatch(clearPromoCodeData());

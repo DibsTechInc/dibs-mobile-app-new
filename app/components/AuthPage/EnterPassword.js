@@ -53,7 +53,6 @@ class EnterPassword extends Component {
    */
   async handleOnPress() {
     const { email } = this.props.navigation.state.params;
-    console.log(email, this.state.password);
 
     await new Promise(res => this.setState({ isLoading: true }, res));
     const user = await new Promise(res => this.props.submitLogin(email, this.state.password, res));

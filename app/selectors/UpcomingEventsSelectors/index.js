@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 /**
  * @param {Object} state in store
  * @returns {Object} upcoming event state
@@ -29,3 +31,4 @@ export function getUpcomingEventsData(state) {
 export function getUserHasUpcomingEvents(state) {
   return Boolean(getUpcomingEventsData(state).length);
 }
+
