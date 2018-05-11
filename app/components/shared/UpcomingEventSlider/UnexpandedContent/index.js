@@ -3,8 +3,9 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { withNavigation } from 'react-navigation';
 import { Svg, Path } from 'react-native-svg';
+import { ScrollView } from 'react-native';
 
-import { GREY, TEXT_GREY, DARK_TEXT_GREY, SCHEDULE_ROUTE } from '../../../../constants';
+import { GREY, TEXT_GREY, DARK_TEXT_GREY, SCHEDULE_ROUTE, HEIGHT } from '../../../../constants';
 import { SpaceBetweenRow, HeavyText } from '../../../styled';
 import EventListItem from './EventListItem';
 
@@ -100,9 +101,11 @@ class Unexpanded extends React.PureComponent {
             </Svg>
           </UpcomingClassLink>
         </TopRow>
-        {this.props.events.map(event => (
-          <EventListItem key={event.eventid} {...event} />
-        ))}
+        <ScrollView>
+          {this.props.events.map(event => (
+            <EventListItem key={event.eventid} {...event} />
+          ))}
+        </ScrollView>
       </Container>
     );
   }

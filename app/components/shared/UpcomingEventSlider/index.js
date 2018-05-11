@@ -3,9 +3,8 @@ import PropTypes from 'prop-types';
 import { Svg, Path } from 'react-native-svg';
 import SlidingUpPanel from 'rn-sliding-up-panel';
 import styled from 'styled-components';
-import { promisify } from 'bluebird';
 
-import { WHITE, HEIGHT, LIGHT_GREY, GREY } from '../../../constants';
+import { WHITE, HEIGHT, LIGHT_GREY } from '../../../constants';
 import UnexpandedContent from './UnexpandedContent';
 
 const FULL_HEIGHT = HEIGHT - 30;
@@ -39,6 +38,7 @@ class UpcomingClassSlider extends React.PureComponent {
       dragBottom: SHORTENED_HEIGHT,
       expanded: false,
       expanding: false,
+      draggable: true,
     };
     this.onDragStart = this.onDragStart.bind(this);
     this.onDragEnd = this.onDragEnd.bind(this);
@@ -74,7 +74,7 @@ class UpcomingClassSlider extends React.PureComponent {
    * @returns {undefined}
    */
   async handleDragUp() {
-    await new Promise(res => this.setState({ expanding: true }, res));
+    await new Promise(res => this.setState({ expanding: !this.state.expanded }, res));
     await new Promise(res => this.slider.transitionTo({
       toValue: FULL_HEIGHT,
       duration: 100,
@@ -86,7 +86,7 @@ class UpcomingClassSlider extends React.PureComponent {
    * @returns {undefined}
    */
   async handleDragDown() {
-    await new Promise(res => this.setState({ expanding: true }, res));
+    await new Promise(res => this.setState({ expanding: this.state.expanded }, res));
     await new Promise(res => this.slider.transitionTo({
       toValue: SHORTENED_HEIGHT,
       duration: 100,
@@ -108,6 +108,7 @@ class UpcomingClassSlider extends React.PureComponent {
         onDragEnd={this.onDragEnd}
         ref={node => this.slider = node}
         allowMomentum={false}
+        allowDragging={this.state.draggable}
       >
         <Panel>
           <Svg style={{ marginTop: 5 }} width={40} height={12}>
@@ -120,7 +121,7 @@ class UpcomingClassSlider extends React.PureComponent {
             />
           </Svg>
           {this.state.expanded || this.state.expanding ? null : (
-            <UnexpandedContent events={this.props.events} />
+            <UnexpandedContent ref={node => this.unexpanded = node} events={this.props.events} />
           )}
         </Panel>
       </SlidingUpPanel>

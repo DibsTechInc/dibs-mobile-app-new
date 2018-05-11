@@ -11,9 +11,9 @@ const Container = SpaceBetweenRow.extend`
   align-items: center;
   border-bottom-width: 1;
   border-color: ${LIGHT_GREY};
+  flex: 1;
   padding-horizontal: 15;
   padding-vertical: 10;
-  width: 100%;
 `;
 
 const EventInfo = styled.View`
