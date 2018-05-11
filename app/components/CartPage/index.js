@@ -15,7 +15,7 @@ import {
 import { LIGHT_GREY, SOFT_GREY, BLACK } from '../../constants';
 import Icon from '../shared/Icon';
 import CartItem from './CartItem';
-import TransactionBreakdown from './TransactionBreakdown';
+import CartTransaction from './CartTransaction';
 import PromoField from './PromoField';
 
 import { MaterialPanelView } from '../styled';
@@ -51,10 +51,11 @@ const StyledTopView = styled.View`
 `;
 
 const StyledCheckoutView = styled.View`
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  height: 150px;
+  height: 100px;
   margin: 6px;
+  marginBottom: 30px;
   background-color: ${SOFT_GREY};
 `;
 
@@ -194,10 +195,10 @@ class CartPage extends Component {
             {renderCartItems}
           </MaterialPanelView>
           <PromoField />
-          <TransactionBreakdown />
+          <CartTransaction />
         </StyledScrollView>
         <StyledCheckoutView>
-          <View style={{ marginBottom: 30 }}>
+          <View>
             <StyledSavingsText>{renderValueBackMessage}</StyledSavingsText>
           </View>
           <FlexRow>

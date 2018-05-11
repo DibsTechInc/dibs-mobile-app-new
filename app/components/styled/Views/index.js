@@ -35,14 +35,13 @@ export const MaterialPanelView = styled.View`
   border-width: 0.3;
   elevation: 3;
   height: ${props => (props.height ? props.height : 'auto')};
-  margin: 10px;
   padding-horizontal: 10px;
   padding-top: 15px;
   padding-bottom: 20px;
   shadow-color: ${BLACK};
   shadow-opacity: 0.2;
   shadow-radius: 4;
-  width: ${props => (props.width || (Dimensions.get('window').width - 20))};
+  width: ${props => (props.width || (Dimensions.get('window').width))};
 `;
 
 export const Overlay = styled.View`

@@ -6,12 +6,19 @@ import PropTypes from 'prop-types';
 import Swipeable from 'react-native-swipeable';
 import styled from 'styled-components';
 import FadeInView from '../shared/FadeInView';
-import { LIGHT_GREY, SOFT_GREY, BLACK, GREY, WHITE } from '../../constants';
-import { getSortedCartEvents } from '../../selectors';
+import {
+  LIGHT_GREY,
+  SOFT_GREY,
+  BLACK,
+  GREY,
+  WHITE,
+  RECEIPT_ROUTE,
+} from '../../constants';
+import { getSortedCartEvents, getConfirmationState } from '../../selectors';
 import Config from '../../../config.json';
 import Icon from '../shared/Icon';
 import CartItem from '../CartPage/CartItem';
-import TransactionBreakdown from '../CartPage/TransactionBreakdown';
+import CartTransaction from '../CartPage/CartTransaction';
 import PaymentInfo from './PaymentInfo';
 import { MaterialPanelView } from '../styled';
 import { submitCartForPurchase } from '../../actions';
@@ -66,7 +73,7 @@ const StyledCenterText = styled.Text`
 `;
 
 /**
- * @class CartPage
+ * @class ConfirmationPage
  * @extends {Component}
  */
 class ConfirmationPage extends Component {
@@ -81,12 +88,22 @@ class ConfirmationPage extends Component {
       isLoading: false,
       isUpdatingCard: false,
       isProcessingPayment: false,
+      testPurchases: [],
     };
 
     this.toPreviousPage = this.toPreviousPage.bind(this);
     this.setLoading = this.setLoading.bind(this);
     this.setEditCC = this.setEditCC.bind(this);
     this.handlePurchase = this.handlePurchase.bind(this);
+  }
+
+  /**
+   * @returns {undefined}
+   */
+  componentDidUpdate() {
+    if (this.props.confirmedPurchases.length) {
+      this.props.navigation.navigate(RECEIPT_ROUTE);
+    }
   }
 
   /**
@@ -122,13 +139,13 @@ class ConfirmationPage extends Component {
   async handlePurchase() {
     this.setState({ isProcessingPayment: true });
     await new Promise(resolve => this.props.submitCartForPurchase(resolve));
-    this.setState({ isProcessingPayment: false });
   }
 
   /**
    * @returns {JSX} XML
    */
   render() {
+    console.log(this.props.confirmedPurchases, 'confirmed?')
     const purchaseButton = [
       <StyledContinueButton />,
     ];
@@ -163,7 +180,7 @@ class ConfirmationPage extends Component {
         }}
         leftButtons={renderLeftButtons}
         onLeftButtonsActivate={this.handlePurchase}
-        leftButtonsActivationDistance={250}
+        leftButtonsActivationDistance={200}
       >
         <View style={{ flexDirection: 'row' }}>
           <Text style={{ textAlign: 'center', color: WHITE, flex: 1 }}>Swipe to pay</Text>
@@ -186,7 +203,7 @@ class ConfirmationPage extends Component {
           </StyledCenterText>
         </StyledTopView>
         <StyledScrollView style={{ marginTop: 0 }}>
-          <TransactionBreakdown />
+          <CartTransaction />
           <PaymentInfo
             isLoading={this.state.isLoading}
             isUpdatingCard={this.state.isUpdatingCard}
@@ -210,11 +227,13 @@ ConfirmationPage.propTypes = {
   creditCard: PropTypes.shape(),
   cart: PropTypes.arrayOf(PropTypes.shape()),
   submitCartForPurchase: PropTypes.func,
+  confirmedPurchases: PropTypes.arrayOf(PropTypes.shape()),
 };
 
 const mapStateToProps = state => ({
   creditCard: state.creditCard,
   cart: getSortedCartEvents(state),
+  confirmedPurchases: getConfirmationState(state),
 });
 
 const mapDispatchToProps = {

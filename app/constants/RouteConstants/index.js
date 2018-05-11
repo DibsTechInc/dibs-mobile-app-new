@@ -20,3 +20,5 @@ export const CONFIRMATION_ROUTE = 'Confirmation';
 
 export const DRAWER_OPEN = 'DrawerOpen';
 export const SETTINGS_ROUTE = 'Settings';
+
+export const RECEIPT_ROUTE = 'Receipt';
