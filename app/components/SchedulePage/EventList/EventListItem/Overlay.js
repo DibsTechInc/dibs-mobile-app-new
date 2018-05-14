@@ -34,6 +34,11 @@ const CartControls = FlexRow.extend`
   width: ${200 / 3}%;
 `;
 
+const IconContainer = styled.View`
+  align-items: center;
+  width: 50;
+`;
+
 const Quantity = styled.Text`
   color: ${TEXT_GREY};
   font-family: 'flex-font';
@@ -88,26 +93,30 @@ class Overlay extends React.PureComponent {
         {this.props.quantity ? (
           <ControlsContainer>
             <CartControls>
-              <Icon
-                size={15}
-                iconName={this.props.quantity > 1 ? 'minus' : 'trash'}
-                iconColor={TEXT_GREY}
-                padding={10}
-                onPress={this.removeFromCart}
-              />
+              <IconContainer>
+                <Icon
+                  size={15}
+                  iconName={this.props.quantity > 1 ? 'minus' : 'trash'}
+                  iconColor={TEXT_GREY}
+                  padding={10}
+                  onPress={this.removeFromCart}
+                />
+              </IconContainer>
               <Quantity>
                 {this.props.quantity}
               </Quantity>
               {this.props.maxSeatsReached ? (
-                <View style={{ width: 15, height: 15 }} />
+                <View style={{ width: 50, height: 15 }} />
               ) : (
-                <Icon
-                  size={15}
-                  iconName="plus"
-                  iconColor={TEXT_GREY}
-                  padding={10}
-                  onPress={this.addToCart}
-                />
+                <IconContainer>
+                  <Icon
+                    size={15}
+                    iconName="plus"
+                    iconColor={TEXT_GREY}
+                    padding={10}
+                    onPress={this.addToCart}
+                  />
+                </IconContainer>
               )}
             </CartControls>
           </ControlsContainer>

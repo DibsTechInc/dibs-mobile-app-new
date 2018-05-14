@@ -1,4 +1,3 @@
-import { Alert } from 'react-native';
 import { requestUserEvents } from '../UpcomingEventsActions';
 import { setUser } from '../UserActions';
 import { requestEventData } from '../EventActions';

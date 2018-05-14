@@ -3,13 +3,28 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { promisify } from 'bluebird';
 import { Alert } from 'react-native';
+import styled from 'styled-components';
 
 import Config from '../../../../../config.json';
-import { GREY, WHITE } from '../../../../constants/index';
+import { GREY, WHITE, DARK_TEXT_GREY } from '../../../../constants/index';
 import { addToCart, addToWaitlist } from '../../../../actions';
 import { lightenDarkenColor } from '../../../../helpers';
 import DibsLoader from '../../../shared/DibsLoader';
 import MaterialButton from '../../../shared/MaterialButton';
+import { FlexCenter, HeavyText } from '../../../styled';
+
+const StudioColoredQuantity = FlexCenter.extend`
+  border-color: ${Config.STUDIO_COLOR};
+  border-radius: 5;
+  border-width: 1;
+  max-height: 40px;
+  width: 40px;
+`;
+
+const QuantityDisplay = HeavyText.extend`
+  color: ${DARK_TEXT_GREY};
+  font-size: 16;
+`;
 
 /**
  * @class Button
@@ -97,6 +112,15 @@ class Button extends React.PureComponent {
    * @returns {JSX.Element} HTML
    */
   render() {
+    if (this.props.quantity) {
+      return (
+        <StudioColoredQuantity>
+          <QuantityDisplay>
+            {this.props.quantity}
+          </QuantityDisplay>
+        </StudioColoredQuantity>
+      );
+    }
     if (this.state.waitlisting) {
       return (
         <DibsLoader
