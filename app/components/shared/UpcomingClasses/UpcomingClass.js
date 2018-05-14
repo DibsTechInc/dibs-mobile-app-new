@@ -37,9 +37,10 @@ class UpcomingClass extends PureComponent {
           formattedSubtotal={`$${this.props.class.original_price}`}
           taxAmount={this.props.class.tax_amount}
           formattedTaxAmount={`${this.props.class.tax_amount}`}
-          classDiscountAmount={this.props.class.discount_amount}
+          discountAmount={this.props.class.discount_amount}
+          formattedDiscountAmount={`$${this.props.class.discount_amount}`}
           studioCreditAmount={this.props.class.studio_credits_spent}
-          formattedStudioCreditAmount={`${this.props.class.studio_credits_spent}`}
+          formattedStudioCreditAmount={`$${this.props.class.studio_credits_spent}`}
           formattedTotal={`$${this.props.class.chargeAmount}`}
         />
         <MapView
