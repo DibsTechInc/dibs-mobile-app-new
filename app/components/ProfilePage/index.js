@@ -7,7 +7,11 @@ import {
   Button,
 } from 'react-native';
 import SettingsList from 'react-native-settings-list';
-import { MAIN_ROUTE, PROFILE_INFO_ROUTE } from '../../constants/RouteConstants';
+import {
+  MAIN_ROUTE,
+  PROFILE_INFO_ROUTE,
+  ABOUT_ROUTE,
+} from '../../constants/RouteConstants';
 
 import Header from '../Header';
 import FadeInView from '../shared/FadeInView';
@@ -74,7 +78,7 @@ class ProfileScreen extends Component {
             />
             <SettingsList.Item
               title='About'
-              onPress={() => Alert.alert('Route To About Page')}
+              onPress={() => this.props.navigation.navigate(ABOUT_ROUTE)}
             />
             <SettingsList.Item
               title='FAQ'

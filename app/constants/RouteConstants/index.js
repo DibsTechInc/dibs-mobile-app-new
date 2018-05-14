@@ -7,6 +7,7 @@ export const REGISTER_ROUTE = 'Register';
 export const PASSWORD_RESET_ROUTE = 'PasswordReset';
 
 export const DRAWER_ROUTE = 'Drawer';
+export const ABOUT_ROUTE = 'About';
 
 /** Drawer Navigator Routes */
 export const MAIN_ROUTE = 'Main';
