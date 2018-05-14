@@ -7,7 +7,12 @@ import {
   PASSWORD_RESET_ROUTE,
 } from '../../constants/RouteConstants';
 import Config from '../../../config.json';
-import { requestCreditCardInfo, removeCreditCard } from '../index';
+import {
+  requestCreditCardInfo,
+  removeCreditCard,
+  requestUserEvents,
+  setUpcomingEvents,
+} from '../index';
 
 export const setUser = createAction('SET_USER', payload => payload);
 
@@ -70,7 +75,6 @@ export function recordStudioVisit() {
   return async function innerRecordStudioVisit(dispatch, getState, dibsFetch) {
     const { user, studio } = getState();
     if (!user || !user.id) return;
-    console.log(studio.data.id, 'studioid')
     try {
       await dibsFetch(`/api/user/visit/${studio.data.id}`, {
         method: 'POST',
@@ -96,6 +100,7 @@ export function signUpUser(payload, callback) {
       if (res.success) {
         dispatch(setUser(res.user));
         dispatch(recordStudioVisit());
+        dispatch(requestUserEvents());
         return callback(MAIN_ROUTE);
       }
       return callback(null);
@@ -126,6 +131,7 @@ export function submitLogin(email, password, callback) {
         dispatch(setUser(res.user));
         dispatch(recordStudioVisit());
         dispatch(requestCreditCardInfo());
+        dispatch(requestUserEvents());
         callback(res.user);
       } else {
         callback(null);
@@ -146,6 +152,7 @@ export function logOutUser(callback = () => {}) {
       await AsyncStorage.removeItem(Config.USER_TOKEN_KEY);
       dispatch(setUser({}));
       dispatch(removeCreditCard());
+      dispatch(setUpcomingEvents([]));
       callback();
     } catch (err) {
       console.log(err);

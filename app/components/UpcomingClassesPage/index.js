@@ -6,6 +6,7 @@ import { TRANSPARENT, WHITE } from '../../constants';
 import { FadeInView, CustomStatusBar } from '../shared';
 import Header from '../Header';
 import UpcomingEventSlider from './UpcomingEventSlider';
+import Calendar from './Calendar';
 
 /**
  * @class UpcomingClassesPage
@@ -24,6 +25,7 @@ class UpcomingClassesPage extends React.PureComponent {
           iconColor={WHITE}
           backgroundColor={TRANSPARENT}
         />
+        <Calendar />
         <UpcomingEventSlider />
       </FadeInView>
     );

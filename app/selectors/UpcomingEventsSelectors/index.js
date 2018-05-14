@@ -22,6 +22,14 @@ export function getUpcomingEventsLoading(state) {
 
 /**
  * @param {Object} state in store
+ * @returns {Object} current date in upcoming events page
+ */
+export function getUpcomingEventsCurrentDate(state) {
+  return getUpcomingEvents(state).currentDate;
+}
+
+/**
+ * @param {Object} state in store
  * @returns {Array<Object>} the user's upcoming events
  */
 export function getUpcomingEventsData(state) {
@@ -44,6 +52,11 @@ export const getUpcomingEventsByDay = createSelector(
 export const getMostRecentUpcomingEvents = createSelector(
   getUpcomingEventsByDay,
   eventsByDay => eventsByDay[Math.min(...Object.keys(eventsByDay))]
+);
+
+export const getMinimumUpcomingEventsDate = createSelector(
+  getMostRecentUpcomingEvents,
+  events => events.length && moment.tz(events[0].start_time, events[0].mainTZ).startOf('month')
 );
 
 export const getMostRecentUpcomingSliderEvents = createSelector(
