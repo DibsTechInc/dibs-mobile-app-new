@@ -1,6 +1,5 @@
 export * from './CartActions';
 export * from './CreditCardActions';
-export * from './CurrentDateActions';
 export * from './EventActions';
 export * from './StudioActions';
 export * from './UserActions';

@@ -9,7 +9,7 @@ import {
 import styled from 'styled-components';
 import moment from 'moment';
 import { Svg, Path } from 'react-native-svg';
-import { setCurrentDate, addDaysToCurrentDate } from '../../../actions';
+import { setScheduleCurrentDate, addDaysToScheduleCurrentDate } from '../../../actions';
 import CalendarDay from './CalendarDay';
 import { WHITE } from '../../../constants';
 import Config from '../../../../config.json';
@@ -120,7 +120,7 @@ class CalendarStrip extends Component {
     if (invalidSelection) {
       return;
     }
-    this.props.setCurrentDate(moment(date));
+    this.props.setScheduleCurrentDate(moment(date));
   }
   /**
    * Set startingDate to the previous set of days
@@ -129,7 +129,7 @@ class CalendarStrip extends Component {
   async getPreviousDays() {
     await new Promise(res =>
       this.setState({ startingDate: this.state.startingDate.subtract(this.state.numberOfDays, 'd') }, res));
-    this.props.addDaysToCurrentDate(-this.state.numberOfDays);
+    this.props.addDaysToScheduleCurrentDate(-this.state.numberOfDays);
   }
   /**
    * Set startingDate to the next set of days
@@ -138,7 +138,7 @@ class CalendarStrip extends Component {
   async getNextDays() {
     await new Promise(res =>
       this.setState({ startingDate: this.state.startingDate.add(this.state.numberOfDays, 'd') }, res));
-    this.props.addDaysToCurrentDate(this.state.numberOfDays);
+    this.props.addDaysToScheduleCurrentDate(this.state.numberOfDays);
   }
   /**
    * Get dates for the week based on the startingDate
@@ -319,14 +319,14 @@ CalendarStrip.propTypes = {
   selectionAnimation: PropTypes.shape(),
   locale: PropTypes.shape(),
   currentDate: PropTypes.shape(),
-  setCurrentDate: PropTypes.func,
-  addDaysToCurrentDate: PropTypes.func,
+  setScheduleCurrentDate: PropTypes.func,
+  addDaysToScheduleCurrentDate: PropTypes.func,
 };
 
-const mapStateToProps = state => ({ currentDate: state.currentDate });
+const mapStateToProps = state => ({ currentDate: state.events.currentDate });
 const mapDispatchToProps = {
-  setCurrentDate,
-  addDaysToCurrentDate,
+  setScheduleCurrentDate,
+  addDaysToScheduleCurrentDate,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CalendarStrip);

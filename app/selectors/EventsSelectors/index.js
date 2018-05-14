@@ -4,9 +4,11 @@ import { format as formatCurrency } from 'currency-formatter';
 import {
   getStudioCurrency,
   getStudioCustomTimeFormat,
+  getStudioInterval,
 } from '../StudioSelectors';
 import { getCartData } from '../CartSelectors';
 import { getUpcomingEventsData } from '../UpcomingEventsSelectors';
+import Config from '../../../config.json';
 import { createUnboundedSelector } from '../../helpers';
 
 /**
@@ -34,7 +36,7 @@ export function getEventsFetching(state) {
  */
 export const getEventsAreLoading = createSelector(
   getEventsFetching,
-  state => state.currentDate,
+  state => state.events.currentDate,
   (fetchingEvents, currentDate) => Boolean(fetchingEvents[currentDate.toISOString()])
 );
 
@@ -52,10 +54,43 @@ export const getNumberOfEvents = createSelector(
   events => events.length
 );
 
+/**
+ * @returns {Object} right now in studio timezone
+ */
+function getTodayInStudioTimezone() {
+  return moment().tz(Config.STUDIO_TZ);
+}
+
+/**
+ * @param {Object} state in Redux store
+ * @returns {Object} moment instance representing date on schedule
+ */
+export function getScheduleCurrentDate(state) {
+  return getEvents(state).currentDate;
+}
+
+export const getScheduleCurrentDateIsToday = createSelector(
+  [
+    getScheduleCurrentDate,
+    getTodayInStudioTimezone,
+  ],
+  (currentDate, today) => currentDate.isSame(today, 'day')
+);
+
+export const getScheduleCurrentDateIsAfterInterval = createSelector(
+  [
+    getScheduleCurrentDate,
+    getStudioInterval,
+    getTodayInStudioTimezone,
+  ],
+  (currentDate, studioInterval, today) =>
+    currentDate.isAfter(today.add(studioInterval, 'days').startOf('day'))
+);
+
 export const getEventsOnCurrentDate = createSelector(
   [
     getEventsData,
-    state => state.currentDate,
+    state => state.events.currentDate,
   ],
   (events, currentDate) => events.filter((event) => {
     const start = moment(event.start_time).tz(event.mainTZ);

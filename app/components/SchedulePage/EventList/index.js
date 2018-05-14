@@ -8,8 +8,8 @@ import {
   getScheduleEvents,
   getEventsAreLoading,
   getNumberOfEventsOnCurrentDate,
-  getCurrentDateIsToday,
-  getCurrentDateIsAfterInterval,
+  getScheduleCurrentDateIsToday,
+  getScheduleCurrentDateIsAfterInterval,
 } from '../../../selectors';
 import DibsLoader from '../../shared/DibsLoader';
 import { CenteredText } from '../../styled';
@@ -91,8 +91,8 @@ const mapStateToProps = state => ({
   events: getScheduleEvents(state),
   isLoading: getEventsAreLoading(state),
   hasEventsOnCurrentDate: Boolean(getNumberOfEventsOnCurrentDate(state)),
-  currentDateIsToday: getCurrentDateIsToday(state),
-  currentDateIsAfterInterval: getCurrentDateIsAfterInterval(state),
+  currentDateIsToday: getScheduleCurrentDateIsToday(state),
+  currentDateIsAfterInterval: getScheduleCurrentDateIsAfterInterval(state),
 });
 const mapDispatchToProps = {};
 
