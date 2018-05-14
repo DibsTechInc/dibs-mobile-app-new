@@ -1,10 +1,10 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { View, Text, Alert } from 'react-native';
+import HTML from 'react-native-render-html';
+import { View, Text, Dimensions } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import FadeInView from '../FadeInView';
 import TransactionBreakdown from '../TransactionBreakdown';
-import { MaterialButton } from '../../shared';
 import Config from '../../../../config.json';
 
 const LATITUDE = 40.726920;
@@ -28,6 +28,8 @@ class UpcomingClass extends PureComponent {
    * @returns {JSX} XML
    */
   render() {
+    const classDescriptionHTML = <HTML html={this.props.class.classDescription} imagesMaxWidth={Dimensions.get('window').width} />;
+
     return (
       <FadeInView style={{ marginTop: 20 }}>
         <TransactionBreakdown
@@ -58,7 +60,7 @@ class UpcomingClass extends PureComponent {
         <View style={{ flex: 1, margin: 10, marginTop: 10, marginLeft: 10 }}>
           <View>
             <Text style={{ fontFamily: 'flex-font-heavy' }}>Class Description:</Text>
-            <Text style={{ fontFamily: 'flex-font' }}>{this.props.class.classDescription.length ? this.props.class.classDescription : 'No Class Description.'}</Text>
+            <Text style={{ fontFamily: 'flex-font' }}>{this.props.class.classDescription.length ? classDescriptionHTML : 'No Class Description.'}</Text>
           </View>
           <View style={{ marginTop: 20 }}>
             <Text style={{ fontFamily: 'flex-font-heavy' }}>Drop Policy:</Text>

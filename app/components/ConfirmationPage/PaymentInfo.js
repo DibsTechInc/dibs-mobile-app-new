@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { ActivityIndicator, View, Alert } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { connect } from 'react-redux';
 import Promise from 'bluebird';
 import PropTypes from 'prop-types';
@@ -101,7 +101,6 @@ class PaymentInfo extends PureComponent {
     await new Promise(resolve => this.props.updateCreditCard(payload, resolve));
 
     if (hasCC) this.props.setEditCC();
-    else Alert.alert('Something went wrong. Please contact support.');
     this.props.setLoading(false);
   }
 

@@ -10,7 +10,14 @@ const StyledText = styled.Text`
   font-size: 16px;
 `;
 
+/**
+ * @class CreditCardDisplay
+ * @extends Component
+ */
 class CreditCardDisplay extends PureComponent {
+  /**
+   * @returns {JSX} XML
+   */
   render() {
     return (
       <FadeInView style={this.props.displayStyle}>
