@@ -8,7 +8,7 @@ import { WHITE, HEIGHT, LIGHT_GREY } from '../../../constants';
 import UnexpandedContent from './UnexpandedContent';
 
 const FULL_HEIGHT = HEIGHT - 30;
-const SHORTENED_HEIGHT = (HEIGHT / 2) - 20;
+const SHORTENED_HEIGHT = HEIGHT / 3;
 
 const Panel = styled.View`
   align-items: center;
@@ -121,7 +121,7 @@ class UpcomingClassSlider extends React.PureComponent {
             />
           </Svg>
           {this.state.expanded || this.state.expanding ? null : (
-            <UnexpandedContent ref={node => this.unexpanded = node} events={this.props.events} />
+            <UnexpandedContent events={this.props.events} />
           )}
         </Panel>
       </SlidingUpPanel>

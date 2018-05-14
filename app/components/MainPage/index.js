@@ -29,7 +29,7 @@ const BackgroundImage = styled.Image`
 const Content = styled.View`
   flex: 1;
   justify-content: ${props => (props.hasUpcomingClasses ? 'center' : 'flex-end')}
-  margin-bottom: ${props => (props.hasUpcomingClasses ? 200 : 150)};
+  margin-bottom: ${props => (props.hasUpcomingClasses ? 50 : 150)};
 `;
 
 const Greeting = HeavyText.extend`
