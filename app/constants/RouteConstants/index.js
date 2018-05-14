@@ -11,6 +11,7 @@ export const DRAWER_ROUTE = 'Drawer';
 /** Drawer Navigator Routes */
 export const MAIN_ROUTE = 'Main';
 export const SCHEDULE_ROUTE = 'Schedule';
+export const UPCOMING_CLASS_ROUTE = 'UpcomingClasses';
 
 export const PROFILE_ROUTE = 'Profile';
 export const PROFILE_INFO_ROUTE = 'ProfileInfo';

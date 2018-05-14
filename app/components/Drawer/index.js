@@ -6,6 +6,7 @@ import {
   CART_ROUTE,
   CONFIRMATION_ROUTE,
   RECEIPT_ROUTE,
+  UPCOMING_CLASS_ROUTE,
 } from '../../constants/RouteConstants/index';
 import {
   getDrawerConfig,
@@ -17,11 +18,13 @@ import CartPage from '../CartPage';
 import SideMenu from './SideMenu';
 import ConfirmationPage from '../ConfirmationPage';
 import ReceiptPage from '../ReceiptPage';
+import UpcomingClassesPage from '../UpcomingClassesPage';
 
 const Drawer = DrawerNavigator({
   [MAIN_ROUTE]: { screen: MainPage },
   [PROFILE_ROUTE]: { screen: ProfilePage },
   [SCHEDULE_ROUTE]: { screen: SchedulePage },
+  [UPCOMING_CLASS_ROUTE]: { screen: UpcomingClassesPage },
   [CART_ROUTE]: { screen: CartPage },
   [CONFIRMATION_ROUTE]: { screen: ConfirmationPage },
   [RECEIPT_ROUTE]: { screen: ReceiptPage },
