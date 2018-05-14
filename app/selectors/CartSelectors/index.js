@@ -21,6 +21,14 @@ export function getCartIsPurchasing(state) {
 
 /**
  * @param {Object} state in store
+ * @returns {string} error message
+ */
+export function getCartErrorMessage(state) {
+  return getCart(state).errorMessage;
+}
+
+/**
+ * @param {Object} state in store
  * @returns {Array<Object>} items in cart
  */
 export function getCartData(state) {

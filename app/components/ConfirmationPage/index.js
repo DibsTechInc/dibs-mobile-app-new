@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, Text, Alert } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import PropTypes from 'prop-types';
 import Swipeable from 'react-native-swipeable';
@@ -13,8 +13,9 @@ import {
   GREY,
   WHITE,
   RECEIPT_ROUTE,
+  SCHEDULE_ROUTE,
 } from '../../constants';
-import { getSortedCartEvents, getConfirmationState } from '../../selectors';
+import { getSortedCartEvents, getConfirmationState, getCartErrorMessage } from '../../selectors';
 import Config from '../../../config.json';
 import { Icon, CustomStatusBar, DibsLoader } from '../shared';
 import CartItem from '../CartPage/CartItem';
@@ -84,7 +85,6 @@ class ConfirmationPage extends Component {
       isLoading: false,
       isUpdatingCard: false,
       isProcessingPayment: false,
-      testPurchases: [],
     };
 
     this.toPreviousPage = this.toPreviousPage.bind(this);
@@ -97,8 +97,13 @@ class ConfirmationPage extends Component {
    * @returns {undefined}
    */
   componentDidUpdate() {
-    if (this.props.confirmedPurchases.length) {
+    if (!this.props.cartMessage.length && this.props.confirmedPurchases.length) {
       this.props.navigation.navigate(RECEIPT_ROUTE);
+    }
+
+    if (this.props.cartMessage) {
+      this.props.navigation.navigate(SCHEDULE_ROUTE);
+      Alert.alert(this.props.cartMessage);
     }
   }
 
@@ -228,12 +233,14 @@ ConfirmationPage.propTypes = {
   cart: PropTypes.arrayOf(PropTypes.shape()),
   submitCartForPurchase: PropTypes.func,
   confirmedPurchases: PropTypes.arrayOf(PropTypes.shape()),
+  cartMessage: PropTypes.string,
 };
 
 const mapStateToProps = state => ({
   creditCard: state.creditCard,
   cart: getSortedCartEvents(state),
   confirmedPurchases: getConfirmationState(state),
+  cartMessage: getCartErrorMessage(state),
 });
 
 const mapDispatchToProps = {

@@ -24,6 +24,7 @@ export const {
   addToCart,
   clearCart,
   setCartData,
+  setCartErrorMessage,
   setCartVisibleTrue,
   setCartVisibleFalse,
   setCartPurchasingTrue,
@@ -32,6 +33,7 @@ export const {
   ADD_TO_CART: item => item,
   CLEAR_CART: () => [],
   SET_CART_DATA: payload => payload,
+  SET_CART_ERROR_MESSAGE: payload => payload,
   SET_CART_VISIBLE_TRUE: () => true,
   SET_CART_VISIBLE_FALSE: () => false,
   SET_CART_PURCHASING_TRUE: () => true,
@@ -228,19 +230,8 @@ export function submitCartForPurchase(callback) {
         // dispatch(performTransactionAnalytics(resp.transactions)); not sure works with native
         dispatch(clearPromoCodeData());
         dispatch(clearPackagePromoCode());
-      } else if (res.experimentalRoute) {
-        if (res.user) dispatch(setUser(res.user));
-        callback(res);
       } else {
-        // let message = res.message;
-        // if (res.removedEvents.every(r => r.reason === 'SOLD_OUT')) {
-        //   message = 'Oh dang! The classes you chose were just recently sold out…. please pick another option.';
-        //   res.removedEvents.map(event => dispatch(setEventSoldOut({ eventid: event.eventid })));
-        // }
-        // if (res.removedEvents.every(r => r.reason === 'PRICE_CHANGE')) {
-        //   message = 'Oh dang! The classes you chose had their price increase more than 5 minutes ago. Please refresh and try again';
-        // }
-        // console.log(message, 'message'); // add dispatch to messages reducer?
+        dispatch(setCartErrorMessage(res.message));
         callback(res);
       }
     } catch (err) {

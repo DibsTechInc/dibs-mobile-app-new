@@ -43,7 +43,6 @@ class TransactionBreakdown extends Component {
           {this.props.studioCreditAmount > 0 && <BreakdownRow label="Studio Credit" value={this.props.formattedStudioCreditAmount} />}
           {this.props.rafCreditAmount > 0 && <BreakdownRow label="Refer a Friend Credit" value={this.props.formattedRAFCreditAmount} />}
           {this.props.globalCreditAmount > 0 && <BreakdownRow label="Global Credit" value={this.props.formattedGlobalCreditAmount} />}
-          {this.props.classDiscountAmount > 0 && <BreakdownRow label="Global Credit" value={this.props.formattedClassDiscountAmount} />}
           <StyledLine />
           <BreakdownRow
             label="Total"
@@ -74,8 +73,6 @@ TransactionBreakdown.propTypes = {
   formattedGlobalCreditAmount: PropTypes.string,
   taxAmount: PropTypes.number,
   formattedTaxAmount: PropTypes.string,
-  classDiscountAmount: PropTypes.number,
-  formattedClassDiscountAmount: PropTypes.string,
   className: PropTypes.string,
 };
 

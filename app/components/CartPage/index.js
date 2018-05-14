@@ -159,20 +159,18 @@ class CartPage extends Component {
       );
     }
 
-    if (this.props.cart.length) {
-      renderCartItems = this.props.cart.map(item =>
-        (<CartItem
-          key={item.eventid}
-          eventid={item.eventid}
-          name={item.name}
-          quantity={item.quantity}
-          startTime={item.startTime}
-          price={item.price}
-          taxRate={item.taxRate}
-          passid={item.passid}
-        />)
-      );
-    }
+    renderCartItems = this.props.cart.map(item =>
+      (<CartItem
+        key={item.eventid}
+        eventid={item.eventid}
+        name={item.name}
+        quantity={item.quantity}
+        startTime={item.startTime}
+        price={item.price}
+        taxRate={item.taxRate}
+        passid={item.passid}
+      />)
+    );
 
     return (
       <FadeInView style={{ backgroundColor: SOFT_GREY }}>

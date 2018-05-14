@@ -8,12 +8,14 @@ import {
   setCartVisibleFalse,
   setCartPurchasingTrue,
   setCartPurchasingFalse,
+  setCartErrorMessage,
 } from '../../actions/CartActions';
 
 const initialState = {
   data: [],
   visible: false,
   purchasing: false,
+  errorMessage: '',
 };
 
 /**
@@ -46,6 +48,7 @@ function handleAddToCart(
 
 export default handleActions({
   [addToCart]: handleAddToCart,
+  [setCartErrorMessage]: (state, { payload }) => ({ ...state, errorMessage: payload }),
   [combineActions(setCartData, clearCart)]: (state, { payload }) => ({ ...state, data: payload }),
   [combineActions(
     setCartVisibleTrue,
