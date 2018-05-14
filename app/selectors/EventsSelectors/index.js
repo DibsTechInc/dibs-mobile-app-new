@@ -90,7 +90,7 @@ export const getScheduleCurrentDateIsAfterInterval = createSelector(
 export const getEventsOnCurrentDate = createSelector(
   [
     getEventsData,
-    state => state.events.currentDate,
+    getScheduleCurrentDate,
   ],
   (events, currentDate) => events.filter((event) => {
     const start = moment(event.start_time).tz(event.mainTZ);
