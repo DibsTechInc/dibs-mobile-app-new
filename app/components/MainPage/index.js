@@ -12,7 +12,6 @@ import {
   getStudioName,
   getUserHasUpcomingEvents,
 } from '../../selectors';
-import { FadeInView } from '../shared';
 import Header from '../Header';
 import { HeavyText, FlexRow } from '../styled';
 import IconLink from './IconLink';
