@@ -18,7 +18,8 @@ const Container = FlexRow.extend`
   border-bottom-width: 1;
   border-bottom-color: ${LIGHT_GREY};
   overflow: hidden;
-  padding-vertical: 10;
+  padding-top: 10;
+  padding-bottom: ${props => (props.inCart ? 35 : 10)};
   position: relative;
 `;
 
@@ -66,7 +67,7 @@ class EventListItem extends React.PureComponent {
    */
   render() {
     return (
-      <Container>
+      <Container inCart={Boolean(this.props.quantity)}>
         {(
           (this.props.soldOut && !this.props.waitlisted && !this.props.has_waitlist)
           || this.props.quantity
