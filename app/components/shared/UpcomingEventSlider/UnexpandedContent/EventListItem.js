@@ -3,15 +3,14 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { View } from 'react-native';
 
-import { LIGHT_GREY, DARK_TEXT_GREY } from '../../../../constants';
+import { SOFT_GREY, DARK_TEXT_GREY } from '../../../../constants';
 import { SpaceBetweenRow, HeavyText } from '../../../styled';
 import MaterialButton from '../../MaterialButton';
 
 const Container = SpaceBetweenRow.extend`
   align-items: center;
   border-bottom-width: 1;
-  border-color: ${LIGHT_GREY};
-  flex: 1;
+  border-color: ${SOFT_GREY};
   padding-horizontal: 15;
   padding-vertical: 10;
 `;
@@ -22,13 +21,13 @@ const EventInfo = styled.View`
 
 const HeavyEventText = HeavyText.extend`
   color: ${DARK_TEXT_GREY};
-  font-size: 12;
+  font-size: 14;
 `;
 
 const EventText = styled.Text`
   color: ${DARK_TEXT_GREY};
   font-family: flex-font;
-  font-size: 12;
+  font-size: 14;
 `;
 
 /**
@@ -49,7 +48,7 @@ class SliderEventListItem extends React.PureComponent {
               {this.props.shortDayOfWeek} {this.props.shortEventDate}
             </HeavyEventText>
             <EventText numberOfLines={1}>
-              {this.props.formattedStartTime} - {this.props.formattedEndTime} @ {this.props.locationName}
+              {this.props.formattedStartTime} @ {this.props.locationName}
             </EventText>
           </View>
           <View>
@@ -65,6 +64,7 @@ class SliderEventListItem extends React.PureComponent {
           text="Drop"
           style={{ height: 40, width: 70 }}
           onPress={() => {}}
+          fontSize={14}
         />
       </Container>
     );
@@ -75,7 +75,6 @@ SliderEventListItem.propTypes = {
   shortDayOfWeek: PropTypes.string.isRequired,
   shortEventDate: PropTypes.string.isRequired,
   formattedStartTime: PropTypes.string.isRequired,
-  formattedEndTime: PropTypes.string.isRequired,
   locationName: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   instructorName: PropTypes.string.isRequired,

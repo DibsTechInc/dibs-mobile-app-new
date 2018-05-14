@@ -52,7 +52,7 @@ export const getMostRecentUpcomingSliderEvents = createSelector(
   getStudioCustomTimeFormat,
   (events, shortDateFormat, timeFormat) => events.map(({ location, instructor, ...event }) => {
     const localStartTime = moment.tz(event.start_time, event.mainTZ);
-    const localEndTime = moment.tz(event.end_time, event.mainTZ);
+    // const localEndTime = moment.tz(event.end_time, event.mainTZ);
     const formatTime = time => (
       time.get('minute') || timeFormat !== 'LT' ?
         time.format(timeFormat) : time.format('hA')
@@ -62,7 +62,7 @@ export const getMostRecentUpcomingSliderEvents = createSelector(
       shortDayOfWeek: localStartTime.format('ddd'),
       shortEventDate: localStartTime.format(shortDateFormat),
       formattedStartTime: formatTime(localStartTime),
-      formattedEndTime: formatTime(localEndTime),
+      // formattedEndTime: formatTime(localEndTime),
       locationName: location.name,
       instructorName: instructor.name,
     };
