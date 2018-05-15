@@ -1,16 +1,12 @@
-// export { default as CartIcon } from './CartIcon';
-
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import {
   View,
-  Image,
   Alert,
-  Button,
 } from 'react-native';
 import SettingsList from 'react-native-settings-list';
 import {
-  MAIN_ROUTE,
   PROFILE_INFO_ROUTE,
   ABOUT_ROUTE,
   FAQ_ROUTE,
@@ -21,6 +17,7 @@ import {
 import Header from '../Header';
 import FadeInView from '../shared/FadeInView';
 import { SOFT_GREY } from '../../constants/ColorConstants';
+import { getUserFirstName, getUserLastName } from '../../selectors';
 
 /**
  * @class ProfileScreen
@@ -53,7 +50,7 @@ class ProfilePage extends Component {
               titleStyle={{ color: 'darkgray' }}
             />
             <SettingsList.Item
-              title="John Smith"
+              title={`${this.props.userFirstName} ${this.props.userLastName}`}
               onPress={() => this.props.navigation.navigate(PROFILE_INFO_ROUTE)}
             />
             <SettingsList.Header headerStyle={{ marginTop: 15 }} />
@@ -101,7 +98,14 @@ class ProfilePage extends Component {
 }
 
 ProfilePage.propTypes = {
-  navigation: PropTypes.shape(),
+  navigation: PropTypes.shape().isRequired,
+  userFirstName: PropTypes.string.isRequired,
+  userLastName: PropTypes.string.isRequired,
 };
 
-export default ProfilePage;
+const mapStateToProps = state => ({
+  userFirstName: getUserFirstName(state),
+  userLastName: getUserLastName(state),
+});
+
+export default connect(mapStateToProps)(ProfilePage);
