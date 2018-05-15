@@ -56,7 +56,29 @@ export const getMostRecentUpcomingEvents = createSelector(
 
 export const getMinimumUpcomingEventsDate = createSelector(
   getMostRecentUpcomingEvents,
-  events => events.length && moment.tz(events[0].start_time, events[0].mainTZ).startOf('month')
+  events => events.length && moment.tz(events[0].start_time, events[0].mainTZ)
+);
+
+export const getHasUpcomingClassesNextMonth = createSelector(
+  getUpcomingEventsCurrentDate,
+  getUpcomingEventsByDay,
+  (currentDate, eventsByDay) => {
+    const eventsNextMonth = Object.keys(eventsByDay).filter(
+      day => moment(+day).startOf('month').isAfter(currentDate.clone().startOf('month'))
+    );
+    return Boolean(eventsNextMonth.length);
+  }
+);
+
+export const getHasUpcomingClassesPrevMonth = createSelector(
+  getUpcomingEventsCurrentDate,
+  getUpcomingEventsByDay,
+  (currentDate, eventsByDay) => {
+    const eventsPrevMonth = Object.keys(eventsByDay).filter(
+      day => moment(+day).startOf('month').isBefore(currentDate.clone().startOf('month'))
+    );
+    return Boolean(eventsPrevMonth.length);
+  }
 );
 
 export const getMostRecentUpcomingSliderEvents = createSelector(

@@ -75,3 +75,32 @@ export function syncUserEvents(callback = () => {}) {
     dispatch(requestUserEvents(true, callback));
   };
 }
+
+export function setCurrentDateToFirstEventPrevMonth() {
+  return function innerSetCurrentDateToFirstEventPrevMonth(dispatch, getState) {
+    const state = getState();
+    const { currentDate, data } = state.upcomingEvents;
+    const eventsPrevMonth = data.filter((event) => {
+      const eventStart = moment.tz(event.start_time, event.mainTZ);
+      return eventStart.isBefore(currentDate.clone().startOf('month'))
+        && eventStart.isAfter(currentDate.clone().startOf('month').subtract(1, 'month'));
+    });
+    const [{ start_time: startTime, mainTZ }] = eventsPrevMonth; // data is sorted in API by event start time ASC
+    return dispatch(setUpcomingEventsCurrentDate(moment.tz(startTime, mainTZ).startOf('day')));
+  };
+}
+
+/**
+ * @returns {function} thunk
+ */
+export function setCurrentDateToFirstEventNextMonth() {
+  return function innerSetCurrentDateToFirstEventNextMonth(dispatch, getState) {
+    const state = getState();
+    const { currentDate, data } = state.upcomingEvents;
+    const eventsNextMonth = data.filter(
+      event => moment.tz(event.start_time, event.mainTZ).startOf('month').isAfter(currentDate)
+    );
+    const [{ start_time: startTime, mainTZ }] = eventsNextMonth; // data is sorted in API by event start time ASC
+    return dispatch(setUpcomingEventsCurrentDate(moment.tz(startTime, mainTZ).startOf('day')));
+  };
+}
