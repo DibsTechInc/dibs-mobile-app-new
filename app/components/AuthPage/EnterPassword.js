@@ -118,11 +118,6 @@ class EnterPassword extends Component {
   }
 }
 
-EnterPassword.navigationOptions = navigationObject => ({
-  gesturesEnabled: !navigationObject.navigation.state.params.fromReset,
-});
-
-
 EnterPassword.propTypes = {
   navigation: PropTypes.shape(),
   submitLogin: PropTypes.func,

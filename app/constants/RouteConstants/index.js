@@ -13,6 +13,7 @@ export const FAQ_ROUTE = 'FAQ';
 export const CONTACT_ROUTE = 'Contact';
 
 export const SETTINGS_ROUTE = 'Settings';
+export const TERMS_AND_CONDITIONS_ROUTE = 'TermsAndConditions';
 
 /** Drawer Navigator Routes */
 export const MAIN_ROUTE = 'Main';

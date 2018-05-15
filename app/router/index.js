@@ -16,9 +16,10 @@ import {
   FAQ_ROUTE,
   CONTACT_ROUTE,
   SETTINGS_ROUTE,
+  TERMS_AND_CONDITIONS_ROUTE,
 } from '../constants/RouteConstants';
 
-import { EnterPassword, EnterEmail, Signup, PasswordReset } from '../components/AuthPage';
+import { EnterPassword, EnterEmail, Signup, PasswordReset, TermsAndConditions } from '../components/AuthPage';
 import LandingPage from '../components/LandingPage';
 import Drawer from '../components/Drawer';
 import {
@@ -45,6 +46,9 @@ const createStackNavigator = token => StackNavigator(
     },
     [REGISTER_ROUTE]: {
       screen: Signup,
+    },
+    [TERMS_AND_CONDITIONS_ROUTE]: {
+      screen: TermsAndConditions,
     },
     [PASSWORD_RESET_ROUTE]: {
       screen: PasswordReset,

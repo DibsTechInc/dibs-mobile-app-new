@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import {
-  TouchableWithoutFeedback,
-  Keyboard,
   Alert,
+  TouchableOpacity,
+  Text,
+  View,
 } from 'react-native';
 import styled from 'styled-components';
 import CheckBox from 'react-native-checkbox';
@@ -13,12 +14,8 @@ import { signUpUser } from '../../actions/UserActions';
 import FadeInView from '../shared/FadeInView';
 import InputField from '../shared/InputField';
 import MaterialButton from '../shared/MaterialButton';
-
-const StyledView = styled.View`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-`;
+import { TERMS_AND_CONDITIONS_ROUTE } from '../../constants';
+import Config from '../../../config.json';
 
 const StyledText = styled.Text`
   font-family: flex-font;
@@ -138,8 +135,18 @@ class Signup extends Component {
           style={{ width: 200 }}
           containerStyle={{ marginBottom: 25 }}
         />
+        <View style={{ flexDirection: 'row', width: 200, justifyContent: 'space-between', marginBottom: 50 }}>
+          <TouchableOpacity onPress={() => this.props.navigation.navigate(TERMS_AND_CONDITIONS_ROUTE, { url: Config.STUDIO_TERMS_LINK })}>
+            <Text style={{ color: Config.STUDIO_COLOR, fontFamily: 'flex-font' }}>Flex Studios</Text>
+          </TouchableOpacity>
+          <Text> & </Text>
+          <TouchableOpacity onPress={() => this.props.navigation.navigate(TERMS_AND_CONDITIONS_ROUTE, { url: Config.DIBS_TERMS_LINK })}>
+            <Text style={{ color: Config.STUDIO_COLOR, fontFamily: 'flex-font' }}>Dibs</Text>
+          </TouchableOpacity>
+        </View>
         <CheckBox
-          label="Terms and Conditions"
+          label="I have read and agreed to the terms and conditions"
+          labelStyle={{ fontFamily: 'flex-font' }}
           checked={this.state.tAndC}
           onChange={this.handleOnCheck}
         />

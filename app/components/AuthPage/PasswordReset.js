@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 
 import Config from '../../../config.json';
-import { LOGIN_ROUTE } from '../../constants';
+import { LANDING_ROUTE } from '../../constants';
 import { getStudioDomain } from '../../selectors';
 import { createPasswordResetLink } from '../../actions';
 import { HeavyText } from '../styled';
@@ -47,7 +47,7 @@ class PasswordReset extends React.Component {
       success: null,
       message: null,
     };
-    this.navigateToEnterPassword = this.navigateToEnterPassword.bind(this);
+    this.navigateToEnterLanding = this.navigateToEnterLanding.bind(this);
   }
   /**
    * @returns {undefined}
@@ -69,9 +69,8 @@ class PasswordReset extends React.Component {
   /**
    * @returns {undefined}
    */
-  navigateToEnterPassword() {
-    const { email } = this.props.navigation.state.params;
-    this.props.navigation.navigate(LOGIN_ROUTE, { email, fromReset: true });
+  navigateToEnterLanding() {
+    this.props.navigation.navigate(LANDING_ROUTE);
   }
   /**
    * render
@@ -93,9 +92,9 @@ class PasswordReset extends React.Component {
                 {this.state.success ? successMessage : this.state.message}
               </Message>
               <MaterialButton
-                text="Log in"
+                text="Sign In"
                 style={{ height: 40, width: 120, marginTop: 25 }}
-                onPress={this.navigateToEnterPassword}
+                onPress={this.navigateToEnterLanding}
               />
             </MessageContainer>
           )}

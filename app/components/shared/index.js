@@ -11,3 +11,4 @@ export { default as UpcomingClasses } from './UpcomingClasses';
 export { default as TransactionBreakdown } from './TransactionBreakdown';
 export { default as CustomStatusBar } from './CustomStatusBar';
 export { default as PaymentInfo } from './PaymentInfo';
+export { default as CustomWebView } from './CustomWebView';
