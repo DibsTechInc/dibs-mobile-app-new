@@ -26,7 +26,7 @@ class UpcomingClassesPage extends React.PureComponent {
           backgroundColor={TRANSPARENT}
         />
         <Calendar />
-        <UpcomingEventSlider />
+        <UpcomingEventSlider isUpcomingClassesPage />
       </FadeInView>
     );
   }

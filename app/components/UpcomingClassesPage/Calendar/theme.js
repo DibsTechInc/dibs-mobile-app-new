@@ -6,9 +6,17 @@ export default {
     monthText: { color: WHITE, fontFamily: 'flex-font-heavy', fontSize: 18 },
     arrow: { paddingVertical: 0, paddingHorizontal: 30 },
     dayHeader: { color: WHITE, fontFamily: 'flex-font', fontSize: 14 },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingLeft: 10,
+      paddingRight: 10,
+      alignItems: 'center',
+      marginBottom: 25,
+    },
   },
   'stylesheet.calendar.main': {
-    container: { backgroundColor: Config.STUDIO_COLOR },
+    container: { backgroundColor: Config.STUDIO_COLOR, paddingHorizontal: 15 },
     monthView: { backgroundColor: Config.STUDIO_COLOR, paddingTop: 10 },
   },
   'stylesheet.day.basic': {

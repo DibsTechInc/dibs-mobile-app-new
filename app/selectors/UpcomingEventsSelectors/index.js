@@ -31,6 +31,11 @@ export function getUpcomingEventsCurrentDate(state) {
   return getUpcomingEvents(state).currentDate;
 }
 
+export const getUpcomingEventsNaturalCurrrentDate = createSelector(
+  getUpcomingEventsCurrentDate,
+  currentDate => currentDate.format('MMMM D')
+);
+
 /**
  * @param {Object} state in store
  * @returns {Array<Object>} the user's upcoming events

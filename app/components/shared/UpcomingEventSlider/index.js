@@ -121,7 +121,10 @@ class UpcomingClassSlider extends React.PureComponent {
             />
           </Svg>
           {this.state.expanded || this.state.expanding ? null : (
-            <UnexpandedContent events={this.props.events} />
+            <UnexpandedContent
+              isUpcomingClassesPage={this.props.isUpcomingClassesPage}
+              events={this.props.events}
+            />
           )}
         </Panel>
       </SlidingUpPanel>
@@ -129,8 +132,13 @@ class UpcomingClassSlider extends React.PureComponent {
   }
 }
 
+UpcomingClassSlider.defaultProps = {
+  isUpcomingClassesPage: false,
+};
+
 UpcomingClassSlider.propTypes = {
   events: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+  isUpcomingClassesPage: PropTypes.bool,
 };
 
 export default UpcomingClassSlider;
