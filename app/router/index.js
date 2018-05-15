@@ -21,11 +21,13 @@ import {
 import { EnterPassword, EnterEmail, Signup, PasswordReset } from '../components/AuthPage';
 import LandingPage from '../components/LandingPage';
 import Drawer from '../components/Drawer';
-import ProfileInfo from '../components/ProfilePage/ProfileInfo';
-import AboutPage from '../components/AboutPage';
-import FAQPage from '../components/FAQPage';
-import ContactPage from '../components/ContactPage';
-import SettingsPage from '../components/SettingsPage';
+import {
+  AboutUs,
+  ContactUs,
+  FAQ,
+  ProfileInfo,
+  UserSettings,
+} from '../components/ProfilePage';
 
 const createStackNavigator = token => StackNavigator(
   {
@@ -60,17 +62,17 @@ const createStackNavigator = token => StackNavigator(
       screen: ProfileInfo,
     },
     [ABOUT_ROUTE]: {
-      screen: AboutPage,
+      screen: AboutUs,
     },
     [FAQ_ROUTE]: {
-      screen: FAQPage,
+      screen: FAQ,
     },
     [CONTACT_ROUTE]: {
-      screen: ContactPage,
+      screen: ContactUs,
     },
     [SETTINGS_ROUTE]: {
-      screen: SettingsPage,
-    }
+      screen: UserSettings,
+    },
   },
   {
     headerMode: 'none',
