@@ -9,6 +9,8 @@ export const PASSWORD_RESET_ROUTE = 'PasswordReset';
 export const DRAWER_ROUTE = 'Drawer';
 export const ABOUT_ROUTE = 'About';
 
+export const FAQ_ROUTE = 'FAQ';
+
 /** Drawer Navigator Routes */
 export const MAIN_ROUTE = 'Main';
 export const SCHEDULE_ROUTE = 'Schedule';

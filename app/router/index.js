@@ -13,6 +13,7 @@ import {
   PROFILE_INFO_ROUTE,
   PASSWORD_RESET_ROUTE,
   ABOUT_ROUTE,
+  FAQ_ROUTE,
 } from '../constants/RouteConstants';
 
 import { EnterPassword, EnterEmail, Signup, PasswordReset } from '../components/AuthPage';
@@ -20,6 +21,7 @@ import LandingPage from '../components/LandingPage';
 import Drawer from '../components/Drawer';
 import ProfileInfo from '../components/ProfilePage/ProfileInfo';
 import AboutPage from '../components/AboutPage';
+import FAQPage from '../components/FAQPage';
 
 const createStackNavigator = token => StackNavigator(
   {
@@ -55,6 +57,9 @@ const createStackNavigator = token => StackNavigator(
     },
     [ABOUT_ROUTE]: {
       screen: AboutPage,
+    },
+    [FAQ_ROUTE]: {
+      screen: FAQPage,
     },
   },
   {

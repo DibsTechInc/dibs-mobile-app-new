@@ -11,6 +11,7 @@ import {
   MAIN_ROUTE,
   PROFILE_INFO_ROUTE,
   ABOUT_ROUTE,
+  FAQ_ROUTE,
 } from '../../constants/RouteConstants';
 
 import Header from '../Header';
@@ -82,7 +83,7 @@ class ProfileScreen extends Component {
             />
             <SettingsList.Item
               title='FAQ'
-              onPress={() => Alert.alert('Route To FAQ Page')}
+              onPress={() => this.props.navigation.navigate(FAQ_ROUTE)}
             />
             <SettingsList.Item
               title='Contact'
