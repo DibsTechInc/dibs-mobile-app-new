@@ -13,7 +13,7 @@ import Promise from 'bluebird';
 import { signUpUser } from '../../actions/UserActions';
 import FadeInView from '../shared/FadeInView';
 import InputField from '../shared/InputField';
-import MaterialButton from '../shared/MaterialButton';
+import { MaterialButton, CustomStatusBar } from '../shared';
 import { TERMS_AND_CONDITIONS_ROUTE } from '../../constants';
 import Config from '../../../config.json';
 
@@ -110,6 +110,7 @@ class Signup extends Component {
 
     return (
       <FadeInView style={{ justifyContent: 'center', alignItems: 'center', marginBottom: '30%' }}>
+        <CustomStatusBar backgroundColor={'transparent'} barStyle="light-content" />
         <StyledText>
           Just need a few details before we get started
         </StyledText>
