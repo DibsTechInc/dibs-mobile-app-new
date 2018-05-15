@@ -15,6 +15,7 @@ import {
   ABOUT_ROUTE,
   FAQ_ROUTE,
   CONTACT_ROUTE,
+  SETTINGS_ROUTE,
 } from '../constants/RouteConstants';
 
 import { EnterPassword, EnterEmail, Signup, PasswordReset } from '../components/AuthPage';
@@ -24,6 +25,7 @@ import ProfileInfo from '../components/ProfilePage/ProfileInfo';
 import AboutPage from '../components/AboutPage';
 import FAQPage from '../components/FAQPage';
 import ContactPage from '../components/ContactPage';
+import SettingsPage from '../components/SettingsPage';
 
 const createStackNavigator = token => StackNavigator(
   {
@@ -66,6 +68,9 @@ const createStackNavigator = token => StackNavigator(
     [CONTACT_ROUTE]: {
       screen: ContactPage,
     },
+    [SETTINGS_ROUTE]: {
+      screen: SettingsPage,
+    }
   },
   {
     headerMode: 'none',

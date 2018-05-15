@@ -13,6 +13,7 @@ import {
   ABOUT_ROUTE,
   FAQ_ROUTE,
   CONTACT_ROUTE,
+  SETTINGS_ROUTE,
 } from '../../constants/RouteConstants';
 
 import Header from '../Header';
@@ -69,10 +70,10 @@ class ProfileScreen extends Component {
             />
             <SettingsList.Item
               title="Settings"
-              onPress={() => Alert.alert('Route To Settings Page')}
+              onPress={() => this.props.navigation.navigate(SETTINGS_ROUTE)}
             />
 
-            <SettingsList.Header headerStyle={{ marginTop:15 }}/>
+            <SettingsList.Header headerStyle={{ marginTop: 15 }} />
             <SettingsList.Item
               hasNavArrow={false}
               title="ADDITIONAL"
