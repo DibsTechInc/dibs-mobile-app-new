@@ -12,6 +12,7 @@ import {
   PROFILE_INFO_ROUTE,
   ABOUT_ROUTE,
   FAQ_ROUTE,
+  CONTACT_ROUTE,
 } from '../../constants/RouteConstants';
 
 import Header from '../Header';
@@ -45,49 +46,49 @@ class ProfileScreen extends Component {
             <SettingsList.Header headerStyle={{ marginTop: 15 }} />
             <SettingsList.Item
               hasNavArrow={false}
-              title='PERSONAL DETAILS'
+              title="PERSONAL DETAILS"
               titleStyle={{ color: 'darkgray' }}
             />
             <SettingsList.Item
-              title='John Smith'
+              title="John Smith"
               onPress={() => this.props.navigation.navigate(PROFILE_INFO_ROUTE)}
             />
             <SettingsList.Header headerStyle={{ marginTop: 15 }} />
             <SettingsList.Item
               hasNavArrow={false}
-              title='ACCOUNT DETAILS'
+              title="ACCOUNT DETAILS"
               titleStyle={{ color: 'darkgray' }}
             />
             <SettingsList.Item
-              title='Upcoming Classes'
+              title="Upcoming Classes"
               onPress={() => Alert.alert('Route To Upcoming Classes Page')}
             />
             <SettingsList.Item
-              title='Packages/Credit'
+              title="Packages/Credit"
               onPress={() => Alert.alert('Route To Packages/Credits Page')}
             />
             <SettingsList.Item
-              title='Settings'
+              title="Settings"
               onPress={() => Alert.alert('Route To Settings Page')}
             />
 
             <SettingsList.Header headerStyle={{ marginTop:15 }}/>
             <SettingsList.Item
               hasNavArrow={false}
-              title='ADDITIONAL'
+              title="ADDITIONAL"
               titleStyle={{ color: 'darkgray' }}
             />
             <SettingsList.Item
-              title='About'
+              title="About"
               onPress={() => this.props.navigation.navigate(ABOUT_ROUTE)}
             />
             <SettingsList.Item
-              title='FAQ'
+              title="FAQ"
               onPress={() => this.props.navigation.navigate(FAQ_ROUTE)}
             />
             <SettingsList.Item
-              title='Contact'
-              onPress={() => Alert.alert('Route To Contact Page')}
+              title="Contact"
+              onPress={() => this.props.navigation.navigate(CONTACT_ROUTE)}
             />
           </SettingsList>
         </View>

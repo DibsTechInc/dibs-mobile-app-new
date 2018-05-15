@@ -10,6 +10,7 @@ export const DRAWER_ROUTE = 'Drawer';
 export const ABOUT_ROUTE = 'About';
 
 export const FAQ_ROUTE = 'FAQ';
+export const CONTACT_ROUTE = 'Contact';
 
 /** Drawer Navigator Routes */
 export const MAIN_ROUTE = 'Main';
@@ -25,3 +26,4 @@ export const DRAWER_OPEN = 'DrawerOpen';
 export const SETTINGS_ROUTE = 'Settings';
 
 export const RECEIPT_ROUTE = 'Receipt';
+
