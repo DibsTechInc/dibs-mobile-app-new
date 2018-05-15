@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import {
-  Button,
   TouchableWithoutFeedback,
   Keyboard,
   Alert,
@@ -113,47 +112,44 @@ class Signup extends Component {
     const showButton = this.checkForm().canShowButton;
 
     return (
-      <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-          <StyledView>
-            <StyledText>
-              Just need a few details before we get started
-            </StyledText>
-            <InputField
-              value={this.props.navigation.state.params.email || ''}
-              editable={false}
-              style={{ width: 200 }}
-              containerStyle={{ marginBottom: 20 }}
-            />
-            <InputField
-              value={this.state.fullName}
-              onChangeText={fullName => this.setState({ fullName })}
-              placeholder="First and last name"
-              style={{ width: 200 }}
-              containerStyle={{ marginBottom: 20 }}
-            />
-            <InputField
-              value={this.state.password}
-              secureTextEntry
-              onChangeText={password => this.setState({ password })}
-              placeholder="Password (6 char min)"
-              style={{ width: 200 }}
-              containerStyle={{ marginBottom: 25 }}
-            />
-            <CheckBox
-              label="Terms and Conditions"
-              checked={this.state.tAndC}
-              onChange={this.handleOnCheck}
-            />
-            {showButton && (
-              <MaterialButton
-                text="Sign up"
-                onPress={this.handleOnPress}
-                style={{ marginTop: 15, width: 200, height: 40 }}
-              />
-            )}
-          </StyledView>
-        </TouchableWithoutFeedback>
+      <FadeInView style={{ justifyContent: 'center', alignItems: 'center', marginBottom: '30%' }}>
+        <StyledText>
+          Just need a few details before we get started
+        </StyledText>
+        <InputField
+          value={this.props.navigation.state.params.email || ''}
+          editable={false}
+          style={{ width: 200 }}
+          containerStyle={{ marginBottom: 20 }}
+        />
+        <InputField
+          value={this.state.fullName}
+          onChangeText={fullName => this.setState({ fullName })}
+          placeholder="First and last name"
+          style={{ width: 200 }}
+          containerStyle={{ marginBottom: 20 }}
+          autoFocus
+        />
+        <InputField
+          value={this.state.password}
+          secureTextEntry
+          onChangeText={password => this.setState({ password })}
+          placeholder="Password (6 char min)"
+          style={{ width: 200 }}
+          containerStyle={{ marginBottom: 25 }}
+        />
+        <CheckBox
+          label="Terms and Conditions"
+          checked={this.state.tAndC}
+          onChange={this.handleOnCheck}
+        />
+        {showButton && (
+          <MaterialButton
+            text="Sign up"
+            onPress={this.handleOnPress}
+            style={{ marginTop: 15, width: 200, height: 40 }}
+          />
+        )}
       </FadeInView>
     );
   }
