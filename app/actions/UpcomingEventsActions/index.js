@@ -76,6 +76,9 @@ export function syncUserEvents(callback = () => {}) {
   };
 }
 
+/**
+ * @returns {function} thunk
+ */
 export function setCurrentDateToFirstEventPrevMonth() {
   return function innerSetCurrentDateToFirstEventPrevMonth(dispatch, getState) {
     const state = getState();

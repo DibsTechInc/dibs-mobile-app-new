@@ -135,7 +135,7 @@ class Unexpanded extends React.PureComponent {
           </UpcomingClassLink>
         </TopRow>
         <EventListItem {...this.props.events[this.state.currentIndex]} />
-        {this.props.events.length > 0 ? (
+        {this.props.events.length > 1 ? (
           <PageControl>
             <ArrowContainer
               onPress={this.showPrevEvent}
