@@ -2,38 +2,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Calendar } from 'react-native-calendars';
-import { Svg, Path } from 'react-native-svg';
-import { View } from 'react-native';
 
-import Config from '../../../config.json';
-import { WHITE } from '../../constants';
+import Config from '../../../../config.json';
+import { WHITE } from '../../../constants';
 import {
   getUpcomingEventsCurrentDate,
   getMinimumUpcomingEventsDate,
   getHasUpcomingClassesPrevMonth,
   getHasUpcomingClassesNextMonth,
-} from '../../selectors';
+} from '../../../selectors';
 import {
   setCurrentDateToFirstEventNextMonth,
   setCurrentDateToFirstEventPrevMonth,
-} from '../../actions';
-
-const ARROW_SVG_WIDTH = 20;
-
-const CalendarArrow = ({ theta = 0 }) => (
-  <Svg width={ARROW_SVG_WIDTH} height={20}>
-    <Path
-      fill="none"
-      stroke={WHITE}
-      strokeWidth="3"
-      strokeLinecap="round"
-      d="M 7 2 L 13 10 L 7 18"
-      transform={`rotate(${theta}, 10, 10)`}
-    />
-  </Svg>
-);
-
-CalendarArrow.propTypes = { theta: PropTypes.number };
+} from '../../../actions';
+import CalendarArrow from './CalendarArrow';
 
 /**
  * @class CalendarComponent
@@ -49,37 +31,28 @@ class CalendarComponent extends React.PureComponent {
     super(props);
     this.onPressArrowLeft = this.onPressArrowLeft.bind(this);
     this.onPressArrowRight = this.onPressArrowRight.bind(this);
-    this.renderArrow = this.renderArrow.bind(this);
   }
+  /**
+   * @param {function} callback when called calendar goes to prev month
+   * @returns {undefined}
+   */
   onPressArrowLeft(callback) {
     if (!this.props.hasEventsPrevMonth) return;
     this.props.setCurrentDateToFirstEventPrevMonth();
     callback();
   }
+  /**
+   * @param {function} callback when called calendar goes to next month
+   * @returns {undefined}
+   */
   onPressArrowRight(callback) {
     if (!this.props.hasEventsNextMonth) return;
     this.props.setCurrentDateToFirstEventNextMonth();
     callback();
   }
   /**
-   * @param {string} direction either 'left' or 'right'
-   * @returns {JSX} XML
-   */
-  renderArrow(direction) {
-    switch (true) {
-      case (direction === 'left' && this.props.hasEventsPrevMonth):
-        return <CalendarArrow theta={180} />;
-
-      case (direction === 'right' && this.props.hasEventsNextMonth):
-        return <CalendarArrow />;
-
-      default:
-        return <View style={{ width: ARROW_SVG_WIDTH }} />;
-    }
-  }
-  /**
    * render
-   * @returns {JSX.Element} HTML
+   * @returns {JSX.Element} XML
    */
   render() {
     return (
@@ -101,7 +74,15 @@ class CalendarComponent extends React.PureComponent {
         current={this.props.currentDate}
         minDate={this.props.minimumDate}
         firstDay={0}
-        renderArrow={this.renderArrow}
+        renderArrow={direction => (
+          <CalendarArrow
+            direction={direction}
+            disabled={(
+              direction === 'left' ?
+                !this.props.hasEventsPrevMonth : !this.props.hasEventsNextMonth
+            )}
+          />
+        )}
         onPressArrowLeft={this.onPressArrowLeft}
         onPressArrowRight={this.onPressArrowRight}
       />
