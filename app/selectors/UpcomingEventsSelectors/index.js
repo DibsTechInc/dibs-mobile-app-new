@@ -1,6 +1,9 @@
 import moment from 'moment-timezone';
 import { createSelector } from 'reselect';
 import { groupBy } from 'lodash';
+
+import Config from '../../../config.json';
+import { WHITE } from '../../constants';
 import { getStudioShortDateFormat, getStudioCustomTimeFormat } from '../StudioSelectors';
 // import { createUnboundedSelector } from '../../helpers';
 
@@ -125,5 +128,27 @@ export const getUpcomingSliderEventsOnCurrentDate = createSelector(
   getStudioShortDateFormat,
   getStudioCustomTimeFormat,
   generateSliderEvents
+);
+
+export const getUpcomingEventCalendarMarkings = createSelector(
+  getUpcomingEventsByDay,
+  getUpcomingEventsCurrentDate,
+  (eventsByDay, currentDate) => {
+    const daysUserHasEvents = Object.keys(eventsByDay).map(day => moment(+day)).filter(day => day.isSame(currentDate, 'month'));
+    const dayMarkings = {};
+    for (
+      let day = moment(currentDate).tz(Config.STUDIO_TZ).startOf('month');
+      day.isBefore(moment(currentDate).endOf('month'));
+      day.add(1, 'day')
+    ) {
+      dayMarkings[day.format('YYYY-MM-DD')] = {
+        selected: moment(currentDate).isSame(day, 'day'),
+        marked: daysUserHasEvents.some(eventDay => eventDay.isSame(day, 'day')),
+        activeOpacity: 1,
+        dotColor: WHITE,
+      };
+    }
+    return dayMarkings;
+  }
 );
 

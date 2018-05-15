@@ -2,18 +2,21 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Calendar } from 'react-native-calendars';
+import moment from 'moment-timezone';
 
 import Config from '../../../../config.json';
-import { WHITE } from '../../../constants';
+import theme from './theme';
 import {
   getUpcomingEventsCurrentDate,
   getMinimumUpcomingEventsDate,
   getHasUpcomingClassesPrevMonth,
   getHasUpcomingClassesNextMonth,
+  getUpcomingEventCalendarMarkings,
 } from '../../../selectors';
 import {
   setCurrentDateToFirstEventNextMonth,
   setCurrentDateToFirstEventPrevMonth,
+  setUpcomingEventsCurrentDate,
 } from '../../../actions';
 import CalendarArrow from './CalendarArrow';
 
@@ -31,6 +34,7 @@ class CalendarComponent extends React.PureComponent {
     super(props);
     this.onPressArrowLeft = this.onPressArrowLeft.bind(this);
     this.onPressArrowRight = this.onPressArrowRight.bind(this);
+    this.onDayPress = this.onDayPress.bind(this);
   }
   /**
    * @param {function} callback when called calendar goes to prev month
@@ -51,26 +55,26 @@ class CalendarComponent extends React.PureComponent {
     callback();
   }
   /**
+   * @param {Object} date object from Calendar's onDayPress
+   * @returns {undefined}
+   */
+  onDayPress({ dateString }) {
+    this.props.setUpcomingEventsCurrentDate(moment.tz(dateString, Config.STUDIO_TZ));
+  }
+  /**
    * render
    * @returns {JSX.Element} XML
    */
   render() {
+    console.log('test')
     return (
       <Calendar
         style={{
           height: 350,
-          backgroundColor:
-          Config.STUDIO_COLOR,
+          backgroundColor: Config.STUDIO_COLOR,
           marginTop: 30,
-          marginBottom: 10,
         }}
-        theme={{
-          'stylesheet.calendar.header': {
-            monthText: { color: WHITE, fontFamily: 'flex-font-heavy', fontSize: 16 },
-            arrow: { paddingVertical: 0, paddingHorizontal: 30 },
-            dayHeader: { color: WHITE, fontFamily: 'flex-font', fontSize: 14 },
-          },
-        }}
+        theme={theme}
         current={this.props.currentDate}
         minDate={this.props.minimumDate}
         firstDay={0}
@@ -85,6 +89,8 @@ class CalendarComponent extends React.PureComponent {
         )}
         onPressArrowLeft={this.onPressArrowLeft}
         onPressArrowRight={this.onPressArrowRight}
+        markedDates={this.props.dateMarkings}
+        onDayPress={this.onDayPress}
       />
     );
   }
@@ -95,8 +101,10 @@ CalendarComponent.propTypes = {
   minimumDate: PropTypes.string.isRequired,
   hasEventsPrevMonth: PropTypes.bool.isRequired,
   hasEventsNextMonth: PropTypes.bool.isRequired,
+  dateMarkings: PropTypes.shape().isRequired,
   setCurrentDateToFirstEventNextMonth: PropTypes.func.isRequired,
   setCurrentDateToFirstEventPrevMonth: PropTypes.func.isRequired,
+  setUpcomingEventsCurrentDate: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
@@ -104,10 +112,12 @@ const mapStateToProps = state => ({
   minimumDate: getMinimumUpcomingEventsDate(state).toISOString(),
   hasEventsPrevMonth: getHasUpcomingClassesPrevMonth(state),
   hasEventsNextMonth: getHasUpcomingClassesNextMonth(state),
+  dateMarkings: getUpcomingEventCalendarMarkings(state),
 });
 const mapDispatchToProps = {
   setCurrentDateToFirstEventNextMonth,
   setCurrentDateToFirstEventPrevMonth,
+  setUpcomingEventsCurrentDate,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CalendarComponent);

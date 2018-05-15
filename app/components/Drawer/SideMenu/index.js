@@ -101,16 +101,10 @@ class SideMenu extends React.PureComponent {
           </StyledHeavyText>
           <CartIcon iconColor={DARK_TEXT_GREY} />
         </StyledHeader>
-        <SpaceBetweenRow>
-          <BalanceDisplay
-            label="Credit Balance"
-            value={this.props.creditBalance}
-          />
-          <BalanceDisplay
-            label="Flash Credit Balance"
-            value={this.props.flashCreditBalance}
-          />
-        </SpaceBetweenRow>
+        <BalanceDisplay
+          label="Credit Balance"
+          value={this.props.creditBalance}
+        />
         {Boolean(this.props.nextPassName) && (
           <BalanceDisplay
             label="Current Package"
@@ -138,7 +132,6 @@ class SideMenu extends React.PureComponent {
           route={LANDING_ROUTE}
           loggingOut
           logOutUser={this.props.logOutUser}
-
         />
       </StyledContainer>
     );

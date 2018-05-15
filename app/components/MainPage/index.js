@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { Dimensions } from 'react-native';
 
-import backgroundImg from '../../../assets/img/main-page.jpg';
+import backgroundImg from '../../../assets/img/main-page.png';
 import {
   BLACK,
   WHITE,
