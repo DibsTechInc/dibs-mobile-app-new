@@ -7,6 +7,13 @@ export const REGISTER_ROUTE = 'Register';
 export const PASSWORD_RESET_ROUTE = 'PasswordReset';
 
 export const DRAWER_ROUTE = 'Drawer';
+export const ABOUT_ROUTE = 'About';
+
+export const FAQ_ROUTE = 'FAQ';
+export const CONTACT_ROUTE = 'Contact';
+
+export const SETTINGS_ROUTE = 'Settings';
+export const TERMS_AND_CONDITIONS_ROUTE = 'TermsAndConditions';
 
 /** Drawer Navigator Routes */
 export const MAIN_ROUTE = 'Main';
@@ -19,6 +26,6 @@ export const CART_ROUTE = 'Cart';
 export const CONFIRMATION_ROUTE = 'Confirmation';
 
 export const DRAWER_OPEN = 'DrawerOpen';
-export const SETTINGS_ROUTE = 'Settings';
 
 export const RECEIPT_ROUTE = 'Receipt';
+

@@ -11,7 +11,7 @@ import {
   getDrawerConfig,
 } from '../../util/navigation';
 import MainPage from '../MainPage';
-import ProfilePage from '../ProfilePage';
+import { ProfilePage } from '../ProfilePage';
 import SchedulePage from '../SchedulePage';
 import CartPage from '../CartPage';
 import SideMenu from './SideMenu';

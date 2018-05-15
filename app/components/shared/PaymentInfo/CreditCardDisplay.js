@@ -3,7 +3,7 @@ import { View, Image } from 'react-native';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import FadeInView from '../shared/FadeInView';
+import { FadeInView } from '../../shared';
 
 const StyledText = styled.Text`
   font-family: 'flex-font';

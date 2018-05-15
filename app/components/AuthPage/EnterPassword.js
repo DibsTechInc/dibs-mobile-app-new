@@ -87,35 +87,33 @@ class EnterPassword extends Component {
     }
 
     return (
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <InputField
-            label={(
-              this.props.navigation.state.params.fromReset ?
-                'What is your new password?' : 'What is your password?'
-            )}
-            autoFocus
-            returnKeyType="go"
-            placeholder="Password"
-            secureTextEntry
-            autoCapitalize="none"
-            onSubmitEditing={this.handleOnPress}
-            onChangeText={password => this.setState({ password })}
-            value={this.state.password}
-            containerStyle={{ marginBottom: 10, width: 200 }}
-            labelStyle={{ marginBottom: 20, textAlign: 'center' }}
-            style={{ minWidth: 200 }}
-          />
-          <TouchableOpacity
-            onPress={this.navigateToPasswordReset}
-            style={{ marginBottom: 20 }}
-          >
-            <ForgotPasswordText>
-              Forgot your password?
-            </ForgotPasswordText>
-          </TouchableOpacity>
-        </FadeInView>
-      </TouchableWithoutFeedback>
+      <FadeInView style={{ justifyContent: 'center', alignItems: 'center', marginBottom: '30%' }}>
+        <InputField
+          label={(
+            this.props.navigation.state.params.fromReset ?
+              'What is your new password?' : 'What is your password?'
+          )}
+          autoFocus
+          returnKeyType="go"
+          placeholder="Password"
+          secureTextEntry
+          autoCapitalize="none"
+          onSubmitEditing={this.handleOnPress}
+          onChangeText={password => this.setState({ password })}
+          value={this.state.password}
+          containerStyle={{ marginBottom: 10, width: 200 }}
+          labelStyle={{ marginBottom: 20, textAlign: 'center' }}
+          style={{ minWidth: 200 }}
+        />
+        <TouchableOpacity
+          onPress={this.navigateToPasswordReset}
+          style={{ marginBottom: 20 }}
+        >
+          <ForgotPasswordText>
+            Forgot your password?
+          </ForgotPasswordText>
+        </TouchableOpacity>
+      </FadeInView>
     );
   }
 }

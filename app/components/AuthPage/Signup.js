@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import {
-  Button,
-  TouchableWithoutFeedback,
-  Keyboard,
   Alert,
+  TouchableOpacity,
+  Text,
+  View,
 } from 'react-native';
 import styled from 'styled-components';
 import CheckBox from 'react-native-checkbox';
@@ -13,13 +13,9 @@ import Promise from 'bluebird';
 import { signUpUser } from '../../actions/UserActions';
 import FadeInView from '../shared/FadeInView';
 import InputField from '../shared/InputField';
-import MaterialButton from '../shared/MaterialButton';
-
-const StyledView = styled.View`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-`;
+import { MaterialButton, CustomStatusBar } from '../shared';
+import { TERMS_AND_CONDITIONS_ROUTE } from '../../constants';
+import Config from '../../../config.json';
 
 const StyledText = styled.Text`
   font-family: flex-font;
@@ -113,47 +109,55 @@ class Signup extends Component {
     const showButton = this.checkForm().canShowButton;
 
     return (
-      <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-          <StyledView>
-            <StyledText>
-              Just need a few details before we get started
-            </StyledText>
-            <InputField
-              value={this.props.navigation.state.params.email || ''}
-              editable={false}
-              style={{ width: 200 }}
-              containerStyle={{ marginBottom: 20 }}
-            />
-            <InputField
-              value={this.state.fullName}
-              onChangeText={fullName => this.setState({ fullName })}
-              placeholder="First and last name"
-              style={{ width: 200 }}
-              containerStyle={{ marginBottom: 20 }}
-            />
-            <InputField
-              value={this.state.password}
-              secureTextEntry
-              onChangeText={password => this.setState({ password })}
-              placeholder="Password (6 char min)"
-              style={{ width: 200 }}
-              containerStyle={{ marginBottom: 25 }}
-            />
-            <CheckBox
-              label="Terms and Conditions"
-              checked={this.state.tAndC}
-              onChange={this.handleOnCheck}
-            />
-            {showButton && (
-              <MaterialButton
-                text="Sign up"
-                onPress={this.handleOnPress}
-                style={{ marginTop: 15, width: 200, height: 40 }}
-              />
-            )}
-          </StyledView>
-        </TouchableWithoutFeedback>
+      <FadeInView style={{ justifyContent: 'center', alignItems: 'center', marginBottom: '30%' }}>
+        <CustomStatusBar backgroundColor={'transparent'} barStyle="light-content" />
+        <StyledText>
+          Just need a few details before we get started
+        </StyledText>
+        <InputField
+          value={this.props.navigation.state.params.email || ''}
+          editable={false}
+          style={{ width: 200 }}
+          containerStyle={{ marginBottom: 20 }}
+        />
+        <InputField
+          value={this.state.fullName}
+          onChangeText={fullName => this.setState({ fullName })}
+          placeholder="First and last name"
+          style={{ width: 200 }}
+          containerStyle={{ marginBottom: 20 }}
+          autoFocus
+        />
+        <InputField
+          value={this.state.password}
+          secureTextEntry
+          onChangeText={password => this.setState({ password })}
+          placeholder="Password (6 char min)"
+          style={{ width: 200 }}
+          containerStyle={{ marginBottom: 25 }}
+        />
+        <View style={{ flexDirection: 'row', width: 200, justifyContent: 'space-between', marginBottom: 50 }}>
+          <TouchableOpacity onPress={() => this.props.navigation.navigate(TERMS_AND_CONDITIONS_ROUTE, { url: Config.STUDIO_TERMS_LINK })}>
+            <Text style={{ color: Config.STUDIO_COLOR, fontFamily: 'flex-font' }}>Flex Studios</Text>
+          </TouchableOpacity>
+          <Text> & </Text>
+          <TouchableOpacity onPress={() => this.props.navigation.navigate(TERMS_AND_CONDITIONS_ROUTE, { url: Config.DIBS_TERMS_LINK })}>
+            <Text style={{ color: Config.STUDIO_COLOR, fontFamily: 'flex-font' }}>Dibs</Text>
+          </TouchableOpacity>
+        </View>
+        <CheckBox
+          label="I have read and agreed to the terms and conditions"
+          labelStyle={{ fontFamily: 'flex-font' }}
+          checked={this.state.tAndC}
+          onChange={this.handleOnCheck}
+        />
+        {showButton && (
+          <MaterialButton
+            text="Sign up"
+            onPress={this.handleOnPress}
+            style={{ marginTop: 15, width: 200, height: 40 }}
+          />
+        )}
       </FadeInView>
     );
   }
