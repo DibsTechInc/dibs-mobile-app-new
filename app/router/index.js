@@ -40,6 +40,9 @@ const createStackNavigator = token => StackNavigator(
     },
     [PASSWORD_RESET_ROUTE]: {
       screen: PasswordReset,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
     },
     [DRAWER_ROUTE]: {
       screen: Drawer,

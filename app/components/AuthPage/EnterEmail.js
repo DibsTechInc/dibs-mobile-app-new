@@ -3,14 +3,10 @@ import React, { Component } from 'react';
 import { PropTypes } from 'prop-types';
 import { connect } from 'react-redux';
 import {
-  TouchableWithoutFeedback,
-  Keyboard,
   Alert,
 } from 'react-native';
-import styled from 'styled-components';
 import Promise from 'bluebird';
 
-import { RED } from '../../constants';
 import { validateEmail } from '../../actions/UserActions';
 import FadeInView from '../shared/FadeInView';
 import InputField from '../shared/InputField';
@@ -55,10 +51,10 @@ class EnterEmail extends Component {
     await new Promise(res => this.setState({ isLoading: false }, res));
 
     if (!route) {
-      await new Promise(res => this.setState({ isLoading: false }, res));
-      Alert.alert('Uh oh, we could not verify this email.');
+      this.setState({ isLoading: false });
+      Alert.alert('Uh oh, we could not verify this email. Please contact support.');
     } else {
-      this.props.navigation.navigate(route, { email }); // last key for PW reset
+      this.props.navigation.navigate(route, { email, fromReset: false }); // last key for PW reset
     }
   }
 
