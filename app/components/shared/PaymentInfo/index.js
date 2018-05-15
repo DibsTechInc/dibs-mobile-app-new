@@ -3,13 +3,13 @@ import { ActivityIndicator, View } from 'react-native';
 import { connect } from 'react-redux';
 import Promise from 'bluebird';
 import PropTypes from 'prop-types';
+
 import { CreditCardInput } from 'react-native-credit-card-input';
-import FadeInView from '../shared/FadeInView';
+import { FadeInView, MaterialPanel } from '../../shared';
 import GreenCard from './greencc.png';
 import GreenCardFront from './greenccfront.png';
-import MaterialPanel from '../shared/MaterialPanel';
-import Config from '../../../config.json';
-import { updateCreditCard } from '../../actions/CreditCardActions';
+import Config from '../../../../config.json';
+import { updateCreditCard } from '../../../actions/CreditCardActions';
 import CreditCardDisplay from './CreditCardDisplay';
 
 import AmexIcon from './stp_card_amex.png';
@@ -158,9 +158,10 @@ class PaymentInfo extends PureComponent {
       cardImageBack={GreenCard}
       cardImageFront={GreenCardFront}
 
-      cardScale={0.8}
+      cardScale={0.7}
       labels={labels}
       allowScroll
+      labelStyle={{ paddingTop: 10 }}
 
       validColor="black"
       invalidColor="red"
@@ -205,7 +206,7 @@ class PaymentInfo extends PureComponent {
 
     if (this.props.isUpdatingCard || !hasCC) {
       creditCardDisplay = creditCardInput;
-      displayHeight = 350;
+      displayHeight = 320;
     } else if (this.state.valid || hasCC) {
       creditCardDisplay = paymentDisplay;
       displayHeight = 120;
@@ -244,7 +245,7 @@ class PaymentInfo extends PureComponent {
         headerStyle={{ marginLeft: 10 }}
         onPressHeadingRight={this.props.setEditCC}
       >
-        <FadeInView style={{ margin: 10 }}>
+        <FadeInView>
           {creditCardDisplay}
         </FadeInView>
       </MaterialPanel>

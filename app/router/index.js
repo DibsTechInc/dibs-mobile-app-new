@@ -12,12 +12,23 @@ import {
   DRAWER_ROUTE,
   PROFILE_INFO_ROUTE,
   PASSWORD_RESET_ROUTE,
+  ABOUT_ROUTE,
+  FAQ_ROUTE,
+  CONTACT_ROUTE,
+  SETTINGS_ROUTE,
+  TERMS_AND_CONDITIONS_ROUTE,
 } from '../constants/RouteConstants';
 
-import { EnterPassword, EnterEmail, Signup, PasswordReset } from '../components/AuthPage';
+import { EnterPassword, EnterEmail, Signup, PasswordReset, TermsAndConditions } from '../components/AuthPage';
 import LandingPage from '../components/LandingPage';
 import Drawer from '../components/Drawer';
-import ProfileInfo from '../components/ProfilePage/ProfileInfo';
+import {
+  AboutUs,
+  ContactUs,
+  FAQ,
+  ProfileInfo,
+  UserSettings,
+} from '../components/ProfilePage';
 
 const createStackNavigator = token => StackNavigator(
   {
@@ -36,8 +47,14 @@ const createStackNavigator = token => StackNavigator(
     [REGISTER_ROUTE]: {
       screen: Signup,
     },
+    [TERMS_AND_CONDITIONS_ROUTE]: {
+      screen: TermsAndConditions,
+    },
     [PASSWORD_RESET_ROUTE]: {
       screen: PasswordReset,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
     },
     [DRAWER_ROUTE]: {
       screen: Drawer,
@@ -47,6 +64,18 @@ const createStackNavigator = token => StackNavigator(
     },
     [PROFILE_INFO_ROUTE]: {
       screen: ProfileInfo,
+    },
+    [ABOUT_ROUTE]: {
+      screen: AboutUs,
+    },
+    [FAQ_ROUTE]: {
+      screen: FAQ,
+    },
+    [CONTACT_ROUTE]: {
+      screen: ContactUs,
+    },
+    [SETTINGS_ROUTE]: {
+      screen: UserSettings,
     },
   },
   {

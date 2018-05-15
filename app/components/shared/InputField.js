@@ -43,27 +43,25 @@ class InputField extends React.PureComponent {
    */
   render() {
     return (
-      <View>
-        <StudioColorBottomBorder
-          style={{
-            ...this.props.containerStyle,
-            borderBottomWidth: 1 + Boolean(this.state.focused),
-          }}
-        >
-          {this.props.label ? (
-            <Label style={this.props.labelStyle}>
-              {this.props.label}
-            </Label>
-          ) : null}
-          <ScrollView keyboardShouldPersistTaps="never">
-            <DefaultInput
-              onFocus={this.onFocus}
-              onBlur={this.onBlur}
-              {...this.props}
-            />
-          </ScrollView>
-        </StudioColorBottomBorder>
-      </View>
+      <StudioColorBottomBorder
+        style={{
+          ...this.props.containerStyle,
+          borderBottomWidth: 1 + Boolean(this.state.focused),
+        }}
+      >
+        {this.props.label ? (
+          <Label style={this.props.labelStyle}>
+            {this.props.label}
+          </Label>
+        ) : null}
+        <View keyboardShouldPersistTaps="never">
+          <DefaultInput
+            onFocus={this.onFocus}
+            onBlur={this.onBlur}
+            {...this.props}
+          />
+        </View>
+      </StudioColorBottomBorder>
     );
   }
 }

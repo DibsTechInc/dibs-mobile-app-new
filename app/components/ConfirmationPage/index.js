@@ -7,9 +7,7 @@ import Swipeable from 'react-native-swipeable';
 import styled from 'styled-components';
 import FadeInView from '../shared/FadeInView';
 import {
-  LIGHT_GREY,
   SOFT_GREY,
-  BLACK,
   GREY,
   WHITE,
   RECEIPT_ROUTE,
@@ -17,10 +15,9 @@ import {
 } from '../../constants';
 import { getSortedCartEvents, getConfirmationState, getCartErrorMessage } from '../../selectors';
 import Config from '../../../config.json';
-import { Icon, CustomStatusBar, DibsLoader } from '../shared';
+import { Icon, CustomStatusBar, DibsLoader, PaymentInfo } from '../shared';
 import CartItem from '../CartPage/CartItem';
 import CartTransaction from '../CartPage/CartTransaction';
-import PaymentInfo from './PaymentInfo';
 import { MaterialPanelView } from '../styled';
 import { submitCartForPurchase } from '../../actions';
 
