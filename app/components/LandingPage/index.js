@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 import {
   AsyncStorage,
+  View,
 } from 'react-native';
 
 import styled from 'styled-components';
@@ -14,7 +15,7 @@ import { VERIFY_ROUTE } from '../../constants/RouteConstants/index';
 import Config from '../../../config.json';
 import FadeInView from '../shared/FadeInView';
 import { FlexCenter } from '../styled';
-import MaterialButton from '../shared/MaterialButton';
+import { MaterialButton, CustomStatusBar } from '../shared';
 
 const StyledView = styled.View`
   flex: 1;
@@ -51,12 +52,27 @@ class LandingPage extends Component {
     super(props);
     this.checkAuth();
     this.handleOnPress = this.handleOnPress.bind(this);
+
+    this.state = {
+      currentIndex: 0,
+    };
+
+    this.handleOnChangeIndex = this.handleOnChangeIndex.bind(this);
   }
   /**
    * @returns {undefined}
    */
   handleOnPress() {
     this.props.navigation.navigate(VERIFY_ROUTE);
+  }
+  /**
+   * @param {number} index the current index of the swipe page
+   * @returns {undefined}
+   */
+  handleOnChangeIndex(index) {
+    this.setState({
+      currentIndex: index, // so we can change status bar color depending on background of the slides
+    });
   }
   /**
    * @returns {undefined}
@@ -71,23 +87,31 @@ class LandingPage extends Component {
    * @returns {JSX} XML
    */
   render() {
+    console.log(this.state.currentIndex)
     return (
-      <Swiper loop={false}>
-        <FadeInView style={{ flex: 1 }}>
-          <StyledWelcomeView>
-            <StyledWelcomeText>Welcome to FLEX Studios!</StyledWelcomeText>
-            <StyledGrayText>Swipe to learn more</StyledGrayText>
-          </StyledWelcomeView>
-          <StyledButtonsView>
-            <MaterialButton
-              onPress={this.handleOnPress}
-              text="Continue"
-              style={{ width: '75%', height: 40 }}
-            />
-          </StyledButtonsView>
-        </FadeInView>
-        <About />
-      </Swiper>
+      <View style={{ flex: 1 }}>
+        <CustomStatusBar backgroundColor={'transparent'} barStyle="dark-content" />
+        <Swiper
+          loop={false}
+          onIndexChanged={this.handleOnChangeIndex}
+        >
+          <FadeInView style={{ flex: 1 }}>
+            <StyledWelcomeView>
+              <StyledWelcomeText>Welcome to FLEX Studios!</StyledWelcomeText>
+              <StyledGrayText>Swipe to learn more</StyledGrayText>
+            </StyledWelcomeView>
+            <StyledButtonsView>
+              <MaterialButton
+                onPress={this.handleOnPress}
+                text="Continue"
+                style={{ width: '75%', height: 40 }}
+              />
+            </StyledButtonsView>
+          </FadeInView>
+          <About />
+        </Swiper>
+      </View>
+      
     );
   }
 }

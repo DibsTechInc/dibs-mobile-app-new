@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Header from '../Header';
-import { FadeInView, PaymentInfo } from '../shared';
+import { FadeInView, PaymentInfo, CustomStatusBar } from '../shared';
 import { WHITE, BLACK } from '../../constants';
 
 class ProfileInfo extends Component {
@@ -41,9 +41,13 @@ class ProfileInfo extends Component {
   render() {
     return (
       <FadeInView>
+        <CustomStatusBar backgroundColor={WHITE} barStyle="dark-content" />
         <Header
           iconColor={BLACK}
           backgroundColor={WHITE}
+          showCart={false}
+          iconType="arrow-left"
+          iconSize={15}
         />
         <PaymentInfo
           isLoading={this.state.isLoading}

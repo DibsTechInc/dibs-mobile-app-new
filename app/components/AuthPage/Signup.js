@@ -110,7 +110,7 @@ class Signup extends Component {
 
     return (
       <FadeInView style={{ justifyContent: 'center', alignItems: 'center', marginBottom: '30%' }}>
-        <CustomStatusBar backgroundColor={'transparent'} barStyle="light-content" />
+        <CustomStatusBar backgroundColor={'transparent'} barStyle="dark-content" />
         <StyledText>
           Just need a few details before we get started
         </StyledText>

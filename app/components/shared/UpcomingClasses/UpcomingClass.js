@@ -59,7 +59,7 @@ class UpcomingClass extends PureComponent {
             description="blahblah"
           />
         </MapView>
-        <View style={{ flex: 1, margin: 10, marginTop: 10, marginLeft: 10 }}>
+        <View style={{ flex: 1, margin: 10, marginTop: 10, marginLeft: 10, marginBottom: 50 }}>
           <View>
             <Text style={{ fontFamily: 'flex-font-heavy' }}>Class Description:</Text>
             <Text style={{ fontFamily: 'flex-font' }}>{this.props.class.classDescription.length ? classDescriptionHTML : 'No Class Description.'}</Text>
