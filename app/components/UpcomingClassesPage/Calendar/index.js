@@ -8,7 +8,6 @@ import Config from '../../../../config.json';
 import theme from './theme';
 import {
   getUpcomingEventsCurrentDate,
-  getMinimumUpcomingEventsDate,
   getHasUpcomingClassesPrevMonth,
   getHasUpcomingClassesNextMonth,
   getUpcomingEventCalendarMarkings,
@@ -75,7 +74,7 @@ class CalendarComponent extends React.PureComponent {
         }}
         theme={theme}
         current={this.props.currentDate}
-        minDate={this.props.minimumDate}
+        minDate={moment().tz(Config.STUDIO_TZ).startOf('day').toISOString()}
         firstDay={0}
         renderArrow={direction => (
           <CalendarArrow
@@ -97,7 +96,6 @@ class CalendarComponent extends React.PureComponent {
 
 CalendarComponent.propTypes = {
   currentDate: PropTypes.string.isRequired,
-  minimumDate: PropTypes.string.isRequired,
   hasEventsPrevMonth: PropTypes.bool.isRequired,
   hasEventsNextMonth: PropTypes.bool.isRequired,
   dateMarkings: PropTypes.shape().isRequired,
@@ -108,7 +106,6 @@ CalendarComponent.propTypes = {
 
 const mapStateToProps = state => ({
   currentDate: getUpcomingEventsCurrentDate(state).toISOString(),
-  minimumDate: getMinimumUpcomingEventsDate(state).toISOString(),
   hasEventsPrevMonth: getHasUpcomingClassesPrevMonth(state),
   hasEventsNextMonth: getHasUpcomingClassesNextMonth(state),
   dateMarkings: getUpcomingEventCalendarMarkings(state),

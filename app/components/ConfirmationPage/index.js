@@ -53,10 +53,10 @@ const StyledContinueButton = styled.TouchableOpacity`
   padding-right: 10px;
   padding-top: 15px;
   padding-bottom: 15px;
-  background-color: ${props => props.hasDisabledColor ? GREY : Config.STUDIO_COLOR};
+  background-color: ${props => (props.hasDisabledColor ? GREY : Config.STUDIO_COLOR)};
   border-radius: 5px;
   border-width: 1px;
-  border-color: ${props => props.hasDisabledColor ? GREY : Config.STUDIO_COLOR};;
+  border-color: ${props => (props.hasDisabledColor ? GREY : Config.STUDIO_COLOR)};;
 `;
 
 const StyledCenterText = styled.Text`

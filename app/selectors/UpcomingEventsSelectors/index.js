@@ -62,11 +62,6 @@ export const getMostRecentUpcomingEvents = createSelector(
   eventsByDay => (eventsByDay[Math.min(...Object.keys(eventsByDay))] || [])
 );
 
-export const getMinimumUpcomingEventsDate = createSelector(
-  getMostRecentUpcomingEvents,
-  events => (events.length ? moment.tz(events[0].start_time, events[0].mainTZ) : moment().tz(Config.STUDIO_TZ))
-);
-
 export const getHasUpcomingClassesNextMonth = createSelector(
   getUpcomingEventsCurrentDate,
   getUpcomingEventsByDay,
