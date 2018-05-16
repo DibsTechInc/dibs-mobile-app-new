@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { View, Text, Alert } from 'react-native';
+import { View, Text, Alert, Dimensions } from 'react-native';
 import { withNavigation, NavigationActions } from 'react-navigation';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -17,6 +17,7 @@ import {
 import { submitCartForPurchase } from '../../actions';
 import {
   SOFT_GREY,
+  LIGHT_GREY,
   GREY,
   WHITE,
   BLACK,
@@ -33,6 +34,8 @@ import { MaterialPanelView } from '../styled';
 
 import MaterialButton from '../shared/MaterialButton';
 import Config from '../../../config.json';
+
+const WIDTH = Dimensions.get('window').width;
 
 const StyledScrollView = styled.ScrollView`
   flex: 1;
@@ -56,7 +59,10 @@ const StyledTopView = styled.View`
 const StyledCheckoutView = styled.View`
   justify-content: space-between;
   align-items: center;
-  marginBottom: 30px;
+  height: 100px;
+  border-top-width: 0.3;
+  border-color: ${LIGHT_GREY};
+  elevation: 3;
   background-color: ${WHITE};
 `;
 
@@ -77,12 +83,10 @@ const StyledCenterText = styled.Text`
 `;
 
 const StyledContinueButton = styled.TouchableOpacity`
-  padding-left: 10px;
   padding-right: 10px;
   padding-top: 15px;
   padding-bottom: 15px;
   background-color: ${props => props.hasDisabledColor ? GREY : Config.STUDIO_COLOR};
-  border-radius: 5px;
   border-width: 1px;
   border-color: ${props => props.hasDisabledColor ? GREY : Config.STUDIO_COLOR};;
 `;
@@ -202,15 +206,12 @@ class CartPage extends Component {
     const renderButtonColor = notReadyForPurchase ? GREY : Config.STUDIO_COLOR;
     const renderLeftButtons = notReadyForPurchase ? null : purchaseButton;
 
-    const renderPurchaseButton = (<View style={{ width: 390, overflow: 'hidden', backgroundColor: Config.STUDIO_COLOR, borderRadius: 5 }}>
+    const renderPurchaseButton = (<View style={{ overflow: 'hidden', backgroundColor: Config.STUDIO_COLOR, width: WIDTH }}>
       <Swipeable
         contentContainerStyle={
         { backgroundColor: renderButtonColor,
-          paddingLeft: 100,
-          paddingRight: 100,
           paddingTop: 15,
           paddingBottom: 15,
-          borderRadius: 5,
           borderWidth: 1,
           borderColor: renderButtonColor,
         }}
@@ -218,9 +219,9 @@ class CartPage extends Component {
         onLeftButtonsActivate={this.handlePurchase}
         leftButtonsActivationDistance={150}
       >
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{ flexDirection: 'row', position: 'relative' }}>
           <Text style={{ textAlign: 'center', color: WHITE, flex: 1 }}>Swipe to pay</Text>
-          <Text style={{ color: WHITE }}>{'>>'}</Text>
+          <Text style={{ color: WHITE, position: 'absolute', right: 40 }}>{'>>'}</Text>
         </View>
       </Swipeable>
     </View>);
@@ -255,6 +256,7 @@ class CartPage extends Component {
                 text="Class Schedule"
                 onPress={() => { this.props.navigation.navigate(SCHEDULE_ROUTE); }}
                 style={{ flex: 1, height: 50 }}
+                borderRadius={0}
               />
             </FlexRow>
           </StyledCheckoutView>
@@ -303,7 +305,7 @@ class CartPage extends Component {
           />
         </StyledScrollView>
         <StyledCheckoutView>
-          <View style={{ marginBottom: 30 }}>
+          <View style={{ justifyContent: 'center', alignItems: 'center', width: '100%', height: '50%' }}>
             <StyledSavingsText>{renderValueBackMessage}</StyledSavingsText>
           </View>
           <FlexRow>

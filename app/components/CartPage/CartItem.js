@@ -14,10 +14,6 @@ const StyledCartItemView = styled.View`
   min-height: 100px;
 `;
 
-// const StyledCartDetailHeaderView = styled.View`
-//   height: 20
-// `;
-
 const StyledText = styled.Text`
   font-family: 'flex-font';
 `;
