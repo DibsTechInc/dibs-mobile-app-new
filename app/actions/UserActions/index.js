@@ -18,18 +18,36 @@ import {
 export const setUser = createAction('SET_USER', payload => payload);
 
 /**
+ * @returns {function} thunk
+ */
+export function recordStudioVisit() {
+  return async function innerRecordStudioVisit(dispatch, getState, dibsFetch) {
+    try {
+      await dibsFetch(`/api/user/visit/${Config.DIBS_STUDIO_ID}`, {
+        method: 'POST',
+        requiresAuth: true,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+}
+
+/**
  * @param {function} callback on complete
  * @returns {function} thunk
  */
 export function requestUserData(callback) {
-  return async function innerRequestUserData(dispatch, getstate, dibsFetch) {
+  return async function innerRequestUserData(dispatch, getState, dibsFetch) {
     try {
       const res = await dibsFetch('/api/user', {
         method: 'GET',
         requiresAuth: true,
       });
-      if (res.success) dispatch(setUser(res.user));
-      else console.log(res);
+      if (res.success) {
+        dispatch(setUser(res.user));
+        dispatch(recordStudioVisit());
+      } else console.log(res);
     } catch (err) {
       console.log(err);
     }
@@ -65,23 +83,6 @@ export function validateEmail(email, callback = () => {}) {
     } catch (err) {
       console.log(err);
       return callback(null);
-    }
-  };
-}
-
-/**
- * @returns {function} thunk
- */
-export function recordStudioVisit() {
-  return async function innerRecordStudioVisit(dispatch, getState, dibsFetch) {
-    const { user, studio } = getState();
-    if (!user || !user.id) return;
-    try {
-      await dibsFetch(`/api/user/visit/${studio.data.id}`, {
-        method: 'POST',
-      });
-    } catch (err) {
-      console.log(err);
     }
   };
 }
