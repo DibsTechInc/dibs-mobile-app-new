@@ -224,6 +224,7 @@ export function submitCartForPurchase(callback) {
       if (res.success) {
         dispatch(setUser(res.user));
         dispatch(setTransactionsConfirmed(res.transactions));
+        dispatch(clearCart());
         callback(null);
         dispatch(requestUserEvents()); // implement with upcomming classes
         // dispatch(requestUserTransactions()); implement with transaction history

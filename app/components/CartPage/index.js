@@ -276,6 +276,8 @@ class CartPage extends Component {
         price={item.price}
         taxRate={item.taxRate}
         passid={item.passid}
+        instructorName={item.instructorName}
+        locationName={item.locationName}
       />)
     );
 

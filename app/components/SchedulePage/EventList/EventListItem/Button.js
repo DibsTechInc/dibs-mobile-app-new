@@ -66,6 +66,8 @@ class Button extends React.PureComponent {
       taxRate: this.props.taxRate,
       name: this.props.name,
       start_time: this.props.start_time,
+      locationName: this.props.locationName,
+      instructorName: this.props.instructorName,
     });
   }
   /**
@@ -164,6 +166,9 @@ Button.propTypes = {
   start_time: PropTypes.string.isRequired,
   waitlisted: PropTypes.bool.isRequired,
   soldOut: PropTypes.bool.isRequired,
+  locationName: PropTypes.string.isRequired,
+  instructorName: PropTypes.string.isRequired,
+  quantity: PropTypes.number.isRequired,
 };
 
 const mapStateToProps = null; // state => ({});

@@ -8,8 +8,9 @@ import { format as formatCurrency } from 'currency-formatter';
 
 import { addToCart, removeOneEventItem } from '../../actions';
 import { getStudioCurrency } from '../../selectors';
-import { TEXT_GREY, GREY } from '../../constants';
+import { TEXT_GREY, GREY, DARK_TEXT_GREY } from '../../constants';
 import Icon from '../shared/Icon';
+import Config from '../../../config.json';
 
 const StyledCartItemView = styled.View`
   margin: 10px;
@@ -68,15 +69,19 @@ class CartItem extends Component {
       );
     }
 
+    const timeFormat = Config.STUDIO_TZ === 'Europe/London' ? moment(this.props.startTime).format('hh:mm [@ ]') : moment(this.props.startTime).format('h:mm A z [@ ]');
+    const timeDisplay = `${timeFormat} ${this.props.locationName}`;
+
     return (
       <StyledCartItemView>
         <View style={{ justifyContent: 'space-between', flex: 1 }}>
           <View>
             <Text style={{ fontSize: 16, fontFamily: 'flex-font-heavy' }}>{moment(this.props.startTime).format('ddd M/D')}</Text>
-            <Text style={{ fontSize: 16, fontFamily: 'flex-font' }}>{moment(this.props.startTime).format('h:mm A z [@]')} Flex</Text>
+            <Text style={{ fontSize: 16, fontFamily: 'flex-font', color: DARK_TEXT_GREY }}>{timeDisplay}</Text>
           </View>
           <View>
             <Text style={{ fontSize: 16, fontFamily: 'flex-font-heavy' }}>{this.props.name}</Text>
+            <Text style={{ fontSize: 16, fontFamily: 'flex-font', color: DARK_TEXT_GREY }}>{this.props.instructorName}</Text>
             <Text style={{ fontSize: 16, fontFamily: 'flex-font', color: GREY }}>{formatCurrency(this.props.price, { code: this.props.currency, precision: (this.props.price % 1 && 2) })}</Text>
           </View>
         </View>
@@ -119,6 +124,8 @@ CartItem.propTypes = {
   addToCart: PropTypes.func,
   showCartAdjustments: PropTypes.bool,
   currency: PropTypes.string,
+  locationName: PropTypes.string,
+  instructorName: PropTypes.string,
 };
 
 const mapDispatchToProps = {
