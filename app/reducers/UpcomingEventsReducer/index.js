@@ -1,4 +1,7 @@
 import { handleActions, combineActions } from 'redux-actions';
+import moment from 'moment-timezone';
+
+import Config from '../../../config.json';
 import {
   setUpcomingEvents,
   removeUpcomingEvent,
@@ -14,7 +17,7 @@ const initialState = {
   data: [],
   loading: false,
   syncing: false,
-  currentDate: null,
+  currentDate: moment().tz(Config.STUDIO_TZ),
 };
 
 export default handleActions({

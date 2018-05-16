@@ -7,8 +7,9 @@ import {
   Dimensions,
 } from 'react-native';
 import styled from 'styled-components';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { Svg, Path } from 'react-native-svg';
+
 import { setScheduleCurrentDate, addDaysToScheduleCurrentDate } from '../../../actions';
 import CalendarDay from './CalendarDay';
 import { WHITE } from '../../../constants';
@@ -65,21 +66,14 @@ class CalendarStrip extends Component {
   constructor(props) {
     super(props);
 
-    if (props.locale && props.locale.name && props.locale.config) {
-      moment.locale(props.locale.name, props.locale.config);
-    } else if (props.locale) {
-      throw new Error('Locale prop is not in the correct format. \b Locale has to be in form of object, with params NAME and CONFIG!');
-    }
+    const startingDate = moment().tz(Config.STUDIO_TZ).startOf('day');
+    const numberOfDays = CalendarStrip.getNumberOfDaysToDisplay();
+    startingDate.add(Math.floor(props.currentDate.diff(startingDate, 'days') / numberOfDays) * numberOfDays, 'days');
 
     this.state = {
       numberOfDays: CalendarStrip.getNumberOfDaysToDisplay(),
-      startingDate: this.setLocale(moment(this.props.startingDate)),
+      startingDate,
     };
-
-    // To add for when we handle orientation change
-    // Dimensions.addEventListener('change', () => {
-    //   this.setState({ numberOfDays: CalendarStrip.getNumberOfDaysToDisplay() });
-    // });
 
     this.resetAnimation();
 
@@ -153,22 +147,11 @@ class CalendarStrip extends Component {
         date: null,
         isExpiredDate: null,
       };
-      dateInfo.date = this.setLocale(moment(startDate).add(index, 'days'));
-      dateInfo.isExpiredDate = dateInfo.date.isBefore(this.props.startingDate);
+      dateInfo.date = moment(startDate).tz(Config.STUDIO_TZ).add(index, 'days');
+      dateInfo.isExpiredDate = dateInfo.date.isBefore(this.props.lowerBound);
       dateInfos.push(dateInfo);
     });
     return dateInfos;
-  }
-  /**
-   * Function that checks if the locale is passed to the component and sets it to the passed moment instance
-   * @param {Object} momentInstance set locale of moment instance
-   * @returns {Object} moment instance with that set locale
-   */
-  setLocale(momentInstance) {
-    if (this.props.locale) {
-      return momentInstance.locale(this.props.locale.name);
-    }
-    return momentInstance;
   }
   /**
    * Function to check if provided date is the same as selected one, hence date is selected
@@ -247,7 +230,7 @@ class CalendarStrip extends Component {
    */
   render() {
     const lowerBound = this.state.startingDate.clone().subtract(this.state.numberOfDays, 'd').add(1, 'd');
-    const canGoBack = lowerBound.isBefore(this.props.startingDate);
+    const canGoBack = lowerBound.isBefore(this.props.lowerBound);
     let opacityAnim = 1;
     return (
       <Container>
@@ -308,16 +291,15 @@ class CalendarStrip extends Component {
 
 /* eslint-disable global-require */
 CalendarStrip.defaultProps = {
-  startingDate: moment().seconds(0).milliseconds(0),
+  lowerBound: moment().tz(Config.STUDIO_TZ).startOf('day'),
   calendarHeaderFormat: 'MMMM YYYY',
 };
 
 CalendarStrip.propTypes = {
-  startingDate: PropTypes.shape(),
+  lowerBound: PropTypes.shape(),
   calendarHeaderFormat: PropTypes.string,
   calendarAnimation: PropTypes.shape(),
   selectionAnimation: PropTypes.shape(),
-  locale: PropTypes.shape(),
   currentDate: PropTypes.shape(),
   setScheduleCurrentDate: PropTypes.func,
   addDaysToScheduleCurrentDate: PropTypes.func,

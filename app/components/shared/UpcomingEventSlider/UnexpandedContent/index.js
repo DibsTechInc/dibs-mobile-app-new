@@ -118,9 +118,11 @@ class Unexpanded extends React.PureComponent {
   render() {
     return (
       <Container>
-        <SwipeInstructions style={{ marginBottom: this.props.isUpcomingClassesPage ? 20 : 0 }}>
-          Swipe up to view more details.
-        </SwipeInstructions>
+        {this.props.events.length ? (
+          <SwipeInstructions style={{ marginBottom: this.props.isUpcomingClassesPage ? 20 : 0 }}>
+            Swipe up to view more details.
+          </SwipeInstructions>
+        ) : null}
         {this.props.isUpcomingClassesPage ? null : (
           <TopRow>
             <UpNext>

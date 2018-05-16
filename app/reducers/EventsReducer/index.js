@@ -64,5 +64,5 @@ export default handleActions({
   [removeKeyFromFetchingEvents]: (state, { payload }) => ({ ...state, fetching: omit(state.fetching, payload) }),
   [setEventSoldOut]: handleSetEventSoldOut,
   [setScheduleCurrentDate]: (state, { payload }) => ({ ...state, currentDate: payload }),
-  [addDaysToScheduleCurrentDate]: (state, { payload }) => ({ ...state, currentDate: moment(state.scheduleCurrentDate).add(payload, 'days') }),
+  [addDaysToScheduleCurrentDate]: (state, { payload }) => ({ ...state, currentDate: moment(state.currentDate).add(payload, 'days') }),
 }, initialState);

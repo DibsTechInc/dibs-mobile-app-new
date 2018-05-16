@@ -29,6 +29,9 @@ export default {
       opacity: 1,
       marginTop: 3,
     },
+    todayText: {
+      color: WHITE,
+    },
     selected: {
       backgroundColor: Config.STUDIO_HIGHLIGHT_COLOR,
       borderRadius: 16,

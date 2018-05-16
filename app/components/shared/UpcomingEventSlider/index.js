@@ -38,11 +38,18 @@ class UpcomingClassSlider extends React.PureComponent {
       dragBottom: SHORTENED_HEIGHT,
       expanded: false,
       expanding: false,
-      draggable: true,
+      draggable: Boolean(props.events.length),
     };
     this.onDragStart = this.onDragStart.bind(this);
     this.onDragEnd = this.onDragEnd.bind(this);
     this.getArrowPathStr = this.getArrowPathStr.bind(this);
+  }
+  /**
+   * @param {Object} props component will receive
+   * @returns {undefined}
+   */
+  componentWillReceiveProps(props) {
+    this.setState({ draggable: Boolean(props.events.length) });
   }
   /**
    * @returns {undefined}

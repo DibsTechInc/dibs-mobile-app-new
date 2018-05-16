@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import { withNavigation } from 'react-navigation';
 
 import { getUpcomingEventsNaturalCurrrentDate } from '../../../../selectors';
+import { setScheduleCurrentDate } from '../../../../actions';
 import { DARK_TEXT_GREY, SCHEDULE_ROUTE } from '../../../../constants';
 import { MaterialButton } from '../../../shared';
 
@@ -21,6 +22,10 @@ const NoEventsText = styled.Text`
   margin-top: 10;
   text-align: center;
 `;
+
+// This component is only used in UpcomingClasses page
+// if you need it elsewhere make sure to do proper
+// set up with Redux
 
 /**
  * @class NoEvents
@@ -40,6 +45,7 @@ class NoEvents extends React.PureComponent {
    * @returns {undefined}
    */
   onPress() {
+    this.props.setScheduleCurrentDate(this.props.selectedDate);
     this.props.navigation.navigate(SCHEDULE_ROUTE);
   }
   /**
@@ -65,12 +71,15 @@ class NoEvents extends React.PureComponent {
 NoEvents.propTypes = {
   navigation: PropTypes.shape().isRequired,
   naturalDate: PropTypes.string.isRequired,
+  selectedDate: PropTypes.shape().isRequired,
+  setScheduleCurrentDate: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
   naturalDate: getUpcomingEventsNaturalCurrrentDate(state),
+  selectedDate: state.upcomingEvents.currentDate,
 });
-const mapDispatchToProps = {};
+const mapDispatchToProps = { setScheduleCurrentDate };
 
 export default compose(
   withNavigation,

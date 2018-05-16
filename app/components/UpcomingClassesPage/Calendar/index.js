@@ -59,14 +59,13 @@ class CalendarComponent extends React.PureComponent {
    * @returns {undefined}
    */
   onDayPress({ dateString }) {
-    this.props.setUpcomingEventsCurrentDate(moment.tz(dateString, Config.STUDIO_TZ));
+    this.props.setUpcomingEventsCurrentDate(moment.tz(moment(dateString), Config.STUDIO_TZ));
   }
   /**
    * render
    * @returns {JSX.Element} XML
    */
   render() {
-    console.log('test')
     return (
       <Calendar
         style={{

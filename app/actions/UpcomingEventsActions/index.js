@@ -41,9 +41,10 @@ export function requestUserEvents(setCurrentDate = true, callback = () => {}) {
       if (res.success) {
         dispatch(setUpcomingEvents(res.events.upcoming));
         const eventDates = res.events.upcoming.map(event => +moment.tz(event.start_time, event.mainTZ));
-        const minDate = moment(Math.min(...eventDates)).tz(Config.STUDIO_TZ).startOf('day');
-        dispatch(setUpcomingEventsCurrentDate(minDate));
-        // TODO flash MYFIRST message
+        if (res.events.upcoming.length) {
+          const minDate = moment(Math.min(...eventDates)).tz(Config.STUDIO_TZ).startOf('day');
+          dispatch(setUpcomingEventsCurrentDate(minDate));
+        }
       } else console.log(res);
     } catch (err) {
       console.log(err);
