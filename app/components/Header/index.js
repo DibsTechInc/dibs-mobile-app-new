@@ -7,7 +7,7 @@ import { CartIcon, Icon } from '../shared';
 
 const StyledView = styled.View`
   background-color: ${props => props.backgroundColor};
-  height: 50;
+  height: 60;
   justify-content: space-between;
   flex-direction: row;
   align-items: center;

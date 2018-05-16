@@ -64,7 +64,7 @@ class UpcomingClass extends PureComponent {
             <Text style={{ fontFamily: 'flex-font-heavy' }}>Class Description:</Text>
             <Text style={{ fontFamily: 'flex-font' }}>{this.props.class.classDescription.length ? classDescriptionHTML : 'No Class Description.'}</Text>
           </View>
-          <View style={{ marginTop: 20 }}>
+          <View style={{ marginTop: 20, marginBottom: 20 }}>
             <Text style={{ fontFamily: 'flex-font-heavy' }}>Drop Policy:</Text>
             <Text style={{ fontFamily: 'flex-font' }}>{Config.STUDIO_DROP_POLICY}</Text>
           </View>

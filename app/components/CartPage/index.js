@@ -1,28 +1,35 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { View } from 'react-native';
+import { View, Text, Alert } from 'react-native';
 import { withNavigation, NavigationActions } from 'react-navigation';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import Swipeable from 'react-native-swipeable';
+
 import FadeInView from '../shared/FadeInView';
 import { FlexRow } from '../styled/Views';
-import { getSortedCartEvents } from '../../selectors/CartSelectors';
+import { getSortedCartEvents, getConfirmationState, getCartErrorMessage } from '../../selectors';
 import {
   getFormattedCartValueBack,
   getCartValueBack,
   getFormattedCartTotal,
 } from '../../selectors/CartSelectors/PurchaseBreakdown';
-import { LIGHT_GREY, SOFT_GREY, BLACK, WHITE } from '../../constants';
-import { Icon, CustomStatusBar } from '../shared';
+import { submitCartForPurchase } from '../../actions';
+import {
+  SOFT_GREY,
+  GREY,
+  WHITE,
+  BLACK,
+  RECEIPT_ROUTE,
+  SCHEDULE_ROUTE,
+} from '../../constants';
+
+import { Icon, CustomStatusBar, DibsLoader, PaymentInfo } from '../shared';
 import CartItem from './CartItem';
 import CartTransaction from './CartTransaction';
 import PromoField from './PromoField';
 
 import { MaterialPanelView } from '../styled';
-import {
-  SCHEDULE_ROUTE,
-  CONFIRMATION_ROUTE,
-} from '../../constants/RouteConstants';
 
 import MaterialButton from '../shared/MaterialButton';
 import Config from '../../../config.json';
@@ -70,6 +77,17 @@ const StyledCenterText = styled.Text`
   color: ${WHITE}
 `;
 
+const StyledContinueButton = styled.TouchableOpacity`
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  background-color: ${props => props.hasDisabledColor ? GREY : Config.STUDIO_COLOR};
+  border-radius: 5px;
+  border-width: 1px;
+  border-color: ${props => props.hasDisabledColor ? GREY : Config.STUDIO_COLOR};;
+`;
+
 /**
  * @class CartPage
  * @extends {Component}
@@ -83,6 +101,58 @@ class CartPage extends Component {
     super();
 
     this.toPreviousPage = this.toPreviousPage.bind(this);
+
+    this.state = {
+      isLoading: false,
+      isUpdatingCard: false,
+      isProcessingPayment: false,
+    };
+
+    this.setLoading = this.setLoading.bind(this);
+    this.setEditCC = this.setEditCC.bind(this);
+    this.handlePurchase = this.handlePurchase.bind(this);
+  }
+
+  /**
+   * @returns {undefined}
+   */
+  componentDidUpdate() {
+    if (!this.props.cartMessage.length && this.props.confirmedPurchases.length) {
+      this.props.navigation.navigate(RECEIPT_ROUTE);
+    }
+
+    if (this.props.cartMessage) {
+      this.props.navigation.navigate(SCHEDULE_ROUTE);
+      Alert.alert(this.props.cartMessage);
+    }
+  }
+
+  /**
+   * @param {bool} bool the state of the loading
+   * @returns {undefined}
+   */
+  setLoading(bool) {
+    this.setState({
+      isLoading: bool,
+    });
+  }
+
+  /**
+   * @param {bool} bool the state of the editing
+   * @returns {undefined}
+   */
+  setEditCC() {
+    this.setState({
+      isUpdatingCard: !this.state.isUpdatingCard,
+    });
+  }
+
+   /**
+   * @returns {undefined}
+   */
+  async handlePurchase() {
+    this.setState({ isProcessingPayment: true });
+    await new Promise(resolve => this.props.submitCartForPurchase(resolve));
   }
 
   /**
@@ -123,8 +193,42 @@ class CartPage extends Component {
    */
   render() {
     const renderValueBackMessage = this.props.valueBack > 0 ? `Place your order to earn ${this.props.formattedValueBack} in credit back` : `Place your order for ${this.props.formattedCartTotal}`;
-
     let renderCartItems = <CartItem hasEmptyCart />;
+
+    const purchaseButton = [
+      <StyledContinueButton />,
+    ];
+
+    const notReadyForPurchase = (!(this.props.creditCard.expMonth) || this.state.isLoading || this.state.isUpdatingCard);
+    const renderButtonColor = notReadyForPurchase ? GREY : Config.STUDIO_COLOR;
+    const renderLeftButtons = notReadyForPurchase ? null : purchaseButton;
+
+    const renderPurchaseButton = (<View style={{ width: 390, overflow: 'hidden', backgroundColor: Config.STUDIO_COLOR, borderRadius: 5 }}>
+      <Swipeable
+        contentContainerStyle={
+        { backgroundColor: renderButtonColor,
+          paddingLeft: 100,
+          paddingRight: 100,
+          paddingTop: 15,
+          paddingBottom: 15,
+          borderRadius: 5,
+          borderWidth: 1,
+          borderColor: renderButtonColor,
+        }}
+        leftButtons={renderLeftButtons}
+        onLeftButtonsActivate={this.handlePurchase}
+        leftButtonsActivationDistance={150}
+      >
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={{ textAlign: 'center', color: WHITE, flex: 1 }}>Swipe to pay</Text>
+          <Text style={{ color: WHITE }}>{'>>'}</Text>
+        </View>
+      </Swipeable>
+    </View>);
+
+    if (this.state.isProcessingPayment) {
+      return <FadeInView style={{ backgroundColor: Config.STUDIO_COLOR }}><DibsLoader showText /></FadeInView>;
+    }
 
     if (!this.props.cart.length) {
       return (
@@ -190,6 +294,12 @@ class CartPage extends Component {
           <MaterialPanelView style={{ shadowOffset: { width: 3, height: 3 }, marginTop: 0 }}>
             {renderCartItems}
           </MaterialPanelView>
+          <PaymentInfo
+            isLoading={this.state.isLoading}
+            isUpdatingCard={this.state.isUpdatingCard}
+            setLoading={this.setLoading}
+            setEditCC={this.setEditCC}
+          />
           <PromoField />
           <CartTransaction />
         </StyledScrollView>
@@ -198,11 +308,7 @@ class CartPage extends Component {
             <StyledSavingsText>{renderValueBackMessage}</StyledSavingsText>
           </View>
           <FlexRow>
-            <MaterialButton
-              text="Checkout"
-              onPress={() => { this.props.navigation.navigate(CONFIRMATION_ROUTE); }}
-              style={{ flex: 1, height: 50 }}
-            />
+            {renderPurchaseButton}
           </FlexRow>
         </StyledCheckoutView>
       </FadeInView>
@@ -216,6 +322,10 @@ CartPage.propTypes = {
   formattedValueBack: PropTypes.string.isRequired,
   valueBack: PropTypes.number.isRequired,
   formattedCartTotal: PropTypes.string.isRequired,
+  submitCartForPurchase: PropTypes.func,
+  cartMessage: PropTypes.string,
+  creditCard: PropTypes.shape(),
+  confirmedPurchases: PropTypes.arrayOf(PropTypes.shape()),
 };
 
 const mapStateToProps = state => ({
@@ -223,6 +333,13 @@ const mapStateToProps = state => ({
   formattedValueBack: getFormattedCartValueBack(state),
   valueBack: getCartValueBack(state),
   formattedCartTotal: getFormattedCartTotal(state),
+  creditCard: state.creditCard,
+  confirmedPurchases: getConfirmationState(state),
+  cartMessage: getCartErrorMessage(state),
 });
 
-export default withNavigation(connect(mapStateToProps)(CartPage));
+const mapDispatchToProps = {
+  submitCartForPurchase,
+};
+
+export default withNavigation(connect(mapStateToProps, mapDispatchToProps)(CartPage));
