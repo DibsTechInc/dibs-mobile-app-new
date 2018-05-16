@@ -224,6 +224,7 @@ export function submitCartForPurchase(callback) {
       if (res.success) {
         dispatch(setUser(res.user));
         dispatch(setTransactionsConfirmed(res.transactions));
+        dispatch(clearCart());
         callback(null);
         dispatch(requestUserEvents()); // implement with upcomming classes
         // dispatch(requestUserTransactions()); implement with transaction history
@@ -231,10 +232,18 @@ export function submitCartForPurchase(callback) {
         dispatch(clearPromoCodeData());
         dispatch(clearPackagePromoCode());
         dispatch(clearCart());
-      } else {
-        dispatch(setCartErrorMessage(res.message));
-        callback(res);
+        return;
       }
+
+      if (res.experimentalRoute) {
+        console.log('Experimental Route Hit!');
+      }
+
+      dispatch(setCartErrorMessage(res.message));
+      dispatch(clearCart());
+      dispatch(clearPromoCodeData());
+      dispatch(clearPackagePromoCode());
+      callback(res);
     } catch (err) {
       console.log(err);
       callback(null);

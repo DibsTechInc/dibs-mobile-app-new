@@ -69,6 +69,7 @@ class DibsLoader extends React.Component {
     this.cycleSecondAnimation(this.cycleSecondAnimation);
     this.cycleThirdAnimation(this.cycleThirdAnimation);
   }
+
   /**
    * @param {string} animationKey in state for which animation
    * @returns {Object} style for dot in loader
@@ -153,6 +154,7 @@ DibsLoader.propTypes = {
   duration: PropTypes.number,
   showText: PropTypes.bool,
   backgroundColor: PropTypes.string,
+  onFinishLoading: PropTypes.func,
 };
 
 export default DibsLoader;

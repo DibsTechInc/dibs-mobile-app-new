@@ -71,6 +71,8 @@ class Overlay extends React.PureComponent {
       taxRate: this.props.taxRate,
       name: this.props.name,
       start_time: this.props.start_time,
+      locationName: this.props.locationName,
+      instructorName: this.props.instructorName,
     });
   }
   /**
@@ -138,6 +140,8 @@ Overlay.propTypes = {
   name: PropTypes.string.isRequired,
   start_time: PropTypes.string.isRequired,
   removeOneEventItem: PropTypes.func.isRequired,
+  locationName: PropTypes.string.isRequired,
+  instructorName: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = null; // state => ({});

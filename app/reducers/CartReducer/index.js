@@ -28,6 +28,7 @@ function handleAddToCart(
   state,
   { payload }
 ) {
+  console.log(payload, '???')
   const newData = cloneDeep(state.data);
   const arrayElem = newData.find(e => (e.eventid === payload.eventid && e.passid === payload.passid));
   if (arrayElem) {
@@ -42,6 +43,8 @@ function handleAddToCart(
     price: payload.price,
     taxRate: payload.taxRate,
     name: payload.name,
+    locationName: payload.locationName,
+    instructorName: payload.instructorName,
   });
   return { ...state, data: newData };
 }

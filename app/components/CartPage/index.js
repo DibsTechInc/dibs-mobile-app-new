@@ -122,7 +122,8 @@ class CartPage extends Component {
    * @returns {undefined}
    */
   componentDidUpdate() {
-    if (!this.props.cartMessage.length && this.props.confirmedPurchases.length) {
+    console.log(this.props.cartMessage, '???')
+    if (!this.props.cartMessage && this.props.confirmedPurchases.length) {
       this.props.navigation.navigate(RECEIPT_ROUTE);
     }
 
@@ -276,6 +277,8 @@ class CartPage extends Component {
         price={item.price}
         taxRate={item.taxRate}
         passid={item.passid}
+        instructorName={item.instructorName}
+        locationName={item.locationName}
       />)
     );
 

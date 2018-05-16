@@ -64,10 +64,6 @@ class ProfilePage extends Component {
               onPress={() => Alert.alert('Route To Upcoming Classes Page')}
             />
             <SettingsList.Item
-              title="Packages/Credit"
-              onPress={() => Alert.alert('Route To Packages/Credits Page')}
-            />
-            <SettingsList.Item
               title="Settings"
               onPress={() => this.props.navigation.navigate(SETTINGS_ROUTE)}
             />
