@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { FadeInView } from '../shared';
 import { getConfirmedTransactionsByEvent } from '../../selectors';
-import UpcomingClasses from './UpcomingClasses';
+import UpcomingClasses from '../shared/UpcomingClasses';
 
 /**
  * @class ReceiptPage

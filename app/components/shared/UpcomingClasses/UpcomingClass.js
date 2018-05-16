@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import HTML from 'react-native-render-html';
 import { View, Text, Dimensions } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import { format as formatCurrency } from 'currency-formatter';
 
 import FadeInView from '../FadeInView';
 import TransactionBreakdown from '../TransactionBreakdown';
@@ -30,20 +29,21 @@ class UpcomingClass extends PureComponent {
    * @returns {JSX} XML
    */
   render() {
-    const classDescriptionHTML = <HTML html={this.props.class.classDescription} imagesMaxWidth={Dimensions.get('window').width} />;
+    const classDescriptionHTML = this.props.classDescription
+      && <HTML html={this.props.classDescription} imagesMaxWidth={Dimensions.get('window').width} />;
 
     return (
       <FadeInView style={{ marginTop: 20 }}>
         <TransactionBreakdown
-          className={this.props.class.className}
-          formattedSubtotal={formatCurrency(this.props.class.original_price, { code: this.props.currency, precision: (this.props.class.original_price % 1 && 2) })}
-          taxAmount={this.props.class.tax_amount}
-          formattedTaxAmount={formatCurrency(this.props.class.tax_amount, { code: this.props.currency, precision: (this.props.class.tax_amount % 1 && 2) })}
-          discountAmount={this.props.class.discount_amount}
-          formattedDiscountAmount={formatCurrency(this.props.class.discount_amount, { code: this.props.currency, precision: (this.props.class.discount_amount % 1 && 2) })}
-          studioCreditAmount={this.props.class.studio_credits_spent}
-          formattedStudioCreditAmount={formatCurrency(this.props.class.studio_credits_spent, { code: this.props.currency, precision: (this.props.class.studio_credits_spent % 1 && 2) })}
-          formattedTotal={formatCurrency(this.props.class.chargeAmount, { code: this.props.currency, precision: (this.props.class.chargeAmount % 1 && 2) })}
+          className={this.props.className}
+          formattedSubtotal={this.props.formattedSubtotal}
+          taxAmount={this.props.tax_amount}
+          formattedTaxAmount={this.props.formattedTaxAmount}
+          discountAmount={this.props.discount_amount}
+          formattedDiscountAmount={this.props.formattedDiscountAmount}
+          studioCreditAmount={this.props.studio_credits_spent}
+          formattedStudioCreditAmount={this.props.formattedStudioCreditsSpent}
+          formattedTotal={this.props.formattedTotal}
         />
         <MapView
           ref={(ref) => { this.map = ref; }}
@@ -63,12 +63,20 @@ class UpcomingClass extends PureComponent {
         </MapView>
         <View style={{ flex: 1, margin: 10, marginTop: 10, marginLeft: 10, marginBottom: 50 }}>
           <View>
-            <Text style={{ fontFamily: 'flex-font-heavy' }}>Class Description:</Text>
-            <Text style={{ fontFamily: 'flex-font' }}>{this.props.class.classDescription.length ? classDescriptionHTML : 'No Class Description.'}</Text>
+            <Text style={{ fontFamily: 'flex-font-heavy' }}>
+              Class Description:
+            </Text>
+            <Text style={{ fontFamily: 'flex-font' }}>
+              {classDescriptionHTML || 'No Class Description.'}
+            </Text>
           </View>
           <View style={{ marginTop: 20, marginBottom: 20 }}>
-            <Text style={{ fontFamily: 'flex-font-heavy' }}>Drop Policy:</Text>
-            <Text style={{ fontFamily: 'flex-font' }}>{Config.STUDIO_DROP_POLICY}</Text>
+            <Text style={{ fontFamily: 'flex-font-heavy' }}>
+              Drop Policy:
+            </Text>
+            <Text style={{ fontFamily: 'flex-font' }}>
+              {Config.STUDIO_DROP_POLICY}
+            </Text>
           </View>
         </View>
       </FadeInView>
@@ -77,8 +85,16 @@ class UpcomingClass extends PureComponent {
 }
 
 UpcomingClass.propTypes = {
-  class: PropTypes.shape(),
-  currency: PropTypes.string,
+  formattedSubtotal: PropTypes.string,
+  className: PropTypes.string,
+  tax_amount: PropTypes.number,
+  formattedTaxAmount: PropTypes.string,
+  discount_amount: PropTypes.number,
+  formattedDiscountAmount: PropTypes.string,
+  studio_credits_spent: PropTypes.number,
+  formattedStudioCreditsSpent: PropTypes.string,
+  formattedTotal: PropTypes.string,
+  classDescription: PropTypes.string,
 };
 
 export default UpcomingClass;

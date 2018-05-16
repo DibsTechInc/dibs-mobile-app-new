@@ -1,6 +1,7 @@
 import { createSelector } from 'reselect';
 import Decimal from 'decimal.js';
-import { getEventsData } from '../';
+import { format as formatCurrency } from 'currency-formatter';
+import { getEventsData, getStudioCurrency } from '../';
 
 /**
  * getConfirmationState
@@ -14,7 +15,8 @@ export function getConfirmationState(state) {
 export const getConfirmedTransactionsByEvent = createSelector(
   getConfirmationState,
   getEventsData,
-  (transactions, events) => transactions.reduce((acc, transaction) => {
+  getStudioCurrency,
+  (transactions, events, currency) => transactions.reduce((acc, transaction) => {
     const eventTransaction = acc.find(({ eventid }) => transaction.eventid === eventid);
 
     if (!eventTransaction) {
@@ -62,6 +64,13 @@ export const getConfirmedTransactionsByEvent = createSelector(
     .plus(transaction.discount_amount)
     .toNumber();
     return acc;
-  }, [])
+  }, []).map(item => ({
+    ...item,
+    formattedSubtotal: formatCurrency(item.original_price, { code: currency, precision: (item.original_price % 1 && 2) }),
+    formattedTaxAmount: formatCurrency(item.tax_amount, { code: currency, precision: (item.tax_amount % 1 && 2) }),
+    formattedDiscountAmount: formatCurrency(item.discount_amount, { code: currency, precision: (item.discount_amount % 1 && 2) }),
+    formattedStudioCreditsSpent: formatCurrency(item.studio_credits_spent, { code: currency, precision: (item.studio_credits_spent % 1 && 2) }),
+    formattedTotal: formatCurrency(item.chargeAmount, { code: currency, precision: (item.chargeAmount % 1 && 2) }),
+  }))
 );
 
