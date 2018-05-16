@@ -38,9 +38,9 @@ export const MaterialPanelView = styled.View`
   padding-horizontal: 10px;
   padding-top: 15px;
   padding-bottom: 20px;
-  shadow-color: ${BLACK};
-  shadow-opacity: 0.2;
-  shadow-radius: 2;
+  shadow-color: ${LIGHT_GREY};
+  shadow-opacity: 0.1;
+  shadow-radius: 5;
   width: ${props => (props.width || (Dimensions.get('window').width))};
 `;
 

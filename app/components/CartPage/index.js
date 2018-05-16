@@ -249,9 +249,7 @@ class CartPage extends Component {
             </StyledCenterText>
           </StyledTopView>
           <StyledScrollView>
-            <MaterialPanelView style={{ shadowOffset: { width: 3, height: 3 }, marginTop: 0 }}>
-              {renderCartItems}
-            </MaterialPanelView>
+            {renderCartItems}
           </StyledScrollView>
           <StyledCheckoutView>
             <FlexRow>
@@ -299,9 +297,7 @@ class CartPage extends Component {
           </StyledCenterText>
         </StyledTopView>
         <StyledScrollView>
-          <MaterialPanelView style={{ shadowOffset: { width: 3, height: 3 }, marginTop: 0 }}>
-            {renderCartItems}
-          </MaterialPanelView>
+          {renderCartItems}
           <PaymentInfo
             isLoading={this.state.isLoading}
             isUpdatingCard={this.state.isUpdatingCard}
