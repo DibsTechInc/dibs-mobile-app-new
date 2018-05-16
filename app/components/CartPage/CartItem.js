@@ -74,7 +74,7 @@ class CartItem extends Component {
 
     return (
       <MaterialPanelView style={{ flexDirection: 'row', marginTop: 0 }}>
-        <View style={{ justifyContent: 'space-between', flex: 1 }}>
+        <View style={{ justifyContent: 'space-between', flex: 1, margin: 10 }}>
           <View style={{ marginBottom: 10 }}>
             <Text style={{ fontSize: 16, fontFamily: 'flex-font-heavy' }}>{moment(this.props.startTime).format('ddd M/D')}</Text>
             <Text style={{ fontSize: 16, fontFamily: 'flex-font', color: DARK_TEXT_GREY }}>{timeDisplay}</Text>
