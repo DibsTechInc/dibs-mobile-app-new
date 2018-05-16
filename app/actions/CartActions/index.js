@@ -231,14 +231,18 @@ export function submitCartForPurchase(callback) {
         // dispatch(performTransactionAnalytics(resp.transactions)); not sure works with native
         dispatch(clearPromoCodeData());
         dispatch(clearPackagePromoCode());
-      } else if (res.experimentalRoute) {
-        console.log('Experimental Route Hit!');
-        dispatch(setCartErrorMessage(res.message));
-        callback(res);
-      } else {
-        dispatch(setCartErrorMessage(res.message));
-        callback(res);
+        return;
       }
+
+      if (res.experimentalRoute) {
+        console.log('Experimental Route Hit!');
+      }
+
+      dispatch(setCartErrorMessage(res.message));
+      dispatch(clearCart());
+      dispatch(clearPromoCodeData());
+      dispatch(clearPackagePromoCode());
+      callback(res);
     } catch (err) {
       console.log(err);
       callback(null);

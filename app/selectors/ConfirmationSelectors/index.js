@@ -28,7 +28,7 @@ export const getConfirmedTransactionsByEvent = createSelector(
                                                .minus(transaction.original_price)
                                                .toNumber()
       ) : 0;
-
+      console.log(confirmedEvent, 'confirmedEvent')
       const payload = {
         ...transaction,
         transactionids: [id],
