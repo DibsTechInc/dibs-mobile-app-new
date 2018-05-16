@@ -23,8 +23,6 @@ export const PROFILE_ROUTE = 'Profile';
 export const PROFILE_INFO_ROUTE = 'ProfileInfo';
 
 export const CART_ROUTE = 'Cart';
-export const CONFIRMATION_ROUTE = 'Confirmation';
-
 export const DRAWER_OPEN = 'DrawerOpen';
 
 export const RECEIPT_ROUTE = 'Receipt';
