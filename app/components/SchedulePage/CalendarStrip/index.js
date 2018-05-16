@@ -66,7 +66,7 @@ class CalendarStrip extends Component {
   constructor(props) {
     super(props);
 
-    const startingDate = moment().tz(Config.STUDIO_TZ).startOf('day');
+    const startingDate = moment();
     const numberOfDays = CalendarStrip.getNumberOfDaysToDisplay();
     startingDate.add(Math.floor(props.currentDate.diff(startingDate, 'days') / numberOfDays) * numberOfDays, 'days');
 
@@ -111,10 +111,8 @@ class CalendarStrip extends Component {
    */
   onDateSelected(date) {
     const invalidSelection = date.isBefore(this.state.startingDate);
-    if (invalidSelection) {
-      return;
-    }
-    this.props.setScheduleCurrentDate(moment(date));
+    if (invalidSelection) return;
+    this.props.setScheduleCurrentDate(moment(date, Config.STUDIO_TZ));
   }
   /**
    * Set startingDate to the previous set of days
@@ -140,7 +138,7 @@ class CalendarStrip extends Component {
    * @returns {undefined}
    */
   getDatesForWeek() {
-    const startDate = moment(this.state.startingDate);
+    const startDate = moment(this.state.startingDate).tz(Config.STUDIO_TZ);
     const dateInfos = [];
     [...Array(this.state.numberOfDays)].forEach((item, index) => {
       const dateInfo = {

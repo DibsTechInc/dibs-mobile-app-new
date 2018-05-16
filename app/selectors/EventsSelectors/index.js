@@ -93,8 +93,8 @@ export const getEventsOnCurrentDate = createSelector(
     getScheduleCurrentDate,
   ],
   (events, currentDate) => events.filter((event) => {
-    const start = moment(event.start_time).tz(event.mainTZ);
-    return start.isSame(currentDate, 'day');
+    const start = moment.tz(event.start_time, event.mainTZ);
+    return start.isSame(currentDate.clone().tz(event.mainTZ), 'day');
   })
 );
 
@@ -105,7 +105,7 @@ export const getNumberOfEventsOnCurrentDate = createSelector(
 
 export const getEventsOnCurrentDateAfterNow = createSelector(
   getEventsOnCurrentDate,
-  events => events.filter(event => moment(event.start_time).isAfter(moment()))
+  events => events.filter(event => moment.tz(event.start_time, event.mainTZ).isAfter(moment()))
 );
 
 export const getScheduleEvents = createUnboundedSelector(

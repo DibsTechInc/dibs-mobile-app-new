@@ -1,5 +1,5 @@
 import { createActions } from 'redux-actions';
-import { cloneDeep, uniq } from 'lodash';
+import { cloneDeep } from 'lodash';
 import moment from 'moment';
 import {
   getUsersNextPassId,
@@ -11,8 +11,8 @@ import {
 import {
   clearPromoCodeData,
   clearPackagePromoCode,
-  setEventSoldOut,
-  requestEventData,
+  // setEventSoldOut,
+  // requestEventData,
   setUser,
   setTransactionsConfirmed,
   requestUserEvents,
