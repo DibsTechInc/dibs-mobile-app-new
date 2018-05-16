@@ -4,9 +4,10 @@ import styled from 'styled-components';
 import { withNavigation } from 'react-navigation';
 import { Svg, Path } from 'react-native-svg';
 
-import { GREY, TEXT_GREY, DARK_TEXT_GREY, SCHEDULE_ROUTE, SOFT_GREY } from '../../../../constants';
+import { GREY, TEXT_GREY, DARK_TEXT_GREY, SOFT_GREY, UPCOMING_CLASS_ROUTE } from '../../../../constants';
 import { SpaceBetweenRow, HeavyText, FlexRow } from '../../../styled';
 import EventListItem from './EventListItem';
+import NoEvents from './NoEvents';
 
 const Container = styled.View`
   align-items: center;
@@ -46,16 +47,6 @@ const ViewMore = HeavyText.extend`
   margin-right: 5;
 `;
 
-const ArrowPath = props => (
-  <Path
-    d={props.d}
-    strokeWidth="2"
-    strokeLinecap="round"
-    stroke={DARK_TEXT_GREY}
-    fill="none"
-  />
-);
-
 const PageControl = FlexRow.extend`
   justify-content: space-between;
   margin-top: 15;
@@ -72,6 +63,16 @@ const ArrowContainer = styled.TouchableOpacity`
   align-items: center;
   width: 30;
 `;
+
+const ArrowPath = props => (
+  <Path
+    d={props.d}
+    strokeWidth="2"
+    strokeLinecap="round"
+    stroke={DARK_TEXT_GREY}
+    fill="none"
+  />
+);
 
 ArrowPath.propTypes = { d: PropTypes.string.isRequired };
 
@@ -96,7 +97,7 @@ class Unexpanded extends React.PureComponent {
    * @returns {undefined}
    */
   navigateToUpcoming() {
-    this.props.navigation.navigate(SCHEDULE_ROUTE);
+    this.props.navigation.navigate(UPCOMING_CLASS_ROUTE);
   }
   /**
    * @returns {undefined}
@@ -117,25 +118,31 @@ class Unexpanded extends React.PureComponent {
   render() {
     return (
       <Container>
-        <SwipeInstructions>
+        <SwipeInstructions style={{ marginBottom: this.props.isUpcomingClassesPage ? 20 : 0 }}>
           Swipe up to view more details.
         </SwipeInstructions>
-        <TopRow>
-          <UpNext>
-            Up next...
-          </UpNext>
-          <UpcomingClassLink onPress={this.navigateToUpcoming}>
-            <ViewMore>
-              VIEW MORE
-            </ViewMore>
-            <Svg width={20} height={15}>
-              <ArrowPath d="M 2 7.5 L 18 7.5" />
-              <ArrowPath d="M 12 2 L 18 7.5 L 12 13" />
-            </Svg>
-          </UpcomingClassLink>
-        </TopRow>
-        <EventListItem {...this.props.events[this.state.currentIndex]} />
-        {this.props.events.length > 0 ? (
+        {this.props.isUpcomingClassesPage ? null : (
+          <TopRow>
+            <UpNext>
+              Up next...
+            </UpNext>
+            <UpcomingClassLink onPress={this.navigateToUpcoming}>
+              <ViewMore>
+                VIEW MORE
+              </ViewMore>
+              <Svg width={20} height={15}>
+                <ArrowPath d="M 2 7.5 L 18 7.5" />
+                <ArrowPath d="M 12 2 L 18 7.5 L 12 13" />
+              </Svg>
+            </UpcomingClassLink>
+          </TopRow>
+        )}
+        {this.props.events.length ? (
+          <EventListItem {...this.props.events[this.state.currentIndex]} />
+        ) : (
+          <NoEvents />
+        )}
+        {this.props.events.length > 1 ? (
           <PageControl>
             <ArrowContainer
               onPress={this.showPrevEvent}
@@ -181,6 +188,7 @@ class Unexpanded extends React.PureComponent {
 Unexpanded.propTypes = {
   navigation: PropTypes.shape().isRequired,
   events: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+  isUpcomingClassesPage: PropTypes.bool.isRequired,
 };
 
 export default withNavigation(Unexpanded);

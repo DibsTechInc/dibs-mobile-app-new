@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import Config from '../../../config.json';
 import { requestEventData, requestStudioData } from '../../actions';
 import {
-  setCurrentDate,
   getStudioDibsConfig,
   getEventsAreLoading,
 } from '../../selectors';
@@ -69,19 +68,17 @@ class SchedulePage extends Component {
 SchedulePage.propTypes = {
   requestEventData: PropTypes.func,
   currentDate: PropTypes.shape(),
-  navigation: PropTypes.shape(),
 };
 
 const mapStateToProps = state => ({
   isLoading: getEventsAreLoading(state),
   studioConfig: getStudioDibsConfig(state),
-  currentDate: state.currentDate,
+  currentDate: state.events.currentDate,
 });
 
 const mapDispatchToProps = {
   requestEventData,
   requestStudioData,
-  setCurrentDate,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SchedulePage);

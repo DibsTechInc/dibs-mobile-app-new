@@ -8,8 +8,8 @@ import {
   getScheduleEvents,
   getEventsAreLoading,
   getNumberOfEventsOnCurrentDate,
-  getCurrentDateIsToday,
-  getCurrentDateIsAfterInterval,
+  getScheduleCurrentDateIsToday,
+  getScheduleCurrentDateIsAfterInterval,
 } from '../../../selectors';
 import DibsLoader from '../../shared/DibsLoader';
 import { CenteredText } from '../../styled';
@@ -43,7 +43,7 @@ class EventList extends React.PureComponent {
     switch (true) {
       case this.props.currentDateIsToday
         && this.props.hasEventsOnCurrentDate:
-        return 'Dang, there are no more classes available today.';
+        return 'Sorry, there are no more classes available today.';
 
       case this.props.currentDateIsAfterInterval:
         return 'Classes are not available yet on this date. Please check again later.';
@@ -54,7 +54,7 @@ class EventList extends React.PureComponent {
   }
   /**
    * render
-   * @returns {JSX.Element} HTML
+   * @returns {JSX.Element} XML
    */
   render() {
     return (
@@ -91,8 +91,8 @@ const mapStateToProps = state => ({
   events: getScheduleEvents(state),
   isLoading: getEventsAreLoading(state),
   hasEventsOnCurrentDate: Boolean(getNumberOfEventsOnCurrentDate(state)),
-  currentDateIsToday: getCurrentDateIsToday(state),
-  currentDateIsAfterInterval: getCurrentDateIsAfterInterval(state),
+  currentDateIsToday: getScheduleCurrentDateIsToday(state),
+  currentDateIsAfterInterval: getScheduleCurrentDateIsAfterInterval(state),
 });
 const mapDispatchToProps = {};
 

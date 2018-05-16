@@ -13,12 +13,16 @@ export const {
   removeKeyFromFetchingEvents,
   setEventSoldOut,
   setEventsLoadingFalse,
+  setScheduleCurrentDate,
+  addDaysToScheduleCurrentDate,
 } = createActions({
   SET_EVENTS: payload => payload,
   ADD_KEY_TO_FETCHING_EVENTS: getDateAsString,
   REMOVE_KEY_FROM_FETCHING_EVENTS: getDateAsString,
   SET_EVENT_SOLD_OUT: payload => payload,
   SET_EVENTS_LOADING_FALSE: () => false,
+  SET_SCHEDULE_CURRENT_DATE: payload => payload,
+  ADD_DAYS_TO_SCHEDULE_CURRENT_DATE: num => num,
 });
 
 /**
@@ -30,7 +34,7 @@ export function requestEventData({ eventids } = {}) {
     let currentDate;
     try {
       const state = getState();
-      const { studio, currentDate: tmp } = state;
+      const { studio, events: { currentDate: tmp } } = state;
       currentDate = tmp;
       if (getState().events.fetching[currentDate.toISOString()]) return;
       if (!getEventsOnCurrentDate(state).length) dispatch(addKeyToFetchingEvents(currentDate));

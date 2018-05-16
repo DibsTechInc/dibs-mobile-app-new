@@ -1,6 +1,5 @@
 export * from './CartSelectors';
 export * from './CartSelectors/PurchaseBreakdown';
-export * from './CurrentDateSelectors';
 export * from './EventsSelectors';
 export * from './PromoCodeSelectors';
 export * from './StudioSelectors';

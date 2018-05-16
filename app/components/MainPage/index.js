@@ -4,8 +4,16 @@ import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { Dimensions } from 'react-native';
 
-import backgroundImg from '../../../assets/img/main-page.jpg';
-import { BLACK, WHITE, TRANSPARENT, LIGHT_GREY, SCHEDULE_ROUTE, PROFILE_ROUTE } from '../../constants';
+import backgroundImg from '../../../assets/img/main-page.png';
+import {
+  BLACK,
+  WHITE,
+  TRANSPARENT,
+  LIGHT_GREY,
+  SCHEDULE_ROUTE,
+  PROFILE_ROUTE,
+  UPCOMING_CLASS_ROUTE,
+} from '../../constants';
 import { FadeInView, CustomStatusBar } from '../shared';
 import {
   getUserFirstName,
@@ -85,7 +93,7 @@ class MainPage extends React.PureComponent {
             <IconLink
               iconName="arrow-up"
               text={'VIEW\nUPCOMING'}
-              route={SCHEDULE_ROUTE}
+              route={UPCOMING_CLASS_ROUTE}
             />
             <IconLink
               iconName="user"

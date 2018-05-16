@@ -1,15 +1,20 @@
 import { handleActions } from 'redux-actions';
+import moment from 'moment-timezone';
 import { omit } from 'lodash';
+import Config from '../../../config.json';
 import {
   setEvents,
   addKeyToFetchingEvents,
   removeKeyFromFetchingEvents,
   setEventSoldOut,
+  setScheduleCurrentDate,
+  addDaysToScheduleCurrentDate,
 } from '../../actions/EventActions';
 
 const initialState = {
   fetching: {},
   data: [],
+  currentDate: moment().tz(Config.STUDIO_TZ),
 };
 
 // TODO marking event as sold out and updating spot count
@@ -58,4 +63,6 @@ export default handleActions({
   }),
   [removeKeyFromFetchingEvents]: (state, { payload }) => ({ ...state, fetching: omit(state.fetching, payload) }),
   [setEventSoldOut]: handleSetEventSoldOut,
+  [setScheduleCurrentDate]: (state, { payload }) => ({ ...state, currentDate: payload }),
+  [addDaysToScheduleCurrentDate]: (state, { payload }) => ({ ...state, currentDate: moment(state.scheduleCurrentDate).add(payload, 'days') }),
 }, initialState);
