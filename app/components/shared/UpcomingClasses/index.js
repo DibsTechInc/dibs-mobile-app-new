@@ -1,10 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import { ScrollView } from 'react-native';
 import Swiper from 'react-native-swiper';
-
-import { getStudioCurrency } from '../../../selectors';
 
 import UpcomingClass from './UpcomingClass';
 
@@ -34,8 +31,4 @@ UpcomingClasses.propTypes = {
   currency: PropTypes.string,
 };
 
-const mapStateToProps = state => ({
-  currency: getStudioCurrency(state),
-});
-
-export default connect(mapStateToProps)(UpcomingClasses);
+export default UpcomingClasses;
