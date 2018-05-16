@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import HTML from 'react-native-render-html';
 import { View, Text, Dimensions } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import { format as formatCurrency } from 'currency-formatter';
+
 import FadeInView from '../FadeInView';
 import TransactionBreakdown from '../TransactionBreakdown';
 import Config from '../../../../config.json';
@@ -34,14 +36,15 @@ class UpcomingClass extends PureComponent {
       <FadeInView style={{ marginTop: 20 }}>
         <TransactionBreakdown
           className={this.props.class.className}
-          formattedSubtotal={`$${this.props.class.original_price}`}
+          formattedSubtotal={formatCurrency(this.props.class.original_price, { code: this.props.currency, precision: (this.props.class.original_price % 1 && 2) })}
           taxAmount={this.props.class.tax_amount}
-          formattedTaxAmount={`${this.props.class.tax_amount}`}
+          formattedTaxAmount={formatCurrency(this.props.class.tax_amount, { code: this.props.currency, precision: (this.props.class.tax_amount % 1 && 2) })}
           discountAmount={this.props.class.discount_amount}
-          formattedDiscountAmount={`$${this.props.class.discount_amount}`}
+          formattedDiscountAmount={formatCurrency(this.props.class.discount_amount, { code: this.props.currency, precision: (this.props.class.discount_amount % 1 && 2) })}
           studioCreditAmount={this.props.class.studio_credits_spent}
-          formattedStudioCreditAmount={`$${this.props.class.studio_credits_spent}`}
-          formattedTotal={`$${this.props.class.chargeAmount}`}
+          formattedStudioCreditAmount={formatCurrency(this.props.class.studio_credits_spent, { code: this.props.currency, precision: (this.props.class.studio_credits_spent % 1 && 2) })}
+          formattedTotal={formatCurrency(this.props.class.chargeAmount, { code: this.props.currency, precision: (this.props.class.chargeAmount % 1 && 2) })}
+
         />
         <MapView
           ref={(ref) => { this.map = ref; }}
@@ -76,6 +79,7 @@ class UpcomingClass extends PureComponent {
 
 UpcomingClass.propTypes = {
   class: PropTypes.shape(),
+  currency: PropTypes.string,
 };
 
 export default UpcomingClass;

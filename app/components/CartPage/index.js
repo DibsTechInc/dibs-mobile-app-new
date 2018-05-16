@@ -8,12 +8,14 @@ import Swipeable from 'react-native-swipeable';
 
 import FadeInView from '../shared/FadeInView';
 import { FlexRow } from '../styled/Views';
-import { getSortedCartEvents, getConfirmationState, getCartErrorMessage } from '../../selectors';
 import {
   getFormattedCartValueBack,
+  getSortedCartEvents,
+  getConfirmationState,
   getCartValueBack,
   getFormattedCartTotal,
-} from '../../selectors/CartSelectors/PurchaseBreakdown';
+  getCartErrorMessage,
+} from '../../selectors';
 import { submitCartForPurchase } from '../../actions';
 import {
   SOFT_GREY,
@@ -59,7 +61,7 @@ const StyledTopView = styled.View`
 const StyledCheckoutView = styled.View`
   justify-content: space-between;
   align-items: center;
-  height: 100px;
+  height: 110px;
   border-top-width: 0.3;
   border-color: ${LIGHT_GREY};
   elevation: 3;
@@ -277,6 +279,8 @@ class CartPage extends Component {
       />)
     );
 
+    console.log(this.props.cart, 'cart')
+
     return (
       <FadeInView style={{ backgroundColor: SOFT_GREY }}>
         <CustomStatusBar backgroundColor={Config.STUDIO_COLOR} barStyle="light-content" />
@@ -295,14 +299,14 @@ class CartPage extends Component {
           <MaterialPanelView style={{ shadowOffset: { width: 3, height: 3 }, marginTop: 0 }}>
             {renderCartItems}
           </MaterialPanelView>
-          <PromoField />
-          <CartTransaction />
           <PaymentInfo
             isLoading={this.state.isLoading}
             isUpdatingCard={this.state.isUpdatingCard}
             setLoading={this.setLoading}
             setEditCC={this.setEditCC}
           />
+          <PromoField />
+          <CartTransaction />
         </StyledScrollView>
         <StyledCheckoutView>
           <View style={{ justifyContent: 'center', alignItems: 'center', width: '100%', height: '50%' }}>
