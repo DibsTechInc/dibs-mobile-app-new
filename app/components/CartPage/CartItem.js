@@ -93,7 +93,9 @@ class CartItem extends Component {
             padding={10}
             onPress={this.removeFromCart}
           />}
-          <Text style={{ fontSize: 16, marginLeft: 25, marginRight: 25 }}>{this.props.quantity}</Text>
+          <View style={{ borderWidth: 1, width: 30, height: 30, justifyContent: 'center', alignItems: 'center', borderRadius: 5, borderColor: Config.STUDIO_COLOR, margin: 10 }}>
+            <Text style={{ fontSize: 16 }}>{this.props.quantity}</Text>
+          </View>
           {this.props.showCartAdjustments && this.props.quantity <= 3 && <Icon
             size={15}
             iconName="plus"

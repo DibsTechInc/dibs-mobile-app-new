@@ -32,8 +32,6 @@ import CartItem from './CartItem';
 import CartTransaction from './CartTransaction';
 import PromoField from './PromoField';
 
-import { MaterialPanelView } from '../styled';
-
 import MaterialButton from '../shared/MaterialButton';
 import Config from '../../../config.json';
 
