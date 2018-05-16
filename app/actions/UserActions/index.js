@@ -12,6 +12,7 @@ import {
   removeCreditCard,
   requestUserEvents,
   setUpcomingEvents,
+  clearCart,
 } from '../index';
 
 export const setUser = createAction('SET_USER', payload => payload);
@@ -153,6 +154,7 @@ export function logOutUser(callback = () => {}) {
       dispatch(setUser({}));
       dispatch(removeCreditCard());
       dispatch(setUpcomingEvents([]));
+      dispatch(clearCart());
       callback();
     } catch (err) {
       console.log(err);

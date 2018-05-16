@@ -230,6 +230,7 @@ export function submitCartForPurchase(callback) {
         // dispatch(performTransactionAnalytics(resp.transactions)); not sure works with native
         dispatch(clearPromoCodeData());
         dispatch(clearPackagePromoCode());
+        dispatch(clearCart());
       } else {
         dispatch(setCartErrorMessage(res.message));
         callback(res);

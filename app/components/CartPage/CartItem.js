@@ -73,7 +73,7 @@ class CartItem extends Component {
         <View style={{ justifyContent: 'space-between', flex: 1 }}>
           <View>
             <Text style={{ fontSize: 16, fontFamily: 'flex-font-heavy' }}>{moment(this.props.startTime).format('ddd M/D')}</Text>
-            <Text style={{ fontSize: 16, fontFamily: 'flex-font' }}>{moment(this.props.startTime).format('h:mm A z [@]')} Flex</Text>
+            <Text style={{ fontSize: 16, fontFamily: 'flex-font' }}>{moment(this.props.startTime).format('h:mm A z [@]')} Kensington</Text>
           </View>
           <View>
             <Text style={{ fontSize: 16, fontFamily: 'flex-font-heavy' }}>{this.props.name}</Text>

@@ -127,6 +127,11 @@ class SideMenu extends React.PureComponent {
           route={SCHEDULE_ROUTE}
         />
         <NavLink
+          iconName="arrow-up"
+          label="Upcoming Classes"
+          route={SCHEDULE_ROUTE}
+        />
+        <NavLink
           iconName="times"
           label="Logout"
           route={LANDING_ROUTE}
