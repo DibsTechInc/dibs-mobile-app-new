@@ -25,6 +25,14 @@ export function getUpcomingEventsLoading(state) {
 
 /**
  * @param {Object} state in store
+ * @returns {boolean} if user is dropping event
+ */
+export function getDroppingUpcomingEvent(state) {
+  return Boolean(getUpcomingEvents(state).dropping);
+}
+
+/**
+ * @param {Object} state in store
  * @returns {Object} current date in upcoming events page
  */
 export function getUpcomingEventsCurrentDate(state) {

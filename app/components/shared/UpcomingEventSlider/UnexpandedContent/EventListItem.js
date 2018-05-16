@@ -1,11 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { View } from 'react-native';
+import { View, Alert } from 'react-native';
+import { promisify } from 'bluebird';
+import { connect } from 'react-redux';
 
+import Config from '../../../../../config.json';
 import { SOFT_GREY, DARK_TEXT_GREY } from '../../../../constants';
+import { dropUserFromEvent } from '../../../../actions';
+import { getDroppingUpcomingEvent } from '../../../../selectors/index';
 import { SpaceBetweenRow, HeavyText } from '../../../styled';
-import MaterialButton from '../../MaterialButton';
+import { MaterialButton, DibsLoader } from '../../';
 
 const Container = SpaceBetweenRow.extend`
   align-items: center;
@@ -36,8 +41,42 @@ const EventText = styled.Text`
  */
 class SliderEventListItem extends React.PureComponent {
   /**
+   * @constructor
+   * @constructs SliderEvnetListItem
+   * @param {Object} props for component
+   */
+  constructor(props) {
+    super(props);
+    this.startDropClass = this.startDropClass.bind(this);
+    this.dropClass = this.dropClass.bind(this);
+  }
+  /**
+   * @returns {undefined}
+   */
+  startDropClass() {
+    Alert.alert(
+      'Are you sure?',
+      `Do you want to drop ${this.props.name}?`,
+      [
+        { text: 'Yes', onPress: this.dropClass },
+        { text: 'No', onPress: () => { } },
+      ]
+    );
+  }
+  /**
+   * @returns {undefined}
+   */
+  async dropClass() {
+    try {
+      await promisify(this.props.dropUserFromEvent)(this.props.eventid);
+      Alert.alert('Success!', `You were dropped from ${this.props.name}`);
+    } catch (err) {
+      Alert.alert('Uh oh!', err.message);
+    }
+  }
+  /**
    * render
-   * @returns {JSX.Element} HTML
+   * @returns {JSX.Element} XML
    */
   render() {
     return (
@@ -60,12 +99,16 @@ class SliderEventListItem extends React.PureComponent {
             </EventText>
           </View>
         </EventInfo>
-        <MaterialButton
-          text="Drop"
-          style={{ height: 40, width: 70 }}
-          onPress={() => {}}
-          fontSize={14}
-        />
+        {this.props.isDropping ? (
+          <DibsLoader width={70} maxDotRadius={8} dotColor={Config.STUDIO_COLOR} />
+        ) : (
+          <MaterialButton
+            text="Drop"
+            style={{ height: 40, width: 70 }}
+            onPress={this.startDropClass}
+            fontSize={14}
+          />
+        )}
       </Container>
     );
   }
@@ -78,6 +121,14 @@ SliderEventListItem.propTypes = {
   locationName: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   instructorName: PropTypes.string.isRequired,
+  eventid: PropTypes.number.isRequired,
+  isDropping: PropTypes.bool.isRequired,
+  dropUserFromEvent: PropTypes.func.isRequired,
 };
 
-export default SliderEventListItem;
+const mapStateToProps = state => ({
+  isDropping: getDroppingUpcomingEvent(state),
+});
+const mapDispatchToProps = { dropUserFromEvent };
+
+export default connect(mapStateToProps, mapDispatchToProps)(SliderEventListItem);
