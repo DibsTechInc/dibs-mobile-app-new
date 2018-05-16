@@ -44,7 +44,6 @@ class UpcomingClass extends PureComponent {
           studioCreditAmount={this.props.class.studio_credits_spent}
           formattedStudioCreditAmount={formatCurrency(this.props.class.studio_credits_spent, { code: this.props.currency, precision: (this.props.class.studio_credits_spent % 1 && 2) })}
           formattedTotal={formatCurrency(this.props.class.chargeAmount, { code: this.props.currency, precision: (this.props.class.chargeAmount % 1 && 2) })}
-
         />
         <MapView
           ref={(ref) => { this.map = ref; }}

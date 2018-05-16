@@ -32,8 +32,6 @@ import CartItem from './CartItem';
 import CartTransaction from './CartTransaction';
 import PromoField from './PromoField';
 
-import { MaterialPanelView } from '../styled';
-
 import MaterialButton from '../shared/MaterialButton';
 import Config from '../../../config.json';
 
@@ -249,9 +247,7 @@ class CartPage extends Component {
             </StyledCenterText>
           </StyledTopView>
           <StyledScrollView>
-            <MaterialPanelView style={{ shadowOffset: { width: 3, height: 3 }, marginTop: 0 }}>
-              {renderCartItems}
-            </MaterialPanelView>
+            {renderCartItems}
           </StyledScrollView>
           <StyledCheckoutView>
             <FlexRow>
@@ -299,9 +295,7 @@ class CartPage extends Component {
           </StyledCenterText>
         </StyledTopView>
         <StyledScrollView>
-          <MaterialPanelView style={{ shadowOffset: { width: 3, height: 3 }, marginTop: 0 }}>
-            {renderCartItems}
-          </MaterialPanelView>
+          {renderCartItems}
           <PaymentInfo
             isLoading={this.state.isLoading}
             isUpdatingCard={this.state.isUpdatingCard}

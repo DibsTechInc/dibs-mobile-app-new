@@ -226,12 +226,11 @@ export function submitCartForPurchase(callback) {
         dispatch(setTransactionsConfirmed(res.transactions));
         dispatch(clearCart());
         callback(null);
-        dispatch(requestUserEvents()); // implement with upcomming classes
+        dispatch(requestUserEvents());
         // dispatch(requestUserTransactions()); implement with transaction history
         // dispatch(performTransactionAnalytics(resp.transactions)); not sure works with native
         dispatch(clearPromoCodeData());
         dispatch(clearPackagePromoCode());
-        dispatch(clearCart());
         return;
       }
 

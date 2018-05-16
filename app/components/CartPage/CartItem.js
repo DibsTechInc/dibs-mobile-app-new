@@ -11,14 +11,11 @@ import { getStudioCurrency } from '../../selectors';
 import { TEXT_GREY, GREY, DARK_TEXT_GREY, LIGHT_GREY } from '../../constants';
 import Icon from '../shared/Icon';
 import Config from '../../../config.json';
+import { MaterialPanelView } from '../styled';
 
 const StyledCartItemView = styled.View`
-  margin-left: 10px;
-  margin-right: 10px;
   min-height: 100px;
   flex-direction: row;
-  border-bottom-width: 0;
-  border-bottom-color: ${LIGHT_GREY};
 `;
 
 const StyledText = styled.Text`
@@ -76,7 +73,7 @@ class CartItem extends Component {
     const timeDisplay = `${timeFormat} ${this.props.locationName}`;
 
     return (
-      <StyledCartItemView>
+      <MaterialPanelView style={{ flexDirection: 'row', marginTop: 0 }}>
         <View style={{ justifyContent: 'space-between', flex: 1 }}>
           <View style={{ marginBottom: 10 }}>
             <Text style={{ fontSize: 16, fontFamily: 'flex-font-heavy' }}>{moment(this.props.startTime).format('ddd M/D')}</Text>
@@ -96,7 +93,9 @@ class CartItem extends Component {
             padding={10}
             onPress={this.removeFromCart}
           />}
-          <Text style={{ fontSize: 16, marginLeft: 25, marginRight: 25 }}>{this.props.quantity}</Text>
+          <View style={{ borderWidth: 1, width: 30, height: 30, justifyContent: 'center', alignItems: 'center', borderRadius: 5, borderColor: Config.STUDIO_COLOR, margin: 10 }}>
+            <Text style={{ fontSize: 16 }}>{this.props.quantity}</Text>
+          </View>
           {this.props.showCartAdjustments && this.props.quantity <= 3 && <Icon
             size={15}
             iconName="plus"
@@ -105,7 +104,7 @@ class CartItem extends Component {
             onPress={this.addToCart}
           />}
         </View>
-      </StyledCartItemView>
+      </MaterialPanelView>
     );
   }
 }
