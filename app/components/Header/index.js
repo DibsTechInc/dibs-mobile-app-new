@@ -3,16 +3,15 @@ import { NavigationActions, withNavigation } from 'react-navigation';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { DRAWER_OPEN, WHITE, DARK_TEXT_GREY } from '../../constants';
-import CartIcon from '../shared/CartIcon';
-import Icon from '../shared/Icon';
+import { CartIcon, Icon } from '../shared';
 
 const StyledView = styled.View`
   background-color: ${props => props.backgroundColor};
-  height: 50;
+  height: 60;
   justify-content: space-between;
   flex-direction: row;
   align-items: center;
-  margin-top: 15;
+  padding-top: 15;
 `;
 
 const StyledMenuView = styled.View`
@@ -69,12 +68,13 @@ class Header extends Component {
    */
   render() {
     return (
-      <StyledView backgroundColor={this.props.backgroundColor}>
+      <StyledView backgroundColor={this.props.backgroundColor} style={this.props.headerStyle}>
         <StyledMenuView>
           <Icon
-            iconName="user-circle"
+            iconName={this.props.iconType}
             iconColor={this.props.iconColor}
             onPress={this.navigateToDrawer}
+            size={this.props.iconSize}
           />
         </StyledMenuView>
         <StyledTitleView titleWithNoCart={this.props.titleWithNoCart}>
@@ -97,6 +97,8 @@ Header.defaultProps = {
   showTitle: false,
   titleText: 'Title Text',
   backgroundColor: WHITE,
+  iconType: 'user-circle',
+  iconSize: 25,
 };
 
 Header.propTypes = {
@@ -108,6 +110,9 @@ Header.propTypes = {
   showTitle: PropTypes.bool,
   textColor: PropTypes.string,
   titleText: PropTypes.string,
+  iconType: PropTypes.string,
+  iconSize: PropTypes.number,
+  headerStyle: PropTypes.shape(),
 };
 
 export default withNavigation(Header);

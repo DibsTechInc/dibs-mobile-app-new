@@ -27,14 +27,14 @@ const styles = StyleSheet.create({
   },
 });
 
-const MyStatusBar = ({ backgroundColor, ...props }) => (
+const CustomStatusBar = ({ backgroundColor, ...props }) => (
   <View style={[styles.statusBar, { backgroundColor }]}>
     <StatusBar translucent backgroundColor={backgroundColor} {...props} />
   </View>
 );
 
-MyStatusBar.propTypes = {
+CustomStatusBar.propTypes = {
   backgroundColor: PropType.string,
 };
 
-export default MyStatusBar;
+export default CustomStatusBar;

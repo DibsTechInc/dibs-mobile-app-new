@@ -8,7 +8,7 @@ import { lightenDarkenColor } from '../../helpers';
 const StyledMaterial = styled.TouchableHighlight`
   align-items: center;
   background-color: ${props => props.backgroundColor};
-  border-radius: 5px;
+  border-radius: ${props => props.borderRadius};
   justify-content: center;
 `;
 
@@ -54,6 +54,7 @@ MaterialButton.defaultProps = {
   disabled: false,
   backgroundColor: Config.STUDIO_COLOR,
   textColor: WHITE,
+  borderRadius: '5px',
 };
 
 const stringOrNum = PropTypes.oneOfType([

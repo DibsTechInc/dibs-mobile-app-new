@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
-import { Font } from 'expo';
+import { Font, ScreenOrientation } from 'expo';
 import styled from 'styled-components';
 import { AsyncStorage } from 'react-native';
 import Promise from 'bluebird';
@@ -41,6 +41,9 @@ class App extends Component {
    */
   constructor() {
     super();
+
+    ScreenOrientation.allow(ScreenOrientation.Orientation.PORTRAIT);
+
     this.state = {
       fetchedAssets: false,
       userToken: null,

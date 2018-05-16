@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Animated, Text } from 'react-native';
 import styled from 'styled-components';
 import { WHITE } from '../../constants';
-import FadeInView from './FadeInView';
+import { FadeInView, CustomStatusBar } from './';
 
 const LoaderView = styled.View`
   align-items: center;
@@ -121,6 +121,7 @@ class DibsLoader extends React.Component {
   render() {
     return (
       <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <CustomStatusBar backgroundColor="transparent" barStyle="light-content" />
         {this.props.showText && <Text style={{ marginBottom: 50, color: '#fff', fontSize: 13, fontFamily: 'flex-font' }}>If only taking vitamins could be classified as working out</Text>}
         <LoaderView {...this.props}>
           <DibsLoaderDot {...this.props} style={this.getFirstDotStyle()} />

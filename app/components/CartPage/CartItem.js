@@ -4,19 +4,18 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { View, Text } from 'react-native';
+import { format as formatCurrency } from 'currency-formatter';
 
-import { addToCart, removeOneEventItem } from '../../actions/CartActions';
-import { TEXT_GREY, LIGHT_GREY } from '../../constants';
+import { addToCart, removeOneEventItem } from '../../actions';
+import { getStudioCurrency } from '../../selectors';
+import { TEXT_GREY, GREY } from '../../constants';
 import Icon from '../shared/Icon';
 
 const StyledCartItemView = styled.View`
   margin: 10px;
   min-height: 100px;
+  flex-direction: row;
 `;
-
-// const StyledCartDetailHeaderView = styled.View`
-//   height: 20
-// `;
 
 const StyledText = styled.Text`
   font-family: 'flex-font';
@@ -71,38 +70,32 @@ class CartItem extends Component {
 
     return (
       <StyledCartItemView>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
+        <View style={{ justifyContent: 'space-between', flex: 1 }}>
+          <View>
+            <Text style={{ fontSize: 16, fontFamily: 'flex-font-heavy' }}>{moment(this.props.startTime).format('ddd M/D')}</Text>
+            <Text style={{ fontSize: 16, fontFamily: 'flex-font' }}>{moment(this.props.startTime).format('h:mm A z [@]')} Flex</Text>
+          </View>
           <View>
             <Text style={{ fontSize: 16, fontFamily: 'flex-font-heavy' }}>{this.props.name}</Text>
-          </View>
-          <View>
-            <Text style={{ fontSize: 16 }}>{moment(this.props.startTime).format('MMM. D, YYYY [at] h:mm A z')}</Text>
+            <Text style={{ fontSize: 16, fontFamily: 'flex-font', color: GREY }}>{formatCurrency(this.props.price, { code: this.props.currency, precision: (this.props.price % 1 && 2) })}</Text>
           </View>
         </View>
-
-        <View style={{ borderWidth: 1, borderColor: LIGHT_GREY }}>
-          <View style={{ flexDirection: 'row', margin: 10 }}>
-            <View style={{ flexDirection: 'row', flex: 1, alignItems: 'center' }}>
-              {this.props.showCartAdjustments && <Icon
-                size={15}
-                iconName={this.props.quantity > 1 ? 'minus' : 'trash'}
-                iconColor={TEXT_GREY}
-                padding={10}
-                onPress={this.removeFromCart}
-              />}
-              <Text style={{ fontSize: 16, marginLeft: 25, marginRight: 25 }}>{this.props.quantity}</Text>
-              {this.props.showCartAdjustments && this.props.quantity <= 3 && <Icon
-                size={15}
-                iconName="plus"
-                iconColor={TEXT_GREY}
-                padding={10}
-                onPress={this.addToCart}
-              />}
-            </View>
-            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={{ fontSize: 16 }}>${this.props.price}</Text>
-            </View>
-          </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          {this.props.showCartAdjustments && <Icon
+            size={15}
+            iconName={this.props.quantity > 1 ? 'minus' : 'trash'}
+            iconColor={TEXT_GREY}
+            padding={10}
+            onPress={this.removeFromCart}
+          />}
+          <Text style={{ fontSize: 16, marginLeft: 25, marginRight: 25 }}>{this.props.quantity}</Text>
+          {this.props.showCartAdjustments && this.props.quantity <= 3 && <Icon
+            size={15}
+            iconName="plus"
+            iconColor={TEXT_GREY}
+            padding={10}
+            onPress={this.addToCart}
+          />}
         </View>
       </StyledCartItemView>
     );
@@ -125,6 +118,7 @@ CartItem.propTypes = {
   removeOneEventItem: PropTypes.func,
   addToCart: PropTypes.func,
   showCartAdjustments: PropTypes.bool,
+  currency: PropTypes.string,
 };
 
 const mapDispatchToProps = {
@@ -132,4 +126,8 @@ const mapDispatchToProps = {
   removeOneEventItem,
 };
 
-export default connect(null, mapDispatchToProps)(CartItem);
+const mapStateToProps = state => ({
+  currency: getStudioCurrency(state),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(CartItem);

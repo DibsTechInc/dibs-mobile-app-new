@@ -4,10 +4,8 @@ import { connect } from 'react-redux';
 import Promise from 'bluebird';
 import PropTypes from 'prop-types';
 
-import { CreditCardInput } from 'react-native-credit-card-input';
+import { LiteCreditCardInput } from 'react-native-credit-card-input';
 import { FadeInView, MaterialPanel } from '../../shared';
-import GreenCard from './greencc.png';
-import GreenCardFront from './greenccfront.png';
 import Config from '../../../../config.json';
 import { updateCreditCard } from '../../../actions/CreditCardActions';
 import CreditCardDisplay from './CreditCardDisplay';
@@ -140,7 +138,7 @@ class PaymentInfo extends PureComponent {
   render() {
     const hasCC = this.props.creditCard.expMonth;
     const displayStyle = (this.state.valid || hasCC || this.props.isUpdatingCard) ?
-    { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' } :
+    { flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' } :
     {};
 
     let paymentDisplay;
@@ -151,24 +149,22 @@ class PaymentInfo extends PureComponent {
       cvc: 'CVC',
     };
 
-    const creditCardInput = (<CreditCardInput
-      requiresCVC
-
-      cardFontFamily="flex-font"
-      cardImageBack={GreenCard}
-      cardImageFront={GreenCardFront}
-
-      cardScale={0.7}
-      labels={labels}
-      allowScroll
-      labelStyle={{ paddingTop: 10 }}
-
-      validColor="black"
-      invalidColor="red"
-      placeholderColor="darkgray"
-
-      onChange={this.onChange}
-    />);
+    const creditCardInput = (
+      <LiteCreditCardInput
+        // requiresCVC
+        // cardFontFamily="flex-font"
+        // cardImageBack={GreenCard}
+        // cardImageFront={GreenCardFront}
+        cardScale={0.7}
+        labels={labels}
+        allowScroll
+        labelStyle={{ paddingTop: 10 }}
+        validColor="black"
+        invalidColor="red"
+        placeholderColor="darkgray"
+        onChange={this.onChange}
+      />
+    );
 
     if (hasCC) {
       const displayCCNum = `•••• •••• •••• ${this.props.creditCard.last4}`;
@@ -202,14 +198,12 @@ class PaymentInfo extends PureComponent {
     }
 
     let creditCardDisplay;
-    let displayHeight;
+    const displayHeight = 120;
 
     if (this.props.isUpdatingCard || !hasCC) {
       creditCardDisplay = creditCardInput;
-      displayHeight = 320;
     } else if (this.state.valid || hasCC) {
       creditCardDisplay = paymentDisplay;
-      displayHeight = 120;
     }
 
     let editLabel;
@@ -228,7 +222,7 @@ class PaymentInfo extends PureComponent {
           headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}
           headerStyle={{ marginLeft: 10 }}
         >
-          <View style={{ justifyContent: 'center', alignItems: 'center', margin: 10, height: 220 }}>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <ActivityIndicator />
           </View>
         </MaterialPanel>

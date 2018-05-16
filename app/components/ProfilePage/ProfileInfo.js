@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import Header from '../Header';
 import { FadeInView, PaymentInfo } from '../shared';
 import { WHITE, BLACK } from '../../constants';
@@ -38,6 +37,9 @@ class ProfileInfo extends Component {
     });
   }
 
+  /**
+   * @returns {JSX} XML
+   */
   render() {
     return (
       <FadeInView>
