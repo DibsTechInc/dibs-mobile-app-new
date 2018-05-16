@@ -67,7 +67,7 @@ export const getHasUpcomingClassesNextMonth = createSelector(
   getUpcomingEventsByDay,
   (currentDate, eventsByDay) => {
     const eventsNextMonth = Object.keys(eventsByDay).filter(
-      day => moment(+day).startOf('month').isAfter(currentDate.clone().startOf('month'))
+      day => moment(+day).startOf('month').isAfter(currentDate)
     );
     return Boolean(eventsNextMonth.length);
   }
