@@ -9,8 +9,8 @@ import FadeInView from '../FadeInView';
 import TransactionBreakdown from '../TransactionBreakdown';
 import Config from '../../../../config.json';
 
-const LATITUDE = 40.726920;
-const LONGITUDE = -73.995358;
+const LATITUDE = 51.5211117;
+const LONGITUDE = -0.090806;
 const LATITUDE_DELTA = 0.01;
 const LONGITUDE_DELTA = 0.01;
 
