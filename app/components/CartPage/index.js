@@ -56,9 +56,8 @@ const StyledTopView = styled.View`
 const StyledCheckoutView = styled.View`
   justify-content: space-between;
   align-items: center;
-  margin: 6px;
   marginBottom: 30px;
-  background-color: ${SOFT_GREY};
+  background-color: ${WHITE};
 `;
 
 const StyledText = styled.Text`
@@ -294,14 +293,14 @@ class CartPage extends Component {
           <MaterialPanelView style={{ shadowOffset: { width: 3, height: 3 }, marginTop: 0 }}>
             {renderCartItems}
           </MaterialPanelView>
+          <PromoField />
+          <CartTransaction />
           <PaymentInfo
             isLoading={this.state.isLoading}
             isUpdatingCard={this.state.isUpdatingCard}
             setLoading={this.setLoading}
             setEditCC={this.setEditCC}
           />
-          <PromoField />
-          <CartTransaction />
         </StyledScrollView>
         <StyledCheckoutView>
           <View style={{ marginBottom: 30 }}>
