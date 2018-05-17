@@ -1,11 +1,14 @@
 import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
+import Dash from 'react-native-dash';
 
-const StyledView = styled.View`
-  flex-direction: row;
+import { SOLD_OUT_GREY, WHITE } from '../../../constants';
+import { FlexRow } from '../../styled';
+
+const StyledView = FlexRow.extend`
   align-items: center;
-  justify-content: space-between;
+  margin-bottom: 5;
 `;
 
 const StyledText = styled.Text`
@@ -25,12 +28,25 @@ class BreakdownRow extends PureComponent {
   render() {
     return (
       <StyledView style={this.props.containerStyle}>
-        <StyledText style={this.props.labelStyle}>{this.props.label}:</StyledText>
-        <StyledText style={this.props.valueStyle}>{this.props.value}</StyledText>
+        <StyledText style={this.props.labelStyle}>
+          {this.props.label}:
+        </StyledText>
+        <Dash
+          style={{ flex: 1, marginTop: 14 }}
+          dashGap={5}
+          dashThickness={1.5}
+          dashColor={this.props.dots ? SOLD_OUT_GREY : WHITE}
+          dashLength={2}
+        />
+        <StyledText style={this.props.valueStyle}>
+          {this.props.value}
+        </StyledText>
       </StyledView>
     );
   }
 }
+
+BreakdownRow.defaultProps = { dots: true };
 
 BreakdownRow.propTypes = {
   label: PropTypes.string.isRequired,
@@ -38,6 +54,7 @@ BreakdownRow.propTypes = {
   containerStyle: PropTypes.shape(),
   labelStyle: PropTypes.shape(),
   valueStyle: PropTypes.shape(),
+  dots: PropTypes.bool,
 };
 
 export default BreakdownRow;

@@ -30,7 +30,6 @@ export const getConfirmedTransactionsByEvent = createSelector(
                                                .minus(transaction.original_price)
                                                .toNumber()
       ) : 0;
-      console.log(confirmedEvent, 'confirmedEvent')
       const payload = {
         ...transaction,
         transactionids: [id],
@@ -69,7 +68,8 @@ export const getConfirmedTransactionsByEvent = createSelector(
     formattedSubtotal: formatCurrency(item.original_price, { code: currency, precision: (item.original_price % 1 && 2) }),
     formattedTaxAmount: formatCurrency(item.tax_amount, { code: currency, precision: (item.tax_amount % 1 && 2) }),
     formattedDiscountAmount: formatCurrency(item.discount_amount, { code: currency, precision: (item.discount_amount % 1 && 2) }),
-    formattedStudioCreditsSpent: formatCurrency(item.studio_credits_spent, { code: currency, precision: (item.studio_credits_spent % 1 && 2) }),
+    formattedStudioCreditAmount: formatCurrency(item.studio_credits_spent, { code: currency, precision: (item.studio_credits_spent % 1 && 2) }),
+    formattedRAFCreditAmount: formatCurrency(item.raf_credits_spent, { code: currency, precision: (item.studio_credits_spent % 1 && 2) }),
     formattedTotal: formatCurrency(item.chargeAmount, { code: currency, precision: (item.chargeAmount % 1 && 2) }),
   }))
 );

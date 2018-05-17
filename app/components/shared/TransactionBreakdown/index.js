@@ -34,22 +34,46 @@ class TransactionBreakdown extends Component {
         headerStyle={{ marginLeft: 10 }}
       >
         <StyledBreakDownView>
-          {this.props.className && <BreakdownRow label="Name" value={this.props.className} />}
+          {Boolean(this.props.className) &&
+            <BreakdownRow
+              label="Name"
+              value={this.props.className}
+              dots={false}
+            />
+          }
+
           <BreakdownRow label="Subtotal" value={this.props.formattedSubtotal} />
-          {this.props.promoCodeAmount > 0 && <BreakdownRow label="Promo Code" value={this.props.formattedPromoCodeAmount} />}
-          {this.props.flashCreditAmount > 0 && <BreakdownRow label="Flash Credit" value={this.props.formattedFlashCreditAmount} />}
-          {this.props.passValueAmount > 0 && <BreakdownRow label="Pass Value" value={this.props.formattedPassValueAmount} />}
-          {this.props.taxAmount > 0 && <BreakdownRow label="Estimated Tax" value={this.props.formattedTaxAmount} />}
-          {this.props.studioCreditAmount > 0 && <BreakdownRow label="Studio Credit" value={this.props.formattedStudioCreditAmount} />}
-          {this.props.rafCreditAmount > 0 && <BreakdownRow label="Refer a Friend Credit" value={this.props.formattedRAFCreditAmount} />}
-          {this.props.globalCreditAmount > 0 && <BreakdownRow label="Global Credit" value={this.props.formattedGlobalCreditAmount} />}
-          {this.props.discountAmount > 0 && <BreakdownRow label="Discount Amount" value={this.props.formattedDiscountAmount} />}
+
+          {this.props.promoCodeAmount > 0 &&
+            <BreakdownRow label="Promo Code" value={this.props.formattedPromoCodeAmount} />}
+
+          {this.props.flashCreditAmount > 0 &&
+            <BreakdownRow label="Flash Credit" value={this.props.formattedFlashCreditAmount} />}
+
+          {this.props.passValueAmount > 0 &&
+            <BreakdownRow label="Pass Value" value={this.props.formattedPassValueAmount} />}
+
+          {this.props.taxAmount > 0 &&
+            <BreakdownRow label="Estimated Tax" value={this.props.formattedTaxAmount} />}
+
+          {this.props.studioCreditAmount > 0 &&
+            <BreakdownRow label="Studio Credit" value={this.props.formattedStudioCreditAmount} />}
+
+          {this.props.rafCreditAmount > 0 &&
+            <BreakdownRow label="Refer a Friend Credit" value={this.props.formattedRAFCreditAmount} />}
+
+          {this.props.globalCreditAmount > 0 &&
+            <BreakdownRow label="Global Credit" value={this.props.formattedGlobalCreditAmount} />}
+
+          {this.props.discountAmount > 0 &&
+            <BreakdownRow label="Discount Amount" value={this.props.formattedDiscountAmount} />}
           <StyledLine />
           <BreakdownRow
             label="Total"
             labelStyle={{ fontFamily: 'flex-font-heavy' }}
             value={this.props.formattedTotal}
             valueStyle={{ fontFamily: 'flex-font-heavy', fontSize: 18 }}
+            dots={false}
           />
         </StyledBreakDownView>
       </MaterialPanel>

@@ -42,7 +42,9 @@ class UpcomingClass extends PureComponent {
           discountAmount={this.props.discount_amount}
           formattedDiscountAmount={this.props.formattedDiscountAmount}
           studioCreditAmount={this.props.studio_credits_spent}
-          formattedStudioCreditAmount={this.props.formattedStudioCreditsSpent}
+          formattedStudioCreditAmount={this.props.formattedStudioCreditAmount}
+          rafCreditsSpent={this.props.raf_credits_spent}
+          formattedRAFCreditAmount={this.props.formattedRAFCreditAmount}
           formattedTotal={this.props.formattedTotal}
         />
         <MapView
@@ -92,7 +94,9 @@ UpcomingClass.propTypes = {
   discount_amount: PropTypes.number,
   formattedDiscountAmount: PropTypes.string,
   studio_credits_spent: PropTypes.number,
-  formattedStudioCreditsSpent: PropTypes.string,
+  formattedStudioCreditAmount: PropTypes.string,
+  raf_credits_spent: PropTypes.number,
+  formattedRAFCreditAmount: PropTypes.string,
   formattedTotal: PropTypes.string,
   classDescription: PropTypes.string,
 };
