@@ -17,6 +17,11 @@ export function getUserPasses(state) {
 
 export const getUserStudioPasses = createSelector(
   getUserPasses,
+  passes => passes.filter(p => p.dibs_studio_id === Config.DIBS_STUDIO_ID).filter(p => p.isValid)
+);
+
+export const getAllUserStudioPasses = createSelector(
+  getUserPasses,
   passes => passes.filter(p => p.dibs_studio_id === Config.DIBS_STUDIO_ID)
 );
 
@@ -124,6 +129,14 @@ export const getUsersNextPassValue = createSelector(
   getPass => (eventid) => {
     const pass = getPass(eventid);
     return ((pass && pass.passValue && !pass.studioPackage.unlimited) ? pass.passValue : 0);
+  }
+);
+
+export const getUserFixedPrice = createSelector(
+  getAllUserStudioPasses,
+  (passes) => {
+    const fixedPricePasses = passes.filter(p => p.studioPackage.member_class_fixed_price !== null);
+    return (fixedPricePasses.length ? Math.min.apply(null, fixedPricePasses.map(p => p.studioPackage.member_class_fixed_price)) : null);
   }
 );
 

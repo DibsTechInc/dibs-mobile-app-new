@@ -1,15 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import Decimal from 'decimal.js';
-import { format as formatCurrency } from 'currency-formatter';
 import styled from 'styled-components';
 import { View } from 'react-native';
+
 import { LIGHT_GREY, DARK_TEXT_GREY } from '../../../../constants';
-import {
-  getUsersNextPassValue,
-  getUsersNextPassId,
-} from '../../../../selectors';
 import { FlexRow, FlexCenter, RightAlignedColumn } from '../../../styled';
 import Button from './Button';
 import Overlay from './Overlay';
@@ -135,16 +129,4 @@ EventListItem.propTypes = {
   quantity: PropTypes.number.isRequired,
 };
 
-const mapStateToProps = (state, props) => {
-  const passValue = getUsersNextPassValue(state)(props.eventid);
-  const valueBack = passValue ? Math.max(0, Decimal(passValue || 0).minus(props.price).toDecimalPlaces(2).toNumber()) : 0;
-  return {
-    passid: getUsersNextPassId(state)(props.eventid),
-    valueBack,
-    formattedValueBack: formatCurrency(valueBack, { code: props.currency }),
-    alreadyPreviewed: state.events.previewed,
-  };
-};
-const mapDispatchToProps = {};
-
-export default connect(mapStateToProps, mapDispatchToProps)(EventListItem);
+export default EventListItem;

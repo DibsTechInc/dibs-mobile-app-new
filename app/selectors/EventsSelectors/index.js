@@ -1,15 +1,19 @@
 import { createSelector } from 'reselect';
 import moment from 'moment-timezone';
 import { format as formatCurrency } from 'currency-formatter';
+import Decimal from 'decimal.js';
+
+import Config from '../../../config.json';
+import { createUnboundedSelector } from '../../helpers';
 import {
   getStudioCurrency,
   getStudioCustomTimeFormat,
   getStudioInterval,
-} from '../StudioSelectors';
-import { getCartData } from '../CartSelectors';
-import { getUpcomingEventsData } from '../UpcomingEventsSelectors';
-import Config from '../../../config.json';
-import { createUnboundedSelector } from '../../helpers';
+  getCartData,
+  getUpcomingEventsData,
+  getUsersNextPassId,
+  getUsersNextPassValue,
+} from '../';
 
 /**
  * getEventsState
@@ -115,8 +119,18 @@ export const getScheduleEvents = createUnboundedSelector(
     getStudioCustomTimeFormat,
     getCartData,
     getUpcomingEventsData,
+    getUsersNextPassId,
+    getUsersNextPassValue,
   ],
-  (events, currency, timeFormat, cartItems, upcomingEvents) => events.map(({ instructor, location, ...event }) => {
+  (
+    events,
+    currency,
+    timeFormat,
+    cartItems,
+    upcomingEvents,
+    getPassId,
+    getPassValue
+  ) => events.map(({ instructor, location, ...event }) => {
     const formatLocalTime = time => moment(time).tz(event.mainTZ).format(timeFormat);
     const eventItemsInCart = cartItems.filter(cartEvent => cartEvent.eventid === event.id);
     const quantityInCart = eventItemsInCart.map(({ quantity }) => quantity)
@@ -126,6 +140,9 @@ export const getScheduleEvents = createUnboundedSelector(
       || quantityInCart === 4
     );
     const bookedEvent = upcomingEvents.find(userEvent => userEvent.eventid === event.id);
+    const passid = getPassId(event.id);
+    const passValue = getPassValue(event.id);
+    const valueBack = passValue ? Math.max(0, Decimal(passValue || 0).minus(event.price).toDecimalPlaces(2).toNumber()) : 0;
     return {
       ...event,
       eventid: event.id,
@@ -141,6 +158,9 @@ export const getScheduleEvents = createUnboundedSelector(
       taxRate: location.tax_rate,
       seatsUserBooked: bookedEvent ? bookedEvent.quantity : 0,
       waitlisted: bookedEvent ? bookedEvent.isWaitlist : false,
+      passid,
+      valueBack,
+      formattedValueBack: formatCurrency(valueBack, { code: currency }),
     };
   })
 );
