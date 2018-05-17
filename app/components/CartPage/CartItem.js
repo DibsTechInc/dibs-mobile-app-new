@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import PropTypes from 'prop-types';
@@ -8,7 +8,7 @@ import { format as formatCurrency } from 'currency-formatter';
 
 import { addToCart, removeOneEventItem } from '../../actions';
 import { getStudioCurrency } from '../../selectors';
-import { TEXT_GREY, GREY, DARK_TEXT_GREY, LIGHT_GREY } from '../../constants';
+import { TEXT_GREY, GREY, DARK_TEXT_GREY } from '../../constants';
 import Icon from '../shared/Icon';
 import Config from '../../../config.json';
 import { MaterialPanelView } from '../styled';
@@ -24,9 +24,9 @@ const StyledText = styled.Text`
 
 /**
  * @class CartItem
- * @extends {Component}
+ * @extends {PureComponent}
  */
-class CartItem extends Component {
+class CartItem extends PureComponent {
     /**
    * @constructor
    * @constructs Overlay
@@ -64,7 +64,9 @@ class CartItem extends Component {
     if (this.props.hasEmptyCart) {
       return (
         <StyledCartItemView>
-          <StyledText>Your cart is empty</StyledText>
+          <StyledText>
+            Your cart is empty
+          </StyledText>
         </StyledCartItemView>
       );
     }
@@ -76,8 +78,12 @@ class CartItem extends Component {
       <MaterialPanelView style={{ flexDirection: 'row', marginTop: 0 }}>
         <View style={{ justifyContent: 'space-between', flex: 1, margin: 10 }}>
           <View style={{ marginBottom: 10 }}>
-            <Text style={{ fontSize: 16, fontFamily: 'flex-font-heavy' }}>{moment(this.props.startTime).format('ddd M/D')}</Text>
-            <Text style={{ fontSize: 16, fontFamily: 'flex-font', color: DARK_TEXT_GREY }}>{timeDisplay}</Text>
+            <Text style={{ fontSize: 16, fontFamily: 'flex-font-heavy' }}>
+              {moment(this.props.startTime).format('ddd M/D')
+            }</Text>
+            <Text style={{ fontSize: 16, fontFamily: 'flex-font', color: DARK_TEXT_GREY }}>
+              {timeDisplay}
+            </Text>
           </View>
           <View>
             <Text style={{ fontSize: 16, fontFamily: 'flex-font-heavy' }}>{this.props.name}</Text>

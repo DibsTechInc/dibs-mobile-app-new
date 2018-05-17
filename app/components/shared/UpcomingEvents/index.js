@@ -17,7 +17,7 @@ class UpcomingClasses extends PureComponent {
     return (
       <ScrollView style={{ flex: 1, marginBottom: 20, marginTop: 20 }}>
         <Swiper loop={false}>
-          {this.props.confirmedPurchases.map(event =>
+          {this.props.events.map(event =>
             <UpcomingClass {...event} key={event.stripe_charge_id} />
           )}
         </Swiper>
@@ -27,7 +27,7 @@ class UpcomingClasses extends PureComponent {
 }
 
 UpcomingClasses.propTypes = {
-  confirmedPurchases: PropTypes.arrayOf(PropTypes.shape()),
+  events: PropTypes.arrayOf(PropTypes.shape()),
 };
 
 export default UpcomingClasses;

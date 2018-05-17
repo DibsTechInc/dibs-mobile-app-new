@@ -44,7 +44,7 @@ export const getConfirmedTransactionsByEvent = createSelector(
       acc.push(payload);
       return acc;
     }
-    // eventTransaction.address = confirmedEvent.address;
+
     eventTransaction.transactionids.push(transaction.id);
     eventTransaction.quantity += 1;
     eventTransaction.amount = new Decimal(eventTransaction.amount).plus(transaction.amount)
@@ -57,7 +57,7 @@ export const getConfirmedTransactionsByEvent = createSelector(
     ).plus(
       transaction.pass ? Math.max(
         new Decimal(transaction.pass.passValue || 0).minus(transaction.original_price)
-                                               .toNumber()
+                                                    .toNumber()
       ) : 0
     )
     .plus(transaction.discount_amount)
@@ -71,6 +71,7 @@ export const getConfirmedTransactionsByEvent = createSelector(
     formattedStudioCreditAmount: formatCurrency(item.studio_credits_spent, { code: currency, precision: (item.studio_credits_spent % 1 && 2) }),
     formattedRAFCreditAmount: formatCurrency(item.raf_credits_spent, { code: currency, precision: (item.studio_credits_spent % 1 && 2) }),
     formattedTotal: formatCurrency(item.chargeAmount, { code: currency, precision: (item.chargeAmount % 1 && 2) }),
+    formattedValueBack: formatCurrency(item.valueBack, { code: currency, precision: (item.chargeAmount % 1 && 2) }),
   }))
 );
 

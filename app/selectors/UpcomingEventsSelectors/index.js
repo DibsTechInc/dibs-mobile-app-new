@@ -1,11 +1,12 @@
 import moment from 'moment-timezone';
 import { createSelector } from 'reselect';
 import { groupBy } from 'lodash';
+import { format as formatCurrency } from 'currency-formatter';
+import Decimal from 'decimal.js';
 
 import Config from '../../../config.json';
 import { WHITE } from '../../constants';
-import { getStudioShortDateFormat, getStudioCustomTimeFormat } from '../StudioSelectors';
-// import { createUnboundedSelector } from '../../helpers';
+import { getStudioShortDateFormat, getStudioCustomTimeFormat, getStudioCurrency } from '../StudioSelectors';
 
 /**
  * @param {Object} state in store
@@ -160,3 +161,29 @@ export const getUpcomingEventCalendarMarkings = createSelector(
   }
 );
 
+/**
+ * @param {Array<Object>} items upcoming class transaction grouped by class
+ * @param {string} currency code of studio
+ * @returns {Array<Object>} upcoming events for expanded slider
+ */
+function generateDetailedUpcomingEvents(items, currency) {
+  return items.map((item) => {
+    const chargeAmount = Decimal(item.amount).minus(item.studio_credits_spent).minus(item.global_credits_spent).minus(item.raf_credits_spent);
+    return {
+      ...item,
+      formattedSubtotal: formatCurrency(item.original_price, { code: currency, precision: (item.original_price % 1 && 2) }),
+      formattedTaxAmount: formatCurrency(item.tax_amount, { code: currency, precision: (item.tax_amount % 1 && 2) }),
+      formattedDiscountAmount: formatCurrency(item.discount_amount, { code: currency, precision: (item.discount_amount % 1 && 2) }),
+      formattedStudioCreditAmount: formatCurrency(item.studio_credits_spent, { code: currency, precision: (item.studio_credits_spent % 1 && 2) }),
+      formattedRAFCreditAmount: formatCurrency(item.raf_credits_spent, { code: currency, precision: (item.studio_credits_spent % 1 && 2) }),
+      formattedTotal: formatCurrency(chargeAmount, { code: currency, precision: (item.chargeAmount % 1 && 2) }),
+      formattedValueBack: formatCurrency(item.valueBack, { code: currency, precision: (item.chargeAmount % 1 && 2) }),
+    };
+  });
+}
+
+export const getDetailedUpcomingEventsOnCurrentDay = createSelector(
+  getUpcomingEventsOnCurrentDate,
+  getStudioCurrency,
+  generateDetailedUpcomingEvents
+);

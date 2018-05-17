@@ -86,9 +86,9 @@ const StyledContinueButton = styled.TouchableOpacity`
   padding-right: 10px;
   padding-top: 15px;
   padding-bottom: 15px;
-  background-color: ${props => props.hasDisabledColor ? GREY : Config.STUDIO_COLOR};
+  background-color: ${props => (props.hasDisabledColor ? GREY : Config.STUDIO_COLOR)};
   border-width: 1px;
-  border-color: ${props => props.hasDisabledColor ? GREY : Config.STUDIO_COLOR};;
+  border-color: ${props => (props.hasDisabledColor ? GREY : Config.STUDIO_COLOR)};;
 `;
 
 /**
@@ -120,7 +120,6 @@ class CartPage extends Component {
    * @returns {undefined}
    */
   componentDidUpdate() {
-    console.log(this.props.cartMessage, '???')
     if (!this.props.cartMessage && this.props.confirmedPurchases.length) {
       this.props.navigation.navigate(RECEIPT_ROUTE);
     }
@@ -221,8 +220,12 @@ class CartPage extends Component {
         leftButtonsActivationDistance={150}
       >
         <View style={{ flexDirection: 'row', position: 'relative' }}>
-          <Text style={{ textAlign: 'center', color: WHITE, flex: 1 }}>Swipe to pay</Text>
-          <Text style={{ color: WHITE, position: 'absolute', right: 40 }}>{'>>'}</Text>
+          <Text style={{ textAlign: 'center', color: WHITE, flex: 1 }}>
+            Swipe to pay
+          </Text>
+          <Text style={{ color: WHITE, position: 'absolute', right: 40 }}>
+            {'>>'}
+          </Text>
         </View>
       </Swipeable>
     </View>);
@@ -263,8 +266,8 @@ class CartPage extends Component {
       );
     }
 
-    renderCartItems = this.props.cart.map(item =>
-      (<CartItem
+    renderCartItems = this.props.cart.map(item => (
+      <CartItem
         key={item.eventid}
         eventid={item.eventid}
         name={item.name}
@@ -275,10 +278,8 @@ class CartPage extends Component {
         passid={item.passid}
         instructorName={item.instructorName}
         locationName={item.locationName}
-      />)
-    );
-
-    console.log(this.props.cart, 'cart')
+      />
+    ));
 
     return (
       <FadeInView style={{ backgroundColor: SOFT_GREY }}>
@@ -307,7 +308,9 @@ class CartPage extends Component {
         </StyledScrollView>
         <StyledCheckoutView>
           <View style={{ justifyContent: 'center', alignItems: 'center', width: '100%', height: '50%' }}>
-            <StyledSavingsText>{renderValueBackMessage}</StyledSavingsText>
+            <StyledSavingsText>
+              {renderValueBackMessage}
+            </StyledSavingsText>
           </View>
           <FlexRow>
             {renderPurchaseButton}
