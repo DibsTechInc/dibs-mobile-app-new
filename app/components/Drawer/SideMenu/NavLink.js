@@ -8,12 +8,13 @@ import { DARK_TEXT_GREY } from '../../../constants';
 const TouchableContainer = styled.TouchableOpacity`
   margin-bottom: -15;
   margin-left: -20;
+  width: 150;
 `;
 
 const RowView = styled.View`
   align-items: center;
   flex-direction: row;
-  width: 100px;
+  width: 150;
 `;
 
 const IconContainer = styled.View`
@@ -24,7 +25,6 @@ const IconContainer = styled.View`
 const LinkText = styled.Text`
   color: ${DARK_TEXT_GREY};
   font-size: 16;
-  margin-left: 5;
 `;
 
 

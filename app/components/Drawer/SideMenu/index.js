@@ -11,6 +11,7 @@ import {
   WHITE,
   DARK_TEXT_GREY,
   LANDING_ROUTE,
+  UPCOMING_CLASS_ROUTE,
 } from '../../../constants';
 import {
   getUsersFullName,
@@ -129,7 +130,7 @@ class SideMenu extends React.PureComponent {
         <NavLink
           iconName="arrow-up"
           label="Upcoming Classes"
-          route={SCHEDULE_ROUTE}
+          route={UPCOMING_CLASS_ROUTE}
         />
         <NavLink
           iconName="times"

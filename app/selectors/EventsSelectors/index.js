@@ -152,6 +152,7 @@ export const getScheduleEvents = createUnboundedSelector(
       eventid: event.id,
       startTimeInLocalTZ: formatLocalTime(event.start_time),
       endTimeInLocalTZ: formatLocalTime(event.end_time),
+      price,
       formattedRoundedPrice: formatCurrency(price, { precision: 0, code: currency }),
       instructorName: instructor.name,
       locationName: location.name,
@@ -165,7 +166,6 @@ export const getScheduleEvents = createUnboundedSelector(
       passid,
       valueBack,
       formattedValueBack: formatCurrency(valueBack, { code: currency }),
-      price,
     };
   })
 );

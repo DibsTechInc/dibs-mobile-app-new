@@ -30,22 +30,21 @@ export const getConfirmedTransactionsByEvent = createSelector(
                                                .minus(transaction.original_price)
                                                .toNumber()
       ) : 0;
-      console.log(confirmedEvent, 'confirmedEvent')
       const payload = {
         ...transaction,
         transactionids: [id],
         quantity: 1,
         valueBack,
         amount,
-        classDescription: confirmedEvent.description,
-        className: confirmedEvent.name,
-        studioAddress: confirmedEvent.address,
+        description: confirmedEvent.description,
+        name: confirmedEvent.name,
+        address: confirmedEvent.address,
       };
 
       acc.push(payload);
       return acc;
     }
-    // eventTransaction.address = confirmedEvent.address;
+
     eventTransaction.transactionids.push(transaction.id);
     eventTransaction.quantity += 1;
     eventTransaction.amount = new Decimal(eventTransaction.amount).plus(transaction.amount)
@@ -58,7 +57,7 @@ export const getConfirmedTransactionsByEvent = createSelector(
     ).plus(
       transaction.pass ? Math.max(
         new Decimal(transaction.pass.passValue || 0).minus(transaction.original_price)
-                                               .toNumber()
+                                                    .toNumber()
       ) : 0
     )
     .plus(transaction.discount_amount)
@@ -69,8 +68,10 @@ export const getConfirmedTransactionsByEvent = createSelector(
     formattedSubtotal: formatCurrency(item.original_price, { code: currency, precision: (item.original_price % 1 && 2) }),
     formattedTaxAmount: formatCurrency(item.tax_amount, { code: currency, precision: (item.tax_amount % 1 && 2) }),
     formattedDiscountAmount: formatCurrency(item.discount_amount, { code: currency, precision: (item.discount_amount % 1 && 2) }),
-    formattedStudioCreditsSpent: formatCurrency(item.studio_credits_spent, { code: currency, precision: (item.studio_credits_spent % 1 && 2) }),
+    formattedStudioCreditAmount: formatCurrency(item.studio_credits_spent, { code: currency, precision: (item.studio_credits_spent % 1 && 2) }),
+    formattedRAFCreditAmount: formatCurrency(item.raf_credits_spent, { code: currency, precision: (item.studio_credits_spent % 1 && 2) }),
     formattedTotal: formatCurrency(item.chargeAmount, { code: currency, precision: (item.chargeAmount % 1 && 2) }),
+    formattedValueBack: formatCurrency(item.valueBack, { code: currency, precision: (item.chargeAmount % 1 && 2) }),
   }))
 );
 
