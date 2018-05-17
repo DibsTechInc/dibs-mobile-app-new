@@ -14,6 +14,7 @@ import {
   getUsersNextPassId,
   getUsersNextPassValue,
 } from '../';
+import { getUserFixedPrice } from '../UserSelectors/Passes/index';
 
 /**
  * getEventsState
@@ -121,6 +122,7 @@ export const getScheduleEvents = createUnboundedSelector(
     getUpcomingEventsData,
     getUsersNextPassId,
     getUsersNextPassValue,
+    getUserFixedPrice,
   ],
   (
     events,
@@ -129,7 +131,8 @@ export const getScheduleEvents = createUnboundedSelector(
     cartItems,
     upcomingEvents,
     getPassId,
-    getPassValue
+    getPassValue,
+    fixedPrice
   ) => events.map(({ instructor, location, ...event }) => {
     const formatLocalTime = time => moment(time).tz(event.mainTZ).format(timeFormat);
     const eventItemsInCart = cartItems.filter(cartEvent => cartEvent.eventid === event.id);
@@ -143,12 +146,13 @@ export const getScheduleEvents = createUnboundedSelector(
     const passid = getPassId(event.id);
     const passValue = getPassValue(event.id);
     const valueBack = passValue ? Math.max(0, Decimal(passValue || 0).minus(event.price).toDecimalPlaces(2).toNumber()) : 0;
+    const price = (!passid && fixedPrice) ? Math.min(event.price, fixedPrice) : event.price;
     return {
       ...event,
       eventid: event.id,
       startTimeInLocalTZ: formatLocalTime(event.start_time),
       endTimeInLocalTZ: formatLocalTime(event.end_time),
-      formattedRoundedPrice: formatCurrency(event.price, { precision: 0, code: currency }),
+      formattedRoundedPrice: formatCurrency(price, { precision: 0, code: currency }),
       instructorName: instructor.name,
       locationName: location.name,
       soldOut: event.seats_remaining <= 0,
@@ -161,6 +165,7 @@ export const getScheduleEvents = createUnboundedSelector(
       passid,
       valueBack,
       formattedValueBack: formatCurrency(valueBack, { code: currency }),
+      price,
     };
   })
 );
