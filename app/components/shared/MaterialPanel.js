@@ -46,7 +46,7 @@ class MaterialPanel extends React.PureComponent {
 }
 
 MaterialPanel.propTypes = {
-  height: PropTypes.number,
+  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   style: PropTypes.shape(),
   headerStyle: PropTypes.shape(),
   headerRightStyle: PropTypes.shape(),

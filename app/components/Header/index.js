@@ -71,7 +71,7 @@ class Header extends Component {
       <StyledView backgroundColor={this.props.backgroundColor} style={this.props.headerStyle}>
         <StyledMenuView>
           <Icon
-            iconName={this.props.iconType}
+            iconName={this.props.iconName}
             iconColor={this.props.iconColor}
             onPress={this.navigateToDrawer}
             size={this.props.iconSize}
@@ -97,7 +97,7 @@ Header.defaultProps = {
   showTitle: false,
   titleText: 'Title Text',
   backgroundColor: WHITE,
-  iconType: 'user-circle',
+  iconName: 'user-circle',
   iconSize: 25,
 };
 
@@ -110,7 +110,7 @@ Header.propTypes = {
   showTitle: PropTypes.bool,
   textColor: PropTypes.string,
   titleText: PropTypes.string,
-  iconType: PropTypes.string,
+  iconName: PropTypes.string,
   iconSize: PropTypes.number,
   headerStyle: PropTypes.shape(),
 };

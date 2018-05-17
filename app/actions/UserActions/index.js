@@ -114,6 +114,57 @@ export function signUpUser(payload, callback) {
 }
 
 /**
+ * updateUser
+ * @param {Object} payload from the request
+ * @param {function} callback callback function
+ * @returns {function} redux thunk
+ */
+export function updateUser(payload, callback) {
+  return async function innerUpdateUser(dispatch, getState, dibsFetch) {
+    try {
+      const res = await dibsFetch('/api/user', {
+        method: 'PUT',
+        body: payload,
+      });
+
+      if (res.success) {
+        dispatch(setUser(res.user));
+      }
+
+      callback(res);
+    } catch (err) {
+      console.log(err);
+      callback(null);
+    }
+  };
+}
+
+/**
+ * @param {Object} payload from the request
+ * @param {function} callback callback function
+ * @returns {function} redux thunk
+ */
+export function updateUserPassword(payload, callback) {
+  return async function innerUpdateUserPassword(dispatch, getState, dibsFetch) {
+    try {
+      const res = await dibsFetch('/api/user/update-password', {
+        method: 'PUT',
+        body: payload,
+      });
+
+      if (res.success) {
+        dispatch(setUser(res.user));
+      }
+
+      callback(res);
+    } catch (err) {
+      console.log(err);
+      callback(null);
+    }
+  };
+}
+
+/**
  * @param {string} email of user
  * @param {string} password user entered
  * @param {function} callback on complete

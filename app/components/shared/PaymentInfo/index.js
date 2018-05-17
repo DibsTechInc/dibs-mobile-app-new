@@ -19,14 +19,14 @@ import UnknownIcon from './stp_card_unknown.png';
 import VisaIcon from './stp_card_visa.png';
 
 /**
- * @class TransactionBreakdown
+ * @class PaymentInfo
  * @extends {Component}
  */
 class PaymentInfo extends PureComponent {
   /**
    * @constructor
    * @param {object} props from parent
-   * @constructs CartPage
+   * @constructs PaymentInfo
    */
   constructor(props) {
     super(props);

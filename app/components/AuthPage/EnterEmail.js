@@ -8,9 +8,7 @@ import {
 import Promise from 'bluebird';
 
 import { validateEmail } from '../../actions/UserActions';
-import FadeInView from '../shared/FadeInView';
-import InputField from '../shared/InputField';
-import DibsLoader from '../shared/DibsLoader';
+import { FadeInView, InputField, DibsLoader } from '../shared';
 import Config from '../../../config.json';
 
 /**

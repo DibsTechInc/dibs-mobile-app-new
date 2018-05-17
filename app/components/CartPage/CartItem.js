@@ -8,7 +8,7 @@ import { format as formatCurrency } from 'currency-formatter';
 
 import { addToCart, removeOneEventItem } from '../../actions';
 import { getStudioCurrency } from '../../selectors';
-import { TEXT_GREY, GREY, DARK_TEXT_GREY, LIGHT_GREY } from '../../constants';
+import { TEXT_GREY, GREY, DARK_TEXT_GREY } from '../../constants';
 import Icon from '../shared/Icon';
 import Config from '../../../config.json';
 import { MaterialPanelView } from '../styled';

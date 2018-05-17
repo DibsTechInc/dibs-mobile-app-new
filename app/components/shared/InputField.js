@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { TextInput, View, ScrollView } from 'react-native';
+import { TextInput, View } from 'react-native';
 import { StudioColorBottomBorder, DefaultInput, HeavyText } from '../styled';
 
 const Label = HeavyText.extend`
@@ -43,25 +43,25 @@ class InputField extends React.PureComponent {
    */
   render() {
     return (
-      <StudioColorBottomBorder
-        style={{
-          ...this.props.containerStyle,
-          borderBottomWidth: 1 + Boolean(this.state.focused),
-        }}
-      >
-        {this.props.label ? (
-          <Label style={this.props.labelStyle}>
-            {this.props.label}
-          </Label>
-        ) : null}
-        <View keyboardShouldPersistTaps="never">
-          <DefaultInput
-            onFocus={this.onFocus}
-            onBlur={this.onBlur}
-            {...this.props}
-          />
-        </View>
-      </StudioColorBottomBorder>
+        <StudioColorBottomBorder
+          style={{
+            ...this.props.containerStyle,
+            borderBottomWidth: 1 + Boolean(this.state.focused),
+          }}
+        >
+          {this.props.label ? (
+            <Label style={this.props.labelStyle}>
+              {this.props.label}
+            </Label>
+          ) : null}
+          <View keyboardShouldPersistTaps="never">
+            <DefaultInput
+              onFocus={this.onFocus}
+              onBlur={this.onBlur}
+              {...this.props}
+            />
+          </View>
+        </StudioColorBottomBorder>
     );
   }
 }
