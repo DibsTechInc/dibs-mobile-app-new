@@ -6,6 +6,7 @@ import styled from 'styled-components';
 
 import { WHITE, HEIGHT, LIGHT_GREY } from '../../../constants';
 import UnexpandedContent from './UnexpandedContent';
+import ExpandedContent from './ExpandedContent';
 
 const FULL_HEIGHT = HEIGHT - 30;
 const SHORTENED_HEIGHT = HEIGHT / 3;
@@ -38,7 +39,7 @@ class UpcomingClassSlider extends React.PureComponent {
       dragBottom: SHORTENED_HEIGHT,
       expanded: false,
       expanding: false,
-      draggable: Boolean(props.events.length),
+      draggable: Boolean(props.sliderEvents.length),
     };
     this.onDragStart = this.onDragStart.bind(this);
     this.onDragEnd = this.onDragEnd.bind(this);
@@ -49,7 +50,7 @@ class UpcomingClassSlider extends React.PureComponent {
    * @returns {undefined}
    */
   componentWillReceiveProps(props) {
-    this.setState({ draggable: Boolean(props.events.length) });
+    this.setState({ draggable: Boolean(props.sliderEvents.length) });
   }
   /**
    * @returns {undefined}
@@ -130,9 +131,12 @@ class UpcomingClassSlider extends React.PureComponent {
           {this.state.expanded || this.state.expanding ? null : (
             <UnexpandedContent
               isUpcomingClassesPage={this.props.isUpcomingClassesPage}
-              events={this.props.events}
+              events={this.props.sliderEvents}
             />
           )}
+          {this.state.expanded && !this.state.expanding ? (
+            <ExpandedContent events={this.props.detailedEvents} />
+          ) : null}
         </Panel>
       </SlidingUpPanel>
     );
@@ -144,7 +148,8 @@ UpcomingClassSlider.defaultProps = {
 };
 
 UpcomingClassSlider.propTypes = {
-  events: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+  sliderEvents: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+  detailedEvents: PropTypes.arrayOf(PropTypes.shape()).isRequired,
   isUpcomingClassesPage: PropTypes.bool,
 };
 

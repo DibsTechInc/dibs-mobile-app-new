@@ -1,10 +1,11 @@
 import { connect } from 'react-redux';
 
 import { UpcomingEventSlider } from '../shared';
-import { getMostRecentUpcomingSliderEvents } from '../../selectors';
+import { getMostRecentUpcomingSliderEvents, getDetailedMostRecentUpcomingEvents } from '../../selectors';
 
 const mapStateToProps = state => ({
-  events: getMostRecentUpcomingSliderEvents(state),
+  sliderEvents: getMostRecentUpcomingSliderEvents(state),
+  detailedEvents: getDetailedMostRecentUpcomingEvents(state),
 });
 const mapDispatchToProps = {};
 

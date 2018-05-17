@@ -182,6 +182,12 @@ function generateDetailedUpcomingEvents(items, currency) {
   });
 }
 
+export const getDetailedMostRecentUpcomingEvents = createSelector(
+  getMostRecentUpcomingEvents,
+  getStudioCurrency,
+  generateDetailedUpcomingEvents
+);
+
 export const getDetailedUpcomingEventsOnCurrentDay = createSelector(
   getUpcomingEventsOnCurrentDate,
   getStudioCurrency,

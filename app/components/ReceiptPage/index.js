@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { FadeInView } from '../shared';
 import { getConfirmedTransactionsByEvent } from '../../selectors';
 import { clearConfirmation } from '../../actions';
-import UpcomingClasses from '../shared/UpcomingEvents';
+import UpcomingEvents from '../shared/UpcomingEvents';
 
 /**
  * @class ReceiptPage
@@ -23,7 +23,7 @@ class ReceiptPage extends Component {
   render() {
     return (
       <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
-        <UpcomingClasses events={this.props.items} />
+        <UpcomingEvents events={this.props.items} />
       </FadeInView>
     );
   }

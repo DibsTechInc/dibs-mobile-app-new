@@ -4,7 +4,7 @@ import { UpcomingEventSlider } from '../shared';
 import { getUpcomingSliderEventsOnCurrentDate } from '../../selectors';
 
 const mapStateToProps = state => ({
-  events: getUpcomingSliderEventsOnCurrentDate(state),
+  sliderEvents: getUpcomingSliderEventsOnCurrentDate(state),
 });
 const mapDispatchToProps = {};
 

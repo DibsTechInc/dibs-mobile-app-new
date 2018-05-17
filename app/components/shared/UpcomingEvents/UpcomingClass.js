@@ -29,13 +29,13 @@ class UpcomingClass extends PureComponent {
    * @returns {JSX} XML
    */
   render() {
-    const classDescriptionHTML = this.props.classDescription
-      && <HTML html={this.props.classDescription} imagesMaxWidth={Dimensions.get('window').width} />;
+    const classDescriptionHTML = this.props.description
+      && <HTML html={this.props.description} imagesMaxWidth={Dimensions.get('window').width} />;
 
     return (
       <FadeInView style={{ marginTop: 20 }}>
         <TransactionBreakdown
-          className={this.props.className}
+          name={this.props.name}
           formattedSubtotal={this.props.formattedSubtotal}
           taxAmount={this.props.tax_amount}
           formattedTaxAmount={this.props.formattedTaxAmount}
@@ -88,7 +88,7 @@ class UpcomingClass extends PureComponent {
 
 UpcomingClass.propTypes = {
   formattedSubtotal: PropTypes.string,
-  className: PropTypes.string,
+  name: PropTypes.string,
   tax_amount: PropTypes.number,
   formattedTaxAmount: PropTypes.string,
   discount_amount: PropTypes.number,
@@ -98,7 +98,7 @@ UpcomingClass.propTypes = {
   raf_credits_spent: PropTypes.number,
   formattedRAFCreditAmount: PropTypes.string,
   formattedTotal: PropTypes.string,
-  classDescription: PropTypes.string,
+  description: PropTypes.string,
 };
 
 export default UpcomingClass;

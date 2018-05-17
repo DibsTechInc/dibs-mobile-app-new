@@ -36,9 +36,9 @@ export const getConfirmedTransactionsByEvent = createSelector(
         quantity: 1,
         valueBack,
         amount,
-        classDescription: confirmedEvent.description,
-        className: confirmedEvent.name,
-        studioAddress: confirmedEvent.address,
+        description: confirmedEvent.description,
+        name: confirmedEvent.name,
+        address: confirmedEvent.address,
       };
 
       acc.push(payload);
