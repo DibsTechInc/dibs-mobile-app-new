@@ -68,7 +68,7 @@ class App extends Component {
       }),
       token && new Promise(res => store.dispatch(requestUserData(res))),
       token && new Promise(res => store.dispatch(requestCreditCardInfo(res))),
-      token && new Promise(res => store.dispatch(requestUserEvents(true, res))),
+      token && new Promise(res => store.dispatch(requestUserEvents(res))),
     ]);
     this.setState({ fetchedAssets: true, userToken: token });
     if (token) await new Promise(res => store.dispatch(syncUserEvents(res)));

@@ -2,6 +2,7 @@ import { createActions } from 'redux-actions';
 import moment from 'moment-timezone';
 
 import Config from '../../../config.json';
+import { setUser } from '../';
 
 export const {
   setUpcomingEvents,
@@ -12,6 +13,8 @@ export const {
   setSyncingEventsTrue,
   setSyncingEventsFalse,
   setUpcomingEventsCurrentDate,
+  setDroppingEventTrue,
+  setDroppingEventFalse,
 } = createActions({
   SET_UPCOMING_EVENTS: payload => payload,
   REMOVE_UPCOMING_EVENT: eventid => eventid,
@@ -21,13 +24,15 @@ export const {
   SET_SYNCING_EVENTS_TRUE: () => true,
   SET_SYNCING_EVENTS_FALSE: () => false,
   SET_UPCOMING_EVENTS_CURRENT_DATE: payload => payload,
+  SET_DROPPING_EVENT_TRUE: () => true,
+  SET_DROPPING_EVENT_FALSE: () => false,
 });
 
 /**
  * @param {function} callback on complete
  * @returns {function} thunk
  */
-export function requestUserEvents(setCurrentDate = true, callback = () => {}) {
+export function requestUserEvents(callback = () => {}) {
   return async function innerRequestUserEvents(dispatch, getState, dibsFetch) {
     const state = getState();
     if (state.upcomingEvents.loading) return;
@@ -73,7 +78,7 @@ export function syncUserEvents(callback = () => {}) {
       console.log(err);
     }
     dispatch(setSyncingEventsFalse());
-    dispatch(requestUserEvents(true, callback));
+    dispatch(requestUserEvents(callback));
   };
 }
 
@@ -106,5 +111,33 @@ export function setCurrentDateToFirstEventNextMonth() {
     );
     const [{ start_time: startTime, mainTZ }] = eventsNextMonth; // data is sorted in API by event start time ASC
     return dispatch(setUpcomingEventsCurrentDate(moment.tz(startTime, mainTZ).startOf('day')));
+  };
+}
+
+/**
+ * @param {number} eventid to drop
+ * @param {*} callback on complete
+ * @returns {function} thunk
+ */
+export function dropUserFromEvent(eventid, callback) {
+  return async function innerDropUserFromEvent(dispatch, getState, dibsFetch) {
+    try {
+      const { dropping } = getState().upcomingEvents;
+      if (dropping) return;
+      dispatch(setDroppingEventTrue());
+      const res = await dibsFetch(`/api/studio/unsubscribe/${eventid}`, {
+        requiresAuth: true,
+        method: 'DELETE',
+      });
+      if (res.success) {
+        dispatch(removeUpcomingEvent(eventid));
+        dispatch(setUser(res.user));
+        callback(null);
+      } else callback(res);
+    } catch (err) {
+      console.log(err);
+      callback({ message: 'Something went wrong dropping your class.' });
+    }
+    dispatch(setDroppingEventFalse());
   };
 }

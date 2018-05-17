@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { FadeInView, UpcomingClasses } from '../shared';
+import { FadeInView } from '../shared';
 import { getConfirmedTransactionsByEvent } from '../../selectors';
 import { clearConfirmation } from '../../actions';
+import UpcomingClasses from '../shared/UpcomingClasses';
 
 /**
  * @class ReceiptPage
@@ -16,7 +17,9 @@ class ReceiptPage extends Component {
   componentWillUnmount() {
     this.props.clearConfirmation();
   }
-
+  /**
+   * @returns {JSX} XML
+   */
   render() {
     return (
       <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>

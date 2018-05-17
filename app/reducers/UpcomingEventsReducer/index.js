@@ -11,12 +11,15 @@ import {
   setSyncingEventsTrue,
   setSyncingEventsFalse,
   setUpcomingEventsCurrentDate,
+  setDroppingEventTrue,
+  setDroppingEventFalse,
 } from '../../actions/UpcomingEventsActions';
 
 const initialState = {
   data: [],
   loading: false,
   syncing: false,
+  droppping: false,
   currentDate: moment().tz(Config.STUDIO_TZ),
 };
 
@@ -32,4 +35,7 @@ export default handleActions({
     setSyncingEventsTrue,
     setSyncingEventsFalse)]: (state, { payload }) => ({ ...state, syncing: payload }),
   [setUpcomingEventsCurrentDate]: (state, { payload }) => ({ ...state, currentDate: payload }),
+  [combineActions(
+    setDroppingEventTrue,
+    setDroppingEventFalse)]: (state, { payload }) => ({ ...state, dropping: payload }),
 }, initialState);
