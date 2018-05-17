@@ -33,8 +33,9 @@ class UpcomingClass extends PureComponent {
       && <HTML html={this.props.description} imagesMaxWidth={Dimensions.get('window').width} />;
 
     return (
-      <FadeInView style={{ marginTop: 20 }}>
+      <FadeInView style={{ marginTop: this.props.forReceiptPage ? 20 : 0 }}>
         <TransactionBreakdown
+          forReceiptPage={this.props.forReceiptPage}
           name={this.props.name}
           formattedSubtotal={this.props.formattedSubtotal}
           taxAmount={this.props.tax_amount}
@@ -87,6 +88,7 @@ class UpcomingClass extends PureComponent {
 }
 
 UpcomingClass.propTypes = {
+  forReceiptPage: PropTypes.bool.isRequired,
   formattedSubtotal: PropTypes.string,
   name: PropTypes.string,
   tax_amount: PropTypes.number,

@@ -15,18 +15,25 @@ class UpcomingClasses extends PureComponent {
    */
   render() {
     return (
-      <ScrollView style={{ flex: 1, marginBottom: 20, marginTop: 20 }}>
+      <ScrollView style={{ flex: 1, marginBottom: 20, marginTop: this.props.forReceiptPage ? 20 : 0 }}>
         <Swiper loop={false}>
-          {this.props.events.map(event =>
-            <UpcomingClass {...event} key={event.eventid} />
-          )}
+          {this.props.events.map(event => (
+            <UpcomingClass
+              key={event.eventid}
+              forReceiptPage={this.props.forReceiptPage}
+              {...event}
+            />
+          ))}
         </Swiper>
       </ScrollView>
     );
   }
 }
 
+UpcomingClasses.defaultProps = { forReceiptPage: true };
+
 UpcomingClasses.propTypes = {
+  forReceiptPage: PropTypes.bool,
   events: PropTypes.arrayOf(PropTypes.shape()),
 };
 

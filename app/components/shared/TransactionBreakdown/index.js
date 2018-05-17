@@ -29,15 +29,15 @@ class TransactionBreakdown extends Component {
   render() {
     return (
       <MaterialPanel
-        heading="Order Summary"
+        heading={this.props.forReceiptPage ? 'Order Summary' : this.props.name}
         style={{ shadowOffset: { width: 3, height: 3 } }}
         headerStyle={{ marginLeft: 10 }}
       >
         <StyledBreakDownView>
-          {Boolean(this.props.className) &&
+          {Boolean(this.props.name) && this.props.forReceiptPage &&
             <BreakdownRow
               label="Name"
-              value={this.props.className}
+              value={this.props.name}
               dots={false}
             />
           }
@@ -81,6 +81,8 @@ class TransactionBreakdown extends Component {
   }
 }
 
+TransactionBreakdown.defaultProps = { forReceiptPage: true };
+
 TransactionBreakdown.propTypes = {
   formattedSubtotal: PropTypes.string,
   formattedTotal: PropTypes.string,
@@ -100,7 +102,8 @@ TransactionBreakdown.propTypes = {
   formattedTaxAmount: PropTypes.string,
   discountAmount: PropTypes.number,
   formattedDiscountAmount: PropTypes.string,
-  className: PropTypes.string,
+  name: PropTypes.string,
+  forReceiptPage: PropTypes.bool,
 };
 
 export default TransactionBreakdown;
