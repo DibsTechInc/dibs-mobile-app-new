@@ -6,8 +6,17 @@ import { LIGHT_GREY } from '../../../constants/ColorConstants';
 
 import BreakdownRow from './BreakdownRow';
 
+const ClassTime = styled.Text`
+  margin-top: -5;
+  margin-bottom: 3;
+  margin-left: 10;
+  font-family: flex-font;
+  font-size: 14;
+`;
+
 const StyledBreakDownView = styled.View`
   margin: 10px;
+  margin-bottom: 0;
   height: auto;
 `;
 
@@ -33,6 +42,11 @@ class TransactionBreakdown extends Component {
         style={{ shadowOffset: { width: 3, height: 3 } }}
         headerStyle={{ marginLeft: 10 }}
       >
+        {!this.props.forReceiptPage &&
+          <ClassTime>
+            {this.props.time}
+          </ClassTime>
+        }
         <StyledBreakDownView>
           {Boolean(this.props.name) && this.props.forReceiptPage &&
             <BreakdownRow
@@ -103,6 +117,7 @@ TransactionBreakdown.propTypes = {
   discountAmount: PropTypes.number,
   formattedDiscountAmount: PropTypes.string,
   name: PropTypes.string,
+  time: PropTypes.string,
   forReceiptPage: PropTypes.bool,
 };
 

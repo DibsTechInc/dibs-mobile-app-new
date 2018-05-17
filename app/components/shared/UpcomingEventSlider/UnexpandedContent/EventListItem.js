@@ -42,7 +42,7 @@ const EventText = styled.Text`
 class SliderEventListItem extends React.PureComponent {
   /**
    * @constructor
-   * @constructs SliderEvnetListItem
+   * @constructs SliderEventListItem
    * @param {Object} props for component
    */
   constructor(props) {

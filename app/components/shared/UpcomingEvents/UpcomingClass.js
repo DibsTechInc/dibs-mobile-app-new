@@ -1,12 +1,18 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import HTML from 'react-native-render-html';
-import { View, Text, Dimensions } from 'react-native';
+import { View, Text, Dimensions, ScrollView, Alert } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import { promisify } from 'bluebird';
+import { connect } from 'react-redux';
 
+import Config from '../../../../config.json';
+import { getDroppingUpcomingEvent } from '../../../selectors';
+import { dropUserFromEvent } from '../../../actions';
 import FadeInView from '../FadeInView';
 import TransactionBreakdown from '../TransactionBreakdown';
-import Config from '../../../../config.json';
+import MaterialButton from '../MaterialButton';
+import DibsLoader from '../DibsLoader';
 
 const LATITUDE = 51.5211117;
 const LONGITUDE = -0.090806;
@@ -19,12 +25,45 @@ const LONGITUDE_DELTA = 0.01;
  */
 class UpcomingClass extends PureComponent {
   /**
+   * @constructor
+   * @constructs UpcomingClass
+   * @param {Object} props for component
+   */
+  constructor(props) {
+    super(props);
+    this.startDropClass = this.startDropClass.bind(this);
+    this.dropClass = this.dropClass.bind(this);
+  }
+  /**
    * @returns {undefined}
    */
   componentDidMount() {
     this.map.animateToRegion({ latitude: LATITUDE, longitude: LONGITUDE, latitudeDelta: LATITUDE_DELTA, longitudeDelta: LONGITUDE_DELTA }, 1);
   }
-
+  /**
+   * @returns {undefined}
+   */
+  startDropClass() {
+    Alert.alert(
+      'Are you sure?',
+      `Do you want to drop ${this.props.name}?`,
+      [
+        { text: 'Yes', onPress: this.dropClass },
+        { text: 'No', onPress: () => { } },
+      ]
+    );
+  }
+  /**
+   * @returns {undefined}
+   */
+  async dropClass() {
+    try {
+      await promisify(this.props.dropUserFromEvent)(this.props.eventid);
+      Alert.alert('Success!', `You were dropped from ${this.props.name}`);
+    } catch (err) {
+      Alert.alert('Uh oh!', err.message);
+    }
+  }
   /**
    * @returns {JSX} XML
    */
@@ -34,54 +73,70 @@ class UpcomingClass extends PureComponent {
 
     return (
       <FadeInView style={{ marginTop: this.props.forReceiptPage ? 20 : 0 }}>
-        <TransactionBreakdown
-          forReceiptPage={this.props.forReceiptPage}
-          name={this.props.name}
-          formattedSubtotal={this.props.formattedSubtotal}
-          taxAmount={this.props.tax_amount}
-          formattedTaxAmount={this.props.formattedTaxAmount}
-          discountAmount={this.props.discount_amount}
-          formattedDiscountAmount={this.props.formattedDiscountAmount}
-          studioCreditAmount={this.props.studio_credits_spent}
-          formattedStudioCreditAmount={this.props.formattedStudioCreditAmount}
-          rafCreditsSpent={this.props.raf_credits_spent}
-          formattedRAFCreditAmount={this.props.formattedRAFCreditAmount}
-          formattedTotal={this.props.formattedTotal}
-        />
-        <MapView
-          ref={(ref) => { this.map = ref; }}
-          style={{ flex: 1, marginBottom: 30 }}
-          initialRegion={{
-            latitude: LATITUDE,
-            longitude: LONGITUDE,
-            latitudeDelta: LATITUDE_DELTA,
-            longitudeDelta: LONGITUDE_DELTA,
-          }}
-        >
-          <Marker
-            coordinate={{ latitude: LATITUDE, longitude: LONGITUDE }}
-            title="My marker"
-            description="blahblah"
+        <ScrollView style={{ marginTop: this.props.forReceiptPage ? 20 : 0 }}>
+          <TransactionBreakdown
+            forReceiptPage={this.props.forReceiptPage}
+            name={this.props.name}
+            time={this.props.time}
+            formattedSubtotal={this.props.formattedSubtotal}
+            taxAmount={this.props.tax_amount}
+            formattedTaxAmount={this.props.formattedTaxAmount}
+            discountAmount={this.props.discount_amount}
+            formattedDiscountAmount={this.props.formattedDiscountAmount}
+            studioCreditAmount={this.props.studio_credits_spent}
+            formattedStudioCreditAmount={this.props.formattedStudioCreditAmount}
+            rafCreditsSpent={this.props.raf_credits_spent}
+            formattedRAFCreditAmount={this.props.formattedRAFCreditAmount}
+            formattedTotal={this.props.formattedTotal}
           />
-        </MapView>
-        <View style={{ flex: 1, margin: 10, marginTop: 10, marginLeft: 10, marginBottom: 50 }}>
-          <View>
-            <Text style={{ fontFamily: 'flex-font-heavy' }}>
-              Class Description:
-            </Text>
-            <Text style={{ fontFamily: 'flex-font' }}>
-              {classDescriptionHTML || 'No Class Description.'}
-            </Text>
+          <MapView
+            ref={(ref) => { this.map = ref; }}
+            style={{ height: 200, marginBottom: 10 }}
+            initialRegion={{
+              latitude: LATITUDE,
+              longitude: LONGITUDE,
+              latitudeDelta: LATITUDE_DELTA,
+              longitudeDelta: LONGITUDE_DELTA,
+            }}
+          >
+            <Marker
+              coordinate={{ latitude: LATITUDE, longitude: LONGITUDE }}
+              title="My marker"
+              description="blahblah"
+            />
+          </MapView>
+          <View style={{ margin: 10, marginLeft: 10 }}>
+            <View>
+              <Text style={{ fontFamily: 'flex-font-heavy' }}>
+                Class Description:
+              </Text>
+              <Text style={{ fontFamily: 'flex-font' }}>
+                {classDescriptionHTML || 'No Class Description.'}
+              </Text>
+            </View>
+            <View style={{ paddingBottom: 10 }}>
+              <Text style={{ fontFamily: 'flex-font-heavy' }}>
+                Drop Policy:
+              </Text>
+              <Text style={{ fontFamily: 'flex-font' }}>
+                {Config.STUDIO_DROP_POLICY}
+              </Text>
+            </View>
           </View>
-          <View style={{ marginTop: 20, marginBottom: 20 }}>
-            <Text style={{ fontFamily: 'flex-font-heavy' }}>
-              Drop Policy:
-            </Text>
-            <Text style={{ fontFamily: 'flex-font' }}>
-              {Config.STUDIO_DROP_POLICY}
-            </Text>
-          </View>
-        </View>
+          {!this.props.forReceiptPage && (
+            <View style={{ alignItems: 'center', paddingBottom: 40 }}>
+              {this.props.dropping ? (
+                <DibsLoader dotColor={Config.STUDIO_COLOR} maxDotRadius={10} width={160} />
+              ) : (
+                <MaterialButton
+                  text="Drop"
+                  style={{ width: 160, height: 40 }}
+                  onPress={this.startDropClass}
+                />
+              )}
+            </View>
+          )}
+        </ScrollView>
       </FadeInView>
     );
   }
@@ -91,6 +146,7 @@ UpcomingClass.propTypes = {
   forReceiptPage: PropTypes.bool.isRequired,
   formattedSubtotal: PropTypes.string,
   name: PropTypes.string,
+  time: PropTypes.string,
   tax_amount: PropTypes.number,
   formattedTaxAmount: PropTypes.string,
   discount_amount: PropTypes.number,
@@ -101,6 +157,14 @@ UpcomingClass.propTypes = {
   formattedRAFCreditAmount: PropTypes.string,
   formattedTotal: PropTypes.string,
   description: PropTypes.string,
+  dropping: PropTypes.bool.isRequired,
 };
 
-export default UpcomingClass;
+const mapStateToProps = state => ({
+  dropping: getDroppingUpcomingEvent(state),
+});
+const mapDispatchToProps = {
+  dropUserFromEvent,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(UpcomingClass);

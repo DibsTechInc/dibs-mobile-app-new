@@ -166,11 +166,13 @@ export const getUpcomingEventCalendarMarkings = createSelector(
  * @param {string} currency code of studio
  * @returns {Array<Object>} upcoming events for expanded slider
  */
-function generateDetailedUpcomingEvents(items, currency) {
+function generateDetailedUpcomingEvents(items, currency, timeFormat) {
   return items.map((item) => {
     const chargeAmount = Decimal(item.amount).minus(item.studio_credits_spent).minus(item.global_credits_spent).minus(item.raf_credits_spent);
+    const time = moment.tz(item.start_time, Config.STUDIO_TZ).format(`MMM D, ${timeFormat}`);
     return {
       ...item,
+      time,
       formattedSubtotal: formatCurrency(item.original_price, { code: currency, precision: (item.original_price % 1 && 2) }),
       formattedTaxAmount: formatCurrency(item.tax_amount, { code: currency, precision: (item.tax_amount % 1 && 2) }),
       formattedDiscountAmount: formatCurrency(item.discount_amount, { code: currency, precision: (item.discount_amount % 1 && 2) }),
@@ -185,11 +187,13 @@ function generateDetailedUpcomingEvents(items, currency) {
 export const getDetailedMostRecentUpcomingEvents = createSelector(
   getMostRecentUpcomingEvents,
   getStudioCurrency,
+  getStudioCustomTimeFormat,
   generateDetailedUpcomingEvents
 );
 
 export const getDetailedUpcomingEventsOnCurrentDay = createSelector(
   getUpcomingEventsOnCurrentDate,
   getStudioCurrency,
+  getStudioCustomTimeFormat,
   generateDetailedUpcomingEvents
 );

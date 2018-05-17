@@ -54,8 +54,8 @@ MaterialPanel.propTypes = {
   headingRight: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
   onPressHeadingRight: PropTypes.func,
   children: PropTypes.oneOfType([
-    PropTypes.element,
-    PropTypes.arrayOf(PropTypes.element),
+    PropTypes.node,
+    PropTypes.arrayOf(PropTypes.node),
   ]),
 };
 

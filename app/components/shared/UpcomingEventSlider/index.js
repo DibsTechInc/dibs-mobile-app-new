@@ -112,9 +112,15 @@ class UpcomingClassSlider extends React.PureComponent {
     }));
     this.setState({ expanded: false, expanding: false });
   }
+  /**
+   * @returns {undefined}
+   */
   pauseDrag() {
     this.setState({ draggable: false });
   }
+  /**
+   * @returns {undefined}
+   */
   resumeDrag() {
     this.setState({ draggable: true });
   }
