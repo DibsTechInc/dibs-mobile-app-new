@@ -307,26 +307,3 @@ export function reactivateUserAccount(email, password, callback) {
   };
 }
 
-
-// export function reactivateUserAccount(email, password, cb = () => {}) {
-//   return function innerReactivateUserAccount(dispatch) {
-//     $.ajax({
-//       method: 'PUT',
-//       data: { email, password },
-//       url: '/api/user/reactivate',
-//       success(data) {
-//         if (data.success) {
-//           return cb(data);
-//         }
-
-//         dispatch(addError(data.message));
-//         return cb(data);
-//       },
-//       error(err) {
-//         console.log(err);
-//         dispatch(addError('Something went wrong trying to activate your account'));
-//       },
-//     });
-//   };
-// }
-
