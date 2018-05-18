@@ -5,6 +5,7 @@ import Header from '../../Header';
 import { FadeInView } from '../../shared';
 import { WHITE, BLACK } from '../../../constants';
 import EmailPreferences from './EmailPreferences';
+import DisableAccount from './DisableAccount';
 
 class UserSettings extends PureComponent {
   constructor(props) {
@@ -13,9 +14,11 @@ class UserSettings extends PureComponent {
     this.state = {
       isLoading: false,
       isUpdatingEmailPreferences: false,
+      isUpdatingDisableAccount: false,
     };
 
     this.setEditEmailPreferences = this.setEdit.bind(this, 'isUpdatingEmailPreferences');
+    this.setEditDisableAccount = this.setEdit.bind(this, 'isUpdatingDisableAccount');
   }
 
   /**
@@ -40,6 +43,10 @@ class UserSettings extends PureComponent {
         <EmailPreferences
           setEditEmailPreferences={this.setEditEmailPreferences}
           isUpdatingEmailPreferences={this.state.isUpdatingEmailPreferences}
+        />
+        <DisableAccount
+          setEditDisableAccount={this.setEditDisableAccount}
+          isUpdatingDisableAccount={this.state.isUpdatingDisableAccount}
         />
       </FadeInView>
     );

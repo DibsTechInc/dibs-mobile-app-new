@@ -258,3 +258,50 @@ export function createPasswordResetLink(email, callback = () => {}) {
     }
   };
 }
+
+/**
+ * @param {function} callback callback
+ * @returns {function} redux thunk
+ */
+export function disableUserAccount(callback) {
+  return async function innerDisableUserAccount(dispatch, getState, dibsFetch) {
+    try {
+      const res = await dibsFetch('/api/user', {
+        method: 'DELETE',
+      });
+
+      if (res.success) {
+        dispatch(logOutUser());
+      }
+
+      callback(res);
+    } catch (err) {
+      console.log(err);
+      callback(err);
+    }
+  };
+}
+
+// /**
+//  * @param {function} cb callback
+//  * @returns {function} redux thunk
+//  */
+// export function disableUserAccount(cb = () => {}) {
+//   return function innerDisableUserAccount(dispatch) {
+//     $.ajax({
+//       method: 'DELETE',
+//       url: '/api/user',
+//       success(data) {
+//         if (data.success) {
+//           dispatch(logoutUser(() => {}));
+//         }
+
+//         cb(data);
+//       },
+//       error(err) {
+//         console.log(err);
+//         dispatch(addError('Something went wrong trying to deactivate your account'));
+//       },
+//     });
+//   };
+// }

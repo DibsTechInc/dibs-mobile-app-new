@@ -88,6 +88,7 @@ class Signup extends Component {
     };
 
     const route = await new Promise(res => this.props.signUpUser(payload, res));
+    console.log(route, '??')
     if (route) this.props.navigation.navigate(route);
 
     return null;

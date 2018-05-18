@@ -55,15 +55,10 @@ class EmailPreferences extends PureComponent {
 
     this.setState({ isLoading: true });
     const response = await new Promise(res => this.props.updateUserEmailPreferences(stateMap[type], this.props.email, res));
-    if (response.code !== 200) {
-      this.setState({
-        message: response.message,
-      });
-    }
 
     this.setState({
       isLoading: false,
-      message: 'Your email preferences have been updated!',
+      message: response.code === 200 ? 'Your email preferences have been updated' : response.message,
     });
   }
 
@@ -126,7 +121,7 @@ class EmailPreferences extends PureComponent {
 
           <GiftedForm.SeparatorWidget />
 
-          {this.state.message.length && <View style={{ width: '100%', height: 50 }}>
+          {this.state.message.length && <View style={{ width: '100%', height: 20, alignItems: 'center', justifyContent: 'center' }}>
             <Text style={{ color: Config.STUDIO_COLOR }}>{this.state.message}</Text>
           </View>
           }
@@ -137,10 +132,10 @@ class EmailPreferences extends PureComponent {
 }
 
 EmailPreferences.propTypes = {
-  isUpdatingEmailPreferences: PropTypes.bool.isRequired,
-  setEditEmailPreferences: PropTypes.func.isRequired,
-  suppressionList: PropTypes.shape().isRequired,
-  email: PropTypes.string.isRequired,
+  isUpdatingEmailPreferences: PropTypes.bool,
+  setEditEmailPreferences: PropTypes.func,
+  suppressionList: PropTypes.shape(),
+  email: PropTypes.string,
 };
 
 const mapStateToProps = state => ({

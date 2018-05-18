@@ -1,0 +1,160 @@
+import React, { PureComponent } from 'react';
+import { withNavigation } from 'react-navigation';
+import { connect } from 'react-redux';
+import { GiftedForm } from 'react-native-gifted-form';
+import PropTypes from 'prop-types';
+import Dialog from 'react-native-dialog';
+
+import { FadeInView, MaterialPanel } from '../../shared';
+import Config from '../../../../config.json';
+import { getUserEmail } from '../../../selectors';
+import { disableUserAccount } from '../../../actions';
+import { LANDING_ROUTE } from '../../../constants';
+
+class DeleteDialog extends PureComponent {
+  render() {
+    return (
+      <FadeInView>
+        <Dialog.Container visible={this.props.dialogVisible}>
+          <Dialog.Title>Deactivate Account</Dialog.Title>
+          <Dialog.Description>
+            Please enter the email address associated with this account
+          </Dialog.Description>
+          <Dialog.Description>
+            {this.props.errorMessage}
+          </Dialog.Description>
+          <Dialog.Input
+            autoCorrect={false}
+            autoCapitalize="none"
+            placeholder="abc@xyz.com"
+            onChangeText={this.props.handleOnChange}
+          />
+          <Dialog.Button label="Cancel" onPress={this.props.handleCancel} />
+          <Dialog.Button label="Confirm" onPress={this.props.handleDelete} />
+        </Dialog.Container>
+      </FadeInView>
+    )
+  }
+}
+
+class DisableAccount extends PureComponent {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      dialogVisible: false,
+      errorMessage: '',
+      email: '',
+    };
+
+    this.handleOnSubmit = this.handleOnSubmit.bind(this);
+    this.handleCancel = this.handleCancel.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
+    this.handleOnChange = this.handleOnChange.bind(this);
+  }
+
+  async handleOnSubmit(isValid, { email, firstName, lastName }, validationResults, postSubmit = null) {
+    this.setState({ dialogVisible: true });
+    postSubmit();
+  }
+
+  handleOnChange(email) {
+    this.setState({ email });
+  }
+
+  handleCancel() {
+    this.setState({ dialogVisible: false });
+  }
+
+  async handleDelete() {
+    if (this.state.email !== this.props.userEmail) {
+      this.setState({
+        errorMessage: 'The email you provided is incorrect',
+      });
+      return;
+    }
+
+    const response = await new Promise(res => this.props.disableUserAccount(res));
+
+    if (response.code === 200) {
+      this.setState({ dialogVisible: false });
+      this.props.navigation.navigate(LANDING_ROUTE);
+    } else {
+      this.setState({ errorMessage: response.message });
+    }
+  }
+
+  render() {
+    if (!this.props.isUpdatingDisableAccount) {
+      return (
+        <MaterialPanel
+          height={100}
+          style={{ shadowOffset: { width: 3, height: 3 } }}
+          heading="Disable Account"
+          headingRight={this.props.isUpdatingDisableAccount ? 'Cancel' : 'Change'}
+          headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}
+          headerStyle={{ marginLeft: 10 }}
+          onPressHeadingRight={this.props.setEditDisableAccount}
+        />
+      );
+    }
+
+    return (
+      <MaterialPanel
+        height={'100%'}
+        style={{ shadowOffset: { width: 3, height: 3 } }}
+        heading="Disable Account"
+        headingRight={this.props.isUpdatingDisableAccount ? 'Cancel' : 'Change'}
+        headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}
+        headerStyle={{ marginLeft: 10 }}
+        onPressHeadingRight={this.props.setEditDisableAccount}
+      >
+        <GiftedForm
+          formName="deactivateAccountForm"
+          style={{ backgroundColor: 'white' }}
+          clearOnClose
+        >
+          <GiftedForm.SubmitWidget
+            title="Deactivate Account"
+            widgetStyles={{
+              submitButton: {
+                backgroundColor: 'red',
+                margin: 0,
+              },
+            }}
+            onSubmit={this.handleOnSubmit}
+          />
+        </GiftedForm>
+        <DeleteDialog
+          dialogVisible={this.state.dialogVisible}
+          handleCancel={this.handleCancel}
+          handleDelete={this.handleDelete}
+          handleOnChange={this.handleOnChange}
+          errorMessage={this.state.errorMessage}
+        />
+      </MaterialPanel>
+
+    )
+  }
+}
+
+DisableAccount.propTypes = {
+  setEditDisableAccount: PropTypes.func.isRequired,
+  isUpdatingDisableAccount: PropTypes.bool.isRequired,
+  disableUserAccount: PropTypes.func.isRequired,
+  navigation: PropTypes.shape().isRequired,
+};
+
+const mapStateToProps = state => ({
+  userEmail: getUserEmail(state),
+});
+
+const mapDispatchToProps = {
+  disableUserAccount,
+};
+
+const connectedDisableAccount = connect(mapStateToProps, mapDispatchToProps)(DisableAccount);
+const navigatedDisableAccount = withNavigation(connectedDisableAccount);
+
+export default navigatedDisableAccount;
+
