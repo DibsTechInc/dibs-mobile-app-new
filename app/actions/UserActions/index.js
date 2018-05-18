@@ -103,9 +103,9 @@ export function signUpUser(payload, callback) {
         dispatch(setUser(res.user));
         dispatch(recordStudioVisit());
         dispatch(requestUserEvents());
-        return callback(MAIN_ROUTE);
+        return callback(res);
       }
-      return callback(null);
+      return callback(res);
     } catch (err) {
       console.log(err);
       return callback(null);
@@ -258,3 +258,52 @@ export function createPasswordResetLink(email, callback = () => {}) {
     }
   };
 }
+
+/**
+ * @param {function} callback callback
+ * @returns {function} redux thunk
+ */
+export function disableUserAccount(callback) {
+  return async function innerDisableUserAccount(dispatch, getState, dibsFetch) {
+    try {
+      const res = await dibsFetch('/api/user', {
+        method: 'DELETE',
+      });
+
+      if (res.success) {
+        dispatch(logOutUser());
+      }
+
+      callback(res);
+    } catch (err) {
+      console.log(err);
+      callback(err);
+    }
+  };
+}
+
+/**
+ * @param {string} email user email
+ * @param {password} password user's password
+ * @param {function} callback callback
+ * @returns {function} redux thunk
+ */
+export function reactivateUserAccount(email, password, callback) {
+  return async function innerReactivateUserAccount(dispatch, getState, dibsFetch) {
+    try {
+      const res = await dibsFetch('/api/user/reactivate', {
+        method: 'PUT',
+        body: {
+          email,
+          password,
+        },
+      });
+
+      callback(res);
+    } catch (err) {
+      console.log(err);
+      callback(err);
+    }
+  };
+}
+

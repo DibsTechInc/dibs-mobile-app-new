@@ -14,7 +14,7 @@ import { signUpUser } from '../../actions/UserActions';
 import FadeInView from '../shared/FadeInView';
 import InputField from '../shared/InputField';
 import { MaterialButton, CustomStatusBar } from '../shared';
-import { TERMS_AND_CONDITIONS_ROUTE } from '../../constants';
+import { TERMS_AND_CONDITIONS_ROUTE, MAIN_ROUTE, LOGIN_ROUTE } from '../../constants';
 import Config from '../../../config.json';
 
 const StyledText = styled.Text`
@@ -87,8 +87,9 @@ class Signup extends Component {
       attempt: 0,
     };
 
-    const route = await new Promise(res => this.props.signUpUser(payload, res));
-    if (route) this.props.navigation.navigate(route);
+    const response = await new Promise(res => this.props.signUpUser(payload, res));
+    if (response.code === 200) this.props.navigation.navigate(MAIN_ROUTE);
+    if (response.accountDisabled) this.props.navigation.navigate(LOGIN_ROUTE, { accountDisabled: response.accountDisabled, email: this.props.navigation.state.params.email });
 
     return null;
   }

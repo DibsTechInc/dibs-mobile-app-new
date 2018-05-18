@@ -12,7 +12,6 @@ class TermsAndConditions extends Component {
    * @returns {JSX.Element} HTML
    */
   render() {
-    console.log(this.props.navigation, '??')
     return <CustomWebView url={this.props.navigation.state.params.url} />;
   }
 }

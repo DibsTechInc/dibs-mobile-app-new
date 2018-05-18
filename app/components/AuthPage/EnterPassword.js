@@ -10,7 +10,7 @@ import Promise from 'bluebird';
 
 import Config from '../../../config.json';
 
-import { submitLogin } from '../../actions/UserActions';
+import { submitLogin, reactivateUserAccount } from '../../actions';
 import FadeInView from '../shared/FadeInView';
 import InputField from '../shared/InputField';
 import DibsLoader from '../shared/DibsLoader';
@@ -18,6 +18,7 @@ import DibsLoader from '../shared/DibsLoader';
 import {
   MAIN_ROUTE,
   PASSWORD_RESET_ROUTE,
+  LANDING_ROUTE,
 } from '../../constants/RouteConstants/index';
 
 const ForgotPasswordText = styled.Text`
@@ -50,13 +51,20 @@ class EnterPassword extends Component {
    * @returns {undefined}
    */
   async handleOnPress() {
-    const { email } = this.props.navigation.state.params;
+    const { email, accountDisabled } = this.props.navigation.state.params;
+    if (accountDisabled) {
+      const response = await new Promise(res => this.props.reactivateUserAccount(email, this.state.password, res));
 
-    await new Promise(res => this.setState({ isLoading: true }, res));
+      if (response.code === 200) this.props.navigation.navigate(LANDING_ROUTE, { accountReactivated: true });
+      else Alert.alert('The password you entered is invalid for this disabled account');
+      return;
+    }
+
+    this.setState({ isLoading: true });
     const user = await new Promise(res => this.props.submitLogin(email, this.state.password, res));
 
     if (!user) {
-      await new Promise(res => this.setState({ isLoading: false }, res));
+      this.setState({ isLoading: false });
       Alert.alert('Incorrect password');
       return;
     }
@@ -88,8 +96,8 @@ class EnterPassword extends Component {
       <FadeInView style={{ justifyContent: 'center', alignItems: 'center', marginBottom: '30%' }}>
         <InputField
           label={(
-            this.props.navigation.state.params.fromReset ?
-              'What is your new password?' : 'What is your password?'
+            this.props.navigation.state.params.accountDisabled ?
+              'Please enter the password associated with this account to reactivate it' : 'What is your password?'
           )}
           autoFocus
           returnKeyType="go"
@@ -119,10 +127,12 @@ class EnterPassword extends Component {
 EnterPassword.propTypes = {
   navigation: PropTypes.shape(),
   submitLogin: PropTypes.func,
+  reactivateUserAccount: PropTypes.func,
 };
 
 const mapDispatchToProps = {
   submitLogin,
+  reactivateUserAccount,
 };
 
 export default connect(null, mapDispatchToProps)(EnterPassword);
