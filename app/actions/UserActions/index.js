@@ -306,4 +306,7 @@ export function reactivateUserAccount(email, password, callback) {
     }
   };
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> static-pages
