@@ -93,7 +93,7 @@ class EmailPreferences extends PureComponent {
         <GiftedForm
           formName="emailPreferencesForm"
           clearOnClose
-
+          style={{ backgroundColor: 'white' }}
           defaults={{
             purchaseReceiptsAndClassUpdates: !this.state.transactionsPref,
             specialOffersAndStudioNews: !this.state.marketingPref,

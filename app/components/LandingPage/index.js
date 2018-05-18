@@ -87,6 +87,7 @@ class LandingPage extends Component {
    * @returns {JSX} XML
    */
   render() {
+    console.log(this.props.navigation, )
     return (
       <View style={{ flex: 1 }}>
         <CustomStatusBar backgroundColor={'transparent'} barStyle="dark-content" />
@@ -98,6 +99,10 @@ class LandingPage extends Component {
             <StyledWelcomeView>
               <StyledWelcomeText>Welcome to FLEX Studios!</StyledWelcomeText>
               <StyledGrayText>Swipe to learn more</StyledGrayText>
+              {this.props.navigation.state.params &&
+                this.props.navigation.state.params.accountReactivated &&
+                <StyledWelcomeText>Your account has been reactivated, please login again</StyledWelcomeText>
+              }
             </StyledWelcomeView>
             <StyledButtonsView>
               <MaterialButton
@@ -110,7 +115,6 @@ class LandingPage extends Component {
           <About />
         </Swiper>
       </View>
-      
     );
   }
 }

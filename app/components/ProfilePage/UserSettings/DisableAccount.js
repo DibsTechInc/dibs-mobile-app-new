@@ -33,9 +33,17 @@ class DeleteDialog extends PureComponent {
           <Dialog.Button label="Confirm" onPress={this.props.handleDelete} />
         </Dialog.Container>
       </FadeInView>
-    )
+    );
   }
 }
+
+DeleteDialog.propTypes = {
+  dialogVisible: PropTypes.bool,
+  errorMessage: PropTypes.string,
+  handleOnChange: PropTypes.func,
+  handleCancel: PropTypes.func,
+  handleDelete: PropTypes.func,
+};
 
 class DisableAccount extends PureComponent {
   constructor(props) {
@@ -118,8 +126,9 @@ class DisableAccount extends PureComponent {
             title="Deactivate Account"
             widgetStyles={{
               submitButton: {
-                backgroundColor: 'red',
+                backgroundColor: Config.STUDIO_COLOR,
                 margin: 0,
+                marginTop: 20,
               },
             }}
             onSubmit={this.handleOnSubmit}

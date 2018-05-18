@@ -79,7 +79,7 @@ class Password extends PureComponent {
       >
         <GiftedForm
           formName="signupForm" // GiftedForm instances that use the same name will also share the same states
-
+          style={{ backgroundColor: 'white' }}
           clearOnClose // delete the values of the form when unmounted
 
           defaults={{

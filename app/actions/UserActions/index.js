@@ -103,9 +103,9 @@ export function signUpUser(payload, callback) {
         dispatch(setUser(res.user));
         dispatch(recordStudioVisit());
         dispatch(requestUserEvents());
-        return callback(MAIN_ROUTE);
+        return callback(res);
       }
-      return callback(null);
+      return callback(res);
     } catch (err) {
       console.log(err);
       return callback(null);
@@ -282,26 +282,51 @@ export function disableUserAccount(callback) {
   };
 }
 
-// /**
-//  * @param {function} cb callback
-//  * @returns {function} redux thunk
-//  */
-// export function disableUserAccount(cb = () => {}) {
-//   return function innerDisableUserAccount(dispatch) {
+/**
+ * @param {string} email user email
+ * @param {password} password user's password
+ * @param {function} callback callback
+ * @returns {function} redux thunk
+ */
+export function reactivateUserAccount(email, password, callback) {
+  return async function innerReactivateUserAccount(dispatch, getState, dibsFetch) {
+    try {
+      const res = await dibsFetch('/api/user/reactivate', {
+        method: 'PUT',
+        body: {
+          email,
+          password,
+        },
+      });
+
+      callback(res);
+    } catch (err) {
+      console.log(err);
+      callback(err);
+    }
+  };
+}
+
+
+// export function reactivateUserAccount(email, password, cb = () => {}) {
+//   return function innerReactivateUserAccount(dispatch) {
 //     $.ajax({
-//       method: 'DELETE',
-//       url: '/api/user',
+//       method: 'PUT',
+//       data: { email, password },
+//       url: '/api/user/reactivate',
 //       success(data) {
 //         if (data.success) {
-//           dispatch(logoutUser(() => {}));
+//           return cb(data);
 //         }
 
-//         cb(data);
+//         dispatch(addError(data.message));
+//         return cb(data);
 //       },
 //       error(err) {
 //         console.log(err);
-//         dispatch(addError('Something went wrong trying to deactivate your account'));
+//         dispatch(addError('Something went wrong trying to activate your account'));
 //       },
 //     });
 //   };
 // }
+
