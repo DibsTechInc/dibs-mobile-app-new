@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "dibs-mobile",
+    "name": "flex-mobile",
     "description": "A booking app for Flex Studios.",
-    "slug": "dibs-mobile",
+    "slug": "flex-mobile",
     "privacy": "public",
     "sdkVersion": "26.0.0",
     "platforms": ["ios"],
