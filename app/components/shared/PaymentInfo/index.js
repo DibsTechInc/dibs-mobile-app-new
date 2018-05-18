@@ -10,13 +10,13 @@ import Config from '../../../../config.json';
 import { updateCreditCard } from '../../../actions/CreditCardActions';
 import CreditCardDisplay from './CreditCardDisplay';
 
-import AmexIcon from './stp_card_amex.png';
-import DinersIcon from './stp_card_diners.png';
-import DiscoverIcon from './stp_card_discover.png';
-import JCBIcon from './stp_card_jcb.png';
-import MasterCardIcon from './stp_card_mastercard.png';
-import UnknownIcon from './stp_card_unknown.png';
-import VisaIcon from './stp_card_visa.png';
+import AmexIcon from '../../../../assets/img/stp_card_amex.png';
+import DinersIcon from '../../../../assets/img/stp_card_diners.png';
+import DiscoverIcon from '../../../../assets/img/stp_card_discover.png';
+import JCBIcon from '../../../../assets/img/stp_card_jcb.png';
+import MasterCardIcon from '../../../../assets/img/stp_card_mastercard.png';
+import UnknownIcon from '../../../../assets/img/stp_card_unknown.png';
+import VisaIcon from '../../../../assets/img/stp_card_visa.png';
 
 /**
  * @class PaymentInfo
