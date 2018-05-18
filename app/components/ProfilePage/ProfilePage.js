@@ -60,10 +60,6 @@ class ProfilePage extends Component {
               titleStyle={{ color: 'darkgray' }}
             />
             <SettingsList.Item
-              title="Upcoming Classes"
-              onPress={() => Alert.alert('Route To Upcoming Classes Page')}
-            />
-            <SettingsList.Item
               title="Settings"
               onPress={() => this.props.navigation.navigate(SETTINGS_ROUTE)}
             />

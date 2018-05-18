@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { GiftedForm, GiftedFormManager } from 'react-native-gifted-form';
+import { GiftedForm } from 'react-native-gifted-form';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
@@ -74,7 +74,7 @@ class PersonalDetails extends PureComponent {
         <GiftedForm
           formName="personalDetailsForm" // GiftedForm instances that use the same name will also share the same states
 
-          clearOnClose={true} // delete the values of the form when unmounted
+          clearOnClose // delete the values of the form when unmounted
 
           defaults={{
             firstName: this.props.firstName,

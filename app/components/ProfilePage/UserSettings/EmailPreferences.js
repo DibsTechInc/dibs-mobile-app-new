@@ -1,0 +1,155 @@
+import React, { PureComponent } from 'react';
+import { View, Text } from 'react-native';
+import { GiftedForm } from 'react-native-gifted-form';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+
+import { MaterialPanel } from '../../shared';
+import { getUserEmail, getUserSuppressionList } from '../../../selectors';
+import { updateUserEmailPreferences } from '../../../actions';
+import Config from '../../../../config.json';
+
+/**
+ * @class EmailPreferences
+ * @extends {Component}
+ */
+class EmailPreferences extends PureComponent {
+   /**
+   * @constructor
+   * @param {object} props from parent
+   * @constructs EmailPreferences
+   */
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      message: '',
+      transactionsPref: this.props.suppressionList.transactional,
+      marketingPref: this.props.suppressionList.nontransactional,
+    };
+
+    this.toggleSubscription = this.toggleSubscription.bind(this);
+    this.updateUserEmailPreferences = this.updateUserEmailPreferences.bind(this);
+
+    this.toggleMarketingPref = this.toggleSubscription.bind(this, 'marketingPref');
+    this.toggleTransactionalPref = this.toggleSubscription.bind(this, 'transactionsPref');
+  }
+
+  /**
+   * toggleSubscriptions
+   * @param {boolean} type the name of the property in state
+   * @returns {boolean} boolean true or false
+   */
+  toggleSubscription(type) {
+    this.setState({ [type]: !this.state[type] });
+    this.updateUserEmailPreferences(type);
+  }
+
+  /**
+   * updateUserEmailPreferences
+   * @param {boolean} type the name of the property in state
+   * @returns {null} carries out updating the user's email pref choice
+   */
+  async updateUserEmailPreferences(type) {
+    const stateMap = { transactionsPref: 'transactional', marketingPref: 'non-transactional' };
+
+    this.setState({ isLoading: true });
+    const response = await new Promise(res => this.props.updateUserEmailPreferences(stateMap[type], this.props.email, res));
+    if (response.code !== 200) {
+      this.setState({
+        message: response.message,
+      });
+    }
+
+    this.setState({
+      isLoading: false,
+      message: 'Your email preferences have been updated!',
+    });
+  }
+
+  /**
+   * @returns {JSX} XML
+   */
+  render() {
+    if (!this.props.isUpdatingEmailPreferences) {
+      return (
+        <MaterialPanel
+          height={100}
+          style={{ shadowOffset: { width: 3, height: 3 } }}
+          heading="Email Preferences"
+          headingRight={this.props.isUpdatingEmailPreferences ? 'Cancel' : 'Change'}
+          headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}
+          headerStyle={{ marginLeft: 10 }}
+          onPressHeadingRight={this.props.setEditEmailPreferences}
+        />
+      );
+    }
+
+    return (
+      <MaterialPanel
+        height={'100%'}
+        style={{ shadowOffset: { width: 3, height: 3 } }}
+        heading="Email Preferences"
+        headingRight={this.props.isUpdatingEmailPreferences ? 'Cancel' : 'Change'}
+        headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}
+        headerStyle={{ marginLeft: 10 }}
+        onPressHeadingRight={this.props.setEditEmailPreferences}
+      >
+        <GiftedForm
+          formName="emailPreferencesForm"
+          clearOnClose
+
+          defaults={{
+            purchaseReceiptsAndClassUpdates: !this.state.transactionsPref,
+            specialOffersAndStudioNews: !this.state.marketingPref,
+          }}
+        >
+          <GiftedForm.SwitchWidget
+            name="purchaseReceiptsAndClassUpdates" // mandatory
+            title="Purchase receipts and class updates"
+            onTintColor={Config.STUDIO_COLOR}
+            clearButtonMode="while-editing"
+            onChange={this.toggleTransactionalPref}
+            disabled={this.state.isLoading}
+            value={!this.state.transactionsPref}
+          />
+
+          <GiftedForm.SwitchWidget
+            name="specialOffersAndStudioNews" // mandatory
+            title="Special offers and studio news"
+            clearButtonMode="while-editing"
+            onTintColor={Config.STUDIO_COLOR}
+            onChange={this.toggleMarketingPref}
+            disabled={this.state.isLoading}
+            value={!this.state.marketingPref}
+          />
+
+          <GiftedForm.SeparatorWidget />
+
+          {this.state.message.length && <View style={{ width: '100%', height: 50 }}>
+            <Text style={{ color: Config.STUDIO_COLOR }}>{this.state.message}</Text>
+          </View>
+          }
+        </GiftedForm>
+      </MaterialPanel>
+    );
+  }
+}
+
+EmailPreferences.propTypes = {
+  isUpdatingEmailPreferences: PropTypes.bool.isRequired,
+  setEditEmailPreferences: PropTypes.func.isRequired,
+  suppressionList: PropTypes.shape().isRequired,
+  email: PropTypes.string.isRequired,
+};
+
+const mapStateToProps = state => ({
+  email: getUserEmail(state),
+  suppressionList: getUserSuppressionList(state),
+});
+
+const mapDispatchToProps = {
+  updateUserEmailPreferences,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(EmailPreferences);

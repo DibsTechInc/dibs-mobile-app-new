@@ -165,6 +165,31 @@ export function updateUserPassword(payload, callback) {
 }
 
 /**
+ * @param {string} list add or remove
+ * @param {string} email email of user
+ * @param {function} callback callback
+ * @returns {function} redux thunk
+ */
+export function updateUserEmailPreferences(list, email, callback) {
+  return async function innerUpdateUserEmailPreferences(dispatch, getState, dibsFetch) {
+    try {
+      const res = await dibsFetch(`/api/user/email/suppression-list/${list}`, {
+        method: 'PUT',
+      });
+
+      if (res.success) {
+        dispatch(setUser(res.user));
+      }
+
+      callback(res);
+    } catch (err) {
+      console.log(err);
+      callback(err);
+    }
+  };
+}
+
+/**
  * @param {string} email of user
  * @param {string} password user entered
  * @param {function} callback on complete
