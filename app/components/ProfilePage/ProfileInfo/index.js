@@ -63,6 +63,7 @@ class ProfileInfo extends PureComponent {
           iconColor={BLACK}
           backgroundColor={WHITE}
           showCart={false}
+          height={80}
         />
         <PersonalDetails
           setEditPersonalDetails={this.setEditPersonalDetails}
