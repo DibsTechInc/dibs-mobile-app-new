@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import { Button, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import { connect } from 'react-redux';
 import { GiftedForm } from 'react-native-gifted-form';
@@ -29,8 +30,10 @@ class DeleteDialog extends PureComponent {
             placeholder="abc@xyz.com"
             onChangeText={this.props.handleOnChange}
           />
-          <Dialog.Button label="Cancel" onPress={this.props.handleCancel} />
-          <Dialog.Button label="Confirm" onPress={this.props.handleDelete} />
+          <View style={{ flexDirection: 'row', justifyContent: 'space-around', paddingLeft: 30, paddingRight: 30 }}>
+            <Button title="Cancel" onPress={this.props.handleCancel} />
+            <Button title="Confirm" onPress={this.props.handleDelete} />
+          </View>
         </Dialog.Container>
       </FadeInView>
     );
