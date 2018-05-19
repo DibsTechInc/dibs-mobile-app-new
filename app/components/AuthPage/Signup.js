@@ -136,12 +136,12 @@ class Signup extends Component {
           containerStyle={{ marginBottom: 20 }}
         />
         <InputField
+          customFocus
           value={this.state.fullName}
           onChangeText={fullName => this.setState({ fullName })}
           placeholder="First and last name"
           style={{ width: 200 }}
           containerStyle={{ marginBottom: 20 }}
-          autoFocus
         />
         <InputField
           value={this.state.password}

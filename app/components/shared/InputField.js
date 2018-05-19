@@ -26,11 +26,11 @@ class InputField extends React.PureComponent {
   }
 
   componentDidMount() {
-    this.focusListener = this.props.navigation.addListener('didFocus', () => this._textInput.focus());
+    if (this.props.customFocus) this.focusListener = this.props.navigation.addListener('didFocus', () => this._textInput.focus());
   }
 
   componentWillUnmount() {
-    this.focusListener.remove();
+    if (this.focusListener) this.focusListener.remove();
   }
   /**
    * @returns {undefined}
@@ -79,6 +79,7 @@ class InputField extends React.PureComponent {
 InputField.defaultProps = {
   containerStyle: {},
   labelStyle: {},
+  customFocus: false,
 };
 
 InputField.propTypes = {
@@ -86,6 +87,7 @@ InputField.propTypes = {
   label: PropTypes.string,
   containerStyle: PropTypes.shape(),
   labelStyle: PropTypes.shape(),
+  customFocus: PropTypes.bool,
 };
 
 export default withNavigation(InputField);

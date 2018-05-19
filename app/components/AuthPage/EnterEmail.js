@@ -97,8 +97,7 @@ class EnterEmail extends PureComponent {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <FadeInView style={{ justifyContent: 'center', alignItems: 'center', marginBottom: '30%' }}>
           <InputField
-            // autoFocus
-            // ref={(ref) => { this.refTextInput = ref; }}
+            customFocus
             label="What is your email?"
             returnKeyType="go"
             placeholder="Email"

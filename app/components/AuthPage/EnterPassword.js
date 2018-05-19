@@ -99,8 +99,8 @@ class EnterPassword extends Component {
             this.props.navigation.state.params.accountDisabled ?
               'Please enter the password associated with this account to reactivate it' : 'What is your password?'
           )}
-          autoFocus
           returnKeyType="go"
+          customFocus
           placeholder="Password"
           secureTextEntry
           autoCapitalize="none"
