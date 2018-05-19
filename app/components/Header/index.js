@@ -55,10 +55,10 @@ class Header extends Component {
     });
 
     const keyType = this.props.navigation.state.key.split('-')[0];
-    const popTop = NavigationActions.popToTop();
+    const pop = NavigationActions.pop();
 
     if (keyType === 'id') {
-      this.props.navigation.dispatch(popTop);
+      this.props.navigation.dispatch(pop);
     } else {
       this.props.navigation.dispatch(navigateAction);
     }
