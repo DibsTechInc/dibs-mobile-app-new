@@ -118,9 +118,11 @@ class Signup extends Component {
     const showButton = this.checkForm().canShowButton;
 
     if (this.state.isLoading) {
-      <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
-        <DibsLoader dotColor={Config.STUDIO_COLOR} />
-      </FadeInView>
+      return (
+        <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <DibsLoader dotColor={Config.STUDIO_COLOR} />
+        </FadeInView>
+      );
     }
 
     return (
