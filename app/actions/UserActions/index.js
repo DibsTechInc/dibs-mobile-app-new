@@ -79,10 +79,10 @@ export function validateEmail(email, callback = () => {}) {
       if (res.message === 'No user with that email') {
         return callback(REGISTER_ROUTE);
       }
-      return callback(null);
+      return callback(res);
     } catch (err) {
       console.log(err);
-      return callback(null);
+      return callback(err);
     }
   };
 }
@@ -93,7 +93,7 @@ export function validateEmail(email, callback = () => {}) {
  * @returns {function} thunk
  */
 export function signUpUser(payload, callback) {
-  return async function innerSignInUser(dispatch, getState, dibsFetch) {
+  return async function innerSignUpUser(dispatch, getState, dibsFetch) {
     try {
       const res = await dibsFetch('/api/user/register', {
         method: 'POST',
@@ -210,9 +210,9 @@ export function submitLogin(email, password, callback) {
         dispatch(recordStudioVisit());
         dispatch(requestCreditCardInfo());
         dispatch(requestUserEvents());
-        callback(res.user);
+        callback(res);
       } else {
-        callback(null);
+        callback(res);
       }
     } catch (err) {
       console.log(err);

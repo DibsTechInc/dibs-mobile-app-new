@@ -6,10 +6,13 @@ import {
   Alert,
 } from 'react-native';
 import Promise from 'bluebird';
+import _ from 'lodash';
 
 import { validateEmail } from '../../actions/UserActions';
 import { FadeInView, InputField, DibsLoader } from '../shared';
 import Config from '../../../config.json';
+
+// import { LOGIN_ROUTE, PASSWORD_RESET_ROUTE, REGISTER_ROUTE } from '../../constants';
 
 /**
  * @class EnterEmail
@@ -44,13 +47,13 @@ class EnterEmail extends Component {
       return;
     }
 
-    await new Promise(res => this.setState({ isLoading: true }, res));
+    this.setState({ isLoading: true });
     const route = await new Promise(res => this.props.validateEmail(email, res));
-    await new Promise(res => this.setState({ isLoading: false }, res));
+    this.setState({ isLoading: false });
 
-    if (!route) {
+    if (_.isObject(route) && route.code !== 200) {
       this.setState({ isLoading: false });
-      Alert.alert('Uh oh, we could not verify this email. Please contact support.');
+      Alert.alert(route.message);
     } else {
       this.props.navigation.navigate(route, { email, fromReset: false }); // last key for PW reset
     }

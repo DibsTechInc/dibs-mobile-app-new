@@ -88,8 +88,13 @@ class Signup extends Component {
     };
 
     const response = await new Promise(res => this.props.signUpUser(payload, res));
-    if (response.code === 200) this.props.navigation.navigate(MAIN_ROUTE);
-    if (response.accountDisabled) this.props.navigation.navigate(LOGIN_ROUTE, { accountDisabled: response.accountDisabled, email: this.props.navigation.state.params.email });
+    if (response.code === 200) {
+      this.props.navigation.navigate(MAIN_ROUTE);
+    } else if (response.accountDisabled) {
+      this.props.navigation.navigate(LOGIN_ROUTE, { accountDisabled: response.accountDisabled, email: this.props.navigation.state.params.email })
+    } else {
+      Alert.alert(response.message);
+    }
 
     return null;
   }

@@ -56,16 +56,16 @@ class EnterPassword extends Component {
       const response = await new Promise(res => this.props.reactivateUserAccount(email, this.state.password, res));
 
       if (response.code === 200) this.props.navigation.navigate(LANDING_ROUTE, { accountReactivated: true });
-      else Alert.alert('The password you entered is invalid for this disabled account');
+      else Alert.alert(response.message);
       return;
     }
 
     this.setState({ isLoading: true });
-    const user = await new Promise(res => this.props.submitLogin(email, this.state.password, res));
+    const response = await new Promise(res => this.props.submitLogin(email, this.state.password, res));
 
-    if (!user) {
+    if (response.code !== 200) {
       this.setState({ isLoading: false });
-      Alert.alert('Incorrect password');
+      Alert.alert(response.message);
       return;
     }
 
