@@ -60,7 +60,7 @@ export function requestUserData(callback) {
  * @param {function} callback on complete
  * @returns {function} thunk
  */
-export function validateEmail(email, callback = () => {}) {
+export function validateEmail(email, callback) {
   return async function innerValidateEmail(dispatch, getState, dibsFetch) {
     try {
       const res = await dibsFetch('/api/user/email/verify', {
@@ -79,10 +79,10 @@ export function validateEmail(email, callback = () => {}) {
       if (res.message === 'No user with that email') {
         return callback(REGISTER_ROUTE);
       }
-      return callback(res);
+      return callback(null);
     } catch (err) {
       console.log(err);
-      return callback(err);
+      return callback(null);
     }
   };
 }

@@ -34,7 +34,7 @@ const Message = styled.Text`
  * @class PasswordReset
  * @extends {React.Component}
  */
-class PasswordReset extends React.Component {
+class PasswordReset extends React.PureComponent {
   /**
    * @constructor
    * @constructs PasswordReset
@@ -77,29 +77,28 @@ class PasswordReset extends React.Component {
    * @returns {JSX.Element} HTML
    */
   render() {
+
     const successMessage = `An email was sent to ${this.props.navigation.state.params.email} with instructions to reset your password at ${this.props.studioDomain}.`;
     return (
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
-          {this.state.loading ? (
-            <DibsLoader dotColor={Config.STUDIO_COLOR} />
-          ) : (
-            <MessageContainer>
-              <Header>
-                {this.state.success ? 'Password Reset Link Sent!' : 'Uh oh!'}
-              </Header>
-              <Message>
-                {this.state.success ? successMessage : this.state.message}
-              </Message>
-              <MaterialButton
-                text="Sign In"
-                style={{ height: 40, width: 120, marginTop: 25 }}
-                onPress={this.navigateToEnterLanding}
-              />
-            </MessageContainer>
-          )}
-        </FadeInView>
-      </TouchableWithoutFeedback>
+      <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
+        {this.state.loading ? (
+          <DibsLoader dotColor={Config.STUDIO_COLOR} />
+        ) : (
+          <MessageContainer>
+            <Header>
+              {this.state.success ? 'Password Reset Link Sent!' : 'Uh oh!'}
+            </Header>
+            <Message>
+              {this.state.success ? successMessage : this.state.message}
+            </Message>
+            <MaterialButton
+              text="Sign In"
+              style={{ height: 40, width: 120, marginTop: 25 }}
+              onPress={this.navigateToEnterLanding}
+            />
+          </MessageContainer>
+        )}
+      </FadeInView>
     );
   }
 }

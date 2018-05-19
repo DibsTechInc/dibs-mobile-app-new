@@ -1,10 +1,12 @@
 
-import React, { Component } from 'react';
-import { PropTypes } from 'prop-types';
-import { connect } from 'react-redux';
+import React, { PureComponent } from 'react';
 import {
+  TouchableWithoutFeedback,
+  Keyboard,
   Alert,
 } from 'react-native';
+import { PropTypes } from 'prop-types';
+import { connect } from 'react-redux';
 import Promise from 'bluebird';
 import _ from 'lodash';
 
@@ -18,7 +20,7 @@ import Config from '../../../config.json';
  * @class EnterEmail
  * @extends Component
  */
-class EnterEmail extends Component {
+class EnterEmail extends PureComponent {
   /**
    * @constructor
    * @constructs EnterEmail
@@ -32,6 +34,14 @@ class EnterEmail extends Component {
     };
     this.handleOnPress = this.handleOnPress.bind(this);
   }
+
+  // componentDidMount() {
+  //   this.focusListener = this.props.navigation.addListener('didFocus', () => this.refTextInput.focus());
+  // }
+
+  // componentWillUnmount() {
+  //   this.focusListener.remove();
+  // }
   /**
    * @returns {undefined}
    */
@@ -47,16 +57,28 @@ class EnterEmail extends Component {
       return;
     }
 
-    this.setState({ isLoading: true });
+    await new Promise(res => this.setState({ isLoading: true }, res));
     const route = await new Promise(res => this.props.validateEmail(email, res));
-    this.setState({ isLoading: false });
+    await new Promise(res => this.setState({ isLoading: false }, res));
 
-    if (_.isObject(route) && route.code !== 200) {
+    if (!route) {
       this.setState({ isLoading: false });
-      Alert.alert(route.message);
+      Alert.alert('Uh oh, we could not verify this email. Please contact support.');
     } else {
       this.props.navigation.navigate(route, { email, fromReset: false }); // last key for PW reset
     }
+
+    // this.setState({ isLoading: true });
+    // const route = await new Promise(res => this.props.validateEmail(email, res));
+    // this.setState({ isLoading: false });
+
+    // if (_.isObject(route) && route.code !== 200) {
+    //   this.setState({ isLoading: false });
+    //   Alert.alert(route.message);
+    // } else {
+    //   this.setState({ isLoading: false });
+    //   this.props.navigation.navigate(route, { email, fromReset: false }); // last key for PW reset
+    // }
   }
 
   /**
@@ -72,23 +94,26 @@ class EnterEmail extends Component {
     }
 
     return (
-      <FadeInView style={{ justifyContent: 'center', alignItems: 'center', marginBottom: '30%' }}>
-        <InputField
-          autoFocus
-          label="What is your email?"
-          returnKeyType="go"
-          placeholder="Email"
-          autoCapitalize="none"
-          onChangeText={email => this.setState({ email })}
-          onSubmitEditing={this.handleOnPress}
-          value={this.state.email}
-          containerStyle={{
-            marginBottom: this.state.emailError ? 10 : 50,
-            width: 200,
-          }}
-          labelStyle={{ marginBottom: 5, textAlign: 'center' }}
-        />
-      </FadeInView>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <FadeInView style={{ justifyContent: 'center', alignItems: 'center', marginBottom: '30%' }}>
+          <InputField
+            // autoFocus
+            // ref={(ref) => { this.refTextInput = ref; }}
+            label="What is your email?"
+            returnKeyType="go"
+            placeholder="Email"
+            autoCapitalize="none"
+            onChangeText={email => this.setState({ email })}
+            onSubmitEditing={this.handleOnPress}
+            value={this.state.email}
+            containerStyle={{
+              marginBottom: this.state.emailError ? 10 : 50,
+              width: 200,
+            }}
+            labelStyle={{ marginBottom: 5, textAlign: 'center' }}
+          />
+        </FadeInView>
+      </TouchableWithoutFeedback>
     );
   }
 }

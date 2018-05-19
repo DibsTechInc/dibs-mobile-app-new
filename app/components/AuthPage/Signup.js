@@ -16,6 +16,7 @@ import InputField from '../shared/InputField';
 import { MaterialButton, CustomStatusBar } from '../shared';
 import { TERMS_AND_CONDITIONS_ROUTE, MAIN_ROUTE, LOGIN_ROUTE } from '../../constants';
 import Config from '../../../config.json';
+import DibsLoader from '../shared/DibsLoader';
 
 const StyledText = styled.Text`
   font-family: flex-font;
@@ -40,7 +41,7 @@ class Signup extends Component {
       password: '',
       tAndC: false,
       errorMessage: '',
-      isSubmitting: false,
+      isLoading: false,
     };
 
     this.handleOnPress = this.handleOnPress.bind(this);
@@ -87,12 +88,14 @@ class Signup extends Component {
       attempt: 0,
     };
 
+    this.setState({ isLoading: true });
     const response = await new Promise(res => this.props.signUpUser(payload, res));
     if (response.code === 200) {
       this.props.navigation.navigate(MAIN_ROUTE);
     } else if (response.accountDisabled) {
       this.props.navigation.navigate(LOGIN_ROUTE, { accountDisabled: response.accountDisabled, email: this.props.navigation.state.params.email })
     } else {
+      this.setState({ isLoading: false });
       Alert.alert(response.message);
     }
 
@@ -113,6 +116,12 @@ class Signup extends Component {
    */
   render() {
     const showButton = this.checkForm().canShowButton;
+
+    if (this.state.isLoading) {
+      <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <DibsLoader dotColor={Config.STUDIO_COLOR} />
+      </FadeInView>
+    }
 
     return (
       <FadeInView style={{ justifyContent: 'center', alignItems: 'center', marginBottom: '30%' }}>

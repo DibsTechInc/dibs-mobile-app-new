@@ -1,7 +1,8 @@
 import React from 'react';
+import { withNavigation } from 'react-navigation';
 import PropTypes from 'prop-types';
 import { TextInput, View } from 'react-native';
-import { StudioColorBottomBorder, DefaultInput, HeavyText } from '../styled';
+import { StudioColorBottomBorder, HeavyText } from '../styled';
 
 const Label = HeavyText.extend`
   margin-bottom: 5;
@@ -22,6 +23,14 @@ class InputField extends React.PureComponent {
     this.state = { focused: false };
     this.onFocus = this.onFocus.bind(this);
     this.onBlur = this.onBlur.bind(this);
+  }
+
+  componentDidMount() {
+    this.focusListener = this.props.navigation.addListener('didFocus', () => this._textInput.focus());
+  }
+
+  componentWillUnmount() {
+    this.focusListener.remove();
   }
   /**
    * @returns {undefined}
@@ -55,9 +64,10 @@ class InputField extends React.PureComponent {
             </Label>
           ) : null}
           <View keyboardShouldPersistTaps="never">
-            <DefaultInput
+            <TextInput
               onFocus={this.onFocus}
               onBlur={this.onBlur}
+              ref={(ref) => { this._textInput = ref; }}
               {...this.props}
             />
           </View>
@@ -78,4 +88,4 @@ InputField.propTypes = {
   labelStyle: PropTypes.shape(),
 };
 
-export default InputField;
+export default withNavigation(InputField);
