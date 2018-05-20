@@ -14,8 +14,8 @@ import TransactionBreakdown from '../TransactionBreakdown';
 import MaterialButton from '../MaterialButton';
 import DibsLoader from '../DibsLoader';
 
-const LATITUDE = 51.5211117;
-const LONGITUDE = -0.090806;
+const LATITUDE = 40.726948;
+const LONGITUDE = 73.995390;
 const LATITUDE_DELTA = 0.01;
 const LONGITUDE_DELTA = 0.01;
 
