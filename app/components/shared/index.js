@@ -12,3 +12,4 @@ export { default as TransactionBreakdown } from './TransactionBreakdown';
 export { default as CustomStatusBar } from './CustomStatusBar';
 export { default as PaymentInfo } from './PaymentInfo';
 export { default as CustomWebView } from './CustomWebView';
+export { default as BackArrow } from './BackArrow';

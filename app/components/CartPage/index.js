@@ -8,7 +8,6 @@ import Swipeable from 'react-native-swipeable';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 
 import FadeInView from '../shared/FadeInView';
-import { FlexRow } from '../styled/Views';
 import {
   getFormattedCartValueBack,
   getSortedCartEvents,
@@ -26,17 +25,15 @@ import {
   BLACK,
   RECEIPT_ROUTE,
   SCHEDULE_ROUTE,
+  WIDTH,
 } from '../../constants';
 
 import { Icon, CustomStatusBar, DibsLoader, PaymentInfo } from '../shared';
 import CartItem from './CartItem';
 import CartTransaction from './CartTransaction';
 import PromoField from './PromoField';
-
-import MaterialButton from '../shared/MaterialButton';
 import Config from '../../../config.json';
-
-const WIDTH = Dimensions.get('window').width;
+import NoItems from './NoItems';
 
 const StyledScrollView = styled.ScrollView`
   flex: 1;
@@ -195,8 +192,9 @@ class CartPage extends Component {
    * @returns {JSX} XML
    */
   render() {
-    const renderValueBackMessage = this.props.valueBack > 0 ? `Place your order to earn ${this.props.formattedValueBack} in credit back` : `Place your order for ${this.props.formattedCartTotal}`;
-    let renderCartItems = <CartItem hasEmptyCart />;
+    const renderValueBackMessage = this.props.valueBack > 0 ?
+      `Place your order to earn ${this.props.formattedValueBack} in credit back`
+      : `Place your order for ${this.props.formattedCartTotal}`;
 
     const purchaseButton = [
       <StyledContinueButton />,
@@ -238,51 +236,8 @@ class CartPage extends Component {
     }
 
     if (!this.props.cart.length) {
-      return (
-        <FadeInView>
-          <CustomStatusBar backgroundColor={Config.STUDIO_COLOR} barStyle="light-content" />
-          <StyledTopView>
-            <Icon
-              iconName="arrow-left"
-              iconColor={WHITE}
-              onPress={this.toPreviousPage}
-              style={{ position: 'absolute', left: 0, fontSize: 11 }}
-            />
-            <StyledCenterText>
-              My Cart
-            </StyledCenterText>
-          </StyledTopView>
-          <StyledScrollView>
-            {renderCartItems}
-          </StyledScrollView>
-          <StyledCheckoutView>
-            <FlexRow>
-              <MaterialButton
-                text="Class Schedule"
-                onPress={() => { this.props.navigation.navigate(SCHEDULE_ROUTE); }}
-                style={{ flex: 1, height: 50 }}
-                borderRadius={0}
-              />
-            </FlexRow>
-          </StyledCheckoutView>
-        </FadeInView>
-      );
+      return <NoItems />;
     }
-
-    renderCartItems = this.props.cart.map(item => (
-      <CartItem
-        key={item.eventid}
-        eventid={item.eventid}
-        name={item.name}
-        quantity={item.quantity}
-        startTime={item.startTime}
-        price={item.price}
-        taxRate={item.taxRate}
-        passid={item.passid}
-        instructorName={item.instructorName}
-        locationName={item.locationName}
-      />
-    ));
 
     return (
       <FadeInView style={{ backgroundColor: SOFT_GREY }}>
@@ -299,7 +254,20 @@ class CartPage extends Component {
           </StyledCenterText>
         </StyledTopView>
         <StyledScrollView>
-          {renderCartItems}
+          {this.props.cart.map(item => (
+            <CartItem
+              key={item.eventid}
+              eventid={item.eventid}
+              name={item.name}
+              quantity={item.quantity}
+              startTime={item.startTime}
+              price={item.price}
+              taxRate={item.taxRate}
+              passid={item.passid}
+              instructorName={item.instructorName}
+              locationName={item.locationName}
+            />
+          ))}
           <PaymentInfo
             isLoading={this.state.isLoading}
             isUpdatingCard={this.state.isUpdatingCard}
