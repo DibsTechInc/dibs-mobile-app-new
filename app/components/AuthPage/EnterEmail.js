@@ -77,7 +77,6 @@ class EnterEmail extends PureComponent {
         </FadeInView>
       );
     }
-    console.log(Boolean(this.state.errorText.length), 'wtf')
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <FadeInView style={{ justifyContent: 'center', alignItems: 'center', marginBottom: '30%' }}>

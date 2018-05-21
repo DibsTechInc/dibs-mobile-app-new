@@ -1,6 +1,8 @@
 import { createActions } from 'redux-actions';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, uniq } from 'lodash';
 import moment from 'moment';
+import { Alert } from 'react-native';
+
 import {
   getUsersNextPassId,
   getSortedCartEvents,
@@ -11,8 +13,8 @@ import {
 import {
   clearPromoCodeData,
   clearPackagePromoCode,
-  // setEventSoldOut,
-  // requestEventData,
+  setEventSoldOut,
+  requestEventData,
   refreshUser,
   setTransactionsConfirmed,
   requestUserEvents,
@@ -231,21 +233,23 @@ export function submitCartForPurchase(callback) {
         // dispatch(performTransactionAnalytics(resp.transactions)); not sure works with native
         dispatch(clearPromoCodeData());
         dispatch(clearPackagePromoCode());
-        return;
+      } else {
+        let message = res.message;
+        if (res.removedEvents.every(r => r.reason === 'SOLD_OUT')) {
+          message = 'Oh dang! The classes you chose were just recently sold out…. please pick another option.';
+          res.removedEvents.map(event => dispatch(setEventSoldOut({ eventid: event.eventid })));
+        }
+        if (res.removedEvents.every(r => r.reason === 'PRICE_CHANGE')) {
+          message = 'Oh dang! The classes you chose had their price increase more than 5 minutes ago. Please refresh and try again';
+        }
+        Alert.alert('Uh oh!', message);
       }
-
-      if (res.experimentalRoute) {
-        console.log('Experimental Route Hit!');
-      }
-
-      dispatch(setCartErrorMessage(res.message));
-      dispatch(clearCart());
-      dispatch(clearPromoCodeData());
-      dispatch(clearPackagePromoCode());
-      callback(res);
     } catch (err) {
       console.log(err);
-      callback(null);
+      Alert.alert('Uh oh!', 'Something went wrong checking out you cart.');
     }
+    const eventids = uniq(cart.data.map(({ eventid }) => eventid));
+    dispatch(requestEventData({ eventids }));
+    callback();
   };
 }
