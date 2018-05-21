@@ -167,17 +167,26 @@ export const getUserFlashCreditAtStudio = createSelector(
   (flashCredits, dibsStudioId) => (flashCredits.find(fc => fc.dibs_studio_id === dibsStudioId) || {})
 );
 
+export const getUserHasFlashCredit = createSelector(
+  getUserFlashCreditAtStudio,
+  fc => Boolean(fc.credit)
+);
+
 export const getUserFlashCreditAmount = createSelector(
   getUserFlashCreditAtStudio,
   flashCredit => (flashCredit.credit || 0)
 );
 
-export const getFormattedUserFlashCreditAmount = createSelector(
-  [
-    getUserFlashCreditAmount,
-    getStudioCurrency,
-  ],
-  (fcAmount, code) => formatCurrency(fcAmount, { code })
+export const getTotalCreditsWithFlashCredits = createSelector(
+  getUserTotalCredits,
+  getUserFlashCreditAmount,
+  (totalCredAmt, flashCredAmt) => Decimal(totalCredAmt).plus(flashCredAmt).toNumber()
+);
+
+export const getFormattedTotalCreditsWithFlashCredits = createSelector(
+  getTotalCreditsWithFlashCredits,
+  getStudioCurrency,
+  (total, code) => formatCurrency(total, { code })
 );
 
 // export const getUserFormattedFlashCreditExpiration = createSelector(
