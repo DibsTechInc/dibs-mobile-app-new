@@ -177,6 +177,12 @@ export const getUserFlashCreditAmount = createSelector(
   flashCredit => (flashCredit.credit || 0)
 );
 
+export const getFormattedUserFlashCreditAmount = createSelector(
+  getUserFlashCreditAmount,
+  getStudioCurrency,
+  (amount, code) => formatCurrency(amount, { code })
+);
+
 export const getTotalCreditsWithFlashCredits = createSelector(
   getUserTotalCredits,
   getUserFlashCreditAmount,
