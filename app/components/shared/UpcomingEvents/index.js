@@ -17,7 +17,7 @@ class UpcomingClasses extends PureComponent {
   render() {
     const containerStyle = { flex: 1, height: HEIGHT };
     const paginationStyle = {
-      backgroundColor: this.props.forReceiptPage ? DEFAULT_BG : WHITE,
+      backgroundColor: WHITE,
       bottom: 0,
       paddingVertical: 5,
       position: 'absolute',
