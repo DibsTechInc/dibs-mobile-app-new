@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { FadeInView } from '../shared';
 import { getConfirmedTransactionsByEvent } from '../../selectors';
 import { clearConfirmation } from '../../actions';
-import UpcomingEvents from '../shared/UpcomingEvents';
+import { UpcomingEvents, FadeInView } from '../shared';
+import { BLACK, WHITE } from '../../constants';
+import Header from '../Header';
 
 /**
  * @class ReceiptPage
@@ -22,7 +23,8 @@ class ReceiptPage extends Component {
    */
   render() {
     return (
-      <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
+      <FadeInView>
+        <Header iconColor={BLACK} backgroundColor={WHITE} />
         <UpcomingEvents events={this.props.items} />
       </FadeInView>
     );

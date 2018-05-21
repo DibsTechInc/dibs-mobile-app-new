@@ -15,16 +15,19 @@ class UpcomingClasses extends PureComponent {
    * @returns {JSX} XML
    */
   render() {
+    const containerStyle = { flex: 1, height: HEIGHT };
+    const paginationStyle = {
+      backgroundColor: this.props.forReceiptPage ? DEFAULT_BG : WHITE,
+      bottom: 0,
+      paddingVertical: 5,
+      position: 'absolute',
+    };
+
     return (
       <Swiper
         loop={false}
-        containerStyle={{ flex: 0, height: HEIGHT - 100 }}
-        paginationStyle={{
-          backgroundColor: this.props.forReceiptPage ? DEFAULT_BG : WHITE,
-          bottom: 0,
-          paddingVertical: 5,
-          position: 'absolute',
-        }}
+        containerStyle={containerStyle}
+        paginationStyle={paginationStyle}
         activeDotStyle={{ backgroundColor: Config.STUDIO_COLOR }}
       >
         {this.props.events.map(event => (

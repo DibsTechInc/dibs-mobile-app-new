@@ -16,7 +16,7 @@ import {
 
 import Header from '../Header';
 import FadeInView from '../shared/FadeInView';
-import { SOFT_GREY } from '../../constants/ColorConstants';
+import { SOFT_GREY, BLACK } from '../../constants/ColorConstants';
 import { getUserFirstName, getUserLastName } from '../../selectors';
 
 /**
@@ -40,7 +40,7 @@ class ProfilePage extends Component {
   render() {
     return (
       <FadeInView style={{ backgroundColor: SOFT_GREY }}>
-        <Header iconColor={'#000'} backgroundColor={SOFT_GREY} />
+        <Header iconColor={BLACK} backgroundColor={SOFT_GREY} />
         <View style={{ backgroundColor: SOFT_GREY, flex: 1 }}>
           <SettingsList borderColor="#fff" defaultItemSize={50}>
             <SettingsList.Header headerStyle={{ marginTop: 15 }} />

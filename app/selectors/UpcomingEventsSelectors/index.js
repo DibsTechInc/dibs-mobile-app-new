@@ -7,6 +7,7 @@ import Decimal from 'decimal.js';
 import Config from '../../../config.json';
 import { WHITE } from '../../constants';
 import { getStudioShortDateFormat, getStudioCustomTimeFormat, getStudioCurrency } from '../StudioSelectors';
+import { getStudioLocations } from '../StudioSelectors/Locations';
 
 /**
  * @param {Object} state in store
@@ -166,10 +167,13 @@ export const getUpcomingEventCalendarMarkings = createSelector(
  * @param {string} currency code of studio
  * @returns {Array<Object>} upcoming events for expanded slider
  */
-function generateDetailedUpcomingEvents(items, currency, timeFormat) {
+function generateDetailedUpcomingEvents(items, currency, timeFormat, locations) {
   return items.map((item) => {
     const chargeAmount = Decimal(item.amount).minus(item.studio_credits_spent).minus(item.global_credits_spent).minus(item.raf_credits_spent);
     const time = moment.tz(item.start_time, Config.STUDIO_TZ).format(`MMM D, ${timeFormat}`);
+    const eventLocation = locations.length && locations.find(l => l.id === item.location.id);
+    const { latitude, longitude } = eventLocation;
+
     return {
       ...item,
       time,
@@ -180,6 +184,8 @@ function generateDetailedUpcomingEvents(items, currency, timeFormat) {
       formattedRAFCreditAmount: formatCurrency(item.raf_credits_spent, { code: currency, precision: (item.studio_credits_spent % 1 && 2) }),
       formattedTotal: formatCurrency(chargeAmount, { code: currency, precision: (item.chargeAmount % 1 && 2) }),
       formattedValueBack: formatCurrency(item.valueBack, { code: currency, precision: (item.chargeAmount % 1 && 2) }),
+      longitude,
+      latitude,
     };
   });
 }
@@ -188,6 +194,7 @@ export const getDetailedMostRecentUpcomingEvents = createSelector(
   getMostRecentUpcomingEvents,
   getStudioCurrency,
   getStudioCustomTimeFormat,
+  getStudioLocations,
   generateDetailedUpcomingEvents
 );
 
@@ -195,5 +202,6 @@ export const getDetailedUpcomingEventsOnCurrentDay = createSelector(
   getUpcomingEventsOnCurrentDate,
   getStudioCurrency,
   getStudioCustomTimeFormat,
+  getStudioLocations,
   generateDetailedUpcomingEvents
 );
