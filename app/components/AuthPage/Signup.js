@@ -6,17 +6,24 @@ import {
   TouchableOpacity,
   Text,
   View,
+  ScrollView,
 } from 'react-native';
 import styled from 'styled-components';
 import CheckBox from 'react-native-checkbox';
+import { KeyboardAccessoryView } from 'react-native-keyboard-accessory';
 import Promise from 'bluebird';
 import { signUpUser } from '../../actions/UserActions';
-import FadeInView from '../shared/FadeInView';
-import InputField from '../shared/InputField';
-import { MaterialButton, CustomStatusBar } from '../shared';
-import { TERMS_AND_CONDITIONS_ROUTE, MAIN_ROUTE, LOGIN_ROUTE } from '../../constants';
+import { MaterialButton, CustomStatusBar, FadeInView, InputField } from '../shared';
+import { TERMS_AND_CONDITIONS_ROUTE, MAIN_ROUTE, LOGIN_ROUTE, DEFAULT_BG } from '../../constants';
 import Config from '../../../config.json';
 import DibsLoader from '../shared/DibsLoader';
+
+const StyledButtonView = styled.View`
+  padding: 8px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+`;
 
 const StyledText = styled.Text`
   font-family: flex-font;
@@ -126,55 +133,63 @@ class Signup extends Component {
     }
 
     return (
-      <FadeInView style={{ justifyContent: 'center', alignItems: 'center', marginBottom: '30%' }}>
-        <CustomStatusBar backgroundColor={'transparent'} barStyle="light-content" />
-        <StyledText>
+      <FadeInView>
+        <CustomStatusBar backgroundColor={'transparent'} barStyle="dark-content" />
+        <ScrollView keyboardShouldPersistTaps="always" contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', height: '60%', position: 'relative' }}>
+          <StyledText>
           Just need a few details before we get started
-        </StyledText>
-        <InputField
-          value={this.props.navigation.state.params.email || ''}
-          editable={false}
-          style={{ width: 200 }}
-          containerStyle={{ marginBottom: 20 }}
-        />
-        <InputField
-          customFocus
-          value={this.state.fullName}
-          onChangeText={fullName => this.setState({ fullName })}
-          placeholder="First and last name"
-          style={{ width: 200 }}
-          containerStyle={{ marginBottom: 20 }}
-        />
-        <InputField
-          value={this.state.password}
-          secureTextEntry
-          onChangeText={password => this.setState({ password })}
-          placeholder="Password (6 char min)"
-          style={{ width: 200 }}
-          containerStyle={{ marginBottom: 25 }}
-        />
-        <View style={{ flexDirection: 'row', width: 200, justifyContent: 'space-between', marginBottom: 50 }}>
-          <TouchableOpacity onPress={() => this.props.navigation.navigate(TERMS_AND_CONDITIONS_ROUTE, { url: Config.STUDIO_TERMS_LINK })}>
-            <Text style={{ color: Config.STUDIO_COLOR, fontFamily: 'flex-font' }}>Flex Studios</Text>
-          </TouchableOpacity>
-          <Text> & </Text>
-          <TouchableOpacity onPress={() => this.props.navigation.navigate(TERMS_AND_CONDITIONS_ROUTE, { url: Config.DIBS_TERMS_LINK })}>
-            <Text style={{ color: Config.STUDIO_COLOR, fontFamily: 'flex-font' }}>Dibs</Text>
-          </TouchableOpacity>
-        </View>
-        <CheckBox
-          label="I have read and agreed to the terms and conditions"
-          labelStyle={{ fontFamily: 'flex-font' }}
-          checked={this.state.tAndC}
-          onChange={this.handleOnCheck}
-        />
-        {showButton && (
-          <MaterialButton
-            text="Sign up"
-            onPress={this.handleOnPress}
-            style={{ marginTop: 15, width: 200, height: 40 }}
+          </StyledText>
+          <InputField
+            value={this.props.navigation.state.params.email || ''}
+            editable={false}
+            style={{ width: 200 }}
+            containerStyle={{ marginBottom: 20 }}
           />
-        )}
+          <InputField
+            customFocus
+            value={this.state.fullName}
+            onChangeText={fullName => this.setState({ fullName })}
+            placeholder="First and last name"
+            style={{ width: 200 }}
+            containerStyle={{ marginBottom: 20 }}
+          />
+          <InputField
+            value={this.state.password}
+            secureTextEntry
+            onChangeText={password => this.setState({ password })}
+            placeholder="Password (6 char min)"
+            style={{ width: 200 }}
+            containerStyle={{ marginBottom: 25 }}
+          />
+          <View style={{ flexDirection: 'row', width: 200, justifyContent: 'space-between', marginBottom: 50 }}>
+            <TouchableOpacity onPress={() => this.props.navigation.navigate(TERMS_AND_CONDITIONS_ROUTE, { url: Config.STUDIO_TERMS_LINK })}>
+              <Text style={{ color: Config.STUDIO_COLOR, fontFamily: 'flex-font' }}>Flex Studios</Text>
+            </TouchableOpacity>
+            <Text> & </Text>
+            <TouchableOpacity onPress={() => this.props.navigation.navigate(TERMS_AND_CONDITIONS_ROUTE, { url: Config.DIBS_TERMS_LINK })}>
+              <Text style={{ color: Config.STUDIO_COLOR, fontFamily: 'flex-font' }}>Dibs</Text>
+            </TouchableOpacity>
+          </View>
+          <CheckBox
+            label="I have read and agreed to the terms and conditions"
+            labelStyle={{ fontFamily: 'flex-font' }}
+            checked={this.state.tAndC}
+            onChange={this.handleOnCheck}
+          />
+        </ScrollView>
+        <KeyboardAccessoryView
+          alwaysVisible
+          hideBorder
+          style={{ backgroundColor: DEFAULT_BG, marginBottom: 25 }}
+        >
+          <StyledButtonView>
+            <MaterialButton
+              onPress={this.handleOnPress}
+              text="Continue"
+              style={{ width: '75%', height: 40 }}
+            />
+          </StyledButtonView>
+        </KeyboardAccessoryView>
       </FadeInView>
     );
   }
@@ -190,3 +205,4 @@ const mapDispatchToProps = {
 };
 
 export default connect(null, mapDispatchToProps)(Signup);
+
