@@ -40,7 +40,7 @@ class ProfilePage extends Component {
   render() {
     return (
       <FadeInView style={{ backgroundColor: SOFT_GREY }}>
-        <Header iconColor={BLACK} backgroundColor={SOFT_GREY} />
+        <Header title="My Account" />
         <View style={{ backgroundColor: SOFT_GREY, flex: 1 }}>
           <SettingsList borderColor="#fff" defaultItemSize={50}>
             <SettingsList.Header headerStyle={{ marginTop: 15 }} />
