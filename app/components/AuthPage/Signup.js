@@ -9,7 +9,6 @@ import {
   ScrollView,
 } from 'react-native';
 import styled from 'styled-components';
-import CheckBox from 'react-native-checkbox';
 import { KeyboardAccessoryView } from 'react-native-keyboard-accessory';
 import Promise from 'bluebird';
 import { signUpUser } from '../../actions/UserActions';
@@ -17,6 +16,7 @@ import { MaterialButton, CustomStatusBar, FadeInView, InputField } from '../shar
 import { TERMS_AND_CONDITIONS_ROUTE, MAIN_ROUTE, LOGIN_ROUTE, DEFAULT_BG } from '../../constants';
 import Config from '../../../config.json';
 import DibsLoader from '../shared/DibsLoader';
+import { CheckBox } from 'react-native-elements'
 
 const StyledButtonView = styled.View`
   padding: 8px;
@@ -169,15 +169,16 @@ class Signup extends Component {
               <Text style={{ color: Config.STUDIO_COLOR, fontFamily: 'flex-font' }}>Dibs Terms</Text>
             </TouchableOpacity>
           </View>
-          <View style={{ width: 250 }}>
+          <View style={{ width: 250, height: 50, position: 'relative' }}>
             <CheckBox
-              label="I have read and agreed to the terms"
-              labelStyle={{ fontFamily: 'flex-font', fontSize: 12, flexWrap: 'wrap' }}
+              title="I have read and agreed to the terms"
               checked={this.state.tAndC}
-              onChange={this.handleOnCheck}
+              containerStyle={{ backgroundColor: DEFAULT_BG, position: 'absolute', bottom: 0, left: -22 }}
+              textStyle={{ fontFamily: 'flex-font', fontSize: 12 }}
+              onPress={this.handleOnCheck}
+              size={20}
             />
           </View>
-          
         </ScrollView>
         <KeyboardAccessoryView
           alwaysVisible
