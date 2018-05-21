@@ -73,10 +73,10 @@ class MainPage extends React.PureComponent {
       <FadeInView style={{ position: 'relative', backgroundColor: BLACK }}>
         <CustomStatusBar backgroundColor={'transparent'} barStyle="light-content" />
         <BackgroundImage source={backgroundImg} />
-        <Header
+        {/* <Header
           iconColor={WHITE}
           backgroundColor={TRANSPARENT}
-        />
+        /> */}
         <Content hasUpcomingClasses={this.props.hasUpcomingClasses}>
           <Greeting>
             Hi {this.props.userFirstName}!

@@ -1,119 +1,76 @@
-import React, { Component } from 'react';
-import { NavigationActions, withNavigation } from 'react-navigation';
+import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { DRAWER_OPEN, WHITE, DARK_TEXT_GREY } from '../../constants';
-import { CartIcon, Icon } from '../shared';
+import { withNavigation } from 'react-navigation';
+import { View } from 'react-native';
 
-const StyledView = styled.View`
-  background-color: ${props => props.backgroundColor};
-  height: 60;
-  justify-content: space-between;
-  flex-direction: row;
+import Config from '../../../config.json';
+import { WHITE, SCHEDULE_ROUTE, CART_ROUTE } from '../../constants';
+import { FlexRow, HeavyText } from '../styled';
+import { BackArrow, CustomStatusBar, CartIcon } from '../shared';
+
+const StudioColoredTop = FlexRow.extend`
   align-items: center;
-  padding-top: 15;
+  background-color: ${Config.STUDIO_COLOR};
+  height: 80;
+  justify-content: space-between;
 `;
 
-const StyledMenuView = styled.View`
-  margin-left: 5;
-`;
-
-const StyledCartView = styled.View`
-  margin-right: 5;
-`;
-
-const StyledTitleView = styled.View`
-  margin-right: ${props => (props.titleWithNoCart ? '15%' : '1%')};
-`;
-
-const StyledText = styled.Text`
-  font-family: flex-font-heavy;
-  color: ${props => (props.textColor ? props.textColor : DARK_TEXT_GREY)}
+const PageTitle = HeavyText.extend`
+  color: ${WHITE};
+  font-size: 16;
+  text-align: center;
 `;
 
 /**
  * @class Header
- * @param {string} route the navigation route
- * @extends {Component}
+ * @extends {React.PureComponent}
  */
-class Header extends Component {
+class Header extends React.PureComponent {
   /**
    * @constructor
-   * @constructs Header
+   * @constructs NoItems
+   * @param {Object} props for component
    */
-  constructor() {
-    super();
-
-    this.navigateToDrawer = this.navigateToDrawer.bind(this);
+  constructor(props) {
+    super(props);
+    this.goBack = this.goBack.bind(this);
   }
   /**
    * @returns {undefined}
    */
-  navigateToDrawer() {
-    const navigateAction = NavigationActions.navigate({
-      routeName: DRAWER_OPEN,
-    });
-
-    const keyType = this.props.navigation.state.key.split('-')[0];
-    const pop = NavigationActions.pop();
-
-    if (keyType === 'id') {
-      this.props.navigation.dispatch(pop);
-    } else {
-      this.props.navigation.dispatch(navigateAction);
+  goBack() {
+    if (this.props.navigation.state.params && this.props.navigation.state.params.previousRoute) {
+      this.props.navigation.navigate(this.props.navigation.state.params.previousRoute);
     }
+    this.props.navigation.goBack();
   }
   /**
-   * @returns {JSX} XML
+   * render
+   * @returns {JSX.Element} HTML
    */
   render() {
     return (
-      <StyledView backgroundColor={this.props.backgroundColor} style={this.props.headerStyle}>
-        <StyledMenuView>
-          <Icon
-            iconName={this.props.iconName}
-            iconColor={this.props.iconColor}
-            onPress={this.navigateToDrawer}
-            size={this.props.iconSize}
+      <View>
+        <CustomStatusBar backgroundColor={Config.STUDIO_COLOR} barStyle="light-content" />
+        <StudioColoredTop>
+          <BackArrow
+            onPress={this.goBack}
+            style={{ marginLeft: 15 }}
+            stroke={WHITE}
           />
-        </StyledMenuView>
-        <StyledTitleView titleWithNoCart={this.props.titleWithNoCart}>
-          {this.props.showTitle && (
-            <StyledText textColor={this.props.textColor}>
-              {this.props.titleText}
-            </StyledText>
-          )}
-        </StyledTitleView>
-        <StyledCartView>
-          {this.props.showCart && <CartIcon iconColor={this.props.iconColor} />}
-        </StyledCartView>
-      </StyledView>
+          <PageTitle>
+            {this.props.title}
+          </PageTitle>
+          <CartIcon iconColor={WHITE} />
+        </StudioColoredTop>
+      </View>
     );
   }
 }
 
-Header.defaultProps = {
-  showCart: true,
-  showTitle: false,
-  titleText: 'Title Text',
-  backgroundColor: WHITE,
-  iconName: 'user-circle',
-  iconSize: 25,
-};
-
 Header.propTypes = {
   navigation: PropTypes.shape(),
-  iconColor: PropTypes.string,
-  backgroundColor: PropTypes.string,
-  showCart: PropTypes.bool,
-  titleWithNoCart: PropTypes.bool,
-  showTitle: PropTypes.bool,
-  textColor: PropTypes.string,
-  titleText: PropTypes.string,
-  iconName: PropTypes.string,
-  iconSize: PropTypes.number,
-  headerStyle: PropTypes.shape(),
+  title: PropTypes.string.isRequired,
 };
 
 export default withNavigation(Header);
-

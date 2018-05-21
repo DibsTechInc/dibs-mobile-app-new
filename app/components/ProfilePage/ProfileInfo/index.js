@@ -59,12 +59,7 @@ class ProfileInfo extends PureComponent {
   render() {
     return (
       <FadeInView>
-        <Header
-          iconColor={BLACK}
-          backgroundColor={WHITE}
-          showCart={false}
-          headerStyle={{ height: 80 }}
-        />
+        <Header title="Personal Details" />
         <PersonalDetails
           setEditPersonalDetails={this.setEditPersonalDetails}
           isUpdatingPersonalDetails={this.state.isUpdatingPersonalDetails}

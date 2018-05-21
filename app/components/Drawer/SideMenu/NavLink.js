@@ -48,6 +48,7 @@ class NavLink extends React.PureComponent {
   openRoute() {
     const navigateAction = NavigationActions.navigate({
       routeName: this.props.route,
+      previousRoute: this.props.navigation.state.key,
     });
 
     if (this.props.loggingOut) {

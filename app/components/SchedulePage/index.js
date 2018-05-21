@@ -52,11 +52,7 @@ class SchedulePage extends Component {
   render() {
     return (
       <FadeInView style={{ height: '100%', backgroundColor: Config.STUDIO_COLOR }}>
-        <CustomStatusBar backgroundColor={Config.STUDIO_COLOR} barStyle="light-content" />
-        <Header
-          iconColor={WHITE}
-          backgroundColor={Config.STUDIO_COLOR}
-        />
+        <Header title="Schedule" />
         <CalendarStrip />
         <Shadow />
         <EventList />
