@@ -4,6 +4,8 @@ import { connect } from 'react-redux';
 import {
   Alert,
   TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import styled from 'styled-components';
 import Promise from 'bluebird';
@@ -26,6 +28,12 @@ const ForgotPasswordText = styled.Text`
   font-size: 12;
 `;
 
+const ErrorText = styled.Text`
+  font-family: flex-font;
+  font-size: 12;
+  color: red;
+`;
+
 /**
  * @class EnterPassword
  * @extends Component
@@ -41,6 +49,8 @@ class EnterPassword extends Component {
     this.state = {
       password: '',
       isLoading: false,
+      validInput: false,
+      errorText: '',
     };
 
     this.handleOnPress = this.handleOnPress.bind(this);
@@ -56,16 +66,16 @@ class EnterPassword extends Component {
       const response = await new Promise(res => this.props.reactivateUserAccount(email, this.state.password, res));
 
       if (response.code === 200) this.props.navigation.navigate(LANDING_ROUTE, { accountReactivated: true });
-      else Alert.alert(response.message);
+      else this.setState({ errorText: response.message });
       return;
     }
 
-    this.setState({ isLoading: true });
+    await new Promise(res => this.setState({ isLoading: true, validInput: true }, res));
     const response = await new Promise(res => this.props.submitLogin(email, this.state.password, res));
+    await new Promise(res => this.setState({ isLoading: false }, res));
 
     if (response.code !== 200) {
-      this.setState({ isLoading: false });
-      Alert.alert(response.message);
+      this.setState({ isLoading: false, errorText: response.message });
       return;
     }
 
@@ -93,33 +103,37 @@ class EnterPassword extends Component {
     }
 
     return (
-      <FadeInView style={{ justifyContent: 'center', alignItems: 'center', marginBottom: '30%' }}>
-        <InputField
-          label={(
-            this.props.navigation.state.params.accountDisabled ?
-              'Please enter the password associated with this account to reactivate it' : 'What is your password?'
-          )}
-          returnKeyType="go"
-          customFocus
-          placeholder="Password"
-          secureTextEntry
-          autoCapitalize="none"
-          onSubmitEditing={this.handleOnPress}
-          onChangeText={password => this.setState({ password })}
-          value={this.state.password}
-          containerStyle={{ marginBottom: 10, width: 200 }}
-          labelStyle={{ marginBottom: 20, textAlign: 'center' }}
-          style={{ minWidth: 200 }}
-        />
-        <TouchableOpacity
-          onPress={this.navigateToPasswordReset}
-          style={{ marginBottom: 20 }}
-        >
-          <ForgotPasswordText>
-            Forgot your password?
-          </ForgotPasswordText>
-        </TouchableOpacity>
-      </FadeInView>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <FadeInView style={{ justifyContent: 'center', alignItems: 'center', marginBottom: '30%' }}>
+          <InputField
+            autoFocus={!this.state.validInput}
+            label={(
+              this.props.navigation.state.params.accountDisabled ?
+                'Please enter the password associated with this account to reactivate it' : 'What is your password?'
+            )}
+            returnKeyType="go"
+            blurOnSubmit={this.state.validInput}
+            placeholder="Password"
+            secureTextEntry
+            autoCapitalize="none"
+            onSubmitEditing={this.handleOnPress}
+            onChangeText={password => this.setState({ password })}
+            value={this.state.password}
+            containerStyle={{ marginBottom: 10, width: 200 }}
+            labelStyle={{ marginBottom: 20, textAlign: 'center' }}
+            style={{ minWidth: 200 }}
+          />
+          <TouchableOpacity
+            onPress={this.navigateToPasswordReset}
+            style={{ marginBottom: 20 }}
+          >
+            <ForgotPasswordText>
+              Forgot your password?
+            </ForgotPasswordText>
+          </TouchableOpacity>
+          {this.state.errorText.length && <ErrorText>{this.state.errorText}</ErrorText>}
+        </FadeInView>
+      </TouchableWithoutFeedback>
     );
   }
 }

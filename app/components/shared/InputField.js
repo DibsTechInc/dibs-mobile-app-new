@@ -24,11 +24,15 @@ class InputField extends React.PureComponent {
     this.onFocus = this.onFocus.bind(this);
     this.onBlur = this.onBlur.bind(this);
   }
-
+  /**
+   * @returns {undefined}
+   */
   componentDidMount() {
     if (this.props.customFocus) this.focusListener = this.props.navigation.addListener('didFocus', () => this._textInput.focus());
   }
-
+  /**
+   * @returns {undefined}
+   */
   componentWillUnmount() {
     if (this.focusListener) this.focusListener.remove();
   }
@@ -52,26 +56,26 @@ class InputField extends React.PureComponent {
    */
   render() {
     return (
-        <StudioColorBottomBorder
-          style={{
-            ...this.props.containerStyle,
-            borderBottomWidth: 1 + Boolean(this.state.focused),
-          }}
-        >
-          {this.props.label ? (
-            <Label style={this.props.labelStyle}>
-              {this.props.label}
-            </Label>
-          ) : null}
-          <View keyboardShouldPersistTaps="never">
-            <TextInput
-              onFocus={this.onFocus}
-              onBlur={this.onBlur}
-              ref={(ref) => { this._textInput = ref; }}
-              {...this.props}
-            />
-          </View>
-        </StudioColorBottomBorder>
+      <StudioColorBottomBorder
+        style={{
+          ...this.props.containerStyle,
+          borderBottomWidth: 1 + Boolean(this.state.focused),
+        }}
+      >
+        {this.props.label ? (
+          <Label style={this.props.labelStyle}>
+            {this.props.label}
+          </Label>
+        ) : null}
+        <View keyboardShouldPersistTaps="never">
+          <TextInput
+            onFocus={this.onFocus}
+            onBlur={this.onBlur}
+            ref={(ref) => { this._textInput = ref; }}
+            {...this.props}
+          />
+        </View>
+      </StudioColorBottomBorder>
     );
   }
 }
