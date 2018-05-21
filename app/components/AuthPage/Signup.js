@@ -8,7 +8,7 @@ import {
   View,
   ScrollView,
 } from 'react-native';
-import { CheckBox } from 'react-native-elements'
+import { CheckBox } from 'react-native-elements';
 import styled from 'styled-components';
 import { KeyboardAccessoryView } from 'react-native-keyboard-accessory';
 import Promise from 'bluebird';
@@ -122,8 +122,6 @@ class Signup extends Component {
    * @returns {JSX} XML
    */
   render() {
-    const showButton = this.checkForm().canShowButton;
-
     if (this.state.isLoading) {
       return (
         <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>

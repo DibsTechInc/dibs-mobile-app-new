@@ -93,7 +93,7 @@ class EnterEmail extends PureComponent {
         <ScrollView keyboardShouldPersistTaps="always" contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', height: '70%', position: 'relative' }}>
           <InputField
             customFocus
-            label="What is your email?"
+            label="What's your email?"
             placeholder="Email"
             autoCapitalize="none"
             onChangeText={email => this.setState({ email })}
@@ -103,7 +103,7 @@ class EnterEmail extends PureComponent {
               marginBottom: this.state.emailError ? 10 : 50,
               width: 200,
             }}
-            labelStyle={{ marginBottom: 5, textAlign: 'center' }}
+            labelStyle={{ marginBottom: 20, textAlign: 'center' }}
             blurOnSubmit={this.state.validInput}
           />
           {this.state.errorText.length && <ErrorText>{this.state.errorText}</ErrorText>}
