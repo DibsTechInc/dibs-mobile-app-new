@@ -1,31 +1,37 @@
-
 import React, { PureComponent } from 'react';
-import {
-  TouchableWithoutFeedback,
-  Keyboard,
-  Alert,
-} from 'react-native';
-import styled from 'styled-components';
+import { ScrollView, Keyboard } from 'react-native';
+import { KeyboardAccessoryView } from 'react-native-keyboard-accessory';
 import { PropTypes } from 'prop-types';
 import { connect } from 'react-redux';
 import Promise from 'bluebird';
+import styled from 'styled-components';
 
+import { FadeInView, InputField, DibsLoader, MaterialButton } from '../shared';
 import { validateEmail } from '../../actions/UserActions';
-import { FadeInView, InputField, DibsLoader } from '../shared';
+
+import { DEFAULT_BG } from '../../constants';
 import Config from '../../../config.json';
+
+const StyledButtonView = styled.View`
+  padding: 8px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+`;
 
 const ErrorText = styled.Text`
   font-family: flex-font;
   font-size: 12;
   color: red;
+  position: absolute;
+  top: 50%;
 `;
-
 /**
  * @class EnterEmail
  * @extends Component
  */
 class EnterEmail extends PureComponent {
-  /**
+    /**
    * @constructor
    * @constructs EnterEmail
    * @param {Object} props for component
@@ -40,8 +46,13 @@ class EnterEmail extends PureComponent {
     };
     this.handleOnPress = this.handleOnPress.bind(this);
   }
-
-  /**
+   /**
+   * @returns {undefined}
+   */
+  componentWillUnmount() {
+    Keyboard.dismiss();
+  }
+    /**
    * @returns {undefined}
    */
   async handleOnPress() {
@@ -58,7 +69,7 @@ class EnterEmail extends PureComponent {
 
     await new Promise(res => this.setState({ isLoading: true, validInput: true }, res));
     const route = await new Promise(res => this.props.validateEmail(email, res));
-    await new Promise(res => this.setState({ isLoading: false }, res));
+    await new Promise(res => this.setState({ isLoading: false, errorText: '' }, res));
 
     if (!route) {
       this.setState({ isLoading: false, errorText: 'Uh oh, we could not verify this email. Please contact support.' });
@@ -78,12 +89,11 @@ class EnterEmail extends PureComponent {
       );
     }
     return (
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <FadeInView style={{ justifyContent: 'center', alignItems: 'center', marginBottom: '30%' }}>
+      <FadeInView>
+        <ScrollView keyboardShouldPersistTaps="always" contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', height: '70%', position: 'relative' }}>
           <InputField
             customFocus
             label="What is your email?"
-            returnKeyType="go"
             placeholder="Email"
             autoCapitalize="none"
             onChangeText={email => this.setState({ email })}
@@ -97,8 +107,21 @@ class EnterEmail extends PureComponent {
             blurOnSubmit={this.state.validInput}
           />
           {this.state.errorText.length && <ErrorText>{this.state.errorText}</ErrorText>}
-        </FadeInView>
-      </TouchableWithoutFeedback>
+        </ScrollView>
+        <KeyboardAccessoryView
+          alwaysVisible
+          hideBorder
+          style={{ backgroundColor: DEFAULT_BG, marginBottom: 25 }}
+        >
+          <StyledButtonView>
+            <MaterialButton
+              onPress={this.handleOnPress}
+              text="Continue"
+              style={{ width: '75%', height: 40 }}
+            />
+          </StyledButtonView>
+        </KeyboardAccessoryView>
+      </FadeInView>
     );
   }
 }
@@ -110,5 +133,6 @@ EnterEmail.propTypes = {
 const mapDispatchToProps = {
   validateEmail,
 };
+
 
 export default connect(null, mapDispatchToProps)(EnterEmail);

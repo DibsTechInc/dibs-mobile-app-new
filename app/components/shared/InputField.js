@@ -30,6 +30,7 @@ class InputField extends React.PureComponent {
   componentDidMount() {
     if (this.props.customFocus) this.focusListener = this.props.navigation.addListener('didFocus', () => this._textInput.focus());
   }
+
   /**
    * @returns {undefined}
    */
@@ -67,14 +68,12 @@ class InputField extends React.PureComponent {
             {this.props.label}
           </Label>
         ) : null}
-        <View keyboardShouldPersistTaps="never">
-          <TextInput
-            onFocus={this.onFocus}
-            onBlur={this.onBlur}
-            ref={(ref) => { this._textInput = ref; }}
-            {...this.props}
-          />
-        </View>
+        <TextInput
+          onFocus={this.onFocus}
+          onBlur={this.onBlur}
+          ref={(ref) => { this._textInput = ref; }}
+          {...this.props}
+        />
       </StudioColorBottomBorder>
     );
   }

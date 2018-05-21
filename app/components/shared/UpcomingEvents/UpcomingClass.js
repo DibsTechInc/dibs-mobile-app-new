@@ -9,6 +9,7 @@ import { connect } from 'react-redux';
 import Config from '../../../../config.json';
 import { getDroppingUpcomingEvent } from '../../../selectors';
 import { dropUserFromEvent } from '../../../actions';
+import { WHITE } from '../../../constants';
 import FadeInView from '../FadeInView';
 import TransactionBreakdown from '../TransactionBreakdown';
 import MaterialButton from '../MaterialButton';
@@ -70,7 +71,7 @@ class UpcomingClass extends PureComponent {
       && <HTML html={this.props.description} imagesMaxWidth={Dimensions.get('window').width} />;
 
     return (
-      <FadeInView style={{ paddingTop: this.props.forReceiptPage ? 10 : 0, paddingBottom: 40, backgroundColor: '#fff' }}>
+      <FadeInView style={{ paddingTop: this.props.forReceiptPage ? 10 : 0, paddingBottom: 40, backgroundColor: WHITE }}>
         <ScrollView style={{ paddingTop: this.props.forReceiptPage ? 10 : 0, paddingBottom: 40 }}>
           <TransactionBreakdown
             forReceiptPage={this.props.forReceiptPage}
