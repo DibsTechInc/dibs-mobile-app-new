@@ -14,8 +14,6 @@ import TransactionBreakdown from '../TransactionBreakdown';
 import MaterialButton from '../MaterialButton';
 import DibsLoader from '../DibsLoader';
 
-const LATITUDE = 40.726948;
-const LONGITUDE = 73.995390;
 const LATITUDE_DELTA = 0.01;
 const LONGITUDE_DELTA = 0.01;
 
@@ -38,7 +36,7 @@ class UpcomingClass extends PureComponent {
    * @returns {undefined}
    */
   componentDidMount() {
-    this.map.animateToRegion({ latitude: LATITUDE, longitude: LONGITUDE, latitudeDelta: LATITUDE_DELTA, longitudeDelta: LONGITUDE_DELTA }, 1);
+    this.map.animateToRegion({ latitude: this.props.latitude, longitude: this.props.longitude, latitudeDelta: LATITUDE_DELTA, longitudeDelta: LONGITUDE_DELTA }, 1);
   }
   /**
    * @returns {undefined}
@@ -93,14 +91,14 @@ class UpcomingClass extends PureComponent {
             ref={(ref) => { this.map = ref; }}
             style={{ height: 200, marginBottom: 10 }}
             initialRegion={{
-              latitude: LATITUDE,
-              longitude: LONGITUDE,
+              latitude: this.props.latitude,
+              longitude: this.props.longitude,
               latitudeDelta: LATITUDE_DELTA,
               longitudeDelta: LONGITUDE_DELTA,
             }}
           >
             <Marker
-              coordinate={{ latitude: LATITUDE, longitude: LONGITUDE }}
+              coordinate={{ latitude: this.props.latitude, longitude: this.props.longitude }}
               title="My marker"
               description="blahblah"
             />
@@ -158,6 +156,8 @@ UpcomingClass.propTypes = {
   formattedTotal: PropTypes.string,
   description: PropTypes.string,
   dropping: PropTypes.bool.isRequired,
+  latitude: PropTypes.number,
+  longitude: PropTypes.number,
 };
 
 const mapStateToProps = state => ({

@@ -1,7 +1,11 @@
 import { createSelector } from 'reselect';
 import Decimal from 'decimal.js';
 import { format as formatCurrency } from 'currency-formatter';
-import { getEventsData, getStudioCurrency } from '../';
+import {
+  getEventsData,
+  getStudioCurrency,
+  getStudioLocations,
+} from '../';
 
 /**
  * getConfirmationState
@@ -16,19 +20,23 @@ export const getConfirmedTransactionsByEvent = createSelector(
   getConfirmationState,
   getEventsData,
   getStudioCurrency,
-  (transactions, events, currency) => transactions.reduce((acc, transaction) => {
+  getStudioLocations,
+  (transactions, events, currency, locations) => transactions.reduce((acc, transaction) => {
     const eventTransaction = acc.find(({ eventid }) => transaction.eventid === eventid);
 
     if (!eventTransaction) {
       const confirmedEvent = events.find(e => transaction.eventid === e.id);
+      const eventLocation = locations.length && locations.find(l => l.id === confirmedEvent.location.id);
+
+      const { latitude, longitude } = eventLocation;
       const { id } = transaction;
       const amount = new Decimal(transaction.amount).minus(transaction.studio_credits_spent)
                                                     .minus(transaction.raf_credits_spent)
                                                     .toNumber();
       const valueBack = transaction.pass ? Math.max(
         new Decimal(transaction.pass.passValue || 0).plus(transaction.discount_amount)
-                                               .minus(transaction.original_price)
-                                               .toNumber()
+                                                    .minus(transaction.original_price)
+                                                    .toNumber()
       ) : 0;
       const payload = {
         ...transaction,
@@ -39,6 +47,8 @@ export const getConfirmedTransactionsByEvent = createSelector(
         description: confirmedEvent.description,
         name: confirmedEvent.name,
         address: confirmedEvent.address,
+        latitude,
+        longitude,
       };
 
       acc.push(payload);

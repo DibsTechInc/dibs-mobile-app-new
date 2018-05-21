@@ -87,7 +87,6 @@ class LandingPage extends Component {
    * @returns {JSX} XML
    */
   render() {
-    console.log(this.props.navigation, )
     return (
       <View style={{ flex: 1 }}>
         <CustomStatusBar backgroundColor={'transparent'} barStyle="dark-content" />
