@@ -61,16 +61,6 @@ class CartItem extends PureComponent {
    * @returns {JSX} XML
    */
   render() {
-    if (this.props.hasEmptyCart) {
-      return (
-        <StyledCartItemView>
-          <StyledText>
-            Your cart is empty
-          </StyledText>
-        </StyledCartItemView>
-      );
-    }
-
     const timeFormat = Config.STUDIO_TZ === 'Europe/London' ? moment(this.props.startTime).format('hh:mm [@ ]') : moment(this.props.startTime).format('h:mm A z [@ ]');
     const timeDisplay = `${timeFormat} ${this.props.locationName}`;
 
@@ -127,7 +117,6 @@ CartItem.propTypes = {
   startTime: PropTypes.string,
   taxRate: PropTypes.number,
   eventid: PropTypes.number,
-  hasEmptyCart: PropTypes.bool,
   removeOneEventItem: PropTypes.func,
   addToCart: PropTypes.func,
   showCartAdjustments: PropTypes.bool,

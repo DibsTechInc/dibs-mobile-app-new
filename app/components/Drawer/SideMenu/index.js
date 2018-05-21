@@ -135,7 +135,7 @@ class SideMenu extends React.PureComponent {
         />
         <NavLink
           iconName="times"
-          label="Logout"
+          label="Log out"
           route={LANDING_ROUTE}
           loggingOut
           logOutUser={this.props.logOutUser}
