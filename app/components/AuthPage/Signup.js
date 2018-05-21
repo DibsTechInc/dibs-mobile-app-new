@@ -27,7 +27,7 @@ const StyledButtonView = styled.View`
 
 const StyledText = styled.Text`
   font-family: flex-font;
-  margin-bottom: 15%;
+  margin-bottom: 7%;
 `;
 
 /**
@@ -142,7 +142,7 @@ class Signup extends Component {
           <InputField
             value={this.props.navigation.state.params.email || ''}
             editable={false}
-            style={{ width: 200 }}
+            style={{ width: 250 }}
             containerStyle={{ marginBottom: 20 }}
           />
           <InputField
@@ -150,7 +150,7 @@ class Signup extends Component {
             value={this.state.fullName}
             onChangeText={fullName => this.setState({ fullName })}
             placeholder="First and last name"
-            style={{ width: 200 }}
+            style={{ width: 250 }}
             containerStyle={{ marginBottom: 20 }}
           />
           <InputField
@@ -158,24 +158,26 @@ class Signup extends Component {
             secureTextEntry
             onChangeText={password => this.setState({ password })}
             placeholder="Password (6 char min)"
-            style={{ width: 200 }}
+            style={{ width: 250 }}
             containerStyle={{ marginBottom: 25 }}
           />
-          <View style={{ flexDirection: 'row', width: 200, justifyContent: 'space-between', marginBottom: 50 }}>
+          <View style={{ width: 250, justifyContent: 'space-between', marginBottom: 20 }}>
             <TouchableOpacity onPress={() => this.props.navigation.navigate(TERMS_AND_CONDITIONS_ROUTE, { url: Config.STUDIO_TERMS_LINK })}>
-              <Text style={{ color: Config.STUDIO_COLOR, fontFamily: 'flex-font' }}>Flex Studios</Text>
+              <Text style={{ color: Config.STUDIO_COLOR, fontFamily: 'flex-font' }}>Flex Studios Terms</Text>
             </TouchableOpacity>
-            <Text> & </Text>
             <TouchableOpacity onPress={() => this.props.navigation.navigate(TERMS_AND_CONDITIONS_ROUTE, { url: Config.DIBS_TERMS_LINK })}>
-              <Text style={{ color: Config.STUDIO_COLOR, fontFamily: 'flex-font' }}>Dibs</Text>
+              <Text style={{ color: Config.STUDIO_COLOR, fontFamily: 'flex-font' }}>Dibs Terms</Text>
             </TouchableOpacity>
           </View>
-          <CheckBox
-            label="I have read and agreed to the terms and conditions"
-            labelStyle={{ fontFamily: 'flex-font' }}
-            checked={this.state.tAndC}
-            onChange={this.handleOnCheck}
-          />
+          <View style={{ width: 250 }}>
+            <CheckBox
+              label="I have read and agreed to the terms"
+              labelStyle={{ fontFamily: 'flex-font', fontSize: 12, flexWrap: 'wrap' }}
+              checked={this.state.tAndC}
+              onChange={this.handleOnCheck}
+            />
+          </View>
+          
         </ScrollView>
         <KeyboardAccessoryView
           alwaysVisible
@@ -185,7 +187,7 @@ class Signup extends Component {
           <StyledButtonView>
             <MaterialButton
               onPress={this.handleOnPress}
-              text="Continue"
+              text="Submit"
               style={{ width: '75%', height: 40 }}
             />
           </StyledButtonView>
