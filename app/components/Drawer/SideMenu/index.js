@@ -15,9 +15,9 @@ import {
 } from '../../../constants';
 import {
   getUsersFullName,
-  getUserTotalCreditsDisplayedAmount,
-  getFormattedUserFlashCreditAmount,
+  getFormattedTotalCreditsWithFlashCredits,
   getUsersFirstPassName,
+  getUserHasFlashCredit,
 } from '../../../selectors';
 import { logOutUser } from '../../../actions';
 import CartIcon from '../../shared/CartIcon';
@@ -105,6 +105,7 @@ class SideMenu extends React.PureComponent {
         <BalanceDisplay
           label="Credit Balance"
           value={this.props.creditBalance}
+          hasFlashCredit={this.props.hasFlashCredit}
         />
         {Boolean(this.props.nextPassName) && (
           <BalanceDisplay
@@ -147,21 +148,20 @@ class SideMenu extends React.PureComponent {
 SideMenu.propTypes = {
   userFullName: PropTypes.string,
   creditBalance: PropTypes.string,
-  flashCreditBalance: PropTypes.string,
+  hasFlashCredit: PropTypes.bool,
   nextPassName: PropTypes.string,
   navigation: PropTypes.shape(),
   logOutUser: PropTypes.func,
 };
 
+const mapStateToProps = state => ({
+  userFullName: getUsersFullName(state),
+  creditBalance: getFormattedTotalCreditsWithFlashCredits(state),
+  nextPassName: getUsersFirstPassName(state),
+  hasFlashCredit: getUserHasFlashCredit(state),
+});
 const mapDispatchToProps = {
   logOutUser,
 };
-
-const mapStateToProps = state => ({
-  userFullName: getUsersFullName(state),
-  creditBalance: getUserTotalCreditsDisplayedAmount(state),
-  flashCreditBalance: getFormattedUserFlashCreditAmount(state),
-  nextPassName: getUsersFirstPassName(state),
-});
 
 export default connect(mapStateToProps, mapDispatchToProps)(SideMenu);
