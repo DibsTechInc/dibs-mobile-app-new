@@ -67,14 +67,12 @@ class InputField extends React.PureComponent {
             {this.props.label}
           </Label>
         ) : null}
-        <View keyboardShouldPersistTaps="never">
-          <TextInput
-            onFocus={this.onFocus}
-            onBlur={this.onBlur}
-            ref={(ref) => { this._textInput = ref; }}
-            {...this.props}
-          />
-        </View>
+        <TextInput
+          onFocus={this.onFocus}
+          onBlur={this.onBlur}
+          ref={(ref) => { this._textInput = ref; }}
+          {...this.props}
+        />
       </StudioColorBottomBorder>
     );
   }
