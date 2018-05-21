@@ -70,8 +70,8 @@ class UpcomingClass extends PureComponent {
       && <HTML html={this.props.description} imagesMaxWidth={Dimensions.get('window').width} />;
 
     return (
-      <FadeInView style={{ marginTop: this.props.forReceiptPage ? 20 : 0 }}>
-        <ScrollView style={{ marginTop: this.props.forReceiptPage ? 20 : 0 }}>
+      <FadeInView style={{ paddingTop: this.props.forReceiptPage ? 10 : 0, paddingBottom: 40, backgroundColor: '#fff' }}>
+        <ScrollView style={{ paddingTop: this.props.forReceiptPage ? 10 : 0, paddingBottom: 40 }}>
           <TransactionBreakdown
             forReceiptPage={this.props.forReceiptPage}
             name={this.props.name}
