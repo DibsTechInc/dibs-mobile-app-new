@@ -1,5 +1,5 @@
 import { requestUserEvents } from '../UpcomingEventsActions';
-import { setUser } from '../UserActions';
+import { refreshUser } from '../UserActions';
 import { requestEventData } from '../EventActions';
 
 /**
@@ -16,7 +16,7 @@ export function addToWaitlist(eventid, callback) {
         body: { eventid },
       });
       if (res.success) {
-        dispatch(setUser(res.user));
+        dispatch(refreshUser(res.user));
         dispatch(requestUserEvents());
       }
       if (res.refreshEvent) dispatch(requestEventData({ eventids: [eventid] }));
@@ -27,3 +27,5 @@ export function addToWaitlist(eventid, callback) {
     return callback(null, { success: false });
   };
 }
+
+export function removeFromWaitlist() {} // TODO

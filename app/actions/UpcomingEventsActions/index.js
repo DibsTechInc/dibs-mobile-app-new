@@ -2,7 +2,7 @@ import { createActions } from 'redux-actions';
 import moment from 'moment-timezone';
 
 import Config from '../../../config.json';
-import { setUser } from '../';
+import { refreshUser } from '../';
 
 export const {
   setUpcomingEvents,
@@ -131,7 +131,7 @@ export function dropUserFromEvent(eventid, callback) {
       });
       if (res.success) {
         dispatch(removeUpcomingEvent(eventid));
-        dispatch(setUser(res.user));
+        dispatch(refreshUser(res.user));
         callback(null);
       } else callback(res);
     } catch (err) {

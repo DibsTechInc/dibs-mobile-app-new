@@ -13,7 +13,7 @@ import {
   clearPackagePromoCode,
   // setEventSoldOut,
   // requestEventData,
-  setUser,
+  refreshUser,
   setTransactionsConfirmed,
   requestUserEvents,
 } from '../';
@@ -222,7 +222,7 @@ export function submitCartForPurchase(callback) {
       });
 
       if (res.success) {
-        dispatch(setUser(res.user));
+        dispatch(refreshUser(res.user));
         dispatch(setTransactionsConfirmed(res.transactions));
         dispatch(clearCart());
         callback(null);

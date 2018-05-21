@@ -3,7 +3,6 @@ import { createAction } from 'redux-actions';
 import {
   LOGIN_ROUTE,
   REGISTER_ROUTE,
-  MAIN_ROUTE,
   PASSWORD_RESET_ROUTE,
 } from '../../constants/RouteConstants';
 import Config from '../../../config.json';
@@ -13,9 +12,21 @@ import {
   requestUserEvents,
   setUpcomingEvents,
   clearCart,
+  refreshCart,
 } from '../index';
 
 export const setUser = createAction('SET_USER', payload => payload);
+
+/**
+ * @param {Object} user json to set in state
+ * @returns {function} thunk
+ */
+export function refreshUser(user) {
+  return function innerRefreshUser(dispatch) {
+    dispatch(setUser(user));
+    dispatch(refreshCart());
+  };
+}
 
 /**
  * @returns {function} thunk
@@ -128,7 +139,7 @@ export function updateUser(payload, callback) {
       });
 
       if (res.success) {
-        dispatch(setUser(res.user));
+        dispatch(refreshUser(res.user));
       }
 
       callback(res);
@@ -153,7 +164,7 @@ export function updateUserPassword(payload, callback) {
       });
 
       if (res.success) {
-        dispatch(setUser(res.user));
+        dispatch(refreshUser(res.user));
       }
 
       callback(res);
@@ -178,7 +189,7 @@ export function updateUserEmailPreferences(list, email, callback) {
       });
 
       if (res.success) {
-        dispatch(setUser(res.user));
+        dispatch(refreshUser(res.user));
       }
 
       callback(res);
