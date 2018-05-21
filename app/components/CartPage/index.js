@@ -5,6 +5,7 @@ import { withNavigation, NavigationActions } from 'react-navigation';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Swipeable from 'react-native-swipeable';
+import { isIphoneX } from 'react-native-iphone-x-helper';
 
 import FadeInView from '../shared/FadeInView';
 import { FlexRow } from '../styled/Views';
@@ -59,8 +60,7 @@ const StyledTopView = styled.View`
 const StyledCheckoutView = styled.View`
   justify-content: space-between;
   align-items: center;
-  height: 110px;
-  border-top-width: 0.3;
+  border-top-width: 1;
   border-color: ${LIGHT_GREY};
   elevation: 3;
   background-color: ${WHITE};
@@ -206,29 +206,32 @@ class CartPage extends Component {
     const renderButtonColor = notReadyForPurchase ? GREY : Config.STUDIO_COLOR;
     const renderLeftButtons = notReadyForPurchase ? null : purchaseButton;
 
-    const renderPurchaseButton = (<View style={{ overflow: 'hidden', backgroundColor: Config.STUDIO_COLOR, width: WIDTH }}>
-      <Swipeable
-        contentContainerStyle={
-        { backgroundColor: renderButtonColor,
-          paddingTop: 15,
-          paddingBottom: 15,
-          borderWidth: 1,
-          borderColor: renderButtonColor,
-        }}
-        leftButtons={renderLeftButtons}
-        onLeftButtonsActivate={this.handlePurchase}
-        leftButtonsActivationDistance={150}
-      >
-        <View style={{ flexDirection: 'row', position: 'relative' }}>
-          <Text style={{ textAlign: 'center', color: WHITE, flex: 1 }}>
-            Swipe to pay
-          </Text>
-          <Text style={{ color: WHITE, position: 'absolute', right: 40 }}>
-            {'>>'}
-          </Text>
-        </View>
-      </Swipeable>
-    </View>);
+    const renderPurchaseButton = (
+      <View style={{ overflow: 'hidden', backgroundColor: Config.STUDIO_COLOR, width: WIDTH }}>
+        <Swipeable
+          contentContainerStyle={{
+            backgroundColor: renderButtonColor,
+            paddingTop: 15,
+            paddingBottom: 15,
+            marginBottom: Number(isIphoneX()) && 30,
+            borderWidth: 1,
+            borderColor: renderButtonColor,
+          }}
+          leftButtons={renderLeftButtons}
+          onLeftButtonsActivate={this.handlePurchase}
+          leftButtonsActivationDistance={150}
+        >
+          <View style={{ flexDirection: 'row', position: 'relative' }}>
+            <Text style={{ textAlign: 'center', color: WHITE, flex: 1 }}>
+              Swipe to pay
+            </Text>
+            <Text style={{ color: WHITE, position: 'absolute', right: 40 }}>
+              {'>>'}
+            </Text>
+          </View>
+        </Swipeable>
+      </View>
+    );
 
     if (this.state.isProcessingPayment) {
       return <FadeInView style={{ backgroundColor: Config.STUDIO_COLOR }}><DibsLoader showText /></FadeInView>;
@@ -307,14 +310,12 @@ class CartPage extends Component {
           <CartTransaction />
         </StyledScrollView>
         <StyledCheckoutView>
-          <View style={{ justifyContent: 'center', alignItems: 'center', width: '100%', height: '50%' }}>
+          <View style={{ justifyContent: 'center', alignItems: 'center', width: '100%', paddingVertical: 15 }}>
             <StyledSavingsText>
               {renderValueBackMessage}
             </StyledSavingsText>
           </View>
-          <FlexRow>
-            {renderPurchaseButton}
-          </FlexRow>
+          {renderPurchaseButton}
         </StyledCheckoutView>
       </FadeInView>
     );
