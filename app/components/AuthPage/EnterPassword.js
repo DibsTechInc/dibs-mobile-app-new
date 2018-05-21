@@ -1,27 +1,32 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import {
-  Alert,
   TouchableOpacity,
-  TouchableWithoutFeedback,
-  Keyboard,
+  ScrollView,
 } from 'react-native';
 import styled from 'styled-components';
 import Promise from 'bluebird';
+import { KeyboardAccessoryView } from 'react-native-keyboard-accessory';
 
 import Config from '../../../config.json';
 
 import { submitLogin, reactivateUserAccount } from '../../actions';
-import FadeInView from '../shared/FadeInView';
-import InputField from '../shared/InputField';
-import DibsLoader from '../shared/DibsLoader';
+import { FadeInView, InputField, DibsLoader, MaterialButton } from '../shared';
+import { DEFAULT_BG } from '../../constants';
 
 import {
   MAIN_ROUTE,
   PASSWORD_RESET_ROUTE,
   LANDING_ROUTE,
 } from '../../constants/RouteConstants/index';
+
+const StyledButtonView = styled.View`
+  padding: 8px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+`;
 
 const ForgotPasswordText = styled.Text`
   font-family: flex-font;
@@ -32,13 +37,15 @@ const ErrorText = styled.Text`
   font-family: flex-font;
   font-size: 12;
   color: red;
+  position: absolute;
+  top: 60%;
 `;
 
 /**
  * @class EnterPassword
  * @extends Component
  */
-class EnterPassword extends Component {
+class EnterPassword extends PureComponent {
   /**
    * @constructor
    * @constructs EnterPassword
@@ -72,7 +79,7 @@ class EnterPassword extends Component {
 
     await new Promise(res => this.setState({ isLoading: true, validInput: true }, res));
     const response = await new Promise(res => this.props.submitLogin(email, this.state.password, res));
-    await new Promise(res => this.setState({ isLoading: false }, res));
+    await new Promise(res => this.setState({ isLoading: false, errorText: '' }, res));
 
     if (response.code !== 200) {
       this.setState({ isLoading: false, errorText: response.message });
@@ -103,8 +110,8 @@ class EnterPassword extends Component {
     }
 
     return (
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <FadeInView style={{ justifyContent: 'center', alignItems: 'center', marginBottom: '30%' }}>
+      <FadeInView>
+        <ScrollView keyboardShouldPersistTaps="always" contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', height: '70%', position: 'relative' }}>
           <InputField
             autoFocus={!this.state.validInput}
             label={(
@@ -132,8 +139,21 @@ class EnterPassword extends Component {
             </ForgotPasswordText>
           </TouchableOpacity>
           {this.state.errorText.length && <ErrorText>{this.state.errorText}</ErrorText>}
-        </FadeInView>
-      </TouchableWithoutFeedback>
+        </ScrollView>
+        <KeyboardAccessoryView
+          alwaysVisible
+          hideBorder
+          style={{ backgroundColor: DEFAULT_BG, marginBottom: 25 }}
+        >
+          <StyledButtonView>
+            <MaterialButton
+              onPress={this.handleOnPress}
+              text="Continue"
+              style={{ width: '75%', height: 40 }}
+            />
+          </StyledButtonView>
+        </KeyboardAccessoryView>
+      </FadeInView>
     );
   }
 }

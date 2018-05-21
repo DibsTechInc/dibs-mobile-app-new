@@ -30,6 +30,7 @@ class InputField extends React.PureComponent {
   componentDidMount() {
     if (this.props.customFocus) this.focusListener = this.props.navigation.addListener('didFocus', () => this._textInput.focus());
   }
+
   /**
    * @returns {undefined}
    */

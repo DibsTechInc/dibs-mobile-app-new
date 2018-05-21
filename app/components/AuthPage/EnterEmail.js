@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, Keyboard } from 'react-native';
 import { KeyboardAccessoryView } from 'react-native-keyboard-accessory';
 import { PropTypes } from 'prop-types';
 import { connect } from 'react-redux';
@@ -46,6 +46,12 @@ class EnterEmail extends PureComponent {
     };
     this.handleOnPress = this.handleOnPress.bind(this);
   }
+   /**
+   * @returns {undefined}
+   */
+  componentWillUnmount() {
+    Keyboard.dismiss();
+  }
     /**
    * @returns {undefined}
    */
@@ -63,7 +69,7 @@ class EnterEmail extends PureComponent {
 
     await new Promise(res => this.setState({ isLoading: true, validInput: true }, res));
     const route = await new Promise(res => this.props.validateEmail(email, res));
-    await new Promise(res => this.setState({ isLoading: false }, res));
+    await new Promise(res => this.setState({ isLoading: false, errorText: '' }, res));
 
     if (!route) {
       this.setState({ isLoading: false, errorText: 'Uh oh, we could not verify this email. Please contact support.' });
