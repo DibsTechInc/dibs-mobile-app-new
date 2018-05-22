@@ -1,10 +1,13 @@
 import { createSelector } from 'reselect';
 import Decimal from 'decimal.js';
 import { format as formatCurrency } from 'currency-formatter';
+import moment from 'moment-timezone';
 import {
   getEventsData,
   getStudioCurrency,
   getStudioLocations,
+  getStudioCustomTimeFormat,
+  getStudioShortDateFormat,
 } from '../';
 
 /**
@@ -21,7 +24,9 @@ export const getConfirmedTransactionsByEvent = createSelector(
   getEventsData,
   getStudioCurrency,
   getStudioLocations,
-  (transactions, events, currency, locations) => transactions.reduce((acc, transaction) => {
+  getStudioCustomTimeFormat,
+  getStudioShortDateFormat,
+  (transactions, events, currency, locations, timeFormat, shortDateFormat) => transactions.reduce((acc, transaction) => {
     const eventTransaction = acc.find(({ eventid }) => transaction.eventid === eventid);
 
     if (!eventTransaction) {
@@ -38,6 +43,12 @@ export const getConfirmedTransactionsByEvent = createSelector(
                                                     .minus(transaction.original_price)
                                                     .toNumber()
       ) : 0;
+
+      const formatTime = time => (
+        time.get('minute') || timeFormat !== 'LT' ?
+          time.format(timeFormat) : time.format('hA')
+      );
+      const localStartTime = moment.tz(confirmedEvent.start_time, confirmedEvent.mainTZ);
       const payload = {
         ...transaction,
         transactionids: [id],
@@ -49,6 +60,11 @@ export const getConfirmedTransactionsByEvent = createSelector(
         address: confirmedEvent.address,
         latitude,
         longitude,
+        locationName: confirmedEvent.location.name,
+        instructorName: confirmedEvent.instructor.name,
+        formattedStartTime: formatTime(localStartTime),
+        shortDayOfWeek: localStartTime.format('ddd'),
+        shortEventDate: localStartTime.format(shortDateFormat),
       };
 
       acc.push(payload);

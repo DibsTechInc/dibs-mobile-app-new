@@ -167,16 +167,21 @@ export const getUpcomingEventCalendarMarkings = createSelector(
  * @param {string} currency code of studio
  * @returns {Array<Object>} upcoming events for expanded slider
  */
-function generateDetailedUpcomingEvents(items, currency, timeFormat, locations) {
-  return items.map((item) => {
+function generateDetailedUpcomingEvents(items, currency, timeFormat, shortDateFormat, locations) {
+  return items.map(({ location, instructor, ...item }) => {
     const chargeAmount = Decimal(item.amount).minus(item.studio_credits_spent).minus(item.global_credits_spent).minus(item.raf_credits_spent);
-    const time = moment.tz(item.start_time, Config.STUDIO_TZ).format(`MMM D, ${timeFormat}`);
-    const eventLocation = locations.length && locations.find(l => l.id === item.location.id);
+    const eventLocation = locations.length && locations.find(l => l.id === location.id);
     const { latitude, longitude } = eventLocation;
+    const localStartTime = moment.tz(item.start_time, item.mainTZ);
+    const formatTime = time => (
+      time.get('minute') || timeFormat !== 'LT' ?
+        time.format(timeFormat) : time.format('hA')
+    );
 
     return {
       ...item,
-      time,
+      shortDayOfWeek: localStartTime.format('ddd'),
+      shortEventDate: localStartTime.format(shortDateFormat),
       formattedSubtotal: formatCurrency(item.original_price, { code: currency, precision: (item.original_price % 1 && 2) }),
       formattedTaxAmount: formatCurrency(item.tax_amount, { code: currency, precision: (item.tax_amount % 1 && 2) }),
       formattedDiscountAmount: formatCurrency(item.discount_amount, { code: currency, precision: (item.discount_amount % 1 && 2) }),
@@ -184,8 +189,11 @@ function generateDetailedUpcomingEvents(items, currency, timeFormat, locations) 
       formattedRAFCreditAmount: formatCurrency(item.raf_credits_spent, { code: currency, precision: (item.studio_credits_spent % 1 && 2) }),
       formattedTotal: formatCurrency(chargeAmount, { code: currency, precision: (item.chargeAmount % 1 && 2) }),
       formattedValueBack: formatCurrency(item.valueBack, { code: currency, precision: (item.chargeAmount % 1 && 2) }),
+      formattedStartTime: formatTime(localStartTime),
       longitude,
       latitude,
+      locationName: location.name,
+      instructorName: instructor.name,
     };
   });
 }
@@ -194,6 +202,7 @@ export const getDetailedMostRecentUpcomingEvents = createSelector(
   getMostRecentUpcomingEvents,
   getStudioCurrency,
   getStudioCustomTimeFormat,
+  getStudioShortDateFormat,
   getStudioLocations,
   generateDetailedUpcomingEvents
 );
@@ -202,6 +211,7 @@ export const getDetailedUpcomingEventsOnCurrentDay = createSelector(
   getUpcomingEventsOnCurrentDate,
   getStudioCurrency,
   getStudioCustomTimeFormat,
+  getStudioShortDateFormat,
   getStudioLocations,
   generateDetailedUpcomingEvents
 );

@@ -1,23 +1,43 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import HTML from 'react-native-render-html';
+import styled from 'styled-components';
 import { View, Dimensions, ScrollView, Alert } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
 import { promisify } from 'bluebird';
 import { connect } from 'react-redux';
+import { isIphoneX } from 'react-native-iphone-x-helper';
 
-import Config from '../../../../config.json';
-import { getDroppingUpcomingEvent } from '../../../selectors';
-import { dropUserFromEvent } from '../../../actions';
-import { WHITE } from '../../../constants';
-import FadeInView from '../FadeInView';
-import TransactionBreakdown from '../TransactionBreakdown';
-import MaterialButton from '../MaterialButton';
-import DibsLoader from '../DibsLoader';
-import { NormalText, HeavyText } from '../../styled';
+import Config from '../../../../../config.json';
+import { WHITE, DARK_TEXT_GREY } from '../../../../constants';
+import { getDroppingUpcomingEvent } from '../../../../selectors';
+import { dropUserFromEvent } from '../../../../actions';
+import FadeInView from '../../FadeInView';
+import TransactionBreakdown from '../../TransactionBreakdown';
+import MaterialButton from '../../MaterialButton';
+import DibsLoader from '../../DibsLoader';
+import { NormalText, HeavyText, SpaceBetweenRow } from '../../../styled';
+import Map from './Map';
 
-const LATITUDE_DELTA = 0.01;
-const LONGITUDE_DELTA = 0.01;
+const EventRow = SpaceBetweenRow.extend`
+  align-items: center;
+  padding-horizontal: 15;
+  padding-vertical: 10;
+  margin-bottom: 10;
+`;
+
+const EventInfo = styled.View`
+  flex-basis: 75%;
+`;
+
+const HeavyEventText = HeavyText.extend`
+  color: ${DARK_TEXT_GREY};
+  font-size: 14;
+`;
+
+const EventText = NormalText.extend`
+  color: ${DARK_TEXT_GREY};
+  font-size: 14;
+`;
 
 /**
  * @class UpcomingClass
@@ -33,12 +53,6 @@ class UpcomingClass extends PureComponent {
     super(props);
     this.startDropClass = this.startDropClass.bind(this);
     this.dropClass = this.dropClass.bind(this);
-  }
-  /**
-   * @returns {undefined}
-   */
-  componentDidMount() {
-    this.map.animateToRegion({ latitude: this.props.latitude, longitude: this.props.longitude, latitudeDelta: LATITUDE_DELTA, longitudeDelta: LONGITUDE_DELTA }, 1);
   }
   /**
    * @returns {undefined}
@@ -74,26 +88,35 @@ class UpcomingClass extends PureComponent {
     return (
       <FadeInView style={{ paddingTop: this.props.forReceiptPage ? 10 : 0, paddingBottom: 40, backgroundColor: WHITE }}>
         <ScrollView style={{ paddingTop: this.props.forReceiptPage ? 10 : 0, paddingBottom: 40 }}>
-          <MapView
-            ref={(ref) => { this.map = ref; }}
-            style={{ height: 200, marginBottom: 10 }}
-            initialRegion={{
-              latitude: this.props.latitude,
-              longitude: this.props.longitude,
-              latitudeDelta: LATITUDE_DELTA,
-              longitudeDelta: LONGITUDE_DELTA,
-            }}
-          >
-            <Marker
-              coordinate={{ latitude: this.props.latitude, longitude: this.props.longitude }}
-              title="My marker"
-              description="blahblah"
-            />
-          </MapView>
+          <EventRow>
+            <EventInfo>
+              <View style={{ marginBottom: 10 }}>
+                <HeavyEventText>
+                  {this.props.shortDayOfWeek} {this.props.shortEventDate}
+                </HeavyEventText>
+                <EventText numberOfLines={1}>
+                  {this.props.formattedStartTime} @ {this.props.locationName}
+                </EventText>
+              </View>
+              <View>
+                <HeavyEventText numberOfLines={1}>
+                  {this.props.name}
+                </HeavyEventText>
+                <EventText numberOfLines={1}>
+                  {this.props.instructorName}
+                </EventText>
+              </View>
+            </EventInfo>
+            <EventText>
+              {this.props.quantity} spot{this.props.quantity > 1 ? 's' : ''}
+            </EventText>
+          </EventRow>
+          <Map
+            latitude={this.props.latitude}
+            longitude={this.props.longitude}
+            locationName={this.props.locationName}
+          />
           <TransactionBreakdown
-            forReceiptPage={this.props.forReceiptPage}
-            name={this.props.name}
-            time={this.props.time}
             formattedSubtotal={this.props.formattedSubtotal}
             taxAmount={this.props.tax_amount}
             formattedTaxAmount={this.props.formattedTaxAmount}
@@ -124,7 +147,7 @@ class UpcomingClass extends PureComponent {
             </View>
           </View>
           {!this.props.forReceiptPage && (
-            <View style={{ alignItems: 'center', paddingBottom: 40 }}>
+            <View style={{ alignItems: 'center', paddingBottom: isIphoneX() ? 80 : 40 }}>
               {this.props.dropping ? (
                 <DibsLoader dotColor={Config.STUDIO_COLOR} maxDotRadius={10} width={160} />
               ) : (
@@ -146,7 +169,6 @@ UpcomingClass.propTypes = {
   forReceiptPage: PropTypes.bool.isRequired,
   formattedSubtotal: PropTypes.string,
   name: PropTypes.string,
-  time: PropTypes.string,
   tax_amount: PropTypes.number,
   formattedTaxAmount: PropTypes.string,
   discount_amount: PropTypes.number,
@@ -160,6 +182,12 @@ UpcomingClass.propTypes = {
   dropping: PropTypes.bool.isRequired,
   latitude: PropTypes.number,
   longitude: PropTypes.number,
+  shortDayOfWeek: PropTypes.string,
+  shortEventDate: PropTypes.string,
+  formattedStartTime: PropTypes.string,
+  locationName: PropTypes.string,
+  instructorName: PropTypes.string,
+  quantity: PropTypes.number,
 };
 
 const mapStateToProps = state => ({

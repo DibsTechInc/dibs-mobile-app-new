@@ -4,7 +4,7 @@ import Swiper from 'react-native-swiper';
 
 import Config from '../../../../config.json';
 import { WHITE, HEIGHT } from '../../../constants';
-import UpcomingClass from './UpcomingClass';
+import UpcomingEvent from './UpcomingEvent';
 
 /**
  * @class UpcomingClasses
@@ -31,7 +31,7 @@ class UpcomingClasses extends PureComponent {
         activeDotStyle={{ backgroundColor: Config.STUDIO_COLOR }}
       >
         {this.props.events.map(event => (
-          <UpcomingClass
+          <UpcomingEvent
             key={event.eventid}
             forReceiptPage={this.props.forReceiptPage}
             {...event}

@@ -3,15 +3,8 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { MaterialPanel } from '../../shared';
 import { LIGHT_GREY } from '../../../constants/ColorConstants';
-import { NormalText } from '../../styled';
 
 import BreakdownRow from './BreakdownRow';
-
-const ClassTime = NormalText.extend`
-  margin-top: -5;
-  margin-bottom: 3;
-  margin-left: 10;
-`;
 
 const StyledBreakDownView = styled.View`
   margin: 10px;
@@ -37,24 +30,11 @@ class TransactionBreakdown extends PureComponent {
   render() {
     return (
       <MaterialPanel
-        heading={this.props.forReceiptPage ? 'Order Summary' : this.props.name}
+        heading="Order Summary"
         style={{ shadowOffset: { width: 3, height: 3 } }}
         headerStyle={{ marginLeft: 10 }}
       >
-        {!this.props.forReceiptPage &&
-          <ClassTime>
-            {this.props.time}
-          </ClassTime>
-        }
         <StyledBreakDownView>
-          {Boolean(this.props.name) && this.props.forReceiptPage &&
-            <BreakdownRow
-              label="Name"
-              value={this.props.name}
-              dots={false}
-            />
-          }
-
           <BreakdownRow label="Subtotal" value={this.props.formattedSubtotal} />
 
           {this.props.promoCodeAmount > 0 &&
@@ -115,9 +95,6 @@ TransactionBreakdown.propTypes = {
   formattedTaxAmount: PropTypes.string,
   discountAmount: PropTypes.number,
   formattedDiscountAmount: PropTypes.string,
-  name: PropTypes.string,
-  time: PropTypes.string,
-  forReceiptPage: PropTypes.bool,
 };
 
 export default TransactionBreakdown;
