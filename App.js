@@ -47,6 +47,7 @@ class App extends Component {
     this.state = {
       fetchedAssets: false,
       userToken: null,
+      errorOccurred: false,
     };
   }
   /**
@@ -59,19 +60,24 @@ class App extends Component {
    * @returns {undefined}
    */
   async getAssets() {
-    const token = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
-    await new Promise(res => store.dispatch(requestStudioData(res)));
-    await Promise.all([
-      Font.loadAsync({
-        'flex-font': SourceSansProRegular,
-        'flex-font-heavy': SourceSansProBold,
-      }),
-      token && new Promise(res => store.dispatch(requestUserData(res))),
-      token && new Promise(res => store.dispatch(requestCreditCardInfo(res))),
-      token && new Promise(res => store.dispatch(requestUserEvents(res))),
-    ]);
-    this.setState({ fetchedAssets: true, userToken: token });
-    if (token) await new Promise(res => store.dispatch(syncUserEvents(res)));
+    try {
+      const token = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
+      await Promise.promisify(cb => store.dispatch(requestStudioData(cb)))();
+      await Promise.all([
+        Font.loadAsync({
+          'flex-font': SourceSansProRegular,
+          'flex-font-heavy': SourceSansProBold,
+        }),
+        token && Promise.promisify(cb => store.dispatch(requestUserData(cb)))(),
+        token && new Promise(res => store.dispatch(requestCreditCardInfo(res))),
+        token && new Promise(res => store.dispatch(requestUserEvents(res))),
+      ]);
+      this.setState({ fetchedAssets: true, userToken: token });
+      if (token) await new Promise(res => store.dispatch(syncUserEvents(res)));
+    } catch (err) {
+      this.setState({ fetchingAssets: false, errorOccurred: true });
+      console.log(err);
+    }
   }
   /**
    * @returns {JSX} XML
@@ -83,7 +89,7 @@ class App extends Component {
           <Navigator userToken={this.state.userToken} />
         ) : (
           <StyledLoadingPage>
-            <DibsLoader />
+            {this.state.errorOccurred ? null : <DibsLoader />}
           </StyledLoadingPage>
         )}
       </Provider>

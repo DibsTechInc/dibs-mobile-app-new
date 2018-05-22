@@ -3,9 +3,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import Config from '../../../config.json';
-import { requestEventData, requestStudioData } from '../../actions';
+import { requestEventData } from '../../actions';
 import {
-  getStudioDibsConfig,
   getEventsAreLoading,
 } from '../../selectors';
 import Header from '../Header';
@@ -67,13 +66,11 @@ SchedulePage.propTypes = {
 
 const mapStateToProps = state => ({
   isLoading: getEventsAreLoading(state),
-  studioConfig: getStudioDibsConfig(state),
   currentDate: state.events.currentDate,
 });
 
 const mapDispatchToProps = {
   requestEventData,
-  requestStudioData,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SchedulePage);

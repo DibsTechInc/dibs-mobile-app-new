@@ -1,4 +1,5 @@
 import { createActions } from 'redux-actions';
+import { Alert } from 'react-native';
 import Config from '../../../config.json';
 
 export const { setStudio, setStudioLoadingTrue, setStudioLoadingFalse } = createActions({
@@ -13,19 +14,29 @@ export const { setStudio, setStudioLoadingTrue, setStudioLoadingFalse } = create
  */
 export function requestStudioData(callback) {
   return async function innerRequestStudioData(dispatch, getState, dibsFetch) {
-    if (getState().studio.loading) return;
+    if (getState().studio.loading) return null;
     try {
       const path = `/api/studio?new_id_format=1&studioid=${Config.DIBS_STUDIO_ID}`;
       dispatch(setStudioLoadingTrue());
       const res = await dibsFetch(path, { method: 'GET' });
       if (res.success) {
         dispatch(setStudio(res.studio));
+        dispatch(setStudioLoadingFalse());
+        return callback();
       }
+      Alert.alert(
+        'Uh oh!',
+        res.message
+      );
+      return callback(res);
     } catch (err) {
       console.log(err);
+      Alert.alert(
+        'Uh oh!',
+        'Something went wrong loading your app.'
+      );
+      return callback(err);
     }
-    dispatch(setStudioLoadingFalse());
-    callback();
   };
 }
 

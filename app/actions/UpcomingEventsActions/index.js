@@ -1,5 +1,6 @@
 import { createActions } from 'redux-actions';
 import moment from 'moment-timezone';
+import { Alert } from 'react-native';
 
 import Config from '../../../config.json';
 import { refreshUser } from '../';
@@ -50,9 +51,10 @@ export function requestUserEvents(callback = () => {}) {
           const minDate = moment(Math.min(...eventDates)).tz(Config.STUDIO_TZ).startOf('day');
           dispatch(setUpcomingEventsCurrentDate(minDate));
         }
-      } else console.log(res);
+      } else Alert.alert('Uh oh!', res.message);
     } catch (err) {
       console.log(err);
+      Alert.alert('Uh oh!', 'Something went wrong getting your upcoming classes.');
     }
     dispatch(setUpcomingEventsLoadingFalse());
     callback();

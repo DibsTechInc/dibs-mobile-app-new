@@ -28,6 +28,14 @@ class Password extends PureComponent {
     this.handleOnSubmit = this.handleOnSubmit.bind(this);
   }
 
+  /**
+   *
+   * @param {boolean} isValid input
+   * @param {Object} payload to submit
+   * @param {Object} validationResults result
+   * @param {function} postSubmit callback
+   * @returns {undefined}
+   */
   async handleOnSubmit(isValid, { confirmPassword, currentPassword, newPassword }, validationResults, postSubmit = null) {
     if (isValid === true) {
       let errMsg = null;
