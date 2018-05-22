@@ -9,7 +9,7 @@ import Config from '../../../../../config.json';
 import { SOFT_GREY, DARK_TEXT_GREY } from '../../../../constants';
 import { dropUserFromEvent } from '../../../../actions';
 import { getDroppingUpcomingEvent } from '../../../../selectors/index';
-import { SpaceBetweenRow, HeavyText } from '../../../styled';
+import { SpaceBetweenRow, HeavyText, NormalText } from '../../../styled';
 import { MaterialButton, DibsLoader } from '../../';
 
 const Container = SpaceBetweenRow.extend`
@@ -29,10 +29,8 @@ const HeavyEventText = HeavyText.extend`
   font-size: 14;
 `;
 
-const EventText = styled.Text`
+const EventText = NormalText.extend`
   color: ${DARK_TEXT_GREY};
-  font-family: flex-font;
-  font-size: 14;
 `;
 
 /**

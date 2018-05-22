@@ -6,6 +6,7 @@ import { withNavigation } from 'react-navigation';
 import { WHITE, TEXT_GREY } from '../../constants';
 import Header from '../Header';
 import { FadeInView, MaterialButton } from '../shared';
+import { NormalText } from '../styled';
 
 const BackButtonContainer = styled.View`
   align-items: center;
@@ -14,10 +15,8 @@ const BackButtonContainer = styled.View`
   width: 100%;
 `;
 
-const BodyText = styled.Text`
+const BodyText = NormalText.extend`
   color: ${TEXT_GREY};
-  font-size: 14;
-  font-family: 'flex-font';
   margin-bottom: 20;
 `;
 

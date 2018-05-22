@@ -18,6 +18,8 @@ import { TERMS_AND_CONDITIONS_ROUTE, MAIN_ROUTE, LOGIN_ROUTE, DEFAULT_BG } from 
 import Config from '../../../config.json';
 import DibsLoader from '../shared/DibsLoader';
 
+import { NormalText } from '../styled';
+
 const StyledButtonView = styled.View`
   padding: 8px;
   flex-direction: row;
@@ -25,8 +27,7 @@ const StyledButtonView = styled.View`
   align-items: center;
 `;
 
-const StyledText = styled.Text`
-  font-family: flex-font;
+const StyledText = NormalText.extend`
   margin-bottom: 7%;
 `;
 
@@ -120,11 +121,13 @@ class Signup extends PureComponent {
     });
   }
   /**
+   * @param{object} urlObj the nav object
    * @returns {undefined}
    */
   handleOnPressNav(urlObj) {
     this.props.navigation.navigate(TERMS_AND_CONDITIONS_ROUTE, urlObj);
   }
+
   /**
    * @returns {JSX} XML
    */

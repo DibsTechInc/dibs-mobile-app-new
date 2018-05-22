@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import { format as formatCurrency } from 'currency-formatter';
 
 import { addToCart, removeOneEventItem } from '../../actions';
@@ -11,15 +11,31 @@ import { getStudioCurrency } from '../../selectors';
 import { TEXT_GREY, GREY, DARK_TEXT_GREY } from '../../constants';
 import Icon from '../shared/Icon';
 import Config from '../../../config.json';
-import { MaterialPanelView } from '../styled';
+import { MaterialPanelView, HeavyText, NormalText } from '../styled';
 
-const StyledCartItemView = styled.View`
-  min-height: 100px;
-  flex-direction: row;
+const StyledCartView = styled.View`
+  justify-content: space-between;
+  flex: 1;
+  margin: 10px;
 `;
 
-const StyledText = styled.Text`
-  font-family: 'flex-font';
+const StyledCartQuantityView = styled.View`
+  border-width: 1px;
+  width: 30px;
+  height: 30px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  border-color: ${Config.STUDIO_COLOR};
+  margin: 10px;
+`;
+
+const DarkGreyNormalText = NormalText.extend`
+  color: ${DARK_TEXT_GREY};
+`;
+
+const GreyNormalText = NormalText.extend`
+  color: ${GREY}
 `;
 
 /**
@@ -66,21 +82,21 @@ class CartItem extends PureComponent {
 
     return (
       <MaterialPanelView style={{ flexDirection: 'row', marginTop: 0 }}>
-        <View style={{ justifyContent: 'space-between', flex: 1, margin: 10 }}>
+        <StyledCartView>
           <View style={{ marginBottom: 10 }}>
-            <Text style={{ fontSize: 16, fontFamily: 'flex-font-heavy' }}>
+            <HeavyText>
               {moment(this.props.startTime).format('ddd M/D')
-            }</Text>
-            <Text style={{ fontSize: 16, fontFamily: 'flex-font', color: DARK_TEXT_GREY }}>
+            }</HeavyText>
+            <DarkGreyNormalText>
               {timeDisplay}
-            </Text>
+            </DarkGreyNormalText>
           </View>
           <View>
-            <Text style={{ fontSize: 16, fontFamily: 'flex-font-heavy' }}>{this.props.name}</Text>
-            <Text style={{ fontSize: 16, fontFamily: 'flex-font', color: DARK_TEXT_GREY }}>{this.props.instructorName}</Text>
-            <Text style={{ fontSize: 16, fontFamily: 'flex-font', color: GREY }}>{formatCurrency(this.props.price, { code: this.props.currency, precision: (this.props.price % 1 && 2) })}</Text>
+            <HeavyText>{this.props.name}</HeavyText>
+            <DarkGreyNormalText>{this.props.instructorName}</DarkGreyNormalText>
+            <GreyNormalText>{formatCurrency(this.props.price, { code: this.props.currency, precision: (this.props.price % 1 && 2) })}</GreyNormalText>
           </View>
-        </View>
+        </StyledCartView>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           {this.props.showCartAdjustments && <Icon
             size={15}
@@ -89,9 +105,9 @@ class CartItem extends PureComponent {
             padding={10}
             onPress={this.removeFromCart}
           />}
-          <View style={{ borderWidth: 1, width: 30, height: 30, justifyContent: 'center', alignItems: 'center', borderRadius: 5, borderColor: Config.STUDIO_COLOR, margin: 10 }}>
-            <Text style={{ fontSize: 16 }}>{this.props.quantity}</Text>
-          </View>
+          <StyledCartQuantityView>
+            <NormalText style={{ fontSize: 16 }}>{this.props.quantity}</NormalText>
+          </StyledCartQuantityView>
           {this.props.showCartAdjustments && this.props.quantity <= 3 && <Icon
             size={15}
             iconName="plus"

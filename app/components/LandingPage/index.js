@@ -13,9 +13,8 @@ import Swiper from 'react-native-swiper';
 import About from './About';
 import { VERIFY_ROUTE } from '../../constants/RouteConstants/index';
 import Config from '../../../config.json';
-import FadeInView from '../shared/FadeInView';
-import { FlexCenter } from '../styled';
-import { MaterialButton, CustomStatusBar } from '../shared';
+import { FadeInView } from '../shared';
+import { MaterialButton, CustomStatusBar, FlexCenter, NormalText } from '../styled';
 
 const StyledView = styled.View`
   flex: 1;
@@ -29,12 +28,7 @@ const StyledWelcomeView = FlexCenter.extend`
   flex: 5;
 `;
 
-const StyledWelcomeText = styled.Text`
-  font-family: 'flex-font';
-  font-size: 14px;
-`;
-
-const StyledGrayText = StyledWelcomeText.extend`
+const StyledGrayText = NormalText.extend`
   color: #b1b1b1;
 `;
 
@@ -95,13 +89,13 @@ class LandingPage extends Component {
           loop={false}
           onIndexChanged={this.handleOnChangeIndex}
         >
-          <FadeInView style={{ flex: 1 }}>
+          <FadeInView>
             <StyledWelcomeView>
-              <StyledWelcomeText>Welcome to FLEX Studios!</StyledWelcomeText>
+              <NormalText>Welcome to FLEX Studios!</NormalText>
               <StyledGrayText>Swipe to learn more</StyledGrayText>
               {this.props.navigation.state.params &&
                 this.props.navigation.state.params.accountReactivated &&
-                <StyledWelcomeText>Your account has been reactivated, please login again</StyledWelcomeText>
+                <NormalText>Your account has been reactivated, please login again</NormalText>
               }
             </StyledWelcomeView>
             <StyledButtonsView>

@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import { withNavigation, NavigationActions } from 'react-navigation';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -33,6 +33,8 @@ import PromoField from './PromoField';
 import Config from '../../../config.json';
 import NoItems from './NoItems';
 
+import { NormalText, HeavyText } from '../styled';
+
 const StyledScrollView = styled.ScrollView`
   flex: 1;
 `;
@@ -61,19 +63,24 @@ const StyledCheckoutView = styled.View`
   background-color: ${WHITE};
 `;
 
-const StyledText = styled.Text`
-  font-family: 'flex-font';
-  font-size: 16px;
+const StyledSwipeText = NormalText.extend`
+  text-align: center;
+  color: ${WHITE};
+  flex: 1;
 `;
 
-const StyledSavingsText = StyledText.extend`
+const StyledSwipeArrows = NormalText.extend`
+  color: ${WHITE};
+  position: absolute;
+  right: 40px;
+`;
+
+const StyledSavingsText = NormalText.extend`
   color: ${BLACK};
 `;
 
-const StyledCenterText = styled.Text`
-  font-family: 'flex-font-heavy';
+const StyledCenterText = HeavyText.extend`
   text-align: center;
-  font-size: 16px;
   color: ${WHITE}
 `;
 
@@ -180,7 +187,7 @@ class CartPage extends PureComponent {
     ];
 
     const notReadyForPurchase = (!(this.props.creditCard.expMonth) || this.props.creditCard.loading || this.state.isUpdatingCard);
-    const renderButtonColor = notReadyForPurchase ? GREY : Config.STUDIO_COLOR;
+    const renderButtonColor = notReadyForPurchase ? LIGHT_GREY : Config.STUDIO_COLOR;
     const renderLeftButtons = notReadyForPurchase ? null : purchaseButton;
 
     const renderPurchaseButton = (
@@ -199,12 +206,12 @@ class CartPage extends PureComponent {
           leftButtonsActivationDistance={150}
         >
           <View style={{ flexDirection: 'row', position: 'relative' }}>
-            <Text style={{ textAlign: 'center', color: WHITE, flex: 1 }}>
+            <StyledSwipeText>
               Swipe to pay
-            </Text>
-            <Text style={{ color: WHITE, position: 'absolute', right: 40 }}>
+            </StyledSwipeText>
+            <StyledSwipeArrows>
               {'>>'}
-            </Text>
+            </StyledSwipeArrows>
           </View>
         </Swipeable>
       </View>

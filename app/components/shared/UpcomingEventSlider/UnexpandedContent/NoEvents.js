@@ -9,15 +9,14 @@ import { getUpcomingEventsNaturalCurrrentDate } from '../../../../selectors';
 import { setScheduleCurrentDate } from '../../../../actions';
 import { DARK_TEXT_GREY, SCHEDULE_ROUTE } from '../../../../constants';
 import { MaterialButton } from '../../../shared';
+import { NormalText } from '../../../styled';
 
 const Container = styled.View`
   align-items: center;
 `;
 
-const NoEventsText = styled.Text`
+const NoEventsText = NormalText.extend`
   color: ${DARK_TEXT_GREY};
-  font-family: 'flex-font';
-  font-size: 14;
   margin-bottom: 20;
   margin-top: 10;
   text-align: center;

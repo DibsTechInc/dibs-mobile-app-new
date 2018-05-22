@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { LIGHT_GREY, WHITE, TEXT_GREY, BLACK } from '../../../../constants';
 import { fadeColor } from '../../../../helpers';
 import { addToCart, removeOneEventItem } from '../../../../actions';
-import { Overlay as StyledOverlay, FlexRow } from '../../../styled';
+import { Overlay as StyledOverlay, FlexRow, NormalText } from '../../../styled';
 import Icon from '../../../shared/Icon';
 
 const EventOverlay = StyledOverlay.extend`
@@ -39,9 +39,8 @@ const IconContainer = styled.View`
   width: 50;
 `;
 
-const Quantity = styled.Text`
+const Quantity = NormalText.extend`
   color: ${TEXT_GREY};
-  font-family: 'flex-font';
   font-size: 16;
 `;
 

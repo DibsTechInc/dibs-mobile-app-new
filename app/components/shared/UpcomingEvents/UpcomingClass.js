@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import HTML from 'react-native-render-html';
-import { View, Text, Dimensions, ScrollView, Alert } from 'react-native';
+import { View, Dimensions, ScrollView, Alert } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { promisify } from 'bluebird';
 import { connect } from 'react-redux';
@@ -14,6 +14,7 @@ import FadeInView from '../FadeInView';
 import TransactionBreakdown from '../TransactionBreakdown';
 import MaterialButton from '../MaterialButton';
 import DibsLoader from '../DibsLoader';
+import { NormalText, HeavyText } from '../../styled';
 
 const LATITUDE_DELTA = 0.01;
 const LONGITUDE_DELTA = 0.01;
@@ -106,20 +107,20 @@ class UpcomingClass extends PureComponent {
           </MapView>
           <View style={{ margin: 10, marginLeft: 10 }}>
             <View>
-              <Text style={{ fontFamily: 'flex-font-heavy' }}>
+              <HeavyText>
                 Class Description:
-              </Text>
-              <Text style={{ fontFamily: 'flex-font' }}>
+              </HeavyText>
+              <NormalText>
                 {classDescriptionHTML || 'No Class Description.'}
-              </Text>
+              </NormalText>
             </View>
             <View style={{ paddingBottom: 10 }}>
-              <Text style={{ fontFamily: 'flex-font-heavy' }}>
+              <HeavyText>
                 Drop Policy:
-              </Text>
-              <Text style={{ fontFamily: 'flex-font' }}>
+              </HeavyText>
+              <NormalText>
                 {Config.STUDIO_DROP_POLICY}
-              </Text>
+              </NormalText>
             </View>
           </View>
           {!this.props.forReceiptPage && (

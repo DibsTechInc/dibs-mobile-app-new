@@ -8,14 +8,13 @@ import styled from 'styled-components';
 import { WHITE, HEIGHT, LIGHT_GREY, TEXT_GREY } from '../../../constants';
 import UnexpandedContent from './UnexpandedContent';
 import UpcomingEvents from '../../shared/UpcomingEvents';
+import { NormalText } from '../../styled';
 
 const FULL_HEIGHT = HEIGHT - 30;
 const SHORTENED_HEIGHT = HEIGHT / 3;
 
-const SwipeInstructions = styled.Text`
+const SwipeInstructions = NormalText.extend`
   color: ${TEXT_GREY};
-  font-family: flex-font;
-  font-size: 14;
   margin-top: 5;
 `;
 

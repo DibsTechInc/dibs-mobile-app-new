@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { WHITE } from '../../constants';
 import Config from '../../../config.json';
 import { lightenDarkenColor } from '../../helpers';
+import { NormalText } from '../styled';
 
 const StyledMaterial = styled.TouchableHighlight`
   align-items: center;
@@ -12,9 +13,8 @@ const StyledMaterial = styled.TouchableHighlight`
   justify-content: center;
 `;
 
-const StyledText = styled.Text`
+const StyledText = NormalText.extend`
   color: ${props => props.textColor};
-  font-family: 'flex-font';
   font-size: ${props => props.fontSize};
 `;
 

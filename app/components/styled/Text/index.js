@@ -1,14 +1,11 @@
 import styled from 'styled-components';
 
-export const CenteredText = styled.Text`
-  text-align: center;
-`;
-
 export const HeavyText = styled.Text`
   font-family: flex-font-heavy;
+  font-size: 14px;
 `;
 
 export const NormalText = styled.Text`
   font-family: flex-font;
-  fontSize: 12px;
+  font-size: 14px;
 `;

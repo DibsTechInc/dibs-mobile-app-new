@@ -14,7 +14,7 @@ import { setScheduleCurrentDate, addDaysToScheduleCurrentDate } from '../../../a
 import CalendarDay from './CalendarDay';
 import { WHITE } from '../../../constants';
 import Config from '../../../../config.json';
-import { FlexRow, FlexCenter } from '../../styled';
+import { FlexRow, FlexCenter, NormalText } from '../../styled';
 
 // Just a shallow array of 7 elements
 
@@ -25,10 +25,10 @@ const Container = styled.View`
   z-index: 5;
 `;
 
-const CalendarHeader = styled.Text`
+const CalendarHeader = NormalText.extend`
   color: ${WHITE};
-  font-size: 14;
   text-align: center;
+  font-size: 14px;
   font-weight: bold;
   margin-bottom: 8;
   margin-top: 4;

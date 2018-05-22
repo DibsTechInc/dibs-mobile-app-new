@@ -1,14 +1,9 @@
 import React, { PureComponent } from 'react';
 import { View, Image } from 'react-native';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 
 import { FadeInView } from '../../shared';
-
-const StyledText = styled.Text`
-  font-family: 'flex-font';
-  font-size: 16px;
-`;
+import { NormalText } from '../../styled';
 
 /**
  * @class CreditCardDisplay
@@ -24,8 +19,8 @@ class CreditCardDisplay extends PureComponent {
         <View>
           <Image source={this.props.cardIcon} style={{ aspectRatio: 0.5, resizeMode: 'contain' }} />
         </View>
-        <StyledText>{this.props.displayCCNum}</StyledText>
-        <StyledText>{this.props.displayDate}</StyledText>
+        <NormalText>{this.props.displayCCNum}</NormalText>
+        <NormalText>{this.props.displayDate}</NormalText>
       </FadeInView>
     );
   }

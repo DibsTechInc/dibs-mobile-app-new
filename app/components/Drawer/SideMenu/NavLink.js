@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { withNavigation } from 'react-navigation';
 import Icon from '../../shared/Icon';
 import { DARK_TEXT_GREY } from '../../../constants';
+import { NormalText } from '../../styled';
 
 const TouchableContainer = styled.TouchableOpacity`
   margin-bottom: -15;
@@ -22,11 +23,9 @@ const IconContainer = styled.View`
   width: 60;
 `;
 
-const LinkText = styled.Text`
+const LinkText = NormalText.extend`
   color: ${DARK_TEXT_GREY};
-  font-size: 16;
 `;
-
 
 /**
  * @class NavLink

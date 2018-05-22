@@ -12,7 +12,7 @@ import {
   getScheduleCurrentDateIsAfterInterval,
 } from '../../../selectors';
 import DibsLoader from '../../shared/DibsLoader';
-import { CenteredText } from '../../styled';
+import { NormalText } from '../../styled';
 import EventListItem from './EventListItem';
 
 const ScrollContainer = styled.ScrollView`
@@ -25,7 +25,8 @@ const ContainerWithMargin = styled.View`
   width: 100%;
 `;
 
-const NoEventsText = CenteredText.extend`
+const NoEventsText = NormalText.extend`
+  text-align: center;
   color: ${DARK_TEXT_GREY};
   font-size: 14;
   width: 75%;

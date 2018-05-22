@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { GREY } from '../../../constants';
 import Config from '../../../../config.json';
 import { Icon } from '../../shared';
+import { NormalText } from '../../styled';
 
 const LabelContainer = styled.View`
   align-items: center;
@@ -13,13 +14,11 @@ const LabelContainer = styled.View`
   margin-bottom: 3;
 `;
 
-const StyledLabelText = styled.Text`
+const StyledLabelText = NormalText.extend`
   color: ${GREY};
-  font-family: 'flex-font';
-  font-size: 14;
 `;
 
-const StyledValueText = styled.Text`
+const StyledValueText = NormalText.extend`
   color: ${Config.STUDIO_COLOR};
   font-size: 20;
   margin-bottom: 10;

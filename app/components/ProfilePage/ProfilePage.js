@@ -40,7 +40,7 @@ class ProfilePage extends PureComponent {
     this.handleFAQRoute = this.handleOnPress.bind(this, FAQ_ROUTE);
     this.handleContactRoute = this.handleOnPress.bind(this, CONTACT_ROUTE);
   }
-   /**
+  /**
    * @returns {undefined}
    */
   async handleLogout() {

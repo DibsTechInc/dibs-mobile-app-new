@@ -30,9 +30,7 @@ const StyledButtonView = styled.View`
   align-items: center;
 `;
 
-const ErrorText = styled.Text`
-  font-family: flex-font;
-  font-size: 12;
+const ErrorText = NormalText.extend`
   color: red;
   position: absolute;
   top: 60%;
