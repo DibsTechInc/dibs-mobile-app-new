@@ -1,4 +1,5 @@
 import { DrawerNavigator } from 'react-navigation';
+import React from 'react';
 import {
   MAIN_ROUTE,
   PROFILE_ROUTE,
@@ -18,7 +19,7 @@ import SideMenu from './SideMenu';
 import ReceiptPage from '../ReceiptPage';
 import UpcomingClassesPage from '../UpcomingClassesPage';
 
-const Drawer = DrawerNavigator({
+export default DrawerNavigator({
   [MAIN_ROUTE]: { screen: MainPage },
   [PROFILE_ROUTE]: { screen: ProfilePage },
   [SCHEDULE_ROUTE]: { screen: SchedulePage },
@@ -26,5 +27,3 @@ const Drawer = DrawerNavigator({
   [CART_ROUTE]: { screen: CartPage },
   [RECEIPT_ROUTE]: { screen: ReceiptPage },
 }, getDrawerConfig(300, 'left', MAIN_ROUTE, SideMenu));
-
-export default Drawer;

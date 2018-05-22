@@ -103,6 +103,7 @@ class Navigator extends Component {
       attempted: false,
       token: null,
     };
+    this.checkAuth = this.checkAuth.bind(this);
   }
   /**
    * @returns {undefined}
@@ -113,7 +114,7 @@ class Navigator extends Component {
   /**
    * @returns {undefined}
    */
-  checkAuth = async () => {
+  async checkAuth() {
     if (this.state.attempted) {
       return;
     }

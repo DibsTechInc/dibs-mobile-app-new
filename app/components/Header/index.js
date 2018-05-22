@@ -4,7 +4,7 @@ import { withNavigation } from 'react-navigation';
 import { View } from 'react-native';
 
 import Config from '../../../config.json';
-import { WHITE, SCHEDULE_ROUTE, CART_ROUTE } from '../../constants';
+import { WHITE } from '../../constants';
 import { FlexRow, HeavyText } from '../styled';
 import { BackArrow, CustomStatusBar, CartIcon } from '../shared';
 
@@ -39,10 +39,11 @@ class Header extends React.PureComponent {
    * @returns {undefined}
    */
   goBack() {
-    if (this.props.navigation.state.params && this.props.navigation.state.params.previousRoute) {
-      this.props.navigation.navigate(this.props.navigation.state.params.previousRoute);
-    }
-    this.props.navigation.goBack();
+    if (
+      this.props.navigation.state.params
+      && this.props.navigation.state.params.previousRoute
+    ) return this.props.navigation.navigate(this.props.navigation.state.params.previousRoute);
+    return this.props.navigation.goBack();
   }
   /**
    * render
