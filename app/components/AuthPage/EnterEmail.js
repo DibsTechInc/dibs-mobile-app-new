@@ -116,7 +116,7 @@ class EnterEmail extends PureComponent {
           <StyledButtonView>
             <MaterialButton
               onPress={this.handleOnPress}
-              text="Continue"
+              text="Next"
               style={{ width: '75%', height: 40 }}
             />
           </StyledButtonView>
