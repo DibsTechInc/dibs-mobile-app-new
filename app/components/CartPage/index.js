@@ -14,6 +14,7 @@ import {
   getConfirmationState,
   getCartValueBack,
   getFormattedCartTotal,
+  getCartIsPurchasing,
 } from '../../selectors';
 import { submitCartForPurchase } from '../../actions';
 import {
@@ -108,11 +109,14 @@ class CartPage extends PureComponent {
   }
 
   /**
+   * @param {Object} props previous props
    * @returns {undefined}
    */
-  componentDidUpdate() {
+  componentDidUpdate(props) {
     if (this.props.confirmedPurchases.length) {
       this.props.navigation.navigate(RECEIPT_ROUTE);
+    } else if (props.purchasing && !this.props.purchasing) {
+      this.endPurchase();
     }
   }
 
@@ -132,6 +136,13 @@ class CartPage extends PureComponent {
   handlePurchase() {
     this.setState({ isProcessingPayment: true });
     this.props.submitCartForPurchase();
+  }
+
+  /**
+   * @returns {undefined}
+   */
+  endPurchase() {
+    this.setState({ isProcessingPayment: false });
   }
 
   /**
@@ -276,6 +287,7 @@ CartPage.propTypes = {
   submitCartForPurchase: PropTypes.func,
   creditCard: PropTypes.shape(),
   confirmedPurchases: PropTypes.arrayOf(PropTypes.shape()),
+  purchasing: PropTypes.bool.isRequired,
 };
 
 const mapStateToProps = state => ({
@@ -285,6 +297,7 @@ const mapStateToProps = state => ({
   formattedCartTotal: getFormattedCartTotal(state),
   creditCard: state.creditCard,
   confirmedPurchases: getConfirmationState(state),
+  purchasing: getCartIsPurchasing(state),
 });
 
 const mapDispatchToProps = {

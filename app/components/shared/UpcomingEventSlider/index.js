@@ -10,7 +10,7 @@ import UnexpandedContent from './UnexpandedContent';
 import UpcomingEvents from '../../shared/UpcomingEvents';
 
 const FULL_HEIGHT = HEIGHT - 30;
-const SHORTENED_HEIGHT = HEIGHT / 3;
+const SHORTENED_HEIGHT = HEIGHT / 2;
 
 const SwipeInstructions = styled.Text`
   color: ${TEXT_GREY};

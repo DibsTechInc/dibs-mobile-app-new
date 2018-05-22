@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { NavigationActions } from 'react-navigation';
+import { Svg, Path } from 'react-native-svg';
 
 import backgroundImg from '../../../assets/img/main-page.png';
 import {
@@ -41,28 +42,39 @@ const MainPageHeader = SpaceBetweenRow.extend`
 
 const Content = styled.View`
   flex: 1;
-  justify-content: ${props => (props.hasUpcomingClasses ? 'center' : 'flex-end')}
-  margin-bottom: ${props => (props.hasUpcomingClasses ? 50 : 150)};
+  justify-content: ${props => (props.hasUpcomingClasses ? 'center' : 'flex-end')};
+  margin-bottom: ${props => (props.hasUpcomingClasses ? 250 : 50)};
+  padding-horizontal: 40;
 `;
 
 const Greeting = HeavyText.extend`
   color: ${WHITE};
   font-size: 32;
-  padding-horizontal: 20;
 `;
 
 const Welcome = styled.Text`
   color: ${LIGHT_GREY};
   font-size: 14;
   font-family: 'flex-font';
-  padding-horizontal: 20;
 `;
 
 const IconRow = FlexRow.extend`
   align-items: flex-end;
+  justify-content: space-between;
   margin-top: 15;
+  position: relative;
   width: 100%;
 `;
+
+const IconBorder = () => (
+  <Svg width={2} height={50}>
+    <Path
+      strokeWidth={1}
+      stroke={WHITE}
+      d="M 1 0 L 1 50"
+    />
+  </Svg>
+);
 
 /**
  * @class MainPage
@@ -108,7 +120,7 @@ class MainPage extends React.PureComponent {
           <CartIcon iconColor={WHITE} />
         </MainPageHeader>
         <Content hasUpcomingClasses={this.props.hasUpcomingClasses}>
-          <Greeting>
+          <Greeting numberOfLines={1}>
             Hi {this.props.userFirstName}!
           </Greeting>
           <Welcome>
@@ -119,17 +131,22 @@ class MainPage extends React.PureComponent {
               iconName="calendar"
               text={'BOOK\nCLASSES'}
               route={SCHEDULE_ROUTE}
+              alignItems="flex-start"
             />
+            <IconBorder />
             <IconLink
               iconName="arrow-up"
               text={'VIEW\nUPCOMING'}
               route={UPCOMING_CLASS_ROUTE}
+              alignItems="center"
             />
+            <IconBorder />
             <IconLink
               iconName="user"
               text={'MANAGE\nACCOUNT'}
               route={PROFILE_ROUTE}
               lastIcon
+              alignItems="flex-end"
             />
           </IconRow>
         </Content>
