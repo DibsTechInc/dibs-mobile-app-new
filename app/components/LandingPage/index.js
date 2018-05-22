@@ -13,8 +13,8 @@ import Swiper from 'react-native-swiper';
 import About from './About';
 import { VERIFY_ROUTE } from '../../constants/RouteConstants/index';
 import Config from '../../../config.json';
-import { FadeInView } from '../shared';
-import { MaterialButton, CustomStatusBar, FlexCenter, NormalText } from '../styled';
+import { FadeInView, CustomStatusBar, MaterialButton } from '../shared';
+import { FlexCenter, NormalText } from '../styled';
 
 const StyledView = styled.View`
   flex: 1;
@@ -73,7 +73,6 @@ class LandingPage extends Component {
    */
   async checkAuth() {
     const token = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
-    console.log(token, 'token')
     if (token) {
       this.props.navigation.navigate('Drawer');
     }
