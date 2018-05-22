@@ -1,15 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { View, TouchableOpacity } from 'react-native';
-import styled from 'styled-components';
 import { DARK_TEXT_GREY } from '../../constants';
-import { MaterialPanelView } from '../styled';
+import { MaterialPanelView, HeavyText } from '../styled';
 
 
-const Heading = styled.Text`
+const Heading = HeavyText.extend`
   color: ${DARK_TEXT_GREY};
   font-size: 16px;
-  font-family: 'flex-font-heavy';
   margin-bottom: 15px;
 `;
 

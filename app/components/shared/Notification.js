@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { WHITE, RED } from '../../constants';
+import { NormalText } from '../styled';
 
 const StyledView = styled.View`
   position: relative;
@@ -24,8 +25,7 @@ const StyledNotification = styled.View`
   top: ${props => props.top};
 `;
 
-const StyledNotificationText = styled.Text`
-  font-family: flex-font;
+const StyledNotificationText = NormalText.extend`
   font-size: ${props => props.fontSize};
   color: ${props => props.notificationTextColor};
 `;

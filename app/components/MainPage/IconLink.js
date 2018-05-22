@@ -5,7 +5,7 @@ import { withNavigation } from 'react-navigation';
 import { View } from 'react-native';
 
 import { WHITE } from '../../constants';
-import { CenteredText } from '../styled';
+import { NormalText } from '../styled';
 import { Icon } from '../shared';
 
 const Link = styled.TouchableOpacity`
@@ -13,7 +13,8 @@ const Link = styled.TouchableOpacity`
   justify-content: space-between;
 `;
 
-const LinkText = CenteredText.extend`
+const LinkText = NormalText.extend`
+  text-align: center;
   color: ${WHITE};
   font-size: 10;
   margin-top: 5;

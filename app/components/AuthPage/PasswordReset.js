@@ -3,10 +3,6 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { promisify } from 'bluebird';
 import styled from 'styled-components';
-import {
-  TouchableWithoutFeedback,
-  Keyboard,
-} from 'react-native';
 
 import Config from '../../../config.json';
 import { LANDING_ROUTE } from '../../constants';

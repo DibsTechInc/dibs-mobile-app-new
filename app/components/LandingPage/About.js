@@ -20,8 +20,7 @@ class About extends Component {
   render() {
     return (
       <StyledView>
-        <Text>About FLEX Studios</Text>
-        <Text>GET RIPPED</Text>
+        <Text>About FLEX Studios - Placeholder</Text>
       </StyledView>
     );
   }

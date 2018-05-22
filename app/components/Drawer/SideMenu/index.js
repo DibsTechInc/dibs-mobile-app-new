@@ -19,7 +19,7 @@ import {
   getUserHasFlashCredit,
 } from '../../../selectors';
 import CartIcon from '../../shared/CartIcon';
-import { SpaceBetweenRow } from '../../styled';
+import { SpaceBetweenRow, HeavyText } from '../../styled';
 import BalanceDisplay from './BalanceDisplay';
 import NavLink from './NavLink';
 
@@ -39,10 +39,9 @@ const StyledCloseButtonContainer = styled.View`
   margin-top: 20;
 `;
 
-const StyledHeavyText = styled.Text`
+const StyledHeavyText = HeavyText.extend`
   color: ${DARK_TEXT_GREY};
   font-size: 20;
-  font-family: 'flex-font-heavy';
   max-width: 180px;
 `;
 

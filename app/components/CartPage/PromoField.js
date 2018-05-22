@@ -9,9 +9,9 @@ import { verifyPromoCode, clearPromoCodeError, clearPromoCodeNotice, clearPromoC
 import MaterialPanel from '../shared/MaterialPanel';
 import MaterialButton from '../shared/MaterialButton';
 import DibsLoader from '../shared/DibsLoader';
-import { FlexRow } from '../styled';
+import { FlexRow, NormalText } from '../styled';
 
-const PromoCodeText = styled.Text`
+const PromoCodeText = NormalText.extend`
   flex: 2;
   margin-right: 10px;
 `;
@@ -30,17 +30,13 @@ const LoaderContainer = styled.View`
   padding-vertical: 10;
 `;
 
-const ErrorMessage = styled.Text`
+const ErrorMessage = NormalText.extend`
   color: ${RED};
-  font-family: 'flex-font';
-  font-size: 14;
   margin-top: 10;
 `;
 
-const NoticeMessage = styled.Text`
+const NoticeMessage = NormalText.extend`
   color: ${DARK_TEXT_GREY};
-  font-family: 'flex-font';
-  font-size: 14;
   margin-top: 10;
 `;
 

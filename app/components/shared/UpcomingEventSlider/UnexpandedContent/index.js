@@ -5,7 +5,7 @@ import { withNavigation } from 'react-navigation';
 import { Svg, Path } from 'react-native-svg';
 
 import { GREY, TEXT_GREY, DARK_TEXT_GREY, SOFT_GREY, UPCOMING_CLASS_ROUTE } from '../../../../constants';
-import { SpaceBetweenRow, HeavyText, FlexRow } from '../../../styled';
+import { SpaceBetweenRow, HeavyText, FlexRow, NormalText } from '../../../styled';
 import EventListItem from './EventListItem';
 import NoEvents from './NoEvents';
 
@@ -15,10 +15,8 @@ const Container = styled.View`
   width: 100%;
 `;
 
-const SwipeInstructions = styled.Text`
+const SwipeInstructions = NormalText.extend`
   color: ${TEXT_GREY};
-  font-family: flex-font;
-  font-size: 14;
   margin-top: -5;
 `;
 
@@ -29,10 +27,8 @@ const TopRow = SpaceBetweenRow.extend`
   width: 100%;
 `;
 
-const UpNext = styled.Text`
+const UpNext = NormalText.extend`
   color: ${GREY};
-  font-size: 14;
-  font-family: flex-font;
 `;
 
 const UpcomingClassLink = styled.TouchableOpacity`
@@ -42,8 +38,6 @@ const UpcomingClassLink = styled.TouchableOpacity`
 
 const ViewMore = HeavyText.extend`
   color: ${DARK_TEXT_GREY};
-  font-size: 14;
-  font-family: flex-font;
   margin-right: 5;
 `;
 
@@ -53,10 +47,9 @@ const PageControl = FlexRow.extend`
   width: 150;
 `;
 
-const EventNumber = styled.Text`
+const EventNumber = NormalText.extend`
   color: ${TEXT_GREY};
   font-size: 16;
-  font-family: flex-font;
 `;
 
 const ArrowContainer = styled.TouchableOpacity`

@@ -12,6 +12,8 @@ import { validateEmail } from '../../actions/UserActions';
 import { DEFAULT_BG } from '../../constants';
 import Config from '../../../config.json';
 
+import { NormalText } from '../styled';
+
 const StyledButtonView = styled.View`
   padding: 8px;
   flex-direction: row;
@@ -19,9 +21,7 @@ const StyledButtonView = styled.View`
   align-items: center;
 `;
 
-const ErrorText = styled.Text`
-  font-family: flex-font;
-  font-size: 12;
+const ErrorText = NormalText.extend`
   color: red;
   position: absolute;
   top: 50%;

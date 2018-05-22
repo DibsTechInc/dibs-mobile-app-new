@@ -7,6 +7,5 @@ const mapStateToProps = state => ({
   sliderEvents: getUpcomingSliderEventsOnCurrentDate(state),
   detailedEvents: getDetailedUpcomingEventsOnCurrentDay(state),
 });
-const mapDispatchToProps = {};
 
-export default connect(mapStateToProps, mapDispatchToProps)(UpcomingEventSlider);
+export default connect(mapStateToProps)(UpcomingEventSlider);

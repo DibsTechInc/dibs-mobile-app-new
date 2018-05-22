@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { View } from 'react-native';
 
 import { LIGHT_GREY, DARK_TEXT_GREY } from '../../../../constants';
-import { FlexRow, FlexCenter, RightAlignedColumn } from '../../../styled';
+import { FlexRow, FlexCenter, RightAlignedColumn, HeavyText } from '../../../styled';
 import Button from './Button';
 import Overlay from './Overlay';
 
@@ -30,24 +30,14 @@ const ButtonColumn = FlexCenter.extend`
   flex-basis: 30%;
 `;
 
-const Price = styled.Text`
+const Price = HeavyText.extend`
   color: ${DARK_TEXT_GREY};
   font-size: 20;
-  font-family: 'flex-font-heavy';
 `;
 
 const ScheduleText = styled.Text`
   color: ${DARK_TEXT_GREY};
   font-size: 12;
-`;
-
-const HeavyText = ScheduleText.extend`
-  font-family: 'flex-font-heavy';
-  font-size: 14;
-`;
-
-const ClassTime = HeavyText.extend`
-  font-size: 14;
 `;
 
 /**
@@ -86,9 +76,9 @@ class EventListItem extends React.PureComponent {
         </PriceColumn>
         <CenterColumn>
           <View style={{ marginBottom: 10 }}>
-            <ClassTime>
+            <HeavyText>
               {this.props.startTimeInLocalTZ} - {this.props.endTimeInLocalTZ}
-            </ClassTime>
+            </HeavyText>
             <ScheduleText numberOfLines={1}>
               {this.props.locationName}
             </ScheduleText>

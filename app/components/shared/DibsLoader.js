@@ -4,6 +4,7 @@ import { Animated, Text } from 'react-native';
 import styled from 'styled-components';
 import { WHITE } from '../../constants';
 import { FadeInView, CustomStatusBar } from './';
+import { NormalText } from '../styled';
 
 const LoaderView = styled.View`
   align-items: center;
@@ -17,6 +18,11 @@ const DotContainer = styled.View`
   flex: 1;
   justify-content: center;
   width: ${props => (props.width / 3)};
+`;
+
+const FadeInViewText = NormalText.extend`
+  margin-bottom: 50px;
+  color: ${WHITE};
 `;
 
 const DibsLoaderDot = props => (
@@ -123,7 +129,7 @@ class DibsLoader extends React.Component {
     return (
       <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
         <CustomStatusBar backgroundColor="transparent" barStyle="light-content" />
-        {this.props.showText && <Text style={{ marginBottom: 50, color: '#fff', fontSize: 13, fontFamily: 'flex-font' }}>If only taking vitamins could be classified as working out</Text>}
+        {this.props.showText && <FadeInViewText>If only taking vitamins could be classified as working out</FadeInViewText>}
         <LoaderView {...this.props}>
           <DibsLoaderDot {...this.props} style={this.getFirstDotStyle()} />
           <DibsLoaderDot {...this.props} style={this.getSecondDotStyle()} />

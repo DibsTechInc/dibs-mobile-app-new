@@ -3,15 +3,14 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { MaterialPanel } from '../../shared';
 import { LIGHT_GREY } from '../../../constants/ColorConstants';
+import { NormalText } from '../../styled';
 
 import BreakdownRow from './BreakdownRow';
 
-const ClassTime = styled.Text`
+const ClassTime = NormalText.extend`
   margin-top: -5;
   margin-bottom: 3;
   margin-left: 10;
-  font-family: flex-font;
-  font-size: 14;
 `;
 
 const StyledBreakDownView = styled.View`
