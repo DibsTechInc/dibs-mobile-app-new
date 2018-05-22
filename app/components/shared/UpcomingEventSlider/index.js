@@ -11,7 +11,7 @@ import UpcomingEvents from '../../shared/UpcomingEvents';
 import { NormalText } from '../../styled';
 
 const FULL_HEIGHT = HEIGHT - 30;
-const SHORTENED_HEIGHT = HEIGHT / 2;
+const SHORTENED_HEIGHT = HEIGHT / 2.5;
 
 const SwipeInstructions = NormalText.extend`
   color: ${TEXT_GREY};

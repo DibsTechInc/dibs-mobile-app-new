@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import Dash from 'react-native-dash';
 
-import { SOLD_OUT_GREY, WHITE } from '../../../constants';
+import { WHITE, SOFT_GREY } from '../../../constants';
 import { FlexRow } from '../../styled';
 
 const StyledView = FlexRow.extend`
@@ -35,7 +35,7 @@ class BreakdownRow extends PureComponent {
           style={{ flex: 1, marginTop: 14 }}
           dashGap={5}
           dashThickness={1.5}
-          dashColor={this.props.dots ? SOLD_OUT_GREY : WHITE}
+          dashColor={this.props.dots ? SOFT_GREY : WHITE}
           dashLength={2}
         />
         <StyledText style={this.props.valueStyle}>

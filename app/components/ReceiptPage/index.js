@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { getConfirmedTransactionsByEvent } from '../../selectors';
 import { clearConfirmation } from '../../actions';
 import { UpcomingEvents, FadeInView } from '../shared';
-import { BLACK, WHITE } from '../../constants';
 import Header from '../Header';
 
 /**
@@ -24,7 +23,7 @@ class ReceiptPage extends PureComponent {
   render() {
     return (
       <FadeInView>
-        <Header iconColor={BLACK} backgroundColor={WHITE} title="" />
+        <Header title="Order Summary" />
         <UpcomingEvents events={this.props.items} />
       </FadeInView>
     );
