@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react';
 
 import Header from '../../Header';
 import { FadeInView, PaymentInfo } from '../../shared';
-import { WHITE, BLACK } from '../../../constants';
 import PersonalDetails from './PersonalDetails';
 import Password from './Password';
 
@@ -26,21 +25,9 @@ class ProfileInfo extends PureComponent {
       isUpdatingPersonalDetails: false,
       isUpdatingPassword: false,
     };
-
-    this.setLoading = this.setLoading.bind(this);
     this.setEditCC = this.setEdit.bind(this, 'isUpdatingCard');
     this.setEditPersonalDetails = this.setEdit.bind(this, 'isUpdatingPersonalDetails');
     this.setEditPassword = this.setEdit.bind(this, 'isUpdatingPassword');
-  }
-
-  /**
-   * @param {bool} bool the state of the loading
-   * @returns {undefined}
-   */
-  setLoading(bool) {
-    this.setState({
-      isLoading: bool,
-    });
   }
 
   /**
@@ -69,9 +56,7 @@ class ProfileInfo extends PureComponent {
           isUpdatingPassword={this.state.isUpdatingPassword}
         />
         <PaymentInfo
-          isLoading={this.state.isLoading}
           isUpdatingCard={this.state.isUpdatingCard}
-          setLoading={this.setLoading}
           setEditCC={this.setEditCC}
         />
       </FadeInView>

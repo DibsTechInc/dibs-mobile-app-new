@@ -58,6 +58,8 @@ export function requestUserData(callback) {
       if (res.success) {
         dispatch(setUser(res.user));
         dispatch(recordStudioVisit());
+        dispatch(requestCreditCardInfo());
+        dispatch(requestUserEvents());
       } else console.log(res);
     } catch (err) {
       console.log(err);
@@ -113,6 +115,7 @@ export function signUpUser(payload, callback) {
       if (res.success) {
         dispatch(setUser(res.user));
         dispatch(recordStudioVisit());
+        dispatch(requestCreditCardInfo());
         dispatch(requestUserEvents());
         return callback(res);
       }
@@ -278,6 +281,7 @@ export function disableUserAccount(callback) {
   return async function innerDisableUserAccount(dispatch, getState, dibsFetch) {
     try {
       const res = await dibsFetch('/api/user', {
+        requiresAuth: true,
         method: 'DELETE',
       });
 
