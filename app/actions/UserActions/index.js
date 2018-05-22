@@ -239,9 +239,12 @@ export function submitLogin(email, password, callback) {
  * @returns {function} thunk
  */
 export function logOutUser(callback = () => {}) {
+  console.log('here!')
   return async function innerLogOutUser(dispatch) {
     try {
+      console.log('here?')
       await AsyncStorage.removeItem(Config.USER_TOKEN_KEY);
+      console.log('here?')
       dispatch(setUser({}));
       dispatch(removeCreditCard());
       dispatch(setUpcomingEvents([]));

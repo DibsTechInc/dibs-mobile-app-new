@@ -7,3 +7,8 @@ export const CenteredText = styled.Text`
 export const HeavyText = styled.Text`
   font-family: flex-font-heavy;
 `;
+
+export const NormalText = styled.Text`
+  font-family: flex-font;
+  fontSize: 12px;
+`;

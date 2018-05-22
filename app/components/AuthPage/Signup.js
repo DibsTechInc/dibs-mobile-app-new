@@ -54,6 +54,8 @@ class Signup extends PureComponent {
     this.handleOnPress = this.handleOnPress.bind(this);
     this.checkForm = this.checkForm.bind(this);
     this.handleOnCheck = this.handleOnCheck.bind(this);
+    this.handleOnPressNavStudioTerms = this.handleOnPressNav.bind(this, { url: Config.STUDIO_TERMS_LINK });
+    this.handleOnPressNavDibsTerms = this.handleOnPressNav.bind(this, { url: Config.DIBS_TERMS_LINK });
   }
 
   /**
@@ -100,7 +102,7 @@ class Signup extends PureComponent {
     if (response.code === 200) {
       this.props.navigation.navigate(MAIN_ROUTE);
     } else if (response.accountDisabled) {
-      this.props.navigation.navigate(LOGIN_ROUTE, { accountDisabled: response.accountDisabled, email: this.props.navigation.state.params.email })
+      this.props.navigation.navigate(LOGIN_ROUTE, { accountDisabled: response.accountDisabled, email: this.props.navigation.state.params.email });
     } else {
       this.setState({ isLoading: false });
       Alert.alert(response.message);
@@ -117,7 +119,12 @@ class Signup extends PureComponent {
       tAndC: !this.state.tAndC,
     });
   }
-
+  /**
+   * @returns {undefined}
+   */
+  handleOnPressNav(urlObj) {
+    this.props.navigation.navigate(TERMS_AND_CONDITIONS_ROUTE, urlObj);
+  }
   /**
    * @returns {JSX} XML
    */
@@ -160,10 +167,10 @@ class Signup extends PureComponent {
             containerStyle={{ marginBottom: 30 }}
           />
           <View style={{ width: 250, justifyContent: 'space-between', marginBottom: 10 }}>
-            <TouchableOpacity style={{ marginBottom: 10 }} onPress={() => this.props.navigation.navigate(TERMS_AND_CONDITIONS_ROUTE, { url: Config.STUDIO_TERMS_LINK })}>
+            <TouchableOpacity style={{ marginBottom: 10 }} onPress={this.handleOnPressNavStudioTerms}>
               <Text style={{ color: Config.STUDIO_COLOR, fontFamily: 'flex-font' }}>Flex Studios Terms</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => this.props.navigation.navigate(TERMS_AND_CONDITIONS_ROUTE, { url: Config.DIBS_TERMS_LINK })}>
+            <TouchableOpacity onPress={this.handleOnPressNavDibsTerms}>
               <Text style={{ color: Config.STUDIO_COLOR, fontFamily: 'flex-font' }}>Dibs Terms</Text>
             </TouchableOpacity>
           </View>

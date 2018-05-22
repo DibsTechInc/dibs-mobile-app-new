@@ -15,6 +15,8 @@ import { submitLogin, reactivateUserAccount } from '../../actions';
 import { FadeInView, InputField, DibsLoader, MaterialButton } from '../shared';
 import { DEFAULT_BG } from '../../constants';
 
+import { NormalText } from '../styled';
+
 import {
   MAIN_ROUTE,
   PASSWORD_RESET_ROUTE,
@@ -26,11 +28,6 @@ const StyledButtonView = styled.View`
   flex-direction: row;
   justify-content: center;
   align-items: center;
-`;
-
-const ForgotPasswordText = styled.Text`
-  font-family: flex-font;
-  font-size: 12;
 `;
 
 const ErrorText = styled.Text`
@@ -134,9 +131,9 @@ class EnterPassword extends PureComponent {
             onPress={this.navigateToPasswordReset}
             style={{ marginBottom: 20 }}
           >
-            <ForgotPasswordText>
+            <NormalText>
               Forgot your password?
-            </ForgotPasswordText>
+            </NormalText>
           </TouchableOpacity>
           {this.state.errorText.length && <ErrorText>{this.state.errorText}</ErrorText>}
         </ScrollView>

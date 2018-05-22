@@ -3,7 +3,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { TouchableOpacity } from 'react-native';
-import { Svg, Line } from 'react-native-svg';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {
   MAIN_ROUTE,
@@ -11,7 +10,6 @@ import {
   SCHEDULE_ROUTE,
   WHITE,
   DARK_TEXT_GREY,
-  LANDING_ROUTE,
   UPCOMING_CLASS_ROUTE,
 } from '../../../constants';
 import {
@@ -20,12 +18,10 @@ import {
   getUsersFirstPassName,
   getUserHasFlashCredit,
 } from '../../../selectors';
-import { logOutUser } from '../../../actions';
 import CartIcon from '../../shared/CartIcon';
 import { SpaceBetweenRow } from '../../styled';
 import BalanceDisplay from './BalanceDisplay';
 import NavLink from './NavLink';
-import Config from '../../../../config.json';
 
 const StyledContainer = styled.View`
   background: ${WHITE};
@@ -70,6 +66,7 @@ class SideMenu extends React.PureComponent {
   close() {
     this.props.navigation.navigate('DrawerClose');
   }
+
   /**
    * render
    * @returns {JSX.Element} HTML
@@ -119,13 +116,6 @@ class SideMenu extends React.PureComponent {
           label="Upcoming Classes"
           route={UPCOMING_CLASS_ROUTE}
         />
-        <NavLink
-          iconName="times"
-          label="Log out"
-          route={LANDING_ROUTE}
-          loggingOut
-          logOutUser={this.props.logOutUser}
-        />
       </StyledContainer>
     );
   }
@@ -137,7 +127,6 @@ SideMenu.propTypes = {
   hasFlashCredit: PropTypes.bool,
   nextPassName: PropTypes.string,
   navigation: PropTypes.shape(),
-  logOutUser: PropTypes.func,
 };
 
 const mapStateToProps = state => ({
@@ -146,8 +135,5 @@ const mapStateToProps = state => ({
   nextPassName: getUsersFirstPassName(state),
   hasFlashCredit: getUserHasFlashCredit(state),
 });
-const mapDispatchToProps = {
-  logOutUser,
-};
 
-export default connect(mapStateToProps, mapDispatchToProps)(SideMenu);
+export default connect(mapStateToProps)(SideMenu);
