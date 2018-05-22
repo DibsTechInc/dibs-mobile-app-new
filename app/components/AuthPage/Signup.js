@@ -8,8 +8,8 @@ import {
   View,
   ScrollView,
 } from 'react-native';
+import { CheckBox } from 'react-native-elements';
 import styled from 'styled-components';
-import CheckBox from 'react-native-checkbox';
 import { KeyboardAccessoryView } from 'react-native-keyboard-accessory';
 import Promise from 'bluebird';
 import { signUpUser } from '../../actions/UserActions';
@@ -122,8 +122,6 @@ class Signup extends Component {
    * @returns {JSX} XML
    */
   render() {
-    const showButton = this.checkForm().canShowButton;
-
     if (this.state.isLoading) {
       return (
         <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -159,25 +157,26 @@ class Signup extends Component {
             onChangeText={password => this.setState({ password })}
             placeholder="Password (6 char min)"
             style={{ width: 250 }}
-            containerStyle={{ marginBottom: 25 }}
+            containerStyle={{ marginBottom: 30 }}
           />
-          <View style={{ width: 250, justifyContent: 'space-between', marginBottom: 20 }}>
-            <TouchableOpacity onPress={() => this.props.navigation.navigate(TERMS_AND_CONDITIONS_ROUTE, { url: Config.STUDIO_TERMS_LINK })}>
+          <View style={{ width: 250, justifyContent: 'space-between', marginBottom: 10 }}>
+            <TouchableOpacity style={{ marginBottom: 10 }} onPress={() => this.props.navigation.navigate(TERMS_AND_CONDITIONS_ROUTE, { url: Config.STUDIO_TERMS_LINK })}>
               <Text style={{ color: Config.STUDIO_COLOR, fontFamily: 'flex-font' }}>Flex Studios Terms</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => this.props.navigation.navigate(TERMS_AND_CONDITIONS_ROUTE, { url: Config.DIBS_TERMS_LINK })}>
               <Text style={{ color: Config.STUDIO_COLOR, fontFamily: 'flex-font' }}>Dibs Terms</Text>
             </TouchableOpacity>
           </View>
-          <View style={{ width: 250 }}>
+          <View style={{ width: 250, height: 30, position: 'relative', marginTop: 35 }}>
             <CheckBox
-              label="I have read and agreed to the terms"
-              labelStyle={{ fontFamily: 'flex-font', fontSize: 12, flexWrap: 'wrap' }}
+              title="I have read and agreed to the terms"
               checked={this.state.tAndC}
-              onChange={this.handleOnCheck}
+              containerStyle={{ backgroundColor: DEFAULT_BG, position: 'absolute', bottom: 0, left: -22 }}
+              textStyle={{ fontFamily: 'flex-font', fontSize: 12 }}
+              onPress={this.handleOnCheck}
+              size={20}
             />
           </View>
-          
         </ScrollView>
         <KeyboardAccessoryView
           alwaysVisible
