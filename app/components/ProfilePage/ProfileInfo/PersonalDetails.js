@@ -63,7 +63,7 @@ class PersonalDetails extends PureComponent {
 
     return (
       <MaterialPanel
-        height={'100%'}
+        height={'40%'}
         style={{ shadowOffset: { width: 3, height: 3 } }}
         heading="Personal Details"
         headingRight={this.props.isUpdatingPersonalDetails ? 'Cancel' : 'Change'}
@@ -75,7 +75,7 @@ class PersonalDetails extends PureComponent {
           formName="personalDetailsForm" // GiftedForm instances that use the same name will also share the same states
           style={{ backgroundColor: 'white' }}
           clearOnClose // delete the values of the form when unmounted
-
+          scrollEnabled={false}
           defaults={{
             firstName: this.props.firstName,
             lastName: this.props.lastName,
@@ -142,6 +142,7 @@ class PersonalDetails extends PureComponent {
               submitButton: {
                 backgroundColor: Config.STUDIO_COLOR,
                 margin: 0,
+                marginTop: 10,
               },
             }}
             onSubmit={this.handleOnSubmit}

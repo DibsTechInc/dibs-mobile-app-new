@@ -77,7 +77,6 @@ class PasswordReset extends React.PureComponent {
    * @returns {JSX.Element} HTML
    */
   render() {
-
     const successMessage = `An email was sent to ${this.props.navigation.state.params.email} with instructions to reset your password at ${this.props.studioDomain}.`;
     return (
       <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>

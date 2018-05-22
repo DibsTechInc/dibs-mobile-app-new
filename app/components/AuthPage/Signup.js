@@ -186,7 +186,7 @@ class Signup extends Component {
           <StyledButtonView>
             <MaterialButton
               onPress={this.handleOnPress}
-              text="Submit"
+              text="Register"
               style={{ width: '75%', height: 40 }}
             />
           </StyledButtonView>

@@ -1,8 +1,7 @@
 import React, { PureComponent } from 'react';
-
+import { ScrollView } from 'react-native';
 import Header from '../../Header';
 import { FadeInView, PaymentInfo } from '../../shared';
-import { WHITE, BLACK } from '../../../constants';
 import PersonalDetails from './PersonalDetails';
 import Password from './Password';
 
@@ -60,20 +59,22 @@ class ProfileInfo extends PureComponent {
     return (
       <FadeInView>
         <Header title="Personal Details" />
-        <PersonalDetails
-          setEditPersonalDetails={this.setEditPersonalDetails}
-          isUpdatingPersonalDetails={this.state.isUpdatingPersonalDetails}
-        />
-        <Password
-          setEditPassword={this.setEditPassword}
-          isUpdatingPassword={this.state.isUpdatingPassword}
-        />
-        <PaymentInfo
-          isLoading={this.state.isLoading}
-          isUpdatingCard={this.state.isUpdatingCard}
-          setLoading={this.setLoading}
-          setEditCC={this.setEditCC}
-        />
+        <ScrollView>
+          <PersonalDetails
+            setEditPersonalDetails={this.setEditPersonalDetails}
+            isUpdatingPersonalDetails={this.state.isUpdatingPersonalDetails}
+          />
+          <Password
+            setEditPassword={this.setEditPassword}
+            isUpdatingPassword={this.state.isUpdatingPassword}
+          />
+          <PaymentInfo
+            isLoading={this.state.isLoading}
+            isUpdatingCard={this.state.isUpdatingCard}
+            setLoading={this.setLoading}
+            setEditCC={this.setEditCC}
+          />
+        </ScrollView>
       </FadeInView>
     );
   }

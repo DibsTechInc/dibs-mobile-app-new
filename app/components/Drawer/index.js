@@ -1,5 +1,5 @@
 import { DrawerNavigator } from 'react-navigation';
-import React from 'react';
+
 import {
   MAIN_ROUTE,
   PROFILE_ROUTE,

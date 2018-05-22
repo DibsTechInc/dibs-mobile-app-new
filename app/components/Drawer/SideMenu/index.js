@@ -3,7 +3,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { TouchableOpacity } from 'react-native';
-import { Svg, Path } from 'react-native-svg';
+import { Svg, Line } from 'react-native-svg';
+import Icon from 'react-native-vector-icons/Ionicons';
 import {
   MAIN_ROUTE,
   PROFILE_ROUTE,
@@ -78,22 +79,7 @@ class SideMenu extends React.PureComponent {
       <StyledContainer>
         <StyledCloseButtonContainer style={{ justifyContent: 'flex-start' }}>
           <TouchableOpacity onPress={this.close}>
-            <Svg height={30} width={30}>
-              <Path
-                stroke={Config.STUDIO_COLOR}
-                strokeWidth={3}
-                d="M 12 5 L 2 15 L 12 25"
-                fill="none"
-                strokeLinecap="round"
-              />
-              <Path
-                stroke={Config.STUDIO_COLOR}
-                strokeWidth={3}
-                d="M 3 15 L 28 15"
-                fill="none"
-                strokeLinecap="round"
-              />
-            </Svg>
+            <Icon name="ios-close" color="#000" size={48} />
           </TouchableOpacity>
         </StyledCloseButtonContainer>
         <StyledHeader>
