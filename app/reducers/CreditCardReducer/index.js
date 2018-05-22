@@ -7,9 +7,8 @@ import {
 } from '../../actions/CreditCardActions';
 
 export default handleActions({
-  [combineActions(
-    setCreditCard,
-    removeCreditCard)]: (state, { payload }) => ({ ...state, ...payload }),
+  [setCreditCard]: (state, { payload }) => ({ ...state, ...payload }),
+  [removeCreditCard]: state => ({ loading: state.loading }),
   [combineActions(
     setCreditCardLoadingTrue,
     setCreditCardLoadingFalse)]: (state, { payload }) => ({ ...state, loading: payload }),
