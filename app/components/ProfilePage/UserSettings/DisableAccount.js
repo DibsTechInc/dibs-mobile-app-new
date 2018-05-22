@@ -133,7 +133,7 @@ class DisableAccount extends PureComponent {
 
     return (
       <MaterialPanel
-        height={'100%'}
+        height={'20%'}
         style={{ shadowOffset: { width: 3, height: 3 } }}
         heading="Disable Account"
         headingRight={this.props.isUpdatingDisableAccount ? 'Cancel' : 'Change'}
