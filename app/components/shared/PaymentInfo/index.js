@@ -95,11 +95,8 @@ class PaymentInfo extends PureComponent {
       },
     };
 
-    this.props.setLoading(true);
     await new Promise(resolve => this.props.updateCreditCard(payload, resolve));
-
     if (hasCC) this.props.setEditCC();
-    this.props.setLoading(false);
   }
 
   /**
@@ -208,7 +205,7 @@ class PaymentInfo extends PureComponent {
       editLabel = this.props.isUpdatingCard ? 'Cancel' : 'Change';
     }
 
-    if (this.props.isLoading) {
+    if (this.props.creditCard.loading) {
       return (
         <MaterialPanel
           height={displayHeight}
@@ -246,8 +243,6 @@ class PaymentInfo extends PureComponent {
 PaymentInfo.propTypes = {
   creditCard: PropTypes.shape().isRequired,
   updateCreditCard: PropTypes.func.isRequired,
-  isLoading: PropTypes.bool.isRequired,
-  setLoading: PropTypes.func.isRequired,
   isUpdatingCard: PropTypes.bool.isRequired,
   setEditCC: PropTypes.func.isRequired,
 };

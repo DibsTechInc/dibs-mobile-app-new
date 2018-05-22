@@ -94,19 +94,15 @@ class CartPage extends PureComponent {
   /**
    * @constructor
    * @constructs CartPage
+   * @param {Object} props for component
    */
-  constructor() {
-    super();
-
-    this.toPreviousPage = this.toPreviousPage.bind(this);
-
+  constructor(props) {
+    super(props);
     this.state = {
-      isLoading: false,
       isUpdatingCard: false,
       isProcessingPayment: false,
     };
-
-    this.setLoading = this.setLoading.bind(this);
+    this.toPreviousPage = this.toPreviousPage.bind(this);
     this.setEditCC = this.setEditCC.bind(this);
     this.handlePurchase = this.handlePurchase.bind(this);
   }
@@ -118,16 +114,6 @@ class CartPage extends PureComponent {
     if (this.props.confirmedPurchases.length) {
       this.props.navigation.navigate(RECEIPT_ROUTE);
     }
-  }
-
-  /**
-   * @param {bool} bool the state of the loading
-   * @returns {undefined}
-   */
-  setLoading(bool) {
-    this.setState({
-      isLoading: bool,
-    });
   }
 
   /**
@@ -193,7 +179,7 @@ class CartPage extends PureComponent {
       <StyledContinueButton />,
     ];
 
-    const notReadyForPurchase = (!(this.props.creditCard.expMonth) || this.state.isLoading || this.state.isUpdatingCard);
+    const notReadyForPurchase = (!(this.props.creditCard.expMonth) || this.props.creditCard.loading || this.state.isUpdatingCard);
     const renderButtonColor = notReadyForPurchase ? GREY : Config.STUDIO_COLOR;
     const renderLeftButtons = notReadyForPurchase ? null : purchaseButton;
 
@@ -262,9 +248,7 @@ class CartPage extends PureComponent {
             />
           ))}
           <PaymentInfo
-            isLoading={this.state.isLoading}
             isUpdatingCard={this.state.isUpdatingCard}
-            setLoading={this.setLoading}
             setEditCC={this.setEditCC}
           />
           <PromoField />

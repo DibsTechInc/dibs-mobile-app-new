@@ -1,5 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
+import { withNavigation } from 'react-navigation';
 
 import { WHITE, TEXT_GREY } from '../../constants';
 import Header from '../Header';
@@ -24,7 +26,25 @@ const BodyText = styled.Text`
  * @extends {React.PureComponent}
  */
 class NoItems extends React.PureComponent {
-  goBack() { /* TODO */ }
+  /**
+   * @constructor
+   * @constructs NoItems
+   * @param {Object} props for component
+   */
+  constructor(props) {
+    super(props);
+    this.goBack = this.goBack.bind(this);
+  }
+  /**
+   * @returns {undefined}
+   */
+  goBack() {
+    if (
+      this.props.navigation.state.params
+      && this.props.navigation.state.params.previousRoute
+    ) return this.props.navigation.navigate(this.props.navigation.state.params.previousRoute);
+    return this.props.navigation.goBack();
+  }
   /**
    * render
    * @returns {JSX.Element} HTML
@@ -48,6 +68,8 @@ class NoItems extends React.PureComponent {
   }
 }
 
-NoItems.propTypes = {};
+NoItems.propTypes = {
+  navigation: PropTypes.shape(),
+};
 
-export default NoItems;
+export default withNavigation(NoItems);
