@@ -11,7 +11,8 @@ import {
 import { CheckBox } from 'react-native-elements';
 import styled from 'styled-components';
 import { KeyboardAccessoryView } from 'react-native-keyboard-accessory';
-import Promise from 'bluebird';
+import { promisify } from 'bluebird';
+
 import { signUpUser } from '../../actions/UserActions';
 import { MaterialButton, CustomStatusBar, FadeInView, InputField } from '../shared';
 import { TERMS_AND_CONDITIONS_ROUTE, MAIN_ROUTE, LOGIN_ROUTE, DEFAULT_BG } from '../../constants';
@@ -99,17 +100,16 @@ class Signup extends PureComponent {
     };
 
     this.setState({ isLoading: true });
-    const response = await new Promise(res => this.props.signUpUser(payload, res));
-    if (response.code === 200) {
-      this.props.navigation.navigate(MAIN_ROUTE);
-    } else if (response.accountDisabled) {
-      this.props.navigation.navigate(LOGIN_ROUTE, { accountDisabled: response.accountDisabled, email: this.props.navigation.state.params.email });
-    } else {
+    try {
+      await promisify(this.props.signUpUser.bind(this, payload))();
+      return this.props.navigation.navigate(MAIN_ROUTE);
+    } catch (err) {
       this.setState({ isLoading: false });
-      Alert.alert(response.message);
+      if (err.message === 'Account disabled') {
+        return this.props.navigation.navigate(LOGIN_ROUTE, { accountDisabled: true, email: this.props.navigation.state.params.email });
+      }
+      return null;
     }
-
-    return null;
   }
 
   /**

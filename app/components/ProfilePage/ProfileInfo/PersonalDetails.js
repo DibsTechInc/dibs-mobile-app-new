@@ -28,6 +28,14 @@ class PersonalDetails extends PureComponent {
     this.handleOnSubmit = this.handleOnSubmit.bind(this);
   }
 
+  /**
+   *
+   * @param {boolean} isValid input
+   * @param {Object} payload to submit
+   * @param {Object} validationResults result
+   * @param {function} postSubmit callback
+   * @returns {undefined}
+   */
   async handleOnSubmit(isValid, { email, firstName, lastName }, validationResults, postSubmit = null) {
     if (isValid === true) {
       const payload = { email, firstName, lastName };

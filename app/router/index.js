@@ -104,7 +104,6 @@ class Navigator extends Component {
       token: null,
     };
     this.checkAuth = this.checkAuth.bind(this);
-    console.log(props.navigation);
   }
   /**
    * @returns {undefined}

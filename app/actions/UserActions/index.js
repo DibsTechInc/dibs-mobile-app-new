@@ -1,4 +1,4 @@
-import { AsyncStorage } from 'react-native';
+import { AsyncStorage, Alert } from 'react-native';
 import { createAction } from 'redux-actions';
 import {
   LOGIN_ROUTE,
@@ -60,9 +60,13 @@ export function requestUserData(callback) {
         dispatch(recordStudioVisit());
         dispatch(requestCreditCardInfo());
         dispatch(requestUserEvents());
-      } else console.log(res);
+      } else {
+        Alert.alert('Uh oh!', res.message);
+        callback(res);
+      }
     } catch (err) {
-      console.log(err);
+      Alert.alert('Uh oh!', 'Something went wrong loading the app.');
+      callback(err);
     }
     callback();
   };
@@ -92,9 +96,11 @@ export function validateEmail(email, callback) {
       if (res.message === 'No user with that email') {
         return callback(REGISTER_ROUTE);
       }
+      Alert.alert('Uh oh!', res.message);
       return callback(null);
     } catch (err) {
       console.log(err);
+      Alert.alert('Uh oh!', 'Something went wrong validating your email.');
       return callback(null);
     }
   };
@@ -117,12 +123,46 @@ export function signUpUser(payload, callback) {
         dispatch(recordStudioVisit());
         dispatch(requestCreditCardInfo());
         dispatch(requestUserEvents());
-        return callback(res);
+        return callback();
+      }
+      if (res.accountDisabled) {
+        throw new Error('Account disabled');
       }
       return callback(res);
     } catch (err) {
       console.log(err);
-      return callback(null);
+      return callback(err);
+    }
+  };
+}
+
+/**
+ * @param {string} email of user
+ * @param {string} password user entered
+ * @param {function} callback on complete
+ * @returns {function} thunk
+ */
+export function submitLogin(email, password, callback) {
+  return async function innerUserLogin(dispatch, getState, dibsFetch) {
+    try {
+      const res = await dibsFetch('/api/user/login', {
+        method: 'POST',
+        body: {
+          email,
+          password,
+        },
+      });
+      if (res.success) {
+        dispatch(setUser(res.user));
+        dispatch(recordStudioVisit());
+        dispatch(requestCreditCardInfo());
+        dispatch(requestUserEvents());
+        callback(res);
+      } else {
+        callback(res);
+      }
+    } catch (err) {
+      console.log(err);
     }
   };
 }
@@ -144,11 +184,10 @@ export function updateUser(payload, callback) {
       if (res.success) {
         dispatch(refreshUser(res.user));
       }
-
       callback(res);
     } catch (err) {
       console.log(err);
-      callback(null);
+      callback({ message: 'Something went wrong updating your account.' });
     }
   };
 }
@@ -204,47 +243,13 @@ export function updateUserEmailPreferences(list, email, callback) {
 }
 
 /**
- * @param {string} email of user
- * @param {string} password user entered
- * @param {function} callback on complete
- * @returns {function} thunk
- */
-export function submitLogin(email, password, callback) {
-  return async function innerUserLogin(dispatch, getState, dibsFetch) {
-    try {
-      const res = await dibsFetch('/api/user/login', {
-        method: 'POST',
-        body: {
-          email,
-          password,
-        },
-      });
-      if (res.success) {
-        dispatch(setUser(res.user));
-        dispatch(recordStudioVisit());
-        dispatch(requestCreditCardInfo());
-        dispatch(requestUserEvents());
-        callback(res);
-      } else {
-        callback(res);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
-}
-
-/**
  * @param {function} callback on complete
  * @returns {function} thunk
  */
 export function logOutUser(callback = () => {}) {
-  console.log('here!')
   return async function innerLogOutUser(dispatch) {
     try {
-      console.log('here?')
       await AsyncStorage.removeItem(Config.USER_TOKEN_KEY);
-      console.log('here?')
       dispatch(setUser({}));
       dispatch(removeCreditCard());
       dispatch(setUpcomingEvents([]));

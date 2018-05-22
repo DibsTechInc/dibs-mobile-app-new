@@ -64,19 +64,37 @@ class DisableAccount extends PureComponent {
     this.handleOnChange = this.handleOnChange.bind(this);
   }
 
+  /**
+   *
+   * @param {boolean} isValid input
+   * @param {Object} payload to submit
+   * @param {Object} validationResults result
+   * @param {function} postSubmit callback
+   * @returns {undefined}
+   */
   async handleOnSubmit(isValid, { email, firstName, lastName }, validationResults, postSubmit = null) {
     this.setState({ dialogVisible: true });
     postSubmit();
   }
 
+  /**
+   * @param {string} email users email
+   * @returns {undefined}
+   */
   handleOnChange(email) {
     this.setState({ email });
   }
 
+  /**
+   * @returns {undefined}
+   */
   handleCancel() {
     this.setState({ dialogVisible: false });
   }
 
+  /**
+   * @returns {undefined}
+   */
   async handleDelete() {
     if (this.state.email !== this.props.userEmail) {
       this.setState({
@@ -95,6 +113,9 @@ class DisableAccount extends PureComponent {
     }
   }
 
+  /**
+   * @returns {JSX} XML
+   */
   render() {
     if (!this.props.isUpdatingDisableAccount) {
       return (
