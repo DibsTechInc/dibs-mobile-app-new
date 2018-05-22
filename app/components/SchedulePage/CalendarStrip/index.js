@@ -106,10 +106,11 @@ class CalendarStrip extends PureComponent {
     }
   }
   /**
-   * @param {Object} date selected
+   * @param {Object} d date selected before being turned into a moment instance
    * @returns {undefined}
    */
-  onDateSelected(date) {
+  onDateSelected(d) {
+    const date = moment(d);
     const invalidSelection = date.isBefore(this.state.startingDate);
     if (invalidSelection) return;
     this.props.setScheduleCurrentDate(moment(date, Config.STUDIO_TZ));

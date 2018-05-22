@@ -5,7 +5,7 @@ import { withNavigation } from 'react-navigation';
 import { Svg, Path } from 'react-native-svg';
 
 import { GREY, TEXT_GREY, DARK_TEXT_GREY, SOFT_GREY, UPCOMING_CLASS_ROUTE } from '../../../../constants';
-import { SpaceBetweenRow, HeavyText, FlexRow, NormalText } from '../../../styled';
+import { SpaceBetweenRow, FlexRow, NormalText } from '../../../styled';
 import EventListItem from './EventListItem';
 import NoEvents from './NoEvents';
 
@@ -29,16 +29,6 @@ const TopRow = SpaceBetweenRow.extend`
 
 const UpNext = NormalText.extend`
   color: ${GREY};
-`;
-
-const UpcomingClassLink = styled.TouchableOpacity`
-  align-items: center;
-  flex-direction: row;
-`;
-
-const ViewMore = HeavyText.extend`
-  color: ${DARK_TEXT_GREY};
-  margin-right: 5;
 `;
 
 const PageControl = FlexRow.extend`
@@ -121,15 +111,6 @@ class Unexpanded extends React.PureComponent {
             <UpNext>
               Up next...
             </UpNext>
-            <UpcomingClassLink onPress={this.navigateToUpcoming}>
-              <ViewMore>
-                VIEW MORE
-              </ViewMore>
-              <Svg width={20} height={15}>
-                <ArrowPath d="M 2 7.5 L 18 7.5" />
-                <ArrowPath d="M 12 2 L 18 7.5 L 12 13" />
-              </Svg>
-            </UpcomingClassLink>
           </TopRow>
         )}
         {this.props.events.length ? (

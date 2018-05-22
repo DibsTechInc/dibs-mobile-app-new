@@ -11,7 +11,7 @@ export default StyleSheet.create({
   },
   dateName: {
     fontSize: 12,
-    fontFamily: 'flex-font',
+    fontFamily: 'flex-font-heavy',
     textAlign: 'center',
   },
   dateNumber: {
@@ -21,7 +21,7 @@ export default StyleSheet.create({
   },
   disabledDateName: {
     fontSize: 10,
-    fontFamily: 'flex-font',
+    fontFamily: 'flex-font-heavy',
     color: 'darkgray',
     textAlign: 'center',
   },
@@ -33,13 +33,13 @@ export default StyleSheet.create({
   },
   highlightDateNameStyle: {
     fontSize: 12,
-    fontFamily: 'flex-font',
+    fontFamily: 'flex-font-heavy',
     fontWeight: 'bold',
     textAlign: 'center',
   },
   highlightDateNumberStyle: {
     fontSize: 16,
-    fontFamily: 'flex-font',
+    fontFamily: 'flex-font-heavy',
     fontWeight: 'bold',
     textAlign: 'center',
   },

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Animated, Text } from 'react-native';
+import { Animated } from 'react-native';
 import styled from 'styled-components';
 import { WHITE } from '../../constants';
 import { FadeInView, CustomStatusBar } from './';

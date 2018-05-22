@@ -74,21 +74,6 @@ class UpcomingClass extends PureComponent {
     return (
       <FadeInView style={{ paddingTop: this.props.forReceiptPage ? 10 : 0, paddingBottom: 40, backgroundColor: WHITE }}>
         <ScrollView style={{ paddingTop: this.props.forReceiptPage ? 10 : 0, paddingBottom: 40 }}>
-          <TransactionBreakdown
-            forReceiptPage={this.props.forReceiptPage}
-            name={this.props.name}
-            time={this.props.time}
-            formattedSubtotal={this.props.formattedSubtotal}
-            taxAmount={this.props.tax_amount}
-            formattedTaxAmount={this.props.formattedTaxAmount}
-            discountAmount={this.props.discount_amount}
-            formattedDiscountAmount={this.props.formattedDiscountAmount}
-            studioCreditAmount={this.props.studio_credits_spent}
-            formattedStudioCreditAmount={this.props.formattedStudioCreditAmount}
-            rafCreditsSpent={this.props.raf_credits_spent}
-            formattedRAFCreditAmount={this.props.formattedRAFCreditAmount}
-            formattedTotal={this.props.formattedTotal}
-          />
           <MapView
             ref={(ref) => { this.map = ref; }}
             style={{ height: 200, marginBottom: 10 }}
@@ -105,6 +90,21 @@ class UpcomingClass extends PureComponent {
               description="blahblah"
             />
           </MapView>
+          <TransactionBreakdown
+            forReceiptPage={this.props.forReceiptPage}
+            name={this.props.name}
+            time={this.props.time}
+            formattedSubtotal={this.props.formattedSubtotal}
+            taxAmount={this.props.tax_amount}
+            formattedTaxAmount={this.props.formattedTaxAmount}
+            discountAmount={this.props.discount_amount}
+            formattedDiscountAmount={this.props.formattedDiscountAmount}
+            studioCreditAmount={this.props.studio_credits_spent}
+            formattedStudioCreditAmount={this.props.formattedStudioCreditAmount}
+            rafCreditsSpent={this.props.raf_credits_spent}
+            formattedRAFCreditAmount={this.props.formattedRAFCreditAmount}
+            formattedTotal={this.props.formattedTotal}
+          />
           <View style={{ margin: 10, marginLeft: 10 }}>
             <View>
               <HeavyText>

@@ -19,9 +19,7 @@ class ProfileInfo extends PureComponent {
     super(props);
 
     this.state = {
-      isLoading: false,
       isUpdatingCard: false,
-      isProcessingPayment: false,
       isUpdatingPersonalDetails: false,
       isUpdatingPassword: false,
     };
@@ -57,7 +55,7 @@ class ProfileInfo extends PureComponent {
             isUpdatingPassword={this.state.isUpdatingPassword}
           />
           <PaymentInfo
-            setLoading={this.setLoading}
+            isUpdatingCard={this.state.isUpdatingCard}
             setEditCC={this.setEditCC}
           />
         </ScrollView>

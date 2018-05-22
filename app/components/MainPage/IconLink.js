@@ -2,19 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { withNavigation } from 'react-navigation';
+import { View } from 'react-native';
 
 import { WHITE } from '../../constants';
 import { NormalText } from '../styled';
 import { Icon } from '../shared';
 
-const Container = styled.View`
-  flex: 1;
-  border-color: ${WHITE};
-  border-right-width: ${props => +!props.lastIcon};
-`;
-
 const Link = styled.TouchableOpacity`
-  align-items: center;
+  align-items: ${props => props.alignItems};
   justify-content: space-between;
 `;
 
@@ -51,19 +46,25 @@ class IconLink extends React.PureComponent {
    */
   render() {
     return (
-      <Container lastIcon={this.props.lastIcon}>
-        <Link onPress={this.onPress} activeOpacity={1}>
-          <Icon
-            padding={0}
-            iconName={this.props.iconName}
-            style={{ color: WHITE }}
-            onPress={this.onPress}
-          />
-          <LinkText>
-            {this.props.text}
-          </LinkText>
+      <View>
+        <Link
+          onPress={this.onPress}
+          activeOpacity={1}
+          alignItems={this.props.alignItems}
+        >
+          <View style={{ alignItems: 'center' }}>
+            <Icon
+              padding={0}
+              iconName={this.props.iconName}
+              style={{ color: WHITE }}
+              onPress={this.onPress}
+            />
+            <LinkText>
+              {this.props.text}
+            </LinkText>
+          </View>
         </Link>
-      </Container>
+      </View>
     );
   }
 }
@@ -78,6 +79,7 @@ IconLink.propTypes = {
   text: PropTypes.string.isRequired,
   route: PropTypes.string.isRequired,
   navigation: PropTypes.shape(),
+  alignItems: PropTypes.string.isRequired,
 };
 
 export default withNavigation(IconLink);
