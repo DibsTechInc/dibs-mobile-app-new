@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { withNavigation, NavigationActions } from 'react-navigation';
+import { withNavigation } from 'react-navigation';
 import Icon from '../../shared/Icon';
 import { DARK_TEXT_GREY } from '../../../constants';
 
@@ -46,19 +46,7 @@ class NavLink extends React.PureComponent {
    * @returns {undefined}
    */
   openRoute() {
-    const navigateAction = NavigationActions.navigate({
-      routeName: this.props.route,
-      previousRoute: this.props.navigation.state.key,
-    });
-
-    if (this.props.loggingOut) {
-      this.props.logOutUser(() => {
-        this.props.navigation.dispatch(navigateAction);
-      });
-      return;
-    }
-
-    this.props.navigation.dispatch(navigateAction);
+    this.props.navigation.navigate(this.props.route);
   }
   /**
    * render
@@ -89,8 +77,6 @@ NavLink.propTypes = {
   label: PropTypes.string.isRequired,
   route: PropTypes.string.isRequired,
   navigation: PropTypes.shape().isRequired,
-  loggingOut: PropTypes.bool,
-  logOutUser: PropTypes.func,
 };
 
 export default withNavigation(NavLink);

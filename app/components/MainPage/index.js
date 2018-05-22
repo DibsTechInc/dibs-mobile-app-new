@@ -2,36 +2,41 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
-import { Dimensions } from 'react-native';
+import { NavigationActions } from 'react-navigation';
 
 import backgroundImg from '../../../assets/img/main-page.png';
 import {
   BLACK,
   WHITE,
-  TRANSPARENT,
   LIGHT_GREY,
   SCHEDULE_ROUTE,
   PROFILE_ROUTE,
   UPCOMING_CLASS_ROUTE,
+  HEIGHT,
+  DRAWER_OPEN,
 } from '../../constants';
-import { FadeInView, CustomStatusBar } from '../shared';
 import {
   getUserFirstName,
   getStudioName,
   getUserHasUpcomingEvents,
 } from '../../selectors';
-import Header from '../Header';
-import { HeavyText, FlexRow } from '../styled';
+import { FadeInView, CustomStatusBar, BurgerIcon, CartIcon } from '../shared';
+import { HeavyText, FlexRow, SpaceBetweenRow } from '../styled';
 import IconLink from './IconLink';
 import UpcomingEventSlider from './UpcomingEventSlider';
 
 const BackgroundImage = styled.Image`
   left: 0;
-  height: ${Dimensions.get('window').height};
+  height: ${HEIGHT};
   opacity: 0.25;
   position: absolute;
   right: 0;
   top: 0;
+`;
+
+const MainPageHeader = SpaceBetweenRow.extend`
+  align-items: center;
+  margin-top: 15;
 `;
 
 const Content = styled.View`
@@ -65,6 +70,31 @@ const IconRow = FlexRow.extend`
  */
 class MainPage extends React.PureComponent {
   /**
+   * @constructor
+   * @constructs MainPage
+   */
+  constructor() {
+    super();
+    this.navigateToDrawer = this.navigateToDrawer.bind(this);
+  }
+  /**
+   * @returns {undefined}
+   */
+  navigateToDrawer() {
+    const navigateAction = NavigationActions.navigate({
+      routeName: DRAWER_OPEN,
+    });
+
+    const keyType = this.props.navigation.state.key.split('-')[0];
+    const pop = NavigationActions.pop();
+
+    if (keyType === 'id') {
+      this.props.navigation.dispatch(pop);
+    } else {
+      this.props.navigation.dispatch(navigateAction);
+    }
+  }
+  /**
    * render
    * @returns {JSX.Element} XML
    */
@@ -73,10 +103,10 @@ class MainPage extends React.PureComponent {
       <FadeInView style={{ position: 'relative', backgroundColor: BLACK }}>
         <CustomStatusBar backgroundColor={'transparent'} barStyle="light-content" />
         <BackgroundImage source={backgroundImg} />
-        {/* <Header
-          iconColor={WHITE}
-          backgroundColor={TRANSPARENT}
-        /> */}
+        <MainPageHeader>
+          <BurgerIcon onPress={this.navigateToDrawer} style={{ marginLeft: 20 }} />
+          <CartIcon iconColor={WHITE} />
+        </MainPageHeader>
         <Content hasUpcomingClasses={this.props.hasUpcomingClasses}>
           <Greeting>
             Hi {this.props.userFirstName}!
@@ -113,6 +143,7 @@ MainPage.propTypes = {
   userFirstName: PropTypes.string.isRequired,
   studioName: PropTypes.string.isRequired,
   hasUpcomingClasses: PropTypes.bool.isRequired,
+  navigation: PropTypes.shape(),
 };
 
 const mapStateToProps = state => ({

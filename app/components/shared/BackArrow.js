@@ -16,7 +16,11 @@ class BackArrow extends React.PureComponent {
    */
   render() {
     return (
-      <TouchableOpacity style={this.props.style} onPress={this.props.onPress}>
+      <TouchableOpacity
+        style={this.props.style}
+        onPress={this.props.onPress}
+        activeOpacity={1}
+      >
         <Svg height={30} width={30}>
           <Path
             stroke={this.props.stroke}

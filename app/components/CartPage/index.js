@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { View, Text, Alert, Dimensions } from 'react-native';
+import { View, Text } from 'react-native';
 import { withNavigation, NavigationActions } from 'react-navigation';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -14,7 +14,6 @@ import {
   getConfirmationState,
   getCartValueBack,
   getFormattedCartTotal,
-  getCartErrorMessage,
 } from '../../selectors';
 import { submitCartForPurchase } from '../../actions';
 import {
@@ -117,13 +116,8 @@ class CartPage extends Component {
    * @returns {undefined}
    */
   componentDidUpdate() {
-    if (!this.props.cartMessage && this.props.confirmedPurchases.length) {
+    if (this.props.confirmedPurchases.length) {
       this.props.navigation.navigate(RECEIPT_ROUTE);
-    }
-
-    if (this.props.cartMessage) {
-      this.props.navigation.navigate(SCHEDULE_ROUTE);
-      Alert.alert(this.props.cartMessage);
     }
   }
 
@@ -150,9 +144,8 @@ class CartPage extends Component {
    /**
    * @returns {undefined}
    */
-  async handlePurchase() {
-    this.setState({ isProcessingPayment: true });
-    await new Promise(resolve => this.props.submitCartForPurchase(resolve));
+  handlePurchase() {
+    this.props.submitCartForPurchase();
   }
 
   /**
@@ -297,7 +290,6 @@ CartPage.propTypes = {
   valueBack: PropTypes.number.isRequired,
   formattedCartTotal: PropTypes.string.isRequired,
   submitCartForPurchase: PropTypes.func,
-  cartMessage: PropTypes.string,
   creditCard: PropTypes.shape(),
   confirmedPurchases: PropTypes.arrayOf(PropTypes.shape()),
 };
@@ -309,7 +301,6 @@ const mapStateToProps = state => ({
   formattedCartTotal: getFormattedCartTotal(state),
   creditCard: state.creditCard,
   confirmedPurchases: getConfirmationState(state),
-  cartMessage: getCartErrorMessage(state),
 });
 
 const mapDispatchToProps = {

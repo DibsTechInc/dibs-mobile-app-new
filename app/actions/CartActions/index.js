@@ -26,7 +26,6 @@ export const {
   addToCart,
   clearCart,
   setCartData,
-  setCartErrorMessage,
   setCartVisibleTrue,
   setCartVisibleFalse,
   setCartPurchasingTrue,
@@ -35,7 +34,6 @@ export const {
   ADD_TO_CART: item => item,
   CLEAR_CART: () => [],
   SET_CART_DATA: payload => payload,
-  SET_CART_ERROR_MESSAGE: payload => payload,
   SET_CART_VISIBLE_TRUE: () => true,
   SET_CART_VISIBLE_FALSE: () => false,
   SET_CART_PURCHASING_TRUE: () => true,
@@ -195,7 +193,7 @@ export function updateQuantity({ eventid, quantity }) {
  * @param {function} callback on compleition, node style
  * @returns {function} redux thunk makes request
  */
-export function submitCartForPurchase(callback) {
+export function submitCartForPurchase() {
   return async function innerSubmitCartForPurchase(dispatch, getState, dibsFetch) {
     const state = getState();
     const { promoCode, cart, studio } = state;
@@ -227,7 +225,6 @@ export function submitCartForPurchase(callback) {
         dispatch(refreshUser(res.user));
         dispatch(setTransactionsConfirmed(res.transactions));
         dispatch(clearCart());
-        callback(null);
         dispatch(requestUserEvents());
         // dispatch(requestUserTransactions()); implement with transaction history
         // dispatch(performTransactionAnalytics(resp.transactions)); not sure works with native
@@ -250,6 +247,6 @@ export function submitCartForPurchase(callback) {
     }
     const eventids = uniq(cart.data.map(({ eventid }) => eventid));
     dispatch(requestEventData({ eventids }));
-    callback();
+    dispatch(setCartPurchasingFalse());
   };
 }
