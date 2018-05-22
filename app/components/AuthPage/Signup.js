@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import {
@@ -32,9 +32,9 @@ const StyledText = styled.Text`
 
 /**
  * @class Signup
- * @extends Component
+ * @extends PureComponent
  */
-class Signup extends Component {
+class Signup extends PureComponent {
   /**
    * @constructor
    * @constructs Signup

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
@@ -9,11 +9,10 @@ import {
   getEventsAreLoading,
 } from '../../selectors';
 import Header from '../Header';
-import { WHITE, SOFT_GREY, BLACK } from '../../constants';
+import { SOFT_GREY, BLACK } from '../../constants';
 import FadeInView from '../shared/FadeInView';
 import CalendarStrip from './CalendarStrip';
 import EventList from './EventList';
-import { CustomStatusBar } from '../shared';
 
 const Shadow = styled.View`
   background: ${SOFT_GREY};
@@ -30,7 +29,7 @@ const Shadow = styled.View`
  * @class SchedulePage
  * @extends Component
  */
-class SchedulePage extends Component {
+class SchedulePage extends PureComponent {
   /**
    * @returns {undefined}
    */

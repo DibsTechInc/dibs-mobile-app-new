@@ -151,10 +151,6 @@ class PaymentInfo extends PureComponent {
 
     const creditCardInput = (
       <LiteCreditCardInput
-        // requiresCVC
-        // cardFontFamily="flex-font"
-        // cardImageBack={GreenCard}
-        // cardImageFront={GreenCardFront}
         cardScale={0.7}
         labels={labels}
         allowScroll

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { MaterialPanel } from '../../shared';
@@ -31,7 +31,7 @@ const StyledLine = styled.View`
  * @class TransactionBreakdown
  * @extends {Component}
  */
-class TransactionBreakdown extends Component {
+class TransactionBreakdown extends PureComponent {
   /**
    * @returns {JSX} XML
    */

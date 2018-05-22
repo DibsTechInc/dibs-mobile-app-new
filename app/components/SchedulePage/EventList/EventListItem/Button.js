@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { promisify } from 'bluebird';
 import { Alert } from 'react-native';
-import styled from 'styled-components';
 
 import Config from '../../../../../config.json';
 import { GREY, WHITE, DARK_TEXT_GREY } from '../../../../constants/index';

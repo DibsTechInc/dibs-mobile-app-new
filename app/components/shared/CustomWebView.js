@@ -1,12 +1,12 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { WebView, Alert } from 'react-native';
+import { WebView } from 'react-native';
 
 /**
  * @class CustomWebView
  * @extends Component
  */
-class CustomWebView extends Component {
+class CustomWebView extends PureComponent {
   /**
    * @returns {JSX} XML
    */

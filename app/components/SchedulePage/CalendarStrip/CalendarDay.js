@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import {
   Text,
@@ -7,14 +7,14 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import styles from './CalendarDay.style.js';
-import { OFF_WHITE, WHITE } from '../../../constants';
+import { WHITE } from '../../../constants';
 import Config from '../../../../config.json';
 
 /**
  * @class CalendarDay
  * @extends Component
  */
-class CalendarDay extends Component {
+class CalendarDay extends PureComponent {
   /**
    * @constructor
    * @constructs CalendarDay

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { CustomWebView } from '../shared';
 
@@ -6,7 +6,7 @@ import { CustomWebView } from '../shared';
  * @class TermsAndConditions
  * @extends {React.Component}
  */
-class TermsAndConditions extends Component {
+class TermsAndConditions extends PureComponent {
   /**
    * render
    * @returns {JSX.Element} HTML

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import styled from 'styled-components';
@@ -14,7 +14,7 @@ const IconText = styled.Text`
  * @class DrawerItem
  * @extends PureComponent
  */
-class IconComponent extends Component {
+class IconComponent extends PureComponent {
   /**
    * @returns {JSX} XML
    */

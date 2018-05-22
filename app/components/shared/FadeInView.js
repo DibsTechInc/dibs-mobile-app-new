@@ -6,7 +6,7 @@ import { Animated } from 'react-native';
  * @class CartPage
  * @extends {Component}
  */
-class FadeInView extends React.Component {
+class FadeInView extends React.PureComponent {
   state = {
     fadeAnim: new Animated.Value(0),
   }

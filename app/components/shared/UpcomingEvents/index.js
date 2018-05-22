@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Swiper from 'react-native-swiper';
 
 import Config from '../../../../config.json';
-import { WHITE, HEIGHT, DEFAULT_BG } from '../../../constants';
+import { WHITE, HEIGHT } from '../../../constants';
 import UpcomingClass from './UpcomingClass';
 
 /**

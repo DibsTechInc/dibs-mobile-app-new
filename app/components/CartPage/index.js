@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { View, Text } from 'react-native';
 import { withNavigation, NavigationActions } from 'react-navigation';
@@ -23,7 +23,6 @@ import {
   WHITE,
   BLACK,
   RECEIPT_ROUTE,
-  SCHEDULE_ROUTE,
   WIDTH,
 } from '../../constants';
 
@@ -91,7 +90,7 @@ const StyledContinueButton = styled.TouchableOpacity`
  * @class CartPage
  * @extends {Component}
  */
-class CartPage extends Component {
+class CartPage extends PureComponent {
   /**
    * @constructor
    * @constructs CartPage
@@ -145,6 +144,7 @@ class CartPage extends Component {
    * @returns {undefined}
    */
   handlePurchase() {
+    this.setState({ isProcessingPayment: true });
     this.props.submitCartForPurchase();
   }
 

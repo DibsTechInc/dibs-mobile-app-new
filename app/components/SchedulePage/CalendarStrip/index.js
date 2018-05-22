@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import {
@@ -49,7 +49,7 @@ const DatesContainer = FlexCenter.extend`
  * @class CalendarStrip
  * @extends Component
  */
-class CalendarStrip extends Component {
+class CalendarStrip extends PureComponent {
   /**
    * @static
    * @returns {number} number of days for the calendar to display

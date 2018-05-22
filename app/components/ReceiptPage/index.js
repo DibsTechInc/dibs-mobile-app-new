@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { getConfirmedTransactionsByEvent } from '../../selectors';
@@ -11,7 +11,7 @@ import Header from '../Header';
  * @class ReceiptPage
  * @extends {Component}
  */
-class ReceiptPage extends Component {
+class ReceiptPage extends PureComponent {
   /**
    * @returns {JSX} XML
    */
@@ -24,7 +24,7 @@ class ReceiptPage extends Component {
   render() {
     return (
       <FadeInView>
-        <Header iconColor={BLACK} backgroundColor={WHITE} />
+        <Header iconColor={BLACK} backgroundColor={WHITE} title="" />
         <UpcomingEvents events={this.props.items} />
       </FadeInView>
     );
