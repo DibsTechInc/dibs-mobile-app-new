@@ -39,6 +39,11 @@ const EventText = NormalText.extend`
   font-size: 14;
 `;
 
+const DesciptionText = NormalText.extend`
+  margin-top: 15px;
+  margin-bottom: 15px;
+`;
+
 /**
  * @class UpcomingClass
  * @extends {Component}
@@ -133,17 +138,17 @@ class UpcomingClass extends PureComponent {
               <HeavyText>
                 Class Description:
               </HeavyText>
-              <NormalText>
+              <DesciptionText>
                 {classDescriptionHTML || 'No Class Description.'}
-              </NormalText>
+              </DesciptionText>
             </View>
             <View style={{ paddingBottom: 10 }}>
               <HeavyText>
                 Drop Policy:
               </HeavyText>
-              <NormalText>
+              <DesciptionText>
                 {Config.STUDIO_DROP_POLICY}
-              </NormalText>
+              </DesciptionText>
             </View>
           </View>
           {!this.props.forReceiptPage && (

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { withNavigation } from 'react-navigation';
 
-import { WHITE, TEXT_GREY } from '../../constants';
+import { WHITE, TEXT_GREY, SCHEDULE_ROUTE } from '../../constants';
 import Header from '../Header';
 import { FadeInView, MaterialButton } from '../shared';
 import { NormalText } from '../styled';
@@ -32,17 +32,13 @@ class NoItems extends React.PureComponent {
    */
   constructor(props) {
     super(props);
-    this.goBack = this.goBack.bind(this);
+    this.goToSchedule = this.goToSchedule.bind(this);
   }
   /**
    * @returns {undefined}
    */
-  goBack() {
-    if (
-      this.props.navigation.state.params
-      && this.props.navigation.state.params.previousRoute
-    ) return this.props.navigation.navigate(this.props.navigation.state.params.previousRoute);
-    return this.props.navigation.goBack();
+  goToSchedule() {
+    this.props.navigation.navigate(SCHEDULE_ROUTE);
   }
   /**
    * render
@@ -57,8 +53,8 @@ class NoItems extends React.PureComponent {
             Your cart is empty.
           </BodyText>
           <MaterialButton
-            text="Back"
-            onPress={this.goBack}
+            text="Book Now"
+            onPress={this.goToSchedule}
             style={{ width: 200, height: 40 }}
           />
         </BackButtonContainer>
