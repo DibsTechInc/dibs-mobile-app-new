@@ -27,7 +27,7 @@ export function requestCreditCardInfo(callback = () => {}) {
         requiresAuth: true,
       });
       if (res.success) dispatch(setCreditCard(res.creditCard));
-      else Alert.alert('Uh oh!', res.message);
+      else if (res.message !== 'The user does not have a card') Alert.alert('Uh oh!', 'Something went wrong getting your billing information.');
     } catch (err) {
       console.log(err);
       Alert.alert('Uh oh!', 'Something went wrong getting your billing information.');

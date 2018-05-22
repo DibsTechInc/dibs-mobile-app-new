@@ -121,7 +121,6 @@ export function signUpUser(payload, callback) {
       if (res.success) {
         dispatch(setUser(res.user));
         dispatch(recordStudioVisit());
-        dispatch(requestCreditCardInfo());
         dispatch(requestUserEvents());
         return callback();
       }
