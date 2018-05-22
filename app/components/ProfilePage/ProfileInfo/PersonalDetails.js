@@ -71,7 +71,7 @@ class PersonalDetails extends PureComponent {
 
     return (
       <MaterialPanel
-        height={'40%'}
+        height={'60%'}
         style={{ shadowOffset: { width: 3, height: 3 } }}
         heading="Personal Details"
         headingRight={this.props.isUpdatingPersonalDetails ? 'Cancel' : 'Change'}

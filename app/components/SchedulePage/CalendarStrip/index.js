@@ -87,7 +87,6 @@ class CalendarStrip extends PureComponent {
     this.formatCalendarHeader = this.formatCalendarHeader.bind(this);
     this.animate = this.animate.bind(this);
     this.resetAnimation = this.resetAnimation.bind(this);
-    this.handleOnDateSelected = this.handleOnDateSelected.bind(this);
   }
   /**
    * starts animation
@@ -224,10 +223,6 @@ class CalendarStrip extends PureComponent {
     return `${monthFormatting.length > 1 ? firstDay.format(monthFormatting) : ''} ${monthFormatting.length > 1 ? '/' : ''} ${lastDay.format(this.props.calendarHeaderFormat)}`;
   }
 
-  handleOnDateSelected() {
-    this.onDateSelected(date)
-  }
-
   /**
    * @returns {JSX} XML
    */
@@ -268,7 +263,7 @@ class CalendarStrip extends PureComponent {
                     key={date}
                     date={date}
                     selected={this.isDateSelected(date)}
-                    onDateSelected={this.handleOnDateSelected}
+                    onDateSelected={() => this.onDateSelected(date)}
                     selectionAnimation={this.props.selectionAnimation}
                   />
                 </Animated.View>
