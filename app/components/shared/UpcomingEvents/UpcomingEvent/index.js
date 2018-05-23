@@ -132,6 +132,9 @@ class UpcomingEvent extends PureComponent {
                 <EventText numberOfLines={1}>
                   {this.props.instructorName}
                 </EventText>
+                <EventText numberOfLines={1}>
+                  {this.props.quantity} spot{this.props.quantity > 1 ? 's' : ''}
+                </EventText>
               </View>
             </EventInfo>
             {this.props.forReceiptPage ? (
