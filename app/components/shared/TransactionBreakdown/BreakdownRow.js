@@ -27,7 +27,11 @@ class BreakdownRow extends PureComponent {
    */
   render() {
     return (
-      <StyledView style={this.props.containerStyle}>
+      <StyledView style={{
+        ...this.props.containerStyle,
+        marginBottom: 20,
+      }}
+      >
         <StyledText style={this.props.labelStyle}>
           {this.props.label}:
         </StyledText>
@@ -35,7 +39,7 @@ class BreakdownRow extends PureComponent {
           style={{ flex: 1, marginTop: 14 }}
           dashGap={5}
           dashThickness={1.5}
-          dashColor={this.props.dots ? SOFT_GREY : WHITE}
+          dashColor={WHITE}
           dashLength={2}
         />
         <StyledText style={this.props.valueStyle}>
