@@ -108,7 +108,7 @@ class EnterPassword extends PureComponent {
       <FadeInView>
         <ScrollView keyboardShouldPersistTaps="always" contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', height: '70%', position: 'relative' }}>
           <InputField
-            autoFocus={!this.state.validInput}
+            customFocus={!this.state.validInput}
             label={(
               this.props.navigation.state.params.accountDisabled ?
                 'Please enter the password associated with this account to reactivate it' : 'What is your password?'

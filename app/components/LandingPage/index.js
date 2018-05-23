@@ -11,7 +11,11 @@ import styled from 'styled-components';
 import Swiper from 'react-native-swiper';
 
 import About from './About';
+<<<<<<< HEAD
 import { DARK_TEXT_GREY, VERIFY_ROUTE } from '../../constants';
+=======
+import { VERIFY_ROUTE, DARK_TEXT_GREY } from '../../constants';
+>>>>>>> 5e3c7828ba6ced8abdf5155ef04a3b94ff787f6b
 import Config from '../../../config.json';
 import { FadeInView, CustomStatusBar, MaterialButton } from '../shared';
 import { FlexCenter, NormalText } from '../styled';
@@ -29,7 +33,7 @@ const StyledWelcomeView = FlexCenter.extend`
 `;
 
 const StyledGrayText = NormalText.extend`
-  color: #b1b1b1;
+  color: ${DARK_TEXT_GREY};
 `;
 
 /**

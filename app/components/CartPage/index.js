@@ -16,7 +16,7 @@ import {
   getFormattedCartTotal,
   getCartIsPurchasing,
 } from '../../selectors';
-import { submitCartForPurchase } from '../../actions';
+import { submitCartForPurchase, setEventsLoadingFalse } from '../../actions';
 import {
   SOFT_GREY,
   LIGHT_GREY,
@@ -27,12 +27,13 @@ import {
   WIDTH,
 } from '../../constants';
 
-import { Icon, CustomStatusBar, DibsLoader, PaymentInfo } from '../shared';
+import { CustomStatusBar, DibsLoader, PaymentInfo } from '../shared';
 import CartItem from './CartItem';
 import CartTransaction from './CartTransaction';
 import PromoField from './PromoField';
 import Config from '../../../config.json';
 import NoItems from './NoItems';
+import Header from '../Header';
 
 import { NormalText, HeavyText } from '../styled';
 
@@ -239,17 +240,7 @@ class CartPage extends PureComponent {
     return (
       <FadeInView style={{ backgroundColor: SOFT_GREY }}>
         <CustomStatusBar backgroundColor={Config.STUDIO_COLOR} barStyle="light-content" />
-        <StyledTopView>
-          <Icon
-            iconName="arrow-left"
-            iconColor={WHITE}
-            onPress={this.toPreviousPage}
-            style={{ position: 'absolute', left: 0, fontSize: 11 }}
-          />
-          <StyledCenterText>
-            My Cart
-          </StyledCenterText>
-        </StyledTopView>
+        <Header title="My Cart" showCart={false} />
         <StyledScrollView>
           {this.props.cart.map(item => (
             <CartItem

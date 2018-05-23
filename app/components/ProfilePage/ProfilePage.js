@@ -74,7 +74,7 @@ class ProfilePage extends PureComponent {
               title={`${this.props.userFirstName} ${this.props.userLastName}`}
               onPress={this.handleProfileInfoRoute}
             />
-            <SettingsList.Header headerStyle={{ marginTop: -15 }} />
+            <SettingsList.Header headerStyle={{ marginTop: -18 }} />
             <SettingsList.Item
               hasNavArrow={false}
               title="ACCOUNT DETAILS"
@@ -83,30 +83,6 @@ class ProfilePage extends PureComponent {
             <SettingsList.Item
               title="Settings"
               onPress={this.handleSettingsRoute}
-            />
-            <SettingsList.Header headerStyle={{ marginTop: -15 }} />
-            <SettingsList.Item
-              hasNavArrow={false}
-              title="ADDITIONAL"
-              titleStyle={{ color: 'darkgray' }}
-            />
-            <SettingsList.Item
-              title="About"
-              onPress={this.handleAboutRoute}
-            />
-            <SettingsList.Item
-              title="FAQ"
-              onPress={this.handleFAQRoute}
-            />
-            <SettingsList.Item
-              title="Contact"
-              onPress={this.handleContactRoute}
-            />
-            <SettingsList.Header headerStyle={{ marginTop: -15 }} />
-            <SettingsList.Item
-              hasNavArrow={false}
-              title="MISC"
-              titleStyle={{ color: 'darkgray' }}
             />
             <SettingsList.Item
               hasNavArrow={false}
