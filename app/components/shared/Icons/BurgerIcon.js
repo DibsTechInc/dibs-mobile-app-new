@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { TouchableOpacity } from 'react-native';
 import { Svg, Path } from 'react-native-svg';
 
-import { WHITE } from '../../constants';
+import { WHITE } from '../../../constants';
 
 /**
  * @class BurgerIcon

@@ -1,8 +1,7 @@
 import React from 'react';
 
 import Config from '../../../config.json';
-import { TRANSPARENT } from '../../constants';
-import { FadeInView, CustomStatusBar } from '../shared';
+import { FadeInView } from '../shared';
 import Header from '../Header';
 import UpcomingEventSlider from './UpcomingEventSlider';
 import Calendar from './Calendar';
@@ -19,7 +18,6 @@ class UpcomingClassesPage extends React.PureComponent {
   render() {
     return (
       <FadeInView style={{ position: 'relative', backgroundColor: Config.STUDIO_COLOR }}>
-        <CustomStatusBar backgroundColor={TRANSPARENT} barStyle="light-content" />
         <Header title="My Classes" />
         <Calendar />
         <UpcomingEventSlider isUpcomingClassesPage />

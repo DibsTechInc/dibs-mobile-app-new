@@ -1,4 +1,3 @@
-export { default as CartIcon } from './CartIcon';
 export { default as DibsLoader } from './DibsLoader';
 export { default as FadeInView } from './FadeInView';
 export { default as Icon } from './Icon';
@@ -12,5 +11,5 @@ export { default as TransactionBreakdown } from './TransactionBreakdown';
 export { default as CustomStatusBar } from './CustomStatusBar';
 export { default as PaymentInfo } from './PaymentInfo';
 export { default as CustomWebView } from './CustomWebView';
-export { default as BackArrow } from './BackArrow';
-export { default as BurgerIcon } from './BurgerIcon';
+
+export * from './Icons';

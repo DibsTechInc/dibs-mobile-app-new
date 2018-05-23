@@ -50,7 +50,7 @@ class SchedulePage extends PureComponent {
   render() {
     return (
       <FadeInView style={{ height: '100%', backgroundColor: Config.STUDIO_COLOR }}>
-        <Header title="Schedule" />
+        <Header title="" />
         <CalendarStrip />
         <Shadow />
         <EventList />
