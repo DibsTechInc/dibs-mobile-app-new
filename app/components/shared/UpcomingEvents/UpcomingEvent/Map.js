@@ -1,12 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { connect } from 'react-redux';
+import styled from 'styled-components';
 
 import { getStudioName } from '../../../../selectors';
 
 const LATITUDE_DELTA = 0.01;
 const LONGITUDE_DELTA = 0.01;
+
+const InvisibleInteractionBlocker = styled.View`
+  height: 250;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+`;
 
 /**
  * @class MapView
@@ -30,22 +40,29 @@ class Map extends React.PureComponent {
    */
   render() {
     return (
-      <MapView
-        ref={(ref) => { this.map = ref; }}
-        style={{ height: 250, marginBottom: 10 }}
-        initialRegion={{
-          latitude: this.props.latitude,
-          longitude: this.props.longitude,
-          latitudeDelta: LATITUDE_DELTA,
-          longitudeDelta: LONGITUDE_DELTA,
-        }}
-      >
-        <Marker
-          coordinate={{ latitude: this.props.latitude, longitude: this.props.longitude }}
-          title={this.props.markerTitle}
-          description=""
-        />
-      </MapView>
+      <View style={{ height: 250, position: 'relative' }}>
+        <MapView
+          ref={(ref) => { this.map = ref; }}
+          style={{ height: 250, marginBottom: 10 }}
+          initialRegion={{
+            latitude: this.props.latitude,
+            longitude: this.props.longitude,
+            latitudeDelta: LATITUDE_DELTA,
+            longitudeDelta: LONGITUDE_DELTA,
+          }}
+        >
+          <Marker
+            coordinate={{ latitude: this.props.latitude, longitude: this.props.longitude }}
+            title={this.props.markerTitle}
+            description=""
+          />
+        </MapView>
+        {this.props.allowInteraction ? null : (
+          <InvisibleInteractionBlocker
+            onStartShouldSetResponder={() => true}
+          />
+        )}
+      </View>
     );
   }
 }
@@ -55,6 +72,7 @@ Map.propTypes = {
   longitude: PropTypes.number.isRequired,
   markerTitle: PropTypes.string.isRequired,
   locationName: PropTypes.string.isRequired,
+  allowInteraction: PropTypes.bool.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({

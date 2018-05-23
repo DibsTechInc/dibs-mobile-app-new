@@ -10,7 +10,7 @@ import UpcomingEvent from './UpcomingEvent';
  * @class UpcomingClasses
  * @extends {Component}
  */
-class UpcomingClasses extends PureComponent {
+class UpcomingEvents extends PureComponent {
   /**
    * @returns {JSX} XML
    */
@@ -34,6 +34,7 @@ class UpcomingClasses extends PureComponent {
           <UpcomingEvent
             key={event.eventid}
             forReceiptPage={this.props.forReceiptPage}
+            expanded={this.props.expanded}
             {...event}
           />
         ))}
@@ -42,11 +43,12 @@ class UpcomingClasses extends PureComponent {
   }
 }
 
-UpcomingClasses.defaultProps = { forReceiptPage: true };
+UpcomingEvents.defaultProps = { expanded: true };
 
-UpcomingClasses.propTypes = {
+UpcomingEvents.propTypes = {
   forReceiptPage: PropTypes.bool,
   events: PropTypes.arrayOf(PropTypes.shape()),
+  expanded: PropTypes.bool,
 };
 
-export default UpcomingClasses;
+export default UpcomingEvents;
