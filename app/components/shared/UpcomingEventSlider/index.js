@@ -6,14 +6,16 @@ import { View, Animated } from 'react-native';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { withNavigation } from 'react-navigation';
+import { Svg, Path } from 'react-native-svg';
 
-import { WHITE, HEIGHT, MAIN_ROUTE } from '../../../constants';
+import { WHITE, HEIGHT, MAIN_ROUTE, LIGHT_GREY } from '../../../constants';
 import {
   setUpcomingEventSliderExpandedTrue,
   setUpcomingEventSliderExpandedFalse,
 } from '../../../actions';
 import UpcomingEvents from '../UpcomingEvents';
 import Header from '../../Header';
+import NoEvents from './NoEvents';
 
 const FULL_HEIGHT = HEIGHT - 100;
 const SHORTENED_HEIGHT = HEIGHT / 2.5;
@@ -27,6 +29,15 @@ const Panel = styled.View`
   height: ${HEIGHT};
   padding-top: 20;
   position: absolute;
+  width: 100%;
+`;
+
+const SvgContainer = styled.View`
+  align-items: center;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 10;
   width: 100%;
 `;
 
@@ -149,6 +160,16 @@ class UpcomingClassSlider extends React.PureComponent {
           allowDragging={!this.props.expanded}
         >
           <Panel roundEdge={this.props.expanded || this.state.expanding}>
+            {!this.props.expanded && (
+              <SvgContainer>
+                <Svg width={60} height={3}>
+                  <Path d="M 0 1.5 L 60 1.5" stroke={LIGHT_GREY} strokeWidth={3} />
+                </Svg>
+              </SvgContainer>
+            )}
+            {!this.props.detailedEvents.length && (
+              <NoEvents />
+            )}
             <UpcomingEvents
               forReceiptPage={false}
               events={this.props.detailedEvents}

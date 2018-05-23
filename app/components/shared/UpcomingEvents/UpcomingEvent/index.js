@@ -6,6 +6,7 @@ import { promisify } from 'bluebird';
 import { connect } from 'react-redux';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 import HtmlParser from 'react-native-htmlparser';
+
 import Config from '../../../../../config.json';
 import { WHITE, DARK_TEXT_GREY } from '../../../../constants';
 import { getDroppingUpcomingEvent } from '../../../../selectors';
@@ -103,7 +104,13 @@ class UpcomingEvent extends PureComponent {
       ? <HtmlParser containerStyle={{}} tagsStyle={tagStyle} html={this.props.description} /> : 'No Class Description.';
 
     return (
-      <FadeInView style={{ paddingTop: this.props.forReceiptPage ? 10 : 0, paddingBottom: 40, backgroundColor: WHITE }}>
+      <FadeInView
+        style={{
+          paddingTop: this.props.forReceiptPage ? 10 : 0,
+          paddingBottom: isIphoneX() ? 80 : 40,
+          backgroundColor: WHITE,
+        }}
+      >
         <ScrollView
           ref={node => this.scrollView = node}
           style={{ paddingTop: this.props.forReceiptPage ? 10 : 0, paddingBottom: 40 }}
@@ -127,9 +134,23 @@ class UpcomingEvent extends PureComponent {
                 </EventText>
               </View>
             </EventInfo>
-            <EventText>
-              {this.props.quantity} spot{this.props.quantity > 1 ? 's' : ''}
-            </EventText>
+            {this.props.forReceiptPage ? (
+              <EventText>
+                {this.props.quantity} spot{this.props.quantity > 1 ? 's' : ''}
+              </EventText>
+            ) : (
+              <View style={{ alignItems: 'center' }}>
+                {this.props.dropping ? (
+                  <DibsLoader dotColor={Config.STUDIO_COLOR} maxDotRadius={10} width={160} />
+                ) : (
+                  <MaterialButton
+                    text="Drop"
+                    style={{ width: 80, height: 40 }}
+                    onPress={this.startDropClass}
+                  />
+                )}
+              </View>
+            )}
           </EventRow>
           <Map
             latitude={this.props.latitude}
@@ -167,19 +188,6 @@ class UpcomingEvent extends PureComponent {
               </DesciptionText>
             </View>
           </View>
-          {!this.props.forReceiptPage && (
-            <View style={{ alignItems: 'center', paddingBottom: isIphoneX() ? 80 : 40 }}>
-              {this.props.dropping ? (
-                <DibsLoader dotColor={Config.STUDIO_COLOR} maxDotRadius={10} width={160} />
-              ) : (
-                <MaterialButton
-                  text="Drop"
-                  style={{ width: 160, height: 40 }}
-                  onPress={this.startDropClass}
-                />
-              )}
-            </View>
-          )}
         </ScrollView>
       </FadeInView>
     );
