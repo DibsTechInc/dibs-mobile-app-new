@@ -1,8 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import Config from '../../../config.json';
-import { TRANSPARENT, WHITE } from '../../constants';
+import { TRANSPARENT } from '../../constants';
 import { FadeInView, CustomStatusBar } from '../shared';
 import Header from '../Header';
 import UpcomingEventSlider from './UpcomingEventSlider';

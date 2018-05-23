@@ -1,12 +1,11 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import HTML from 'react-native-render-html';
 import styled from 'styled-components';
-import { View, Dimensions, ScrollView, Alert } from 'react-native';
+import { View, ScrollView, Alert } from 'react-native';
 import { promisify } from 'bluebird';
 import { connect } from 'react-redux';
 import { isIphoneX } from 'react-native-iphone-x-helper';
-
+import HtmlParser from 'react-native-htmlparser';
 import Config from '../../../../../config.json';
 import { WHITE, DARK_TEXT_GREY } from '../../../../constants';
 import { getDroppingUpcomingEvent } from '../../../../selectors';
@@ -45,13 +44,13 @@ const DesciptionText = NormalText.extend`
 `;
 
 /**
- * @class UpcomingClass
+ * @class UpcomingEvent
  * @extends {Component}
  */
 class UpcomingEvent extends PureComponent {
   /**
    * @constructor
-   * @constructs UpcomingClass
+   * @constructs UpcomingEvent
    * @param {Object} props for component
    */
   constructor(props) {
@@ -87,8 +86,14 @@ class UpcomingEvent extends PureComponent {
    * @returns {JSX} XML
    */
   render() {
+    const tagStyle = {
+      general: {
+        fontFamily: 'flex-font',
+      },
+    };
+
     const classDescriptionHTML = this.props.description
-      && <HTML html={this.props.description} imagesMaxWidth={Dimensions.get('window').width} />;
+      ? <HtmlParser containerStyle={{}} tagsStyle={tagStyle} html={this.props.description} /> : 'No Class Description.';
 
     return (
       <FadeInView style={{ paddingTop: this.props.forReceiptPage ? 10 : 0, paddingBottom: 40, backgroundColor: WHITE }}>
@@ -140,7 +145,7 @@ class UpcomingEvent extends PureComponent {
                 Class Description:
               </HeavyText>
               <DesciptionText>
-                {classDescriptionHTML || 'No Class Description.'}
+                {classDescriptionHTML}
               </DesciptionText>
             </View>
             <View style={{ paddingBottom: 10 }}>

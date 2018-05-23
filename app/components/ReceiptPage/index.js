@@ -24,7 +24,7 @@ class ReceiptPage extends PureComponent {
     return (
       <FadeInView>
         <Header title="Order Summary" />
-        <UpcomingEvents events={this.props.items} />
+        <UpcomingEvents forReceiptPage events={this.props.items} />
       </FadeInView>
     );
   }
