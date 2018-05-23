@@ -16,7 +16,7 @@ import {
 
 import Header from '../Header';
 import FadeInView from '../shared/FadeInView';
-import { SOFT_GREY } from '../../constants/ColorConstants';
+import { SOFT_GREY, WHITE } from '../../constants/ColorConstants';
 import { getUserFirstName, getUserLastName } from '../../selectors';
 import { logOutUser } from '../../actions';
 
@@ -63,7 +63,7 @@ class ProfilePage extends PureComponent {
       <FadeInView style={{ backgroundColor: SOFT_GREY }}>
         <Header title="My Account" />
         <View style={{ backgroundColor: SOFT_GREY, flex: 1 }}>
-          <SettingsList borderColor="#fff" defaultItemSize={50}>
+          <SettingsList borderColor={WHITE} defaultItemSize={50}>
             <SettingsList.Header headerStyle={{ marginTop: -20 }} />
             <SettingsList.Item
               hasNavArrow={false}

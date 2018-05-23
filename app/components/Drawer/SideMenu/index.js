@@ -27,6 +27,7 @@ const StyledContainer = styled.View`
   background: ${WHITE};
   paddingHorizontal: 20;
   paddingTop: 20;
+  height: 100%;
 `;
 
 const StyledHeader = SpaceBetweenRow.extend`
