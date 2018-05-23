@@ -54,14 +54,23 @@ class App extends Component {
    * @returns {undefined}
    */
   componentWillMount() {
-    Updates.fetchUpdateAsync();
     this.getAssets();
   }
+
   /**
    * @returns {undefined}
    */
   async getAssets() {
     try {
+      if (process.env.NODE_ENV === 'production') {
+        const update = await Updates.checkForUpdateAsync();
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          // ... notify user of update ...
+          Updates.reloadFromCache();
+        }
+      }
+
       const token = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
       await Promise.promisify(cb => store.dispatch(requestStudioData(cb)))();
       await Promise.all([
@@ -73,6 +82,7 @@ class App extends Component {
         token && new Promise(res => store.dispatch(requestCreditCardInfo(res))),
         token && new Promise(res => store.dispatch(requestUserEvents(res))),
       ]);
+
       this.setState({ fetchedAssets: true, userToken: token });
       if (token) await new Promise(res => store.dispatch(syncUserEvents(res)));
     } catch (err) {
