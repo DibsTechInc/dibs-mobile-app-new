@@ -19,7 +19,6 @@ class UpcomingClassesPage extends React.PureComponent {
   render() {
     return (
       <FadeInView style={{ position: 'relative', backgroundColor: Config.STUDIO_COLOR }}>
-        <CustomStatusBar backgroundColor={TRANSPARENT} barStyle="light-content" />
         <Header title="My Classes" />
         <Calendar />
         <UpcomingEventSlider isUpcomingClassesPage />

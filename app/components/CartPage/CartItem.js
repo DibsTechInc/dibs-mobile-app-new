@@ -85,8 +85,8 @@ class CartItem extends PureComponent {
         <StyledCartView>
           <View style={{ marginBottom: 10 }}>
             <HeavyText>
-              {moment(this.props.startTime).format('ddd M/D')
-            }</HeavyText>
+              {moment(this.props.startTime).format('ddd M/D')}
+            </HeavyText>
             <DarkGreyNormalText>
               {timeDisplay}
             </DarkGreyNormalText>

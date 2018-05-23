@@ -3,7 +3,7 @@ import { Svg, Path } from 'react-native-svg';
 import { TouchableOpacity } from 'react-native';
 import PropTypes from 'prop-types';
 
-import Config from '../../../config.json';
+import Config from '../../../../config.json';
 
 /**
  * @class BackArrow

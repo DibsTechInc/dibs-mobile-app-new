@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { withNavigation } from 'react-navigation';
-import { CART_ROUTE } from '../../constants';
-import { getTotalQuantityInCart } from '../../selectors';
-import Icon from './Icon';
+import { CART_ROUTE } from '../../../constants';
+import { getTotalQuantityInCart } from '../../../selectors';
+import Icon from '../Icon';
 
 /**
  * @class CartIcon

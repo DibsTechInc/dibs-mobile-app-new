@@ -6,12 +6,12 @@ import { View } from 'react-native';
 import Config from '../../../config.json';
 import { WHITE } from '../../constants';
 import { FlexRow, HeavyText } from '../styled';
-import { BackArrow, CustomStatusBar, CartIcon } from '../shared';
+import { BackArrow, CustomStatusBar, CartIcon, XIcon } from '../shared';
 
 const StudioColoredTop = FlexRow.extend`
   align-items: center;
   background-color: ${Config.STUDIO_COLOR};
-  height: 80;
+  height: 90;
   justify-content: space-between;
 `;
 
@@ -51,14 +51,24 @@ class Header extends React.PureComponent {
    */
   render() {
     return (
-      <View>
+      <View style={{ height: 100, overflow: 'hidden' }}>
         <CustomStatusBar backgroundColor={Config.STUDIO_COLOR} barStyle="light-content" />
         <StudioColoredTop>
-          <BackArrow
-            onPress={this.goBack}
-            style={{ marginLeft: 15 }}
-            stroke={WHITE}
-          />
+          {this.props.onClose ? (
+            <XIcon
+              onPress={this.props.onClose}
+              stroke={WHITE}
+              strokeWidth={3}
+              size={20}
+              style={{ marginLeft: 15 }}
+            />
+          ) : (
+            <BackArrow
+              onPress={this.goBack}
+              style={{ marginLeft: 15 }}
+              stroke={WHITE}
+            />
+          )}
           <PageTitle>
             {this.props.title}
           </PageTitle>
@@ -72,6 +82,7 @@ class Header extends React.PureComponent {
 Header.propTypes = {
   navigation: PropTypes.shape(),
   title: PropTypes.string.isRequired,
+  onClose: PropTypes.func,
 };
 
 export default withNavigation(Header);

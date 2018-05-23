@@ -2,8 +2,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import { TouchableOpacity } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
 
 import Config from '../../../../config.json';
 import {
@@ -20,7 +18,7 @@ import {
   getUsersFirstPassName,
   getUserHasFlashCredit,
 } from '../../../selectors';
-import CartIcon from '../../shared/CartIcon';
+import { CartIcon, XIcon } from '../../shared';
 import { SpaceBetweenRow, HeavyText } from '../../styled';
 import BalanceDisplay from './BalanceDisplay';
 import NavLink from './NavLink';
@@ -76,9 +74,12 @@ class SideMenu extends React.PureComponent {
     return (
       <StyledContainer>
         <StyledCloseButtonContainer style={{ justifyContent: 'flex-start' }}>
-          <TouchableOpacity onPress={this.close} activeOpacity={1}>
-            <Icon name="ios-close" color={Config.STUDIO_COLOR} size={48} />
-          </TouchableOpacity>
+          <XIcon
+            onPress={this.close}
+            size={25}
+            stroke={Config.STUDIO_COLOR}
+            strokeWidth={2}
+          />
         </StyledCloseButtonContainer>
         <StyledHeader>
           <StyledHeavyText numberOfLines={1}>
