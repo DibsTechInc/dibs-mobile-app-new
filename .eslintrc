@@ -66,25 +66,7 @@
     "react/no-string-refs": 0
   },
   "globals": {
-    "$": true,
-    "_dibs_config": true,
-    "models": true,
-    "sequelize": true,
-    "Sequelize": true,
-    "apiSuccessWrapper": true,
-    "apiFailureWrapper": true,
-    "isAuthenticated": true,
-    "isStudioAuthenticated": true,
-    "isStudioAdmin": true,
-    "isDibsAdmin": true,
-    "goog_report_conversion": true,
-    "fbq": true,
-    "ga": true,
-    "goog_snippet_vars_signup": true,
-    "goog_snippet_vars_purchase": true,
-    "_dibsUser": true,
-    "_dibsLiveStudios": true,
-    "optimizely": true
+    "__DEV__": true
   },
   "plugins": [
     "import"
