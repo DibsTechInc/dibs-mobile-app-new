@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { promisify } from 'bluebird';
 import { Alert } from 'react-native';
+import styled from 'styled-components';
 
 import Config from '../../../../../config.json';
 import { GREY, WHITE, DARK_TEXT_GREY } from '../../../../constants/index';
@@ -10,13 +11,15 @@ import { addToCart, addToWaitlist } from '../../../../actions';
 import { lightenDarkenColor } from '../../../../helpers';
 import DibsLoader from '../../../shared/DibsLoader';
 import MaterialButton from '../../../shared/MaterialButton';
-import { FlexCenter, HeavyText } from '../../../styled';
+import { HeavyText } from '../../../styled';
 
-const StudioColoredQuantity = FlexCenter.extend`
+const StudioColoredQuantity = styled.TouchableOpacity`
+  align-items: center;
   border-color: ${Config.STUDIO_COLOR};
   border-radius: 5;
   border-width: 1;
-  max-height: 40px;
+  justify-content: center;
+  height: 40px;
   width: 40px;
 `;
 
@@ -115,7 +118,10 @@ class Button extends React.PureComponent {
   render() {
     if (this.props.quantity) {
       return (
-        <StudioColoredQuantity>
+        <StudioColoredQuantity
+          onPress={this.props.showOverlay}
+          activeOpacity={1}
+        >
           <QuantityDisplay>
             {this.props.quantity}
           </QuantityDisplay>
@@ -153,6 +159,10 @@ class Button extends React.PureComponent {
   }
 }
 
+Button.defaultProps = {
+  showOverlay() {},
+};
+
 Button.propTypes = {
   maxSeatsReached: PropTypes.bool.isRequired,
   has_waitlist: PropTypes.bool,
@@ -168,6 +178,7 @@ Button.propTypes = {
   locationName: PropTypes.string.isRequired,
   instructorName: PropTypes.string.isRequired,
   quantity: PropTypes.number.isRequired,
+  showOverlay: PropTypes.func,
 };
 
 const mapStateToProps = null; // state => ({});

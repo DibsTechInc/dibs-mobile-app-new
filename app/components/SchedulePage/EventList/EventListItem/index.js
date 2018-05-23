@@ -13,7 +13,7 @@ const Container = FlexRow.extend`
   border-bottom-color: ${LIGHT_GREY};
   overflow: hidden;
   padding-top: 10;
-  padding-bottom: ${props => (props.inCart ? 35 : 10)};
+  padding-bottom: ${props => (props.showOverlay ? 35 : 10)};
   position: relative;
 `;
 
@@ -46,15 +46,54 @@ const ScheduleText = styled.Text`
  */
 class EventListItem extends React.PureComponent {
   /**
+   * @constructor
+   * @constructs EventListItem
+   * @param {Object} props for component
+   */
+  constructor(props) {
+    super(props);
+    this.state = { showOverlay: false };
+    this.showOverlayAndStartTimer = this.showOverlayAndStartTimer.bind(this);
+  }
+  /**
+   * @param {Object} props component will get
+   * @returns {undefined}
+   */
+  componentWillReceiveProps(props) {
+    if (props.quantity !== this.props.quantity && props.quantity) {
+      this.showOverlayAndStartTimer();
+    }
+    if (!props.quantity) {
+      this.setState({ showOverlay: false });
+    }
+  }
+  /**
+   * @returns {undefined}
+   */
+  componentWillUnmount() {
+    if (this.overlayTimeout) clearTimeout(this.overlayTimeout);
+  }
+  /**
+   * @returns {undefined}
+   */
+  showOverlayAndStartTimer() {
+    if (this.overlayTimeout) clearTimeout(this.overlayTimeout);
+    this.setState({ showOverlay: true });
+    this.overlayTimeout = setTimeout(() => {
+      this.setState({ showOverlay: false });
+      this.overlayTimeout = null;
+    }, 1e4);
+  }
+  /**
    * render
    * @returns {JSX.Element} HTML
    */
   render() {
     return (
-      <Container inCart={Boolean(this.props.quantity)}>
+      <Container showOverlay={this.state.showOverlay}>
         {(
           (this.props.soldOut && !this.props.waitlisted && !this.props.has_waitlist)
-          || this.props.quantity
+          || this.state.showOverlay
         ) ? (
           <Overlay {...this.props} />
         ) : null}
@@ -93,7 +132,10 @@ class EventListItem extends React.PureComponent {
           </View>
         </CenterColumn>
         <ButtonColumn>
-          <Button {...this.props} />
+          <Button
+            {...this.props}
+            showOverlay={this.showOverlayAndStartTimer}
+          />
         </ButtonColumn>
       </Container>
     );
