@@ -64,7 +64,11 @@ class InputField extends React.PureComponent {
         }}
       >
         {this.props.label ? (
-          <Label style={this.props.labelStyle}>
+          <Label style={{
+            ...this.props.labelStyle,
+            fontFamily: 'flex-font',
+          }}
+          >
             {this.props.label}
           </Label>
         ) : null}
@@ -72,6 +76,10 @@ class InputField extends React.PureComponent {
           onFocus={this.onFocus}
           onBlur={this.onBlur}
           ref={(ref) => { this._textInput = ref; }}
+          style={{
+            ...this.props.inputStyle,
+            fontFamily: 'flex-font',
+          }}
           {...this.props}
         />
       </StudioColorBottomBorder>
@@ -91,6 +99,7 @@ InputField.propTypes = {
   containerStyle: PropTypes.shape(),
   labelStyle: PropTypes.shape(),
   customFocus: PropTypes.bool,
+  inputStyle: PropTypes.shape(),
 };
 
 export default withNavigation(InputField);

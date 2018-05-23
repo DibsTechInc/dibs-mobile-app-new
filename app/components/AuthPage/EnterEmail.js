@@ -94,7 +94,6 @@ class EnterEmail extends PureComponent {
           <InputField
             customFocus
             label="What's your email?"
-            placeholder="Email"
             autoCapitalize="none"
             onChangeText={email => this.setState({ email })}
             onSubmitEditing={this.handleOnPress}

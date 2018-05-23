@@ -115,7 +115,6 @@ class EnterPassword extends PureComponent {
             )}
             returnKeyType="go"
             blurOnSubmit={this.state.validInput}
-            placeholder="Password"
             secureTextEntry
             autoCapitalize="none"
             onSubmitEditing={this.handleOnPress}
