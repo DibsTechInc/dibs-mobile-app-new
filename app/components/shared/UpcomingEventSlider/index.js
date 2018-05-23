@@ -157,7 +157,7 @@ class UpcomingClassSlider extends React.PureComponent {
           onDragEnd={this.onDragEnd}
           ref={node => this.slider = node}
           allowMomentum={false}
-          allowDragging={!this.props.expanded}
+          allowDragging={Boolean(!this.props.expanded && this.props.detailedEvents.length)}
         >
           <Panel roundEdge={this.props.expanded || this.state.expanding}>
             {!this.props.expanded && (
