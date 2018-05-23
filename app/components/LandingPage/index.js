@@ -12,6 +12,7 @@ import Swiper from 'react-native-swiper';
 
 import About from './About';
 import { VERIFY_ROUTE, DARK_TEXT_GREY } from '../../constants';
+
 import Config from '../../../config.json';
 import { FadeInView, CustomStatusBar, MaterialButton } from '../shared';
 import { FlexCenter, NormalText } from '../styled';
@@ -53,6 +54,7 @@ class LandingPage extends Component {
 
     this.handleOnChangeIndex = this.handleOnChangeIndex.bind(this);
   }
+
   /**
    * @returns {undefined}
    */

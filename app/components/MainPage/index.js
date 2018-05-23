@@ -1,9 +1,11 @@
 import React from 'react';
+import { Alert } from 'react-native';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { NavigationActions } from 'react-navigation';
 import { Svg, Path } from 'react-native-svg';
+import { Updates } from 'expo';
 
 import backgroundImg from '../../../assets/img/main-page.png';
 import {
@@ -88,7 +90,45 @@ class MainPage extends React.PureComponent {
   constructor() {
     super();
     this.navigateToDrawer = this.navigateToDrawer.bind(this);
+
+    this.state = {
+      downloadingUpdates: false,
+    };
   }
+  /**
+   * @returns {undefined}
+   */
+  componentDidMount() {
+    this.getUpdates();
+  }
+
+  /**
+   * @returns {undefined}
+   */
+  async getUpdates() {
+    if (__DEV__) {
+      return;
+    }
+
+    try {
+      const update = await Updates.checkForUpdateAsync();
+      if (update.isAvailable) {
+        await Updates.fetchUpdateAsync();
+        Alert.alert(
+          'A wild update has appeared!',
+          'Your app will now refresh to get the latest goodies',
+          [
+            { text: 'Continue', onPress: () => Updates.reloadFromCache() },
+          ],
+          { cancelable: false }
+        );
+      }
+    } catch (err) {
+      Alert.alert('There is an update available, restart your app to download');
+      console.log(err);
+    }
+  }
+
   /**
    * @returns {undefined}
    */
