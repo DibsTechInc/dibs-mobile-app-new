@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import Dash from 'react-native-dash';
 
-import { WHITE, SOFT_GREY } from '../../../constants';
+import { WHITE } from '../../../constants';
 import { FlexRow } from '../../styled';
 
 const StyledView = FlexRow.extend`

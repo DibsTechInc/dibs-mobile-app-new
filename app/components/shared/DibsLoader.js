@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Animated } from 'react-native';
 import styled from 'styled-components';
-import { WHITE } from '../../constants';
+import { WHITE, BLACK } from '../../constants';
 import { FadeInView, CustomStatusBar } from './';
 import { NormalText } from '../styled';
 
@@ -22,7 +22,7 @@ const DotContainer = styled.View`
 
 const FadeInViewText = NormalText.extend`
   margin-bottom: 50px;
-  color: ${WHITE};
+  color: ${props => props.darkText ? BLACK : WHITE};
 `;
 
 const DibsLoaderDot = props => (
@@ -129,9 +129,14 @@ class DibsLoader extends React.Component {
     return (
       <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
         <CustomStatusBar backgroundColor="transparent" barStyle="light-content" />
-        {this.props.showText &&
-          <FadeInViewText>
+        {this.props.showPurchaseFlavorText &&
+          <FadeInViewText darkText={this.props.darkText}>
             If only taking vitamins could be classified as working out
+          </FadeInViewText>
+        }
+        {this.props.showUpdateText &&
+          <FadeInViewText darkText={this.props.darkText}>
+            Preparing the treadmills..
           </FadeInViewText>
         }
         <LoaderView {...this.props}>
@@ -150,6 +155,7 @@ DibsLoader.defaultProps = {
   width: 200,
   duration: 500,
   showText: false,
+  darkText: false,
 };
 
 const stringOrNum = PropTypes.oneOfType([
@@ -162,9 +168,11 @@ DibsLoader.propTypes = {
   dotColor: PropTypes.string,
   width: stringOrNum,
   duration: PropTypes.number,
-  showText: PropTypes.bool,
+  showPurchaseFlavorText: PropTypes.bool,
+  showUpdateText: PropTypes.bool,
   backgroundColor: PropTypes.string,
   onFinishLoading: PropTypes.func,
+  darkText: PropTypes.bool,
 };
 
 export default DibsLoader;
