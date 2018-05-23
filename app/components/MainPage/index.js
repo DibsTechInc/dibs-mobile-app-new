@@ -1,5 +1,4 @@
 import React from 'react';
-import { Alert } from 'react-native';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
@@ -94,12 +93,13 @@ class MainPage extends React.PureComponent {
 
     this.state = {
       hasCheckedUpdates: false,
+      needsUpdate: false,
     };
   }
   /**
    * @returns {undefined}
    */
-  componentDidMount() {
+  componentWillMount() {
     this.getUpdates();
   }
 
@@ -108,13 +108,13 @@ class MainPage extends React.PureComponent {
    */
   async getUpdates() {
     if (__DEV__) {
-      this.setState({ hasCheckedUpdates: true });
       return;
     }
 
     try {
       const update = await Updates.checkForUpdateAsync();
       if (update.isAvailable) {
+        this.setState({ needsUpdate: true });
         await Updates.fetchUpdateAsync();
         Updates.reloadFromCache();
       }
@@ -122,7 +122,7 @@ class MainPage extends React.PureComponent {
       console.log(err);
     }
 
-    this.setState({ hasCheckedUpdates: true });
+    this.setState({ needsUpdate: false });
   }
 
   /**
@@ -147,7 +147,7 @@ class MainPage extends React.PureComponent {
    * @returns {JSX.Element} XML
    */
   render() {
-    if (!this.state.hasCheckedUpdates) {
+    if (this.state.needsUpdate) {
       return (<DibsLoader
         dotColor={Config.STUDIO_COLOR}
         maxDotRadius={10}
