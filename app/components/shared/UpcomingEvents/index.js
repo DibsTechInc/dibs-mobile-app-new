@@ -1,9 +1,11 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import Swiper from 'react-native-swiper';
+import { connect } from 'react-redux';
 
 import Config from '../../../../config.json';
 import { WHITE, HEIGHT } from '../../../constants';
+import { setUpcomingEventSliderExpandedFalse } from '../../../actions';
 import UpcomingEvent from './UpcomingEvent';
 
 /**
@@ -11,6 +13,15 @@ import UpcomingEvent from './UpcomingEvent';
  * @extends {Component}
  */
 class UpcomingEvents extends PureComponent {
+  /**
+   * @param {Object} props for component
+   * @returns {undefined}
+   */
+  componentWillReceiveProps(props) {
+    if (props.expanded && !props.events.length) {
+      this.props.setUpcomingEventSliderExpandedFalse();
+    }
+  }
   /**
    * @returns {JSX} XML
    */
@@ -48,7 +59,15 @@ UpcomingEvents.defaultProps = { expanded: true };
 UpcomingEvents.propTypes = {
   forReceiptPage: PropTypes.bool,
   events: PropTypes.arrayOf(PropTypes.shape()),
-  expanded: PropTypes.bool,
+  expanded: PropTypes.bool.isRequired,
+  setUpcomingEventSliderExpandedFalse: PropTypes.func.isRequired,
 };
 
-export default UpcomingEvents;
+const mapStateToProps = state => ({
+  expanded: state.animation.upcomingEventSliderExpanded,
+});
+const mapDispatchToProps = {
+  setUpcomingEventSliderExpandedFalse,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(UpcomingEvents);

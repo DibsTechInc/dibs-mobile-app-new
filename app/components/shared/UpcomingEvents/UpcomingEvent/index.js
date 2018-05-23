@@ -59,6 +59,13 @@ class UpcomingEvent extends PureComponent {
     this.dropClass = this.dropClass.bind(this);
   }
   /**
+   * @param {Object} props component is about to get
+   * @returns {undefined}
+   */
+  componentWillReceiveProps(props) {
+    if (props.expanded !== this.props.expanded) this.scrollView.scrollTo({ y: 0, animated: false });
+  }
+  /**
    * @returns {undefined}
    */
   startDropClass() {
@@ -97,7 +104,10 @@ class UpcomingEvent extends PureComponent {
 
     return (
       <FadeInView style={{ paddingTop: this.props.forReceiptPage ? 10 : 0, paddingBottom: 40, backgroundColor: WHITE }}>
-        <ScrollView style={{ paddingTop: this.props.forReceiptPage ? 10 : 0, paddingBottom: 40 }}>
+        <ScrollView
+          ref={node => this.scrollView = node}
+          style={{ paddingTop: this.props.forReceiptPage ? 10 : 0, paddingBottom: 40 }}
+        >
           <EventRow>
             <EventInfo>
               <View style={{ marginBottom: 10 }}>
@@ -204,6 +214,7 @@ UpcomingEvent.propTypes = {
 
 const mapStateToProps = state => ({
   dropping: getDroppingUpcomingEvent(state),
+  expanded: state.animation.upcomingEventSliderExpanded,
 });
 const mapDispatchToProps = {
   dropUserFromEvent,
