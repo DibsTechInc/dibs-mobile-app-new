@@ -94,50 +94,10 @@ export const getHasUpcomingClassesPrevMonth = createSelector(
   }
 );
 
-/**
- * @param {Array<Object>} events data for slider
- * @param {string} shortDateFormat short date format for studio
- * @param {string} timeFormat for studio
- * @returns {Array<Object>} events for slider
- */
-function generateSliderEvents(events, shortDateFormat, timeFormat) {
-  return events.map(({ location, instructor, ...event }) => {
-    const localStartTime = moment.tz(event.start_time, event.mainTZ);
-    // const localEndTime = moment.tz(event.end_time, event.mainTZ);
-    const formatTime = time => (
-      time.get('minute') || timeFormat !== 'LT' ?
-        time.format(timeFormat) : time.format('hA')
-    );
-    return {
-      ...event,
-      shortDayOfWeek: localStartTime.format('ddd'),
-      shortEventDate: localStartTime.format(shortDateFormat),
-      formattedStartTime: formatTime(localStartTime),
-      // formattedEndTime: formatTime(localEndTime),
-      locationName: location.name,
-      instructorName: instructor.name,
-    };
-  });
-}
-
-export const getMostRecentUpcomingSliderEvents = createSelector(
-  getMostRecentUpcomingEvents,
-  getStudioShortDateFormat,
-  getStudioCustomTimeFormat,
-  generateSliderEvents
-);
-
 export const getUpcomingEventsOnCurrentDate = createSelector(
   getUpcomingEventsData,
   getUpcomingEventsCurrentDate,
   (events, currentDate) => events.filter(event => moment.tz(event.start_time, event.mainTZ).isSame(currentDate, 'day'))
-);
-
-export const getUpcomingSliderEventsOnCurrentDate = createSelector(
-  getUpcomingEventsOnCurrentDate,
-  getStudioShortDateFormat,
-  getStudioCustomTimeFormat,
-  generateSliderEvents
 );
 
 export const getUpcomingEventCalendarMarkings = createSelector(
@@ -165,6 +125,9 @@ export const getUpcomingEventCalendarMarkings = createSelector(
 /**
  * @param {Array<Object>} items upcoming class transaction grouped by class
  * @param {string} currency code of studio
+ * @param {string} timeFormat for clock times
+ * @param {string} shortDateFormat for calendar dates
+ * @param {Array<Object>} locations studio locs
  * @returns {Array<Object>} upcoming events for expanded slider
  */
 function generateDetailedUpcomingEvents(items, currency, timeFormat, shortDateFormat, locations) {
