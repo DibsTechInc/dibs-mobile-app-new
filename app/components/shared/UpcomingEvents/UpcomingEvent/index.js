@@ -48,7 +48,7 @@ const DesciptionText = NormalText.extend`
  * @class UpcomingClass
  * @extends {Component}
  */
-class UpcomingClass extends PureComponent {
+class UpcomingEvent extends PureComponent {
   /**
    * @constructor
    * @constructs UpcomingClass
@@ -120,6 +120,7 @@ class UpcomingClass extends PureComponent {
             latitude={this.props.latitude}
             longitude={this.props.longitude}
             locationName={this.props.locationName}
+            allowInteraction={this.props.expanded}
           />
           <TransactionBreakdown
             formattedSubtotal={this.props.formattedSubtotal}
@@ -170,7 +171,7 @@ class UpcomingClass extends PureComponent {
   }
 }
 
-UpcomingClass.propTypes = {
+UpcomingEvent.propTypes = {
   forReceiptPage: PropTypes.bool.isRequired,
   formattedSubtotal: PropTypes.string,
   name: PropTypes.string,
@@ -193,6 +194,7 @@ UpcomingClass.propTypes = {
   locationName: PropTypes.string,
   instructorName: PropTypes.string,
   quantity: PropTypes.number,
+  expanded: PropTypes.bool.isRequired,
 };
 
 const mapStateToProps = state => ({
@@ -202,4 +204,4 @@ const mapDispatchToProps = {
   dropUserFromEvent,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(UpcomingClass);
+export default connect(mapStateToProps, mapDispatchToProps)(UpcomingEvent);

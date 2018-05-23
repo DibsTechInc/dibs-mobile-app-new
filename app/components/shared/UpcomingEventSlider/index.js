@@ -1,22 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { View } from 'react-native';
-import { Svg, Path } from 'react-native-svg';
 import SlidingUpPanel from 'rn-sliding-up-panel';
 import styled from 'styled-components';
+import { TouchableOpacity } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
-import { WHITE, HEIGHT, LIGHT_GREY, TEXT_GREY } from '../../../constants';
-import UnexpandedContent from './UnexpandedContent';
-import UpcomingEvents from '../../shared/UpcomingEvents';
-import { NormalText } from '../../styled';
+import Config from '../../../../config.json';
+import { WHITE, HEIGHT } from '../../../constants';
+import UpcomingEvents from '../UpcomingEvents';
+import { FlexRow } from '../../styled';
 
 const FULL_HEIGHT = HEIGHT - 30;
 const SHORTENED_HEIGHT = HEIGHT / 2.5;
-
-const SwipeInstructions = NormalText.extend`
-  color: ${TEXT_GREY};
-  margin-top: 5;
-`;
 
 const Panel = styled.View`
   align-items: center;
@@ -26,6 +21,14 @@ const Panel = styled.View`
   bottom: 0;
   height: ${HEIGHT};
   position: absolute;
+  width: 100%;
+`;
+
+const CloseButtonContainer = FlexRow.extend`
+  align-items: center;
+  height: 40;
+  justify-content: flex-end;
+  padding-horizontal: 17;
   width: 100%;
 `;
 
@@ -46,20 +49,10 @@ class UpcomingClassSlider extends React.PureComponent {
       dragBottom: SHORTENED_HEIGHT,
       expanded: false,
       expanding: false,
-      draggable: Boolean(props.sliderEvents.length),
     };
     this.onDragStart = this.onDragStart.bind(this);
     this.onDragEnd = this.onDragEnd.bind(this);
-    this.getArrowPathStr = this.getArrowPathStr.bind(this);
-    this.pauseDrag = this.pauseDrag.bind(this);
-    this.resumeDrag = this.resumeDrag.bind(this);
-  }
-  /**
-   * @param {Object} props component will receive
-   * @returns {undefined}
-   */
-  componentWillReceiveProps(props) {
-    this.setState({ draggable: Boolean(props.sliderEvents.length) });
+    this.handleDragDown = this.handleDragDown.bind(this);
   }
   /**
    * @returns {undefined}
@@ -80,18 +73,10 @@ class UpcomingClassSlider extends React.PureComponent {
     else this.handleDragUp();
   }
   /**
-   * @returns {string} path for arrow icon
-   */
-  getArrowPathStr() {
-    if (this.state.expanding) return '';
-    if (this.state.expanded) return 'M 5 2 L 20 10 L 35 2';
-    return 'M 2 2 L 38 2';
-  }
-  /**
    * @returns {undefined}
    */
   async handleDragUp() {
-    await new Promise(res => this.setState({ expanding: !this.state.expanded }, res));
+    await new Promise(res => this.setState({ expanding: true }, res));
     await new Promise(res => this.slider.transitionTo({
       toValue: FULL_HEIGHT,
       duration: 100,
@@ -103,25 +88,13 @@ class UpcomingClassSlider extends React.PureComponent {
    * @returns {undefined}
    */
   async handleDragDown() {
-    await new Promise(res => this.setState({ expanding: this.state.expanded }, res));
+    await new Promise(res => this.setState({ expanding: false }, res));
     await new Promise(res => this.slider.transitionTo({
       toValue: SHORTENED_HEIGHT,
       duration: 100,
       onAnimationEnd: res,
     }));
     this.setState({ expanded: false, expanding: false });
-  }
-  /**
-   * @returns {undefined}
-   */
-  pauseDrag() {
-    this.setState({ draggable: false });
-  }
-  /**
-   * @returns {undefined}
-   */
-  resumeDrag() {
-    this.setState({ draggable: true });
   }
   /**
    * render
@@ -137,38 +110,21 @@ class UpcomingClassSlider extends React.PureComponent {
         onDragEnd={this.onDragEnd}
         ref={node => this.slider = node}
         allowMomentum={false}
-        allowDragging={this.state.draggable}
+        allowDragging={!this.state.expanded}
       >
         <Panel>
-          <Svg style={{ marginTop: 5 }} width={40} height={12}>
-            <Path
-              stroke={LIGHT_GREY}
-              strokeWidth={2}
-              strokeLinecap="round"
-              fill="none"
-              d={this.getArrowPathStr()}
-            />
-          </Svg>
-          {this.state.expanded && !this.state.expanding ? (
-            <SwipeInstructions>
-              Swipe down from the top to close
-            </SwipeInstructions>
-          ) : null}
-          {this.state.expanded || this.state.expanding ? null : (
-            <UnexpandedContent
-              isUpcomingClassesPage={this.props.isUpcomingClassesPage}
-              events={this.props.sliderEvents}
-            />
-          )}
-          {this.state.expanded && !this.state.expanding ? (
-            <View
-              style={{ marginTop: 15 }}
-              onStartShouldSetResponder={this.pauseDrag}
-              onTouchEnd={this.resumeDrag}
-            >
-              <UpcomingEvents forReceiptPage={false} events={this.props.detailedEvents} />
-            </View>
-          ) : null}
+          <CloseButtonContainer>
+            {this.state.expanded ? (
+              <TouchableOpacity onPress={this.handleDragDown} activeOpacity={1}>
+                <Icon name="ios-close" color={Config.STUDIO_COLOR} size={40} />
+              </TouchableOpacity>
+            ) : null}
+          </CloseButtonContainer>
+          <UpcomingEvents
+            forReceiptPage={false}
+            events={this.props.detailedEvents}
+            expanded={this.state.expanded}
+          />
         </Panel>
       </SlidingUpPanel>
     );
@@ -180,9 +136,7 @@ UpcomingClassSlider.defaultProps = {
 };
 
 UpcomingClassSlider.propTypes = {
-  sliderEvents: PropTypes.arrayOf(PropTypes.shape()).isRequired,
   detailedEvents: PropTypes.arrayOf(PropTypes.shape()).isRequired,
-  isUpcomingClassesPage: PropTypes.bool,
 };
 
 export default UpcomingClassSlider;

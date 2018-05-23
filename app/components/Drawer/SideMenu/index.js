@@ -4,6 +4,8 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+
+import Config from '../../../../config.json';
 import {
   MAIN_ROUTE,
   PROFILE_ROUTE,
@@ -74,8 +76,8 @@ class SideMenu extends React.PureComponent {
     return (
       <StyledContainer>
         <StyledCloseButtonContainer style={{ justifyContent: 'flex-start' }}>
-          <TouchableOpacity onPress={this.close}>
-            <Icon name="ios-close" color="#000" size={48} />
+          <TouchableOpacity onPress={this.close} activeOpacity={1}>
+            <Icon name="ios-close" color={Config.STUDIO_COLOR} size={48} />
           </TouchableOpacity>
         </StyledCloseButtonContainer>
         <StyledHeader>
