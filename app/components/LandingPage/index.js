@@ -95,7 +95,9 @@ class LandingPage extends Component {
               <StyledGrayText>Swipe to learn more</StyledGrayText>
               {this.props.navigation.state.params &&
                 this.props.navigation.state.params.accountReactivated &&
-                <NormalText>Your account has been reactivated, please login again</NormalText>
+                <NormalText>
+                  Your account has been reactivated, please login again.
+                </NormalText>
               }
             </StyledWelcomeView>
             <StyledButtonsView>
