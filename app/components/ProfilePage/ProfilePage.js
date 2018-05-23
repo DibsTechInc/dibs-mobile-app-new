@@ -74,7 +74,7 @@ class ProfilePage extends PureComponent {
               title={`${this.props.userFirstName} ${this.props.userLastName}`}
               onPress={this.handleProfileInfoRoute}
             />
-            <SettingsList.Header headerStyle={{ marginTop: -20 }} />
+            <SettingsList.Header headerStyle={{ marginTop: -18 }} />
             <SettingsList.Item
               hasNavArrow={false}
               title="ACCOUNT DETAILS"
