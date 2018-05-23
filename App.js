@@ -41,20 +41,44 @@ class App extends Component {
    */
   constructor() {
     super();
-
     ScreenOrientation.allow(ScreenOrientation.Orientation.PORTRAIT);
 
     this.state = {
       fetchedAssets: false,
       userToken: null,
       errorOccurred: false,
+      checkedUpdates: false,
     };
   }
   /**
    * @returns {undefined}
    */
   componentWillMount() {
+    this.getUpdates();
     this.getAssets();
+  }
+
+  /**
+   * @returns {undefined}
+   */
+  async getUpdates() {
+    if (__DEV__) {
+      this.setState({ checkedUpdates: true });
+      return;
+    }
+
+    try {
+      const update = await Updates.checkForUpdateAsync();
+      if (update.isAvailable) {
+        await Updates.fetchUpdateAsync();
+        // ... notify user of update ...
+        Updates.reloadFromCache();
+      }
+    } catch (err) {
+      console.log(err);
+    }
+
+    this.setState({ checkedUpdates: true });
   }
 
   /**
@@ -62,15 +86,6 @@ class App extends Component {
    */
   async getAssets() {
     try {
-      if (!__DEV__) {
-        const update = await Updates.checkForUpdateAsync();
-        if (update.isAvailable) {
-          await Updates.fetchUpdateAsync();
-          // ... notify user of update ...
-          Updates.reloadFromCache();
-        }
-      }
-
       const token = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
       await Promise.promisify(cb => store.dispatch(requestStudioData(cb)))();
       await Promise.all([
@@ -96,7 +111,7 @@ class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        {this.state.fetchedAssets ? (
+        {(this.state.fetchedAssets && this.state.checkedUpdates) ? (
           <Navigator userToken={this.state.userToken} />
         ) : (
           <StyledLoadingPage>

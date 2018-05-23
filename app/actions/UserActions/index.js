@@ -29,6 +29,26 @@ export function refreshUser(user) {
 }
 
 /**
+ * @param {function} callback on complete
+ * @returns {function} thunk
+ */
+export function logOutUser(callback = () => {}) {
+  return async function innerLogOutUser(dispatch) {
+    try {
+      await AsyncStorage.removeItem(Config.USER_TOKEN_KEY);
+      dispatch(setUser({}));
+      dispatch(removeCreditCard());
+      dispatch(setUpcomingEvents([]));
+      dispatch(clearCart());
+      callback();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+}
+
+
+/**
  * @returns {function} thunk
  */
 export function recordStudioVisit() {
@@ -61,8 +81,8 @@ export function requestUserData(callback) {
         dispatch(requestCreditCardInfo());
         dispatch(requestUserEvents());
       } else {
-        Alert.alert('Uh oh!', res.message);
-        callback(res);
+        AsyncStorage.clear();
+        dispatch(logOutUser());
       }
     } catch (err) {
       Alert.alert('Uh oh!', 'Something went wrong loading the app.');
@@ -240,26 +260,6 @@ export function updateUserEmailPreferences(list, email, callback) {
     }
   };
 }
-
-/**
- * @param {function} callback on complete
- * @returns {function} thunk
- */
-export function logOutUser(callback = () => {}) {
-  return async function innerLogOutUser(dispatch) {
-    try {
-      await AsyncStorage.removeItem(Config.USER_TOKEN_KEY);
-      dispatch(setUser({}));
-      dispatch(removeCreditCard());
-      dispatch(setUpcomingEvents([]));
-      dispatch(clearCart());
-      callback();
-    } catch (err) {
-      console.log(err);
-    }
-  };
-}
-
 /**
  * @param {String} email of user
  * @param {function} callback on complete

@@ -27,7 +27,7 @@ export function requestCreditCardInfo(callback = () => {}) {
         requiresAuth: true,
       });
       if (res.success) dispatch(setCreditCard(res.creditCard));
-      else if (res.message !== 'The user does not have a card') Alert.alert('Uh oh!', 'Something went wrong getting your billing information.');
+      else if (res.message !== 'The user does not have a card') console.log(res.message, 'requestCCInfoAction')
     } catch (err) {
       console.log(err);
       Alert.alert('Uh oh!', 'Something went wrong getting your billing information.');
@@ -58,10 +58,9 @@ export function updateCreditCard({ ccNum, ccCVC, expiration }, callback = () => 
         },
       });
       if (res.success) dispatch(setCreditCard(res.card));
-      else Alert.alert('Uh oh!', res.message);
+      else console.log(res.message, 'updateCCActions')
     } catch (err) {
-      console.log(err);
-      Alert.alert('Uh oh!', 'Something went wrong updating your billing information.');
+      console.log(err, 'caught error in catch');
     }
     dispatch(setCreditCardLoadingFalse());
     callback();
