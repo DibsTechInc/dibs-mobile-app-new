@@ -23,10 +23,11 @@ import {
   getStudioName,
   getUserHasUpcomingEvents,
 } from '../../selectors';
-import { FadeInView, CustomStatusBar, BurgerIcon, CartIcon } from '../shared';
+import { FadeInView, CustomStatusBar, BurgerIcon, CartIcon, DibsLoader } from '../shared';
 import { HeavyText, FlexRow, SpaceBetweenRow } from '../styled';
 import IconLink from './IconLink';
 import UpcomingEventSlider from './UpcomingEventSlider';
+import Config from '../../../config.json';
 
 const BackgroundImage = styled.Image`
   left: 0;
@@ -92,7 +93,7 @@ class MainPage extends React.PureComponent {
     this.navigateToDrawer = this.navigateToDrawer.bind(this);
 
     this.state = {
-      downloadingUpdates: false,
+      hasCheckedUpdates: false,
     };
   }
   /**
@@ -107,6 +108,7 @@ class MainPage extends React.PureComponent {
    */
   async getUpdates() {
     if (__DEV__) {
+      this.setState({ hasCheckedUpdates: true });
       return;
     }
 
@@ -114,19 +116,13 @@ class MainPage extends React.PureComponent {
       const update = await Updates.checkForUpdateAsync();
       if (update.isAvailable) {
         await Updates.fetchUpdateAsync();
-        Alert.alert(
-          'A wild update has appeared!',
-          'Your app will now refresh to get the latest goodies',
-          [
-            { text: 'Continue', onPress: () => Updates.reloadFromCache() },
-          ],
-          { cancelable: false }
-        );
+        Updates.reloadFromCache();
       }
     } catch (err) {
-      Alert.alert('There is an update available, restart your app to download');
       console.log(err);
     }
+
+    this.setState({ hasCheckedUpdates: true });
   }
 
   /**
@@ -151,6 +147,16 @@ class MainPage extends React.PureComponent {
    * @returns {JSX.Element} XML
    */
   render() {
+    if (!this.state.hasCheckedUpdates) {
+      return (<DibsLoader
+        dotColor={Config.STUDIO_COLOR}
+        maxDotRadius={10}
+        width={160}
+        showUpdateText
+        darkText
+      />);
+    }
+
     return (
       <FadeInView style={{ position: 'relative', backgroundColor: BLACK }}>
         <CustomStatusBar backgroundColor={'transparent'} barStyle="light-content" />
