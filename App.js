@@ -54,20 +54,23 @@ class App extends Component {
    * @returns {undefined}
    */
   componentWillMount() {
-    const update = Updates.checkForUpdateAsync();
-    update.then((status) => {
-      if (status.isAvailable) {
-        Updates.reload();
-      }
-    });
-
     this.getAssets();
   }
+
   /**
    * @returns {undefined}
    */
   async getAssets() {
     try {
+      if (process.env.NODE_ENV === 'production') {
+        const update = await Updates.checkForUpdateAsync();
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          // ... notify user of update ...
+          Updates.reloadFromCache();
+        }
+      }
+
       const token = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
       await Promise.promisify(cb => store.dispatch(requestStudioData(cb)))();
       await Promise.all([
