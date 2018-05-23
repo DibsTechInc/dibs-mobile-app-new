@@ -62,7 +62,7 @@ class App extends Component {
    */
   async getAssets() {
     try {
-      if (process.env.NODE_ENV === 'production') {
+      if (!__DEV__) {
         const update = await Updates.checkForUpdateAsync();
         if (update.isAvailable) {
           await Updates.fetchUpdateAsync();
