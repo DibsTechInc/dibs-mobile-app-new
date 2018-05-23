@@ -129,7 +129,11 @@ class DibsLoader extends React.Component {
     return (
       <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
         <CustomStatusBar backgroundColor="transparent" barStyle="light-content" />
-        {this.props.showText && <FadeInViewText>If only taking vitamins could be classified as working out</FadeInViewText>}
+        {this.props.showText &&
+          <FadeInViewText>
+            If only taking vitamins could be classified as working out
+          </FadeInViewText>
+        }
         <LoaderView {...this.props}>
           <DibsLoaderDot {...this.props} style={this.getFirstDotStyle()} />
           <DibsLoaderDot {...this.props} style={this.getSecondDotStyle()} />

@@ -3,8 +3,15 @@ import PropTypes from 'prop-types';
 import SlidingUpPanel from 'rn-sliding-up-panel';
 import styled from 'styled-components';
 import { View, Animated } from 'react-native';
+import { connect } from 'react-redux';
+import { compose } from 'redux';
+import { withNavigation } from 'react-navigation';
 
-import { WHITE, HEIGHT } from '../../../constants';
+import { WHITE, HEIGHT, MAIN_ROUTE } from '../../../constants';
+import {
+  setUpcomingEventSliderExpandedTrue,
+  setUpcomingEventSliderExpandedFalse,
+} from '../../../actions';
 import UpcomingEvents from '../UpcomingEvents';
 import Header from '../../Header';
 
@@ -44,7 +51,15 @@ class UpcomingClassSlider extends React.PureComponent {
     };
     this.onDragStart = this.onDragStart.bind(this);
     this.onDragEnd = this.onDragEnd.bind(this);
-    this.handleDragDown = this.handleDragDown.bind(this);
+  }
+  /**
+   * @param {Object} props component is about to get
+   * @returns {undefined|null} handles when the slider is closed by the header
+   */
+  componentWillReceiveProps(props) {
+    if (props.expanded && !this.props.expanded) return this.handleDragUp();
+    if (!props.expanded && this.props.expanded) return this.handleDragDown();
+    return null;
   }
   /**
    * @returns {undefined}
@@ -60,8 +75,8 @@ class UpcomingClassSlider extends React.PureComponent {
    * @returns {undefined}
    */
   onDragEnd(pos) {
-    if (!this.state.expanded && pos > (SHORTENED_HEIGHT + 30)) this.handleDragUp();
-    else if (!this.state.expanded || pos < (FULL_HEIGHT - 30)) this.handleDragDown();
+    if (!this.props.expanded && pos > (SHORTENED_HEIGHT + 30)) this.handleDragUp();
+    else if (!this.props.expanded || pos < (FULL_HEIGHT - 30)) this.handleDragDown();
     else this.handleDragUp();
   }
   /**
@@ -83,13 +98,14 @@ class UpcomingClassSlider extends React.PureComponent {
         }
       ).start(res)),
     ]);
-    this.setState({ expanded: true, expanding: false });
+    this.setState({ expanding: false });
+    this.props.setUpcomingEventSliderExpandedTrue();
   }
   /**
    * @returns {undefined}
    */
   async handleDragDown() {
-    await new Promise(res => this.setState({ expanding: false }, res));
+    await new Promise(res => this.setState({ expanding: true }, res));
     await Promise.all([
       new Promise(res => this.slider.transitionTo({
         toValue: SHORTENED_HEIGHT,
@@ -104,7 +120,8 @@ class UpcomingClassSlider extends React.PureComponent {
         }
       ).start(res)),
     ]);
-    this.setState({ expanded: false, expanding: false });
+    this.setState({ expanding: false });
+    this.props.setUpcomingEventSliderExpandedFalse();
   }
   /**
    * render
@@ -117,9 +134,11 @@ class UpcomingClassSlider extends React.PureComponent {
         onStartShouldSetResponder={() => false}
         pointerEvents="box-none"
       >
-        <Animated.View style={{ top: this.state.headerTop, left: 0, right: 0, position: 'absolute' }}>
-          <Header title="My Classes" onClose={this.handleDragDown} />
-        </Animated.View>
+        {this.props.navigation.state.key === MAIN_ROUTE && (
+          <Animated.View style={{ top: this.state.headerTop, left: 0, right: 0, position: 'absolute' }}>
+            <Header title="My Classes" />
+          </Animated.View>
+        )}
         <SlidingUpPanel
           visible
           showBackdrop={false}
@@ -128,13 +147,13 @@ class UpcomingClassSlider extends React.PureComponent {
           onDragEnd={this.onDragEnd}
           ref={node => this.slider = node}
           allowMomentum={false}
-          allowDragging={!this.state.expanded}
+          allowDragging={!this.props.expanded}
         >
-          <Panel roundEdge={this.state.expanded || this.state.expanding}>
+          <Panel roundEdge={this.props.expanded || this.state.expanding}>
             <UpcomingEvents
               forReceiptPage={false}
               events={this.props.detailedEvents}
-              expanded={this.state.expanded}
+              expanded={this.props.expanded}
             />
           </Panel>
         </SlidingUpPanel>
@@ -148,7 +167,22 @@ UpcomingClassSlider.defaultProps = {
 };
 
 UpcomingClassSlider.propTypes = {
+  navigation: PropTypes.shape().isRequired,
   detailedEvents: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+  expanded: PropTypes.bool.isRequired,
+  setUpcomingEventSliderExpandedTrue: PropTypes.func.isRequired,
+  setUpcomingEventSliderExpandedFalse: PropTypes.func.isRequired,
 };
 
-export default UpcomingClassSlider;
+const mapStateToProps = state => ({
+  expanded: state.animation.upcomingEventSliderExpanded,
+});
+const mapDispatchToProps = {
+  setUpcomingEventSliderExpandedTrue,
+  setUpcomingEventSliderExpandedFalse,
+};
+
+export default compose(
+  withNavigation,
+  connect(mapStateToProps, mapDispatchToProps)
+)(UpcomingClassSlider);

@@ -21,7 +21,7 @@ const ScrollContainer = styled.ScrollView`
 
 const ContainerWithMargin = styled.View`
   align-items: center;
-  margin-top: 25%;
+  margin-top: 15%;
   width: 100%;
 `;
 

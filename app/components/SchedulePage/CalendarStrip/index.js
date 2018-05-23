@@ -21,7 +21,7 @@ import { FlexRow, FlexCenter, NormalText } from '../../styled';
 const Container = styled.View`
   background: ${Config.STUDIO_COLOR};
   overflow: hidden;
-  padding-bottom: 10;
+  top: -20;
   z-index: 5;
 `;
 

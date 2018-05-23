@@ -2,9 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withNavigation } from 'react-navigation';
 import { View } from 'react-native';
+import { compose } from 'redux';
+import { connect } from 'react-redux';
 
 import Config from '../../../config.json';
 import { WHITE } from '../../constants';
+import { setUpcomingEventSliderExpandedFalse } from '../../actions';
 import { FlexRow, HeavyText } from '../styled';
 import { BackArrow, CustomStatusBar, CartIcon, XIcon } from '../shared';
 
@@ -46,22 +49,22 @@ class Header extends React.PureComponent {
     return this.props.navigation.goBack();
   }
   /**
-   * render
-   * @returns {JSX.Element} HTML
+   * @returns {JSX.Element} XML
    */
   render() {
     return (
       <View style={{ height: 100, overflow: 'hidden' }}>
         <CustomStatusBar backgroundColor={Config.STUDIO_COLOR} barStyle="light-content" />
         <StudioColoredTop>
-          {this.props.onClose ? (
-            <XIcon
-              onPress={this.props.onClose}
-              stroke={WHITE}
-              strokeWidth={3}
-              size={20}
-              style={{ marginLeft: 15 }}
-            />
+          {this.props.upcomingEventSliderExpanded ? (
+            <View style={{ width: 30, marginLeft: 15 }}>
+              <XIcon
+                onPress={this.props.setUpcomingEventSliderExpandedFalse}
+                stroke={WHITE}
+                strokeWidth={3}
+                size={20}
+              />
+            </View>
           ) : (
             <BackArrow
               onPress={this.goBack}
@@ -80,9 +83,20 @@ class Header extends React.PureComponent {
 }
 
 Header.propTypes = {
-  navigation: PropTypes.shape(),
+  navigation: PropTypes.shape().isRequired,
   title: PropTypes.string.isRequired,
-  onClose: PropTypes.func,
+  upcomingEventSliderExpanded: PropTypes.bool.isRequired,
+  setUpcomingEventSliderExpandedFalse: PropTypes.func.isRequired,
 };
 
-export default withNavigation(Header);
+const mapStateToProps = state => ({
+  upcomingEventSliderExpanded: state.animation.upcomingEventSliderExpanded,
+});
+const mapDispatchToProps = {
+  setUpcomingEventSliderExpandedFalse,
+};
+
+export default compose(
+  withNavigation,
+  connect(mapStateToProps, mapDispatchToProps)
+)(Header);
