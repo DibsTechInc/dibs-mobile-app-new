@@ -72,28 +72,6 @@ export const getMostRecentUpcomingEvents = createSelector(
   eventsByDay => (eventsByDay[Math.min(...Object.keys(eventsByDay))] || [])
 );
 
-export const getHasUpcomingClassesNextMonth = createSelector(
-  getUpcomingEventsCurrentDate,
-  getUpcomingEventsByDay,
-  (currentDate, eventsByDay) => {
-    const eventsNextMonth = Object.keys(eventsByDay).filter(
-      day => moment(+day).startOf('month').isAfter(currentDate)
-    );
-    return Boolean(eventsNextMonth.length);
-  }
-);
-
-export const getHasUpcomingClassesPrevMonth = createSelector(
-  getUpcomingEventsCurrentDate,
-  getUpcomingEventsByDay,
-  (currentDate, eventsByDay) => {
-    const eventsPrevMonth = Object.keys(eventsByDay).filter(
-      day => moment(+day).startOf('month').isBefore(currentDate.clone().startOf('month'))
-    );
-    return Boolean(eventsPrevMonth.length);
-  }
-);
-
 export const getUpcomingEventsOnCurrentDate = createSelector(
   getUpcomingEventsData,
   getUpcomingEventsCurrentDate,

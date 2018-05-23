@@ -18,7 +18,8 @@ class CalendarArrow extends React.PureComponent {
       <Svg
         width={20}
         height={20}
-        style={{ opacity: this.props.disabled ? 0.25 : 1 }}
+        style={{ ...this.props.style, opacity: this.props.disabled ? 0.1 : 1 }}
+        pointerEvents="none"
       >
         <Path
           fill="none"
@@ -36,6 +37,7 @@ class CalendarArrow extends React.PureComponent {
 CalendarArrow.propTypes = {
   disabled: PropTypes.bool.isRequired,
   direction: PropTypes.string.isRequired,
+  style: PropTypes.shape().isRequired,
 };
 
 export default CalendarArrow;

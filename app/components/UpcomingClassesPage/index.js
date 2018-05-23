@@ -20,7 +20,7 @@ class UpcomingClassesPage extends React.PureComponent {
       <FadeInView style={{ position: 'relative', backgroundColor: Config.STUDIO_COLOR }}>
         <Header title="My Classes" />
         <Calendar />
-        <UpcomingEventSlider isUpcomingClassesPage />
+        <UpcomingEventSlider />
       </FadeInView>
     );
   }

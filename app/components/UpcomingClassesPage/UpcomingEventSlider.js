@@ -4,7 +4,7 @@ import { UpcomingEventSlider } from '../shared';
 import { getDetailedUpcomingEventsOnCurrentDay } from '../../selectors';
 
 const mapStateToProps = state => ({
-  detailedEvents: getDetailedUpcomingEventsOnCurrentDay(state),
+  events: getDetailedUpcomingEventsOnCurrentDay(state),
 });
 
 export default connect(mapStateToProps)(UpcomingEventSlider);

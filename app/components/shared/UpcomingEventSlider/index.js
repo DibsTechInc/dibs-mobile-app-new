@@ -157,7 +157,7 @@ class UpcomingClassSlider extends React.PureComponent {
           onDragEnd={this.onDragEnd}
           ref={node => this.slider = node}
           allowMomentum={false}
-          allowDragging={Boolean(!this.props.expanded && this.props.detailedEvents.length)}
+          allowDragging={Boolean(!this.props.expanded && this.props.events.length)}
         >
           <Panel roundEdge={this.props.expanded || this.state.expanding}>
             {!this.props.expanded && (
@@ -167,12 +167,12 @@ class UpcomingClassSlider extends React.PureComponent {
                 </Svg>
               </SvgContainer>
             )}
-            {!this.props.detailedEvents.length && (
+            {!this.props.events.length && (
               <NoEvents />
             )}
             <UpcomingEvents
               forReceiptPage={false}
-              events={this.props.detailedEvents}
+              events={this.props.events}
               expanded={this.props.expanded}
             />
           </Panel>
@@ -182,13 +182,9 @@ class UpcomingClassSlider extends React.PureComponent {
   }
 }
 
-UpcomingClassSlider.defaultProps = {
-  isUpcomingClassesPage: false,
-};
-
 UpcomingClassSlider.propTypes = {
   navigation: PropTypes.shape().isRequired,
-  detailedEvents: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+  events: PropTypes.arrayOf(PropTypes.shape()).isRequired,
   expanded: PropTypes.bool.isRequired,
   setUpcomingEventSliderExpandedTrue: PropTypes.func.isRequired,
   setUpcomingEventSliderExpandedFalse: PropTypes.func.isRequired,

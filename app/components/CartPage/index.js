@@ -16,7 +16,7 @@ import {
   getFormattedCartTotal,
   getCartIsPurchasing,
 } from '../../selectors';
-import { submitCartForPurchase, setEventsLoadingFalse } from '../../actions';
+import { submitCartForPurchase } from '../../actions';
 import {
   SOFT_GREY,
   LIGHT_GREY,
@@ -79,11 +79,6 @@ const StyledSwipeArrows = NormalText.extend`
 
 const StyledSavingsText = NormalText.extend`
   color: ${BLACK};
-`;
-
-const StyledCenterText = HeavyText.extend`
-  text-align: center;
-  color: ${WHITE}
 `;
 
 const StyledContinueButton = styled.TouchableOpacity`

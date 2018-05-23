@@ -3,14 +3,15 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Calendar } from 'react-native-calendars';
 import moment from 'moment-timezone';
+import { View } from 'react-native';
 
 import Config from '../../../../config.json';
+import { TRANSPARENT } from '../../../constants';
 import theme from './theme';
 import {
   getUpcomingEventsCurrentDate,
-  getHasUpcomingClassesPrevMonth,
-  getHasUpcomingClassesNextMonth,
   getUpcomingEventCalendarMarkings,
+  getStudioInterval,
 } from '../../../selectors';
 import {
   setCurrentDateToFirstEventNextMonth,
@@ -40,7 +41,7 @@ class CalendarComponent extends React.PureComponent {
    * @returns {undefined}
    */
   onPressArrowLeft(callback) {
-    if (!this.props.hasEventsPrevMonth) return;
+    if (!this.getIfArrowIsEnabled('left')) return;
     this.props.setCurrentDateToFirstEventPrevMonth();
     callback();
   }
@@ -49,7 +50,7 @@ class CalendarComponent extends React.PureComponent {
    * @returns {undefined}
    */
   onPressArrowRight(callback) {
-    if (!this.props.hasEventsNextMonth) return;
+    if (!this.getIfArrowIsEnabled('right')) return;
     this.props.setCurrentDateToFirstEventNextMonth();
     callback();
   }
@@ -61,44 +62,76 @@ class CalendarComponent extends React.PureComponent {
     this.props.setUpcomingEventsCurrentDate(moment.tz(moment(dateString), Config.STUDIO_TZ));
   }
   /**
+   * @param {string} direction of arrow
+   * @returns {boolean} if the calendar arrow is pressable
+   */
+  getIfArrowIsEnabled(direction) {
+    return (
+      moment(this.props.currentDate).isSame(
+        moment().tz(Config.STUDIO_TZ).add(Number(direction === 'left'), 'months'),
+        'month'
+      ) && (direction === 'left' || (
+        moment().tz(Config.STUDIO_TZ)
+                .add(1, 'months')
+                .startOf('month')
+                .isBefore(moment().add(this.props.studioInterval, 'days'))
+      ))
+    );
+  }
+  /**
    * render
    * @returns {JSX.Element} XML
    */
   render() {
     return (
-      <Calendar
-        style={{
-          height: 350,
-          backgroundColor: Config.STUDIO_COLOR,
-          marginTop: 30,
-        }}
-        theme={theme}
-        current={this.props.currentDate}
-        minDate={moment().tz(Config.STUDIO_TZ).startOf('day').toISOString()}
-        firstDay={0}
-        renderArrow={direction => (
-          <CalendarArrow
-            direction={direction}
-            disabled={(
-              direction === 'left' ?
-                !this.props.hasEventsPrevMonth : !this.props.hasEventsNextMonth
-            )}
-          />
-        )}
-        onPressArrowLeft={this.onPressArrowLeft}
-        onPressArrowRight={this.onPressArrowRight}
-        markedDates={this.props.dateMarkings}
-        onDayPress={this.onDayPress}
-      />
+      <View style={{ position: 'relative' }}>
+        <Calendar
+          style={{
+            height: 350,
+            backgroundColor: Config.STUDIO_COLOR,
+            marginTop: 30,
+          }}
+          theme={theme}
+          current={this.props.currentDate}
+          minDate={moment().tz(Config.STUDIO_TZ).startOf('day').toISOString()}
+          firstDay={0}
+          renderArrow={() => (
+            <View
+              style={{ opacity: 0, width: 50, height: 50 }}
+            />
+          )}
+          onPressArrowLeft={this.onPressArrowLeft}
+          onPressArrowRight={this.onPressArrowRight}
+          markedDates={this.props.dateMarkings}
+          onDayPress={this.onDayPress}
+        />
+        <CalendarArrow
+          direction="left"
+          disabled={!this.getIfArrowIsEnabled('left')}
+          style={{
+            position: 'absolute',
+            left: 70,
+            top: 45,
+          }}
+        />
+        <CalendarArrow
+          direction="right"
+          disabled={!this.getIfArrowIsEnabled('right')}
+          style={{
+            position: 'absolute',
+            right: 70,
+            top: 45,
+          }}
+        />
+      </View>
     );
   }
 }
 
 CalendarComponent.propTypes = {
   currentDate: PropTypes.string.isRequired,
-  hasEventsPrevMonth: PropTypes.bool.isRequired,
-  hasEventsNextMonth: PropTypes.bool.isRequired,
   dateMarkings: PropTypes.shape().isRequired,
+  studioInterval: PropTypes.number.isRequired,
   setCurrentDateToFirstEventNextMonth: PropTypes.func.isRequired,
   setCurrentDateToFirstEventPrevMonth: PropTypes.func.isRequired,
   setUpcomingEventsCurrentDate: PropTypes.func.isRequired,
@@ -106,9 +139,8 @@ CalendarComponent.propTypes = {
 
 const mapStateToProps = state => ({
   currentDate: getUpcomingEventsCurrentDate(state).toISOString(),
-  hasEventsPrevMonth: getHasUpcomingClassesPrevMonth(state),
-  hasEventsNextMonth: getHasUpcomingClassesNextMonth(state),
   dateMarkings: getUpcomingEventCalendarMarkings(state),
+  studioInterval: getStudioInterval(state),
 });
 const mapDispatchToProps = {
   setCurrentDateToFirstEventNextMonth,

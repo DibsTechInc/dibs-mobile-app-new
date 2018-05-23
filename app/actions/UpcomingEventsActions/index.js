@@ -91,12 +91,15 @@ export function setCurrentDateToFirstEventPrevMonth() {
   return function innerSetCurrentDateToFirstEventPrevMonth(dispatch, getState) {
     const state = getState();
     const { currentDate, data } = state.upcomingEvents;
-    const eventsPrevMonth = data.filter((event) => {
+    const eventPrevMonth = data.find((event) => {
       const eventStart = moment.tz(event.start_time, event.mainTZ);
       return eventStart.isBefore(currentDate.clone().startOf('month'))
         && eventStart.isAfter(currentDate.clone().startOf('month').subtract(1, 'month'));
     });
-    const [{ start_time: startTime, mainTZ }] = eventsPrevMonth; // data is sorted in API by event start time ASC
+    if (!eventPrevMonth) {
+      return dispatch(setUpcomingEventsCurrentDate(moment().tz(Config.STUDIO_TZ).startOf('month')));
+    }
+    const { start_time: startTime, mainTZ } = eventPrevMonth; // data is sorted in API by event start time ASC
     return dispatch(setUpcomingEventsCurrentDate(moment.tz(startTime, mainTZ).startOf('day')));
   };
 }
@@ -108,10 +111,13 @@ export function setCurrentDateToFirstEventNextMonth() {
   return function innerSetCurrentDateToFirstEventNextMonth(dispatch, getState) {
     const state = getState();
     const { currentDate, data } = state.upcomingEvents;
-    const eventsNextMonth = data.filter(
+    const eventNextMonth = data.find(
       event => moment.tz(event.start_time, event.mainTZ).startOf('month').isAfter(currentDate)
     );
-    const [{ start_time: startTime, mainTZ }] = eventsNextMonth; // data is sorted in API by event start time ASC
+    if (!eventNextMonth) {
+      return dispatch(setUpcomingEventsCurrentDate(moment().tz(Config.STUDIO_TZ).startOf('month').add(1, 'month')));
+    }
+    const { start_time: startTime, mainTZ } = eventNextMonth; // data is sorted in API by event start time ASC
     return dispatch(setUpcomingEventsCurrentDate(moment.tz(startTime, mainTZ).startOf('day')));
   };
 }
