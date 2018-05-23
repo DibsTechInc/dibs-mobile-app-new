@@ -54,12 +54,11 @@ class UpcomingClassSlider extends React.PureComponent {
   }
   /**
    * @param {Object} props component is about to get
-   * @returns {undefined|null} handles when the slider is closed by the header
+   * @returns {undefined}
    */
   componentWillReceiveProps(props) {
-    if (props.expanded && !this.props.expanded) return this.handleDragUp();
-    if (!props.expanded && this.props.expanded) return this.handleDragDown();
-    return null;
+    if (props.expanded && !this.props.expanded) this.handleDragUp();
+    if (!props.expanded && this.props.expanded) this.handleDragDown();
   }
   /**
    * @returns {undefined}

@@ -11,7 +11,7 @@ import styled from 'styled-components';
 import Swiper from 'react-native-swiper';
 
 import About from './About';
-import { VERIFY_ROUTE } from '../../constants/RouteConstants/index';
+import { DARK_TEXT_GREY, VERIFY_ROUTE } from '../../constants';
 import Config from '../../../config.json';
 import { FadeInView, CustomStatusBar, MaterialButton } from '../shared';
 import { FlexCenter, NormalText } from '../styled';
@@ -87,6 +87,7 @@ class LandingPage extends Component {
         <Swiper
           loop={false}
           onIndexChanged={this.handleOnChangeIndex}
+          activeDotStyle={{ backgroundColor: DARK_TEXT_GREY }}
         >
           <FadeInView>
             <StyledWelcomeView>

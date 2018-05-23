@@ -35,6 +35,18 @@ class Map extends React.PureComponent {
     }, 1);
   }
   /**
+   * @param {Object} props component is about to get
+   * @returns {undefined}
+   */
+  componentWillReceiveProps(props) {
+    if (props.expanded !== this.props.expanded) {
+      this.map.animateToCoordinate({
+        latitude: this.props.latitude,
+        longitude: this.props.longitude,
+      }, 1);
+    }
+  }
+  /**
    * render
    * @returns {JSX.Element} HTML
    */
@@ -73,10 +85,12 @@ Map.propTypes = {
   markerTitle: PropTypes.string.isRequired,
   locationName: PropTypes.string.isRequired,
   allowInteraction: PropTypes.bool.isRequired,
+  expanded: PropTypes.bool.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({
   markerTitle: `${getStudioName(state)} - ${props.locationName}`,
+  expanded: state.animation.upcomingEventSliderExpanded,
 });
 const mapDispatchToProps = {};
 
