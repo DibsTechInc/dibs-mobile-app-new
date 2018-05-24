@@ -32,7 +32,7 @@ export function getUserDefaultFilters(state) {
  * @returns {string} user email
  */
 export function getUserEmail(state) {
-  return getUser(state).email;
+  return getUser(state).email || '';
 }
 
 /**
