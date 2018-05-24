@@ -204,7 +204,7 @@ class CartPage extends PureComponent {
             backgroundColor: renderButtonColor,
             paddingTop: 15,
             paddingBottom: 15,
-            marginBottom: Number(isIphoneX()) && 30,
+            marginBottom: Number(isIphoneX()) && 45,
             borderWidth: 1,
             borderColor: renderButtonColor,
           }}
