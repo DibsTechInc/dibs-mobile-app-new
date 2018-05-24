@@ -45,8 +45,8 @@ export function requestEventData({ eventids } = {}) {
       let data = { studios: [studio.data.id] };
       if (eventids) data.eventids = eventids;
       else {
-        data.start = moment.tz(moment(currentDate), studio.mainTZ).startOf('day').format('YYYY-MM-DD HH:mm:ss');
-        data.end = moment.tz(moment(currentDate), studio.mainTZ).endOf('day').format('YYYY-MM-DD HH:mm:ss');
+        data.start = moment.tz(moment(currentDate), studio.data.mainTZ).startOf('day').format('YYYY-MM-DD HH:mm:ss');
+        data.end = moment.tz(moment(currentDate), studio.data.mainTZ).endOf('day').format('YYYY-MM-DD HH:mm:ss');
       }
       data = stringify(data, { encode: false });
       path += data;

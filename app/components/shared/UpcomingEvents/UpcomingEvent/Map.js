@@ -1,14 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 
+import { LIGHT_GREY } from '../../../../constants';
 import { getStudioName } from '../../../../selectors';
 
 const LATITUDE_DELTA = 0.01;
 const LONGITUDE_DELTA = 0.01;
+
+const MapContainer = styled.View`
+  border-color: ${LIGHT_GREY};
+  border-top-width: 1;
+  border-bottom-width: 1;
+  height: 252;
+  position: relative;
+`;
 
 const InvisibleInteractionBlocker = styled.View`
   height: 250;
@@ -52,7 +60,7 @@ class Map extends React.PureComponent {
    */
   render() {
     return (
-      <View style={{ height: 250, position: 'relative' }}>
+      <MapContainer>
         <MapView
           ref={(ref) => { this.map = ref; }}
           style={{ height: 250, marginBottom: 10 }}
@@ -74,7 +82,7 @@ class Map extends React.PureComponent {
             onStartShouldSetResponder={() => true}
           />
         )}
-      </View>
+      </MapContainer>
     );
   }
 }
