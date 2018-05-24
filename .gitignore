@@ -3,3 +3,5 @@ node_modules/**/*
 npm-debug.*
 config.json
 app.json
+assets/icon.png
+assets/splash.png

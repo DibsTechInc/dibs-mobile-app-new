@@ -13,9 +13,10 @@ import styled from 'styled-components';
 import { KeyboardAccessoryView } from 'react-native-keyboard-accessory';
 import { promisify } from 'bluebird';
 
-import { signUpUser } from '../../actions/UserActions';
+import { signUpUser } from '../../actions';
 import { MaterialButton, CustomStatusBar, FadeInView, InputField } from '../shared';
 import { TERMS_AND_CONDITIONS_ROUTE, MAIN_ROUTE, LOGIN_ROUTE, DEFAULT_BG } from '../../constants';
+import { getStudioName } from '../../selectors';
 import Config from '../../../config.json';
 import DibsLoader from '../shared/DibsLoader';
 
@@ -171,7 +172,7 @@ class Signup extends PureComponent {
           />
           <View style={{ width: 250, justifyContent: 'space-between', marginBottom: 10 }}>
             <TouchableOpacity style={{ marginBottom: 10 }} onPress={this.handleOnPressNavStudioTerms}>
-              <Text style={{ color: Config.STUDIO_COLOR, fontFamily: 'flex-font' }}>Flex Studios Terms</Text>
+              <Text style={{ color: Config.STUDIO_COLOR, fontFamily: 'flex-font' }}>{this.props.studioName} Terms</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={this.handleOnPressNavDibsTerms}>
               <Text style={{ color: Config.STUDIO_COLOR, fontFamily: 'flex-font' }}>Dibs Terms</Text>
@@ -208,12 +209,17 @@ class Signup extends PureComponent {
 
 Signup.propTypes = {
   navigation: PropTypes.shape(),
+  studioName: PropTypes.string,
   signUpUser: PropTypes.func,
 };
+
+const mapStateToProps = state => ({
+  studioName: getStudioName(state),
+});
 
 const mapDispatchToProps = {
   signUpUser,
 };
 
-export default connect(null, mapDispatchToProps)(Signup);
+export default connect(mapStateToProps, mapDispatchToProps)(Signup);
 

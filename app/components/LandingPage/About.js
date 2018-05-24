@@ -20,7 +20,7 @@ class About extends Component {
   render() {
     return (
       <StyledView>
-        <Text>About FLEX Studios - Placeholder</Text>
+        <Text>About Core Collective - Placeholder</Text>
         <Text>Custom text / images / image background</Text>
       </StyledView>
     );

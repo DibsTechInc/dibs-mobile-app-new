@@ -1,5 +1,6 @@
 
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import {
@@ -16,6 +17,7 @@ import { VERIFY_ROUTE, DARK_TEXT_GREY } from '../../constants';
 import Config from '../../../config.json';
 import { FadeInView, CustomStatusBar, MaterialButton } from '../shared';
 import { FlexCenter, NormalText } from '../styled';
+import { getStudioName } from '../../selectors';
 
 const StyledView = styled.View`
   flex: 1;
@@ -93,7 +95,7 @@ class LandingPage extends Component {
         >
           <FadeInView>
             <StyledWelcomeView>
-              <NormalText>Welcome to FLEX Studios!</NormalText>
+              <NormalText>Welcome to {this.props.studioName}!</NormalText>
               <StyledGrayText>Swipe to learn more</StyledGrayText>
               {this.props.navigation.state.params &&
                 this.props.navigation.state.params.accountReactivated &&
@@ -119,10 +121,15 @@ class LandingPage extends Component {
 
 LandingPage.propTypes = {
   navigation: PropTypes.shape(),
+  studioName: PropTypes.string,
 };
 
 LandingPage.navigationOptions = {
   headerMode: 'none',
 };
 
-export default LandingPage;
+const mapStateToProps = state => ({
+  studioName: getStudioName(state),
+});
+
+export default connect(mapStateToProps)(LandingPage);
