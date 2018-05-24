@@ -56,7 +56,7 @@ class Header extends React.PureComponent {
       <View style={{ height: 100, overflow: 'hidden' }}>
         <CustomStatusBar backgroundColor={Config.STUDIO_COLOR} barStyle="light-content" />
         <StudioColoredTop>
-          {this.props.upcomingEventSliderExpanded ? (
+          {this.props.upcomingEventSliderExpanded || this.props.isSliderHeader ? (
             <View style={{ width: 30, marginLeft: 15 }}>
               <XIcon
                 onPress={this.props.setUpcomingEventSliderExpandedFalse}
@@ -82,11 +82,17 @@ class Header extends React.PureComponent {
   }
 }
 
+Header.defaultProps = {
+  title: '',
+  isSliderHeader: false,
+};
+
 Header.propTypes = {
   navigation: PropTypes.shape().isRequired,
-  title: PropTypes.string.isRequired,
+  title: PropTypes.string,
   upcomingEventSliderExpanded: PropTypes.bool.isRequired,
   setUpcomingEventSliderExpandedFalse: PropTypes.func.isRequired,
+  isSliderHeader: PropTypes.bool,
 };
 
 const mapStateToProps = state => ({

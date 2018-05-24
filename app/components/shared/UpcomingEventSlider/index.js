@@ -146,7 +146,7 @@ class UpcomingClassSlider extends React.PureComponent {
       >
         {this.props.navigation.state.key === MAIN_ROUTE && (
           <Animated.View style={{ top: this.state.headerTop, left: 0, right: 0, position: 'absolute' }}>
-            <Header title="My Classes" />
+            <Header title="My Classes" isSliderHeader />
           </Animated.View>
         )}
         <SlidingUpPanel
