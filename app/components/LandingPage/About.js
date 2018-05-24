@@ -21,6 +21,7 @@ class About extends Component {
     return (
       <StyledView>
         <Text>About FLEX Studios - Placeholder</Text>
+        <Text>Custom text / images / image background</Text>
       </StyledView>
     );
   }

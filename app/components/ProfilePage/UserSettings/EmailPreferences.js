@@ -82,7 +82,7 @@ class EmailPreferences extends PureComponent {
 
     return (
       <MaterialPanel
-        height={'30%'}
+        height={'21.5%'}
         style={{ shadowOffset: { width: 3, height: 3 } }}
         heading="Email Preferences"
         headingRight={this.props.isUpdatingEmailPreferences ? 'Cancel' : 'Change'}
