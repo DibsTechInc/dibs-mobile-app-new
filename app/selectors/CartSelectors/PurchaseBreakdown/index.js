@@ -14,7 +14,7 @@ import {
 } from '../../PromoCodeSelectors';
 
 import {
-  getSortedCartEvents,
+  getSortedCartItems,
   getCartData,
 } from '../';
 
@@ -31,7 +31,7 @@ import { getStudioCurrency } from '../../StudioSelectors';
 
 export const getCartPromoCodeAmount = createSelector(
   [
-    getSortedCartEvents,
+    getSortedCartItems,
     getPromoCodeType,
     getPromoCodeAmount,
     getPromoCodeProduct,
@@ -154,7 +154,7 @@ BREAKDOWN FOR WHEN USER DOES NOT HAVE PASSES
 */
 
 export const getCartEventsWithoutPasses = createSelector( // TODO edit
-  getSortedCartEvents,
+  getSortedCartItems,
   cartEvents => cartEvents.filter(cartEvent => !cartEvent.passid)
 );
 

@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { View } from 'react-native';
 import { connect } from 'react-redux';
-import { LIGHT_GREY, WHITE, TEXT_GREY, BLACK } from '../../../../constants';
-import { fadeColor } from '../../../../helpers';
-import { addToCart, removeOneEventItem } from '../../../../actions';
-import { Overlay as StyledOverlay, FlexRow, NormalText } from '../../../styled';
-import Icon from '../../../shared/Icon';
+import { LIGHT_GREY, WHITE, TEXT_GREY, BLACK, SOFT_GREY } from '../../../constants';
+import { fadeColor } from '../../../helpers';
+import { addToCart, removeOneEventItem } from '../../../actions';
+import { Overlay as StyledOverlay, FlexRow, NormalText } from '../../styled';
+import Icon from '../../shared/Icon';
 
 const EventOverlay = StyledOverlay.extend`
   background: ${props => props.background};
@@ -88,7 +88,7 @@ class Overlay extends React.PureComponent {
     return (
       <EventOverlay
         background={this.props.soldOut ?
-          fadeColor(WHITE, 0.4) : fadeColor(WHITE, 0.75)
+          fadeColor(SOFT_GREY, 0.4) : fadeColor(WHITE, 0.85)
         }
       >
         {this.props.quantity ? (
@@ -127,8 +127,12 @@ class Overlay extends React.PureComponent {
   }
 }
 
+Overlay.defaultProps = {
+  soldOut: false,
+};
+
 Overlay.propTypes = {
-  soldOut: PropTypes.bool.isRequired,
+  soldOut: PropTypes.bool,
   quantity: PropTypes.number.isRequired,
   maxSeatsReached: PropTypes.bool.isRequired,
   addToCart: PropTypes.func.isRequired,

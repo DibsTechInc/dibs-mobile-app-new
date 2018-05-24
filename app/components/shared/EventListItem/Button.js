@@ -5,13 +5,13 @@ import { promisify } from 'bluebird';
 import { Alert } from 'react-native';
 import styled from 'styled-components';
 
-import Config from '../../../../../config.json';
-import { GREY, WHITE, DARK_TEXT_GREY } from '../../../../constants/index';
-import { addToCart, addToWaitlist } from '../../../../actions';
-import { lightenDarkenColor } from '../../../../helpers';
-import DibsLoader from '../../../shared/DibsLoader';
-import MaterialButton from '../../../shared/MaterialButton';
-import { HeavyText } from '../../../styled';
+import Config from '../../../../config.json';
+import { GREY, WHITE, DARK_TEXT_GREY } from '../../../constants/index';
+import { addToCart, addToWaitlist } from '../../../actions';
+import { lightenDarkenColor } from '../../../helpers';
+import DibsLoader from '../../shared/DibsLoader';
+import MaterialButton from '../../shared/MaterialButton';
+import { HeavyText } from '../../styled';
 
 const StudioColoredQuantity = styled.TouchableOpacity`
   align-items: center;

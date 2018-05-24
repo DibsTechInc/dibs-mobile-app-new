@@ -16,7 +16,7 @@ import {
   setCartVisibleFalse,
 } from '../CartActions';
 import { getStudioCurrency } from '../../selectors/StudioSelectors';
-import { getSortedCartEvents, getCartEventIds, getCartEventNames } from '../../selectors';
+import { getSortedCartItems, getCartEventIds, getCartEventNames } from '../../selectors';
 import { getUsersNextPassId } from '../../selectors/UserSelectors/Passes';
 
 export const {
@@ -54,7 +54,7 @@ export function clearPromoCode() {
   return function innerClearPromoCode(dispatch, getState) {
     const { promoCode } = getState();
     if (promoCode.type === PROMO_TYPE_FREE_CLASS) {
-      const cartItem = getSortedCartEvents(getState())[0];
+      const cartItem = getSortedCartItems(getState())[0];
       dispatch(setCartVisibleTrue());
       dispatch(removeOneEventItem(cartItem.eventid));
       const passid = getUsersNextPassId(getState())(cartItem.eventid);

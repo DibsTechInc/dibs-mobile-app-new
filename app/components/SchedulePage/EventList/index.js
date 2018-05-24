@@ -16,7 +16,7 @@ import {
 } from '../../../selectors';
 import DibsLoader from '../../shared/DibsLoader';
 import { NormalText } from '../../styled';
-import EventListItem from './EventListItem';
+import EventListItem from '../../shared/EventListItem';
 
 const ScrollContainer = styled.ScrollView`
   background: ${WHITE};
