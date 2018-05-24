@@ -113,7 +113,7 @@ class UpcomingEvent extends PureComponent {
       >
         <ScrollView
           ref={node => this.scrollView = node}
-          style={{ paddingTop: this.props.forReceiptPage ? 10 : 0, marginBottom: 70 }}
+          style={{ paddingTop: this.props.forReceiptPage ? 10 : 0, marginBottom: 60 }}
         >
           <EventRow>
             <EventInfo>
