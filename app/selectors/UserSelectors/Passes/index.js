@@ -5,6 +5,7 @@ import { getUser } from '../index';
 import { getCartData } from '../../CartSelectors';
 import { getEventsData } from '../../EventsSelectors';
 import { getUpcomingEventsData } from '../../UpcomingEventsSelectors';
+import { getStudioSource } from '../../StudioSelectors';
 import Config from '../../../../config.json';
 
 /**
@@ -85,18 +86,25 @@ export const getUsersNextPass = createSelector(
   [
     getDetailedUserPasses,
     getCartData,
+    getStudioSource,
     getEventsData,
     getUpcomingEventsData,
   ],
-  (passes, cartItems, events, upcomingEvents) => eventid =>
+  (passes, cartItems, source, events, upcomingEvents) => eventid =>
     passes.reduce((passAcc, pass) => {
       if (passAcc) return passAcc;
 
       const currentEvent = events.find(e => e.id === eventid);
       if (!currentEvent.can_apply_pass) return null;
+      if (!pass) return null;
+      if (source === 'zf' && moment.tz(currentEvent.start_time, currentEvent.mainTZ) > moment(pass.expiresAt)) return null;
+      if (source === 'zf') {
+        const seriesTypeId = pass.studioPackage.zf_series_type_id;
+        if (currentEvent.zf_series_types && !currentEvent.zf_series_types[seriesTypeId]) return null;
+      }
+      if (!pass.studioPackage.unlimited) return pass;
 
-      if (!pass || !pass.studioPackage.unlimited) return pass;
-
+      if (pass.studioPackage.unlimited && !pass.autopay && moment.tz(currentEvent.start_time, currentEvent.mainTZ) > moment(pass.expiresAt)) return null;
       const cartItem = cartItems.find(item => (item.eventid === eventid && item.passid === pass.id));
       if (cartItem) return null;
 

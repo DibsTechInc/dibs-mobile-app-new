@@ -18,6 +18,14 @@ export function getStudioData(state) {
 
 /**
  * @param {Object} state in store
+ * @returns {string} studio source
+ */
+export function getStudioSource(state) {
+  return getStudioData(state).source || '';
+}
+
+/**
+ * @param {Object} state in store
  * @returns {boolean} true if fetching studio data
  */
 export function getStudioIsLoading(state) {
