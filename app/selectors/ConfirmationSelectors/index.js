@@ -2,6 +2,8 @@ import { createSelector } from 'reselect';
 import Decimal from 'decimal.js';
 import { format as formatCurrency } from 'currency-formatter';
 import moment from 'moment-timezone';
+import createTextVersion from 'textversionjs';
+
 import {
   getEventsData,
   getStudioCurrency,
@@ -35,6 +37,8 @@ export const getConfirmedTransactionsByEvent = createSelector(
 
       const { latitude, longitude } = eventLocation;
       const { id } = transaction;
+
+      const formattedDescription = createTextVersion(confirmedEvent.description);
       const amount = new Decimal(transaction.amount).minus(transaction.studio_credits_spent)
                                                     .minus(transaction.raf_credits_spent)
                                                     .toNumber();
@@ -55,7 +59,7 @@ export const getConfirmedTransactionsByEvent = createSelector(
         quantity: 1,
         valueBack,
         amount,
-        description: confirmedEvent.description,
+        formattedDescription,
         name: confirmedEvent.name,
         address: confirmedEvent.address,
         latitude,

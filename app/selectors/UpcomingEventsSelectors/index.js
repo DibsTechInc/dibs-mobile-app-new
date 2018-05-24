@@ -3,6 +3,7 @@ import { createSelector } from 'reselect';
 import { groupBy } from 'lodash';
 import { format as formatCurrency } from 'currency-formatter';
 import Decimal from 'decimal.js';
+import createTextVersion from 'textversionjs';
 
 import Config from '../../../config.json';
 import { WHITE } from '../../constants';
@@ -119,6 +120,8 @@ function generateDetailedUpcomingEvents(items, currency, timeFormat, shortDateFo
         time.format(timeFormat) : time.format('hA')
     );
 
+    const formattedDescription = createTextVersion(item.description);
+
     return {
       ...item,
       shortDayOfWeek: localStartTime.format('ddd'),
@@ -135,6 +138,7 @@ function generateDetailedUpcomingEvents(items, currency, timeFormat, shortDateFo
       latitude,
       locationName: location.name,
       instructorName: instructor.name,
+      formattedDescription,
     };
   });
 }

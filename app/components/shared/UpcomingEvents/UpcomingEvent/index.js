@@ -5,7 +5,7 @@ import { View, ScrollView, Alert } from 'react-native';
 import { promisify } from 'bluebird';
 import { connect } from 'react-redux';
 import { isIphoneX } from 'react-native-iphone-x-helper';
-import HtmlParser from 'react-native-htmlparser';
+// import HtmlParser from 'react-native-htmlparser';
 
 import Config from '../../../../../config.json';
 import { WHITE, DARK_TEXT_GREY } from '../../../../constants';
@@ -94,14 +94,8 @@ class UpcomingEvent extends PureComponent {
    * @returns {JSX} XML
    */
   render() {
-    const tagStyle = {
-      general: {
-        fontFamily: 'flex-font',
-      },
-    };
-
-    const classDescriptionHTML = this.props.description
-      ? <HtmlParser containerStyle={{}} tagsStyle={tagStyle} html={this.props.description} /> : 'No Class Description.';
+    const classDescriptionHTML = this.props.formattedDescription
+      ? this.props.formattedDescription : 'No Class Description.';
 
     return (
       <FadeInView
@@ -210,7 +204,7 @@ UpcomingEvent.propTypes = {
   raf_credits_spent: PropTypes.number,
   formattedRAFCreditAmount: PropTypes.string,
   formattedTotal: PropTypes.string,
-  description: PropTypes.string,
+  formattedDescription: PropTypes.string,
   dropping: PropTypes.bool.isRequired,
   latitude: PropTypes.number,
   longitude: PropTypes.number,

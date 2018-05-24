@@ -19,7 +19,6 @@
     "react-native-dialog": "^3.3.0",
     "react-native-elements": "^0.19.1",
     "react-native-gifted-form": "^0.1.1",
-    "react-native-htmlparser": "^1.0.5",
     "react-native-iphone-x-helper": "^1.0.3",
     "react-native-keyboard-accessory": "0.0.10",
     "react-native-maps": "^0.21.0",
@@ -37,7 +36,8 @@
     "redux-thunk": "^2.2.0",
     "reselect": "^3.0.1",
     "rn-sliding-up-panel": "^1.2.0",
-    "styled-components": "^3.2.6"
+    "styled-components": "^3.2.6",
+    "textversionjs": "^1.1.1"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
