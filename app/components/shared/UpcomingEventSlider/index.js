@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { withNavigation } from 'react-navigation';
 import { Svg, Path } from 'react-native-svg';
+import { isIphoneX } from 'react-native-iphone-x-helper';
 
 import { WHITE, HEIGHT, MAIN_ROUTE, LIGHT_GREY } from '../../../constants';
 import {
@@ -17,8 +18,8 @@ import UpcomingEvents from '../UpcomingEvents';
 import Header from '../../Header';
 import NoEvents from './NoEvents';
 
-const FULL_HEIGHT = HEIGHT - 100;
-const SHORTENED_HEIGHT = HEIGHT / 2.5;
+const FULL_HEIGHT = HEIGHT - (isIphoneX() ? 100 : 80);
+const SHORTENED_HEIGHT = HEIGHT / 2.25;
 
 const Panel = styled.View`
   align-items: center;
@@ -27,7 +28,7 @@ const Panel = styled.View`
   border-top-right-radius: ${props => (props.roundEdge ? 0 : 25)};
   bottom: 0;
   height: ${HEIGHT};
-  padding-top: 20;
+  padding-top: ${props => (props.roundEdge ? 1 : 25)};
   position: absolute;
   width: 100%;
 `;
@@ -159,7 +160,7 @@ class UpcomingClassSlider extends React.PureComponent {
           allowMomentum={false}
           allowDragging={Boolean(!this.props.expanded && this.props.events.length)}
         >
-          <Panel roundEdge={this.props.expanded || this.state.expanding}>
+          <Panel roundEdge={this.props.expanded}>
             {!this.props.expanded && (
               <SvgContainer>
                 <Svg width={60} height={3}>

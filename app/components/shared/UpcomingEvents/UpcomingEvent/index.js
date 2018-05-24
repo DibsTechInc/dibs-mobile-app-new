@@ -107,7 +107,7 @@ class UpcomingEvent extends PureComponent {
       <FadeInView
         style={{
           paddingTop: this.props.forReceiptPage ? 10 : 0,
-          paddingBottom: isIphoneX() ? 80 : 40,
+          paddingBottom: isIphoneX() ? 80 : 60,
           backgroundColor: WHITE,
         }}
       >

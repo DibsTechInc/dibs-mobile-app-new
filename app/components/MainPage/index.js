@@ -39,13 +39,12 @@ const BackgroundImage = styled.Image`
 
 const MainPageHeader = SpaceBetweenRow.extend`
   align-items: center;
-  margin-top: 15;
 `;
 
 const Content = styled.View`
   flex: 1;
   justify-content: ${props => (props.hasUpcomingClasses ? 'center' : 'flex-end')};
-  margin-bottom: ${props => (props.hasUpcomingClasses ? 250 : 50)};
+  margin-bottom: ${props => (props.hasUpcomingClasses ? 190 : 50)};
   padding-horizontal: 40;
 `;
 
