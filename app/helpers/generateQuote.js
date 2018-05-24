@@ -12,6 +12,13 @@ const quotes = [
   'You can be sore tomorrow or sorry tomorrow. You decide.',
   'Do the work, be the prize',
   'Caution: Contains Gains',
+  'The faster you run, the sooner you\'re done',
+  'You can\'t beat science',
+  'Something something oats and squats',
+  'Use it or lose it',
+  'Don\'t compare your chapter 2 to someone else\'s chapter 22',
+  'Spin to win',
+  'Every day you don\'t work out, someone else does.',
 ];
 
 function getRandomIntInclusive(min, max) {
