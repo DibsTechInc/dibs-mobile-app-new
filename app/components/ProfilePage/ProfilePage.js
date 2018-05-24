@@ -24,7 +24,6 @@ import {
   getUserFirstName,
   getUserLastName,
   getUserEmail,
-  getCCLastFour,
 } from '../../selectors';
 import { logOutUser } from '../../actions';
 
@@ -101,16 +100,15 @@ class ProfilePage extends PureComponent {
               titleInfo="••••"
               onPress={this.handleEditPasswordRoute}
             />
-            <SettingsList.Item
-              title="Payment"
-              titleInfo={this.props.ccLastFour}
-              onPress={this.handleEditCCRoute}
-            />
             <SettingsList.Header headerStyle={{ marginTop: -20 }} />
             <SettingsList.Item
               hasNavArrow={false}
               title="ACCOUNT DETAILS"
               titleStyle={{ color: 'darkgray' }}
+            />
+            <SettingsList.Item
+              title="Payment"
+              onPress={this.handleEditCCRoute}
             />
             <SettingsList.Item
               title="Settings"
@@ -134,14 +132,12 @@ ProfilePage.propTypes = {
   userLastName: PropTypes.string.isRequired,
   logOutUser: PropTypes.func.isRequired,
   email: PropTypes.string.isRequired,
-  ccLastFour: PropTypes.string,
 };
 
 const mapStateToProps = state => ({
   userFirstName: getUserFirstName(state),
   userLastName: getUserLastName(state),
   email: getUserEmail(state),
-  ccLastFour: getCCLastFour(state),
 });
 
 const mapDispatchToProps = {
