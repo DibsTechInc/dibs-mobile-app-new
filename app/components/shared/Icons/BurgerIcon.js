@@ -21,7 +21,7 @@ class BurgerIcon extends React.PureComponent {
         onPress={this.props.onPress}
         activeOpacity={1}
       >
-        <Svg height={25} width={25}>
+        <Svg height={20} width={20}>
           <Path
             stroke={WHITE}
             strokeWidth={3}
