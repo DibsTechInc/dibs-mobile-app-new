@@ -5,7 +5,6 @@ import { View, ScrollView, Alert } from 'react-native';
 import { promisify } from 'bluebird';
 import { connect } from 'react-redux';
 import { isIphoneX } from 'react-native-iphone-x-helper';
-// import HtmlParser from 'react-native-htmlparser';
 
 import Config from '../../../../../config.json';
 import { WHITE, DARK_TEXT_GREY } from '../../../../constants';
