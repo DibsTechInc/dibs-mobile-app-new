@@ -15,13 +15,18 @@ export const CONTACT_ROUTE = 'Contact';
 export const SETTINGS_ROUTE = 'Settings';
 export const TERMS_AND_CONDITIONS_ROUTE = 'TermsAndConditions';
 
+export const EDIT_USERNAME_ROUTE = 'EditUsername';
+export const EDIT_PASSWORD_ROUTE = 'EditPassword';
+
+export const EDIT_EMAIL_ROUTE = 'EditEmail';
+export const EDIT_CC_ROUTE = 'EditCC';
+
 /** Drawer Navigator Routes */
 export const MAIN_ROUTE = 'Main';
 export const SCHEDULE_ROUTE = 'Schedule';
 export const UPCOMING_CLASS_ROUTE = 'UpcomingClasses';
 
 export const PROFILE_ROUTE = 'Profile';
-export const PROFILE_INFO_ROUTE = 'ProfileInfo';
 
 export const CART_ROUTE = 'Cart';
 export const DRAWER_OPEN = 'DrawerOpen';

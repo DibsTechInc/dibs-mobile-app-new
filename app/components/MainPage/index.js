@@ -22,11 +22,10 @@ import {
   getStudioName,
   getUserHasUpcomingEvents,
 } from '../../selectors';
-import { FadeInView, CustomStatusBar, BurgerIcon, CartIcon, DibsLoader } from '../shared';
+import { FadeInView, CustomStatusBar, BurgerIcon, CartIcon } from '../shared';
 import { HeavyText, FlexRow, SpaceBetweenRow } from '../styled';
 import IconLink from './IconLink';
 import UpcomingEventSlider from './UpcomingEventSlider';
-import Config from '../../../config.json';
 
 const BackgroundImage = styled.Image`
   left: 0;

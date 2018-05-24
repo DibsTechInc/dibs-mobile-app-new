@@ -58,7 +58,6 @@ export function updateCreditCard({ ccNum, ccCVC, expiration }, callback = () => 
         },
       });
       if (res.success) dispatch(setCreditCard(res.card));
-      else console.log(res.message, 'updateCCActions')
     } catch (err) {
       console.log(err, 'caught error in catch');
     }

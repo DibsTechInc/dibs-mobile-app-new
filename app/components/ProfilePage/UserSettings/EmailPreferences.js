@@ -8,6 +8,7 @@ import { MaterialPanel } from '../../shared';
 import { getUserEmail, getUserSuppressionList } from '../../../selectors';
 import { updateUserEmailPreferences } from '../../../actions';
 import Config from '../../../../config.json';
+import { WHITE } from '../../../constants';
 
 /**
  * @class EmailPreferences
@@ -93,7 +94,7 @@ class EmailPreferences extends PureComponent {
         <GiftedForm
           formName="emailPreferencesForm"
           clearOnClose
-          style={{ backgroundColor: 'white' }}
+          style={{ backgroundColor: WHITE }}
           defaults={{
             purchaseReceiptsAndClassUpdates: !this.state.transactionsPref,
             specialOffersAndStudioNews: !this.state.marketingPref,
@@ -107,6 +108,12 @@ class EmailPreferences extends PureComponent {
             onChange={this.toggleTransactionalPref}
             disabled={this.state.isLoading}
             value={!this.state.transactionsPref}
+            widgetStyles={{
+              rowContainer: {
+                backgroundColor: WHITE,
+                borderColor: WHITE,
+              },
+            }}
           />
 
           <GiftedForm.SwitchWidget
@@ -117,9 +124,13 @@ class EmailPreferences extends PureComponent {
             onChange={this.toggleMarketingPref}
             disabled={this.state.isLoading}
             value={!this.state.marketingPref}
+            widgetStyles={{
+              rowContainer: {
+                backgroundColor: WHITE,
+                borderColor: WHITE,
+              },
+            }}
           />
-
-          <GiftedForm.SeparatorWidget />
 
           {this.state.message.length && <View style={{ width: '100%', height: 20, alignItems: 'center', justifyContent: 'center' }}>
             <Text style={{ color: Config.STUDIO_COLOR }}>{this.state.message}</Text>

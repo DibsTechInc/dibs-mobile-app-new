@@ -63,7 +63,7 @@ class EnterEmail extends PureComponent {
     const isValidEmail = validEmail.test(email);
 
     if (!isValidEmail) {
-      this.setState({ errorText: 'Please enter a valid email address.' });
+      this.setState({ errorText: 'Please enter a valid email address' });
       return;
     }
 
@@ -72,7 +72,7 @@ class EnterEmail extends PureComponent {
     await new Promise(res => this.setState({ isLoading: false, errorText: '' }, res));
 
     if (!route) {
-      this.setState({ isLoading: false, errorText: 'Uh oh, we could not verify this email. Please contact support.' });
+      this.setState({ isLoading: false, errorText: 'Uh oh, we could not verify this email. Please contact support' });
     } else {
       this.props.navigation.navigate(route, { email, fromReset: false }); // last key for PW reset
     }
