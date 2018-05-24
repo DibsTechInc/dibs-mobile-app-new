@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { withNavigation } from 'react-navigation';
-import { CART_ROUTE } from '../../../constants';
+import { CART_ROUTE, MAIN_ROUTE } from '../../../constants';
 import { getTotalQuantityInCart } from '../../../selectors';
 import Icon from '../Icon';
 
@@ -26,7 +26,9 @@ class CartIcon extends React.PureComponent {
    */
   openCart() {
     if (this.props.navigation.state.key === CART_ROUTE) return;
-    this.props.navigation.navigate(CART_ROUTE, { previousRoute: this.props.navigation.state.key });
+    this.props.navigation.navigate(CART_ROUTE, {
+      previousRoute: this.props.fromSideMenu ? MAIN_ROUTE : this.props.navigation.state.key,
+    });
   }
   /**
    * @returns {JSX.Element} HTML
@@ -45,10 +47,13 @@ class CartIcon extends React.PureComponent {
   }
 }
 
+CartIcon.defaultProps = { fromSideMenu: false };
+
 CartIcon.propTypes = {
   quantityInCart: PropTypes.number.isRequired,
   iconColor: PropTypes.string.isRequired,
   navigation: PropTypes.shape().isRequired,
+  fromSideMenu: PropTypes.bool,
 };
 
 const mapStateToProps = state => ({

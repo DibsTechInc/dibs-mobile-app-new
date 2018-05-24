@@ -86,7 +86,7 @@ class SideMenu extends React.PureComponent {
           <StyledHeavyText numberOfLines={1}>
             {this.props.userFullName}
           </StyledHeavyText>
-          <CartIcon iconColor={DARK_TEXT_GREY} />
+          <CartIcon iconColor={DARK_TEXT_GREY} fromSideMenu />
         </StyledHeader>
         <BalanceDisplay
           label="Credit Balance"

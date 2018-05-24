@@ -4,6 +4,7 @@ import { withNavigation } from 'react-navigation';
 import { View } from 'react-native';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
+import { isIphoneX } from 'react-native-iphone-x-helper';
 
 import Config from '../../../config.json';
 import { WHITE } from '../../constants';
@@ -14,7 +15,7 @@ import { BackArrow, CustomStatusBar, CartIcon, XIcon } from '../shared';
 const StudioColoredTop = FlexRow.extend`
   align-items: center;
   background-color: ${Config.STUDIO_COLOR};
-  height: 90;
+  height: ${60 + (isIphoneX() ? 30 : 0)};
   justify-content: space-between;
 `;
 
@@ -53,10 +54,10 @@ class Header extends React.PureComponent {
    */
   render() {
     return (
-      <View style={{ height: 100, overflow: 'hidden' }}>
+      <View style={{ height: 80 + (isIphoneX() ? 20 : 0), overflow: 'hidden' }}>
         <CustomStatusBar backgroundColor={Config.STUDIO_COLOR} barStyle="light-content" />
         <StudioColoredTop>
-          {this.props.upcomingEventSliderExpanded ? (
+          {this.props.upcomingEventSliderExpanded || this.props.isSliderHeader ? (
             <View style={{ width: 30, marginLeft: 15 }}>
               <XIcon
                 onPress={this.props.setUpcomingEventSliderExpandedFalse}
@@ -82,11 +83,17 @@ class Header extends React.PureComponent {
   }
 }
 
+Header.defaultProps = {
+  title: '',
+  isSliderHeader: false,
+};
+
 Header.propTypes = {
   navigation: PropTypes.shape().isRequired,
-  title: PropTypes.string.isRequired,
+  title: PropTypes.string,
   upcomingEventSliderExpanded: PropTypes.bool.isRequired,
   setUpcomingEventSliderExpandedFalse: PropTypes.func.isRequired,
+  isSliderHeader: PropTypes.bool,
 };
 
 const mapStateToProps = state => ({

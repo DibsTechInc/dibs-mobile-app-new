@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { NavigationActions } from 'react-navigation';
 import { Svg, Path } from 'react-native-svg';
 import { Updates } from 'expo';
+import { isIphoneX } from 'react-native-iphone-x-helper';
 
 import backgroundImg from '../../../assets/img/main-page.png';
 import {
@@ -38,13 +39,13 @@ const BackgroundImage = styled.Image`
 
 const MainPageHeader = SpaceBetweenRow.extend`
   align-items: center;
-  margin-top: 15;
+  margin-top: ${isIphoneX() * 15};
 `;
 
 const Content = styled.View`
   flex: 1;
   justify-content: ${props => (props.hasUpcomingClasses ? 'center' : 'flex-end')};
-  margin-bottom: ${props => (props.hasUpcomingClasses ? 250 : 50)};
+  margin-bottom: ${props => (props.hasUpcomingClasses ? 190 : 50)};
   padding-horizontal: 40;
 `;
 

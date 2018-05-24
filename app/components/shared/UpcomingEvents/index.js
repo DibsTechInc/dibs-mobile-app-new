@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import Swiper from 'react-native-swiper';
 import { connect } from 'react-redux';
+import { isIphoneX } from 'react-native-iphone-x-helper';
 
 import Config from '../../../../config.json';
 import { WHITE, HEIGHT } from '../../../constants';
@@ -29,9 +30,11 @@ class UpcomingEvents extends PureComponent {
     const containerStyle = { flex: 1, height: HEIGHT };
     const paginationStyle = {
       backgroundColor: WHITE,
-      bottom: 0,
+      height: 25,
       paddingVertical: 5,
       position: 'absolute',
+      flex: 0,
+      top: HEIGHT - (isIphoneX() ? 140 : 105),
     };
 
     return (
