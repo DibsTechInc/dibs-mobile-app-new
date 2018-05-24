@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { NavigationActions } from 'react-navigation';
 import { Svg, Path } from 'react-native-svg';
 import { Updates } from 'expo';
+import { isIphoneX } from 'react-native-iphone-x-helper';
 
 import backgroundImg from '../../../assets/img/main-page.png';
 import {
@@ -22,11 +23,10 @@ import {
   getStudioName,
   getUserHasUpcomingEvents,
 } from '../../selectors';
-import { FadeInView, CustomStatusBar, BurgerIcon, CartIcon, DibsLoader } from '../shared';
+import { FadeInView, CustomStatusBar, BurgerIcon, CartIcon } from '../shared';
 import { HeavyText, FlexRow, SpaceBetweenRow } from '../styled';
 import IconLink from './IconLink';
 import UpcomingEventSlider from './UpcomingEventSlider';
-import Config from '../../../config.json';
 
 const BackgroundImage = styled.Image`
   left: 0;
@@ -39,6 +39,7 @@ const BackgroundImage = styled.Image`
 
 const MainPageHeader = SpaceBetweenRow.extend`
   align-items: center;
+  margin-top: ${isIphoneX() * 15};
 `;
 
 const Content = styled.View`
