@@ -5,7 +5,7 @@ import { Alert } from 'react-native';
 
 import {
   getUsersNextPassId,
-  getSortedCartEvents,
+  getSortedCartItems,
   getUserHasPasses,
   getCanUseCardToPurchase,
 } from '../../selectors';
@@ -137,7 +137,7 @@ export function removeExpiredEvents() {
  */
 export function applyFreeClassPromoToCart() {
   return function innerApplyFreeClassPromoToCart(dispatch, getState) {
-    const cartData = getSortedCartEvents(getState());
+    const cartData = getSortedCartItems(getState());
     const { eventid } = cartData[0];
     const copiedItem = { ...cartData[0], passid: null };
     dispatch(setCartVisibleTrue());

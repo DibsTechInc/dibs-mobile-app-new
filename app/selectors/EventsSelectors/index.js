@@ -9,12 +9,13 @@ import {
   getStudioCurrency,
   getStudioCustomTimeFormat,
   getStudioInterval,
-  getCartData,
-  getUpcomingEventsData,
+} from '../StudioSelectors';
+import { getUpcomingEventsData } from '../UpcomingEventsSelectors';
+import {
   getUsersNextPassId,
   getUsersNextPassValue,
-} from '../';
-import { getUserFixedPrice } from '../UserSelectors/Passes/index';
+  getUserFixedPrice,
+} from '../UserSelectors/Passes';
 
 /**
  * getEventsState
@@ -118,7 +119,7 @@ export const getScheduleEvents = createUnboundedSelector(
     getEventsOnCurrentDateAfterNow,
     getStudioCurrency,
     getStudioCustomTimeFormat,
-    getCartData,
+    state => ((state.cart && state.cart.data) || []),
     getUpcomingEventsData,
     getUsersNextPassId,
     getUsersNextPassValue,

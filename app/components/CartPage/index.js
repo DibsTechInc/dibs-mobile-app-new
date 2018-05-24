@@ -10,11 +10,11 @@ import { isIphoneX } from 'react-native-iphone-x-helper';
 import FadeInView from '../shared/FadeInView';
 import {
   getFormattedCartValueBack,
-  getSortedCartEvents,
   getConfirmationState,
   getCartValueBack,
   getFormattedCartTotal,
   getCartIsPurchasing,
+  getCartEvents,
 } from '../../selectors';
 import { submitCartForPurchase } from '../../actions';
 import {
@@ -27,33 +27,22 @@ import {
   WIDTH,
 } from '../../constants';
 
-import { CustomStatusBar, DibsLoader, PaymentInfo } from '../shared';
-import CartItem from './CartItem';
+import {
+  CustomStatusBar,
+  DibsLoader,
+  PaymentInfo,
+  EventListItem,
+} from '../shared';
 import CartTransaction from './CartTransaction';
 import PromoField from './PromoField';
 import Config from '../../../config.json';
 import NoItems from './NoItems';
 import Header from '../Header';
 
-import { NormalText, HeavyText } from '../styled';
+import { NormalText } from '../styled';
 
 const StyledScrollView = styled.ScrollView`
   flex: 1;
-`;
-
-const StyledTopView = styled.View`
-  flex-direction: row;
-  position: relative;
-  backgroundColor: ${Config.STUDIO_COLOR};
-  border-width: 1px;
-  border-top-color: ${Config.STUDIO_COLOR};
-  border-left-color: ${Config.STUDIO_COLOR};
-  border-right-color: ${Config.STUDIO_COLOR};
-  border-bottom-width: 1px;
-  border-bottom-color: ${Config.STUDIO_COLOR};
-  height: 80;
-  justify-content: center;
-  align-items: center;
 `;
 
 const StyledCheckoutView = styled.View`
@@ -238,17 +227,10 @@ class CartPage extends PureComponent {
         <Header title="My Cart" showCart={false} />
         <StyledScrollView>
           {this.props.cart.map(item => (
-            <CartItem
+            <EventListItem
               key={item.eventid}
-              eventid={item.eventid}
-              name={item.name}
-              quantity={item.quantity}
-              startTime={item.startTime}
-              price={item.price}
-              taxRate={item.taxRate}
-              passid={item.passid}
-              instructorName={item.instructorName}
-              locationName={item.locationName}
+              isCartEvent
+              {...item}
             />
           ))}
           <PaymentInfo
@@ -284,7 +266,7 @@ CartPage.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  cart: getSortedCartEvents(state),
+  cart: getCartEvents(state),
   formattedValueBack: getFormattedCartValueBack(state),
   valueBack: getCartValueBack(state),
   formattedCartTotal: getFormattedCartTotal(state),

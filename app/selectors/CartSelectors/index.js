@@ -1,5 +1,6 @@
 import { uniq } from 'lodash';
 import { createSelector } from 'reselect';
+import { getScheduleEvents } from '../EventsSelectors';
 
 /**
  * @param {Object} state in store
@@ -35,9 +36,9 @@ export const getTotalQuantityInCart = createSelector(
   data => data.reduce((a, b) => a + b.quantity, 0)
 );
 
-export const getSortedCartEvents = createSelector(
+export const getSortedCartItems = createSelector(
   getCartData,
-  events => events.sort((itemA, itemB) => {
+  items => items.sort((itemA, itemB) => {
     if (itemA.price === 0 && itemB.price) return 1;
     if (itemB.price === 0 && itemA.price) return -1;
     return itemA.price - itemB.price;
@@ -45,11 +46,17 @@ export const getSortedCartEvents = createSelector(
 );
 
 export const getCartEventIds = createSelector(
-  getCartData,
-  events => uniq(events.map(e => e.eventid))
+  getSortedCartItems,
+  items => uniq(items.map(e => e.eventid))
 );
 
 export const getCartEventNames = createSelector(
-  [getCartData],
-  cartEvents => uniq(cartEvents.map(e => e.name))
+  getSortedCartItems,
+  items => uniq(items.map(e => e.name))
+);
+
+export const getCartEvents = createSelector(
+  getCartEventIds,
+  getScheduleEvents,
+  (eventids, events) => eventids.map(eventid => events.find(event => event.id === eventid))
 );

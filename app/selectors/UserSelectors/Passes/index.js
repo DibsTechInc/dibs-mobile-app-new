@@ -2,11 +2,12 @@ import { createSelector } from 'reselect';
 import moment from 'moment';
 import Decimal from 'decimal.js';
 import { getUser } from '../index';
-import { getCartData } from '../../CartSelectors';
 import { getEventsData } from '../../EventsSelectors';
 import { getUpcomingEventsData } from '../../UpcomingEventsSelectors';
 import { getStudioSource } from '../../StudioSelectors';
 import Config from '../../../../config.json';
+
+const getCartData = state => ((state.cart && state.cart.data) || []);
 
 /**
  * @param {Object} state in store

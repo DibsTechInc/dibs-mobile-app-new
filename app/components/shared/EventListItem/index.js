@@ -3,17 +3,18 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { View } from 'react-native';
 
-import { LIGHT_GREY, DARK_TEXT_GREY } from '../../../../constants';
-import { FlexRow, FlexCenter, RightAlignedColumn, HeavyText } from '../../../styled';
+import { WHITE, LIGHT_GREY, DARK_TEXT_GREY } from '../../../constants';
+import { FlexRow, FlexCenter, RightAlignedColumn, HeavyText } from '../../styled';
 import Button from './Button';
 import Overlay from './Overlay';
 
 const Container = FlexRow.extend`
+  background: ${WHITE},
   border-bottom-width: 1;
   border-bottom-color: ${LIGHT_GREY};
   overflow: hidden;
   padding-top: 10;
-  padding-bottom: ${props => (props.showOverlay ? 35 : 10)};
+  padding-bottom: ${props => (props.showOverlay ? 40 : 10)};
   position: relative;
 `;
 
@@ -41,7 +42,7 @@ const ScheduleText = styled.Text`
 `;
 
 /**
- * @class EventListItem
+ * @class EventListItem for SchedulePage and CartPage
  * @extends {React.PureComponent}
  */
 class EventListItem extends React.PureComponent {
@@ -52,7 +53,7 @@ class EventListItem extends React.PureComponent {
    */
   constructor(props) {
     super(props);
-    this.state = { showOverlay: false };
+    this.state = { showOverlay: props.isCartEvent };
     this.showOverlayAndStartTimer = this.showOverlayAndStartTimer.bind(this);
   }
   /**
@@ -144,6 +145,7 @@ class EventListItem extends React.PureComponent {
 
 EventListItem.defaultProps = {
   has_waitlist: false,
+  isCartEvent: false,
 };
 
 EventListItem.propTypes = {
@@ -159,6 +161,7 @@ EventListItem.propTypes = {
   waitlisted: PropTypes.bool.isRequired,
   has_waitlist: PropTypes.bool,
   quantity: PropTypes.number.isRequired,
+  isCartEvent: PropTypes.bool,
 };
 
 export default EventListItem;
