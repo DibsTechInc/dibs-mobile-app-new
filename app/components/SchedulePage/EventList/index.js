@@ -2,6 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
+import { isIphoneX } from 'react-native-iphone-x-helper';
+import { View } from 'react-native';
+
 import { WHITE, DARK_TEXT_GREY } from '../../../constants';
 import Config from '../../../../config.json';
 import {
@@ -32,6 +35,12 @@ const NoEventsText = NormalText.extend`
   width: 75%;
 `;
 
+const IPhoneXPadding = styled.View`
+  background: ${WHITE};
+  height: ${Number(isIphoneX()) * 25};
+  width: 100%;
+`;
+
 /**
  * @class EventList
  * @extends {React.PureComponent}
@@ -59,23 +68,26 @@ class EventList extends React.PureComponent {
    */
   render() {
     return (
-      <ScrollContainer>
-        {this.props.isLoading && !this.props.events.length ? (
-          <ContainerWithMargin>
-            <DibsLoader dotColor={Config.STUDIO_COLOR} />
-          </ContainerWithMargin>
-        ) : null}
-        {!this.props.isLoading && !this.props.events.length && (
-          <ContainerWithMargin>
-            <NoEventsText>
-              {this.getNoEventsText()}
-            </NoEventsText>
-          </ContainerWithMargin>
-        )}
-        {this.props.events.map(event => (
-          <EventListItem key={event.eventid} {...event} />
-        ))}
-      </ScrollContainer>
+      <View style={{ flex: 1 }}>
+        <ScrollContainer>
+          {this.props.isLoading && !this.props.events.length ? (
+            <ContainerWithMargin>
+              <DibsLoader dotColor={Config.STUDIO_COLOR} />
+            </ContainerWithMargin>
+          ) : null}
+          {!this.props.isLoading && !this.props.events.length && (
+            <ContainerWithMargin>
+              <NoEventsText>
+                {this.getNoEventsText()}
+              </NoEventsText>
+            </ContainerWithMargin>
+          )}
+          {this.props.events.map(event => (
+            <EventListItem key={event.eventid} {...event} />
+          ))}
+        </ScrollContainer>
+        <IPhoneXPadding />
+      </View>
     );
   }
 }
