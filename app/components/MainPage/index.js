@@ -115,7 +115,7 @@ class MainPage extends React.PureComponent {
           'A wild update has appeared!',
           'Your app will now refresh to get the latest goodies',
           [
-            { text: 'Continue', onPress: () => Updates.reloadFromCache(); }
+            { text: 'Continue', onPress: () => Updates.reloadFromCache() },
           ],
           { cancelable: false }
         );
