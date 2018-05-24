@@ -90,11 +90,6 @@ class MainPage extends React.PureComponent {
   constructor() {
     super();
     this.navigateToDrawer = this.navigateToDrawer.bind(this);
-
-    this.state = {
-      hasCheckedUpdates: false,
-      needsUpdate: false,
-    };
   }
   /**
    * @returns {undefined}
@@ -114,15 +109,12 @@ class MainPage extends React.PureComponent {
     try {
       const update = await Updates.checkForUpdateAsync();
       if (update.isAvailable) {
-        this.setState({ needsUpdate: true });
         await Updates.fetchUpdateAsync();
         Updates.reloadFromCache();
       }
     } catch (err) {
       console.log(err);
     }
-
-    this.setState({ needsUpdate: false });
   }
 
   /**
@@ -147,16 +139,6 @@ class MainPage extends React.PureComponent {
    * @returns {JSX.Element} XML
    */
   render() {
-    if (this.state.needsUpdate) {
-      return (<DibsLoader
-        dotColor={Config.STUDIO_COLOR}
-        maxDotRadius={10}
-        width={160}
-        showUpdateText
-        darkText
-      />);
-    }
-
     return (
       <FadeInView style={{ position: 'relative', backgroundColor: BLACK }}>
         <CustomStatusBar backgroundColor={'transparent'} barStyle="light-content" />
