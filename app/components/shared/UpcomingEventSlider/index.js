@@ -75,6 +75,12 @@ class UpcomingClassSlider extends React.PureComponent {
   /**
    * @returns {undefined}
    */
+  componentWillUnmount() {
+    this.props.setUpcomingEventSliderExpandedFalse();
+  }
+  /**
+   * @returns {undefined}
+   */
   onDragStart() {
     this.setState({
       dragTop: FULL_HEIGHT,
