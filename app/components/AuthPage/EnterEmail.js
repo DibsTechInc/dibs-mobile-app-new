@@ -24,7 +24,7 @@ const StyledButtonView = styled.View`
 const ErrorText = NormalText.extend`
   color: red;
   position: absolute;
-  top: 50%;
+  top: 52%;
 `;
 /**
  * @class EnterEmail

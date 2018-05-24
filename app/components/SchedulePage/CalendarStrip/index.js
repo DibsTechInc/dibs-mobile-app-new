@@ -19,7 +19,6 @@ import { FlexRow, FlexCenter, NormalText } from '../../styled';
 // Just a shallow array of 7 elements
 
 const Container = styled.View`
-  background: ${Config.STUDIO_COLOR};
   overflow: hidden;
   top: -20;
   z-index: 5;
@@ -232,7 +231,7 @@ class CalendarStrip extends PureComponent {
     const canGoBack = lowerBound.isBefore(this.props.lowerBound);
     let opacityAnim = 1;
     return (
-      <Container>
+      <Container pointerEvents="box-none">
         <CalendarHeader>
           {this.formatCalendarHeader()}
         </CalendarHeader>

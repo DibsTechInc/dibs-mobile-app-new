@@ -104,11 +104,7 @@ class Button extends React.PureComponent {
    */
   async addToWaitlist() {
     await promisify(this.setState.bind(this))({ waitlisting: true });
-    const { success, message } = await promisify(this.props.addToWaitlist.bind(this))(this.props.eventid);
-    Alert.alert(
-      success ? 'Success!' : 'Uh oh!',
-      success ? `You're on the waitlist for ${this.props.name}!` : message
-    );
+    await this.props.addToWaitlist(this.props.eventid);
     await promisify(this.setState.bind(this))({ waitlisting: false });
   }
   /**

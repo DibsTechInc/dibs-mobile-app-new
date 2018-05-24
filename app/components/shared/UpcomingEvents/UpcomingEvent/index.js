@@ -2,14 +2,13 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { View, ScrollView, Alert } from 'react-native';
-import { promisify } from 'bluebird';
 import { connect } from 'react-redux';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 
 import Config from '../../../../../config.json';
 import { WHITE, DARK_TEXT_GREY } from '../../../../constants';
 import { getDroppingUpcomingEvent } from '../../../../selectors';
-import { dropUserFromEvent } from '../../../../actions';
+import { dropUserFromEvent, removeFromWaitlist } from '../../../../actions';
 import FadeInView from '../../FadeInView';
 import TransactionBreakdown from '../../TransactionBreakdown';
 import MaterialButton from '../../MaterialButton';
@@ -55,8 +54,8 @@ class UpcomingEvent extends PureComponent {
    */
   constructor(props) {
     super(props);
-    this.startDropClass = this.startDropClass.bind(this);
-    this.dropClass = this.dropClass.bind(this);
+    this.startCancel = this.startCancel.bind(this);
+    this.removeFromClass = this.removeFromClass.bind(this);
   }
   /**
    * @param {Object} props component is about to get
@@ -68,12 +67,12 @@ class UpcomingEvent extends PureComponent {
   /**
    * @returns {undefined}
    */
-  startDropClass() {
+  startCancel() {
     Alert.alert(
       'Are you sure?',
       `Do you want to drop ${this.props.name}?`,
       [
-        { text: 'Yes', onPress: this.dropClass },
+        { text: 'Yes', onPress: this.removeFromClass },
         { text: 'No', onPress: () => { } },
       ]
     );
@@ -81,13 +80,9 @@ class UpcomingEvent extends PureComponent {
   /**
    * @returns {undefined}
    */
-  async dropClass() {
-    try {
-      await promisify(this.props.dropUserFromEvent)(this.props.eventid);
-      Alert.alert('Success!', `You were dropped from ${this.props.name}`);
-    } catch (err) {
-      Alert.alert('Uh oh!', err.message);
-    }
+  async removeFromClass() {
+    if (this.props.isWaitlist) return this.props.removeFromWaitlist(this.props.eventid);
+    return this.props.dropUserFromEvent(this.props.eventid);
   }
   /**
    * @returns {JSX} XML
@@ -125,9 +120,11 @@ class UpcomingEvent extends PureComponent {
                 <EventText numberOfLines={1}>
                   {this.props.instructorName}
                 </EventText>
-                <EventText numberOfLines={1}>
-                  {this.props.quantity} spot{this.props.quantity > 1 ? 's' : ''}
-                </EventText>
+                {!this.props.forReceiptPage && (
+                  <EventText numberOfLines={1}>
+                    {this.props.isWaitlist ? 'Waitlisted' : `${this.props.quantity} spot${this.props.quantity > 1 ? 's' : ''}`}
+                  </EventText>
+                )}
               </View>
             </EventInfo>
             {this.props.forReceiptPage ? (
@@ -140,9 +137,9 @@ class UpcomingEvent extends PureComponent {
                   <DibsLoader dotColor={Config.STUDIO_COLOR} maxDotRadius={10} width={160} />
                 ) : (
                   <MaterialButton
-                    text="Drop"
+                    text={this.props.isWaitlist ? 'Cancel' : 'Drop'}
                     style={{ width: 80, height: 40 }}
-                    onPress={this.startDropClass}
+                    onPress={this.startCancel}
                   />
                 )}
               </View>
@@ -214,6 +211,9 @@ UpcomingEvent.propTypes = {
   instructorName: PropTypes.string,
   quantity: PropTypes.number,
   expanded: PropTypes.bool.isRequired,
+  isWaitlist: PropTypes.bool,
+  removeFromWaitlist: PropTypes.func.isRequired,
+  eventid: PropTypes.number.isRequired,
 };
 
 const mapStateToProps = state => ({
@@ -222,6 +222,7 @@ const mapStateToProps = state => ({
 });
 const mapDispatchToProps = {
   dropUserFromEvent,
+  removeFromWaitlist,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(UpcomingEvent);

@@ -127,11 +127,12 @@ export function setCurrentDateToFirstEventNextMonth() {
  * @param {*} callback on complete
  * @returns {function} thunk
  */
-export function dropUserFromEvent(eventid, callback) {
+export function dropUserFromEvent(eventid) {
   return async function innerDropUserFromEvent(dispatch, getState, dibsFetch) {
     try {
-      const { dropping } = getState().upcomingEvents;
+      const { dropping, data } = getState().upcomingEvents;
       if (dropping) return;
+      const { name: eventName } = data.find(ev => eventid === ev.eventid);
       dispatch(setDroppingEventTrue());
       const res = await dibsFetch(`/api/studio/unsubscribe/${eventid}`, {
         requiresAuth: true,
@@ -140,11 +141,13 @@ export function dropUserFromEvent(eventid, callback) {
       if (res.success) {
         dispatch(removeUpcomingEvent(eventid));
         dispatch(refreshUser(res.user));
-        callback(null);
-      } else callback(res);
+        Alert.alert('Success!', `You were dropped from ${eventName}`);
+      } else {
+        Alert.alert('Uh oh!', res.message);
+      }
     } catch (err) {
       console.log(err);
-      callback({ message: 'Something went wrong dropping your class.' });
+      Alert.alert('Uh oh!', 'Something went wrong dropping you from your class.');
     }
     dispatch(setDroppingEventFalse());
   };
