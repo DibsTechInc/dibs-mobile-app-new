@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { WHITE, BLACK } from '../../constants';
 import { FadeInView, CustomStatusBar } from './';
 import { NormalText } from '../styled';
+import { generateQuote } from '../../helpers';
 
 const LoaderView = styled.View`
   align-items: center;
@@ -59,6 +60,7 @@ class DibsLoader extends React.Component {
       firstDotAnimation: new Animated.Value(1),
       secondDotAnimation: new Animated.Value(0.5),
       thirdDotAnimation: new Animated.Value(0),
+      quote: generateQuote(),
     };
     this.getFirstDotStyle = this.getDotStyle.bind(this, 'firstDotAnimation');
     this.getSecondDotStyle = this.getDotStyle.bind(this, 'secondDotAnimation');
@@ -129,14 +131,9 @@ class DibsLoader extends React.Component {
     return (
       <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
         <CustomStatusBar backgroundColor="transparent" barStyle="light-content" />
-        {this.props.showPurchaseFlavorText &&
+        {this.props.showQuote &&
           <FadeInViewText darkText={this.props.darkText}>
-            If only taking vitamins could be classified as working out
-          </FadeInViewText>
-        }
-        {this.props.showUpdateText &&
-          <FadeInViewText darkText={this.props.darkText}>
-            Preparing the treadmills..
+            {this.state.quote}
           </FadeInViewText>
         }
         <LoaderView {...this.props}>
@@ -168,8 +165,7 @@ DibsLoader.propTypes = {
   dotColor: PropTypes.string,
   width: stringOrNum,
   duration: PropTypes.number,
-  showPurchaseFlavorText: PropTypes.bool,
-  showUpdateText: PropTypes.bool,
+  showQuote: PropTypes.string,
   backgroundColor: PropTypes.string,
   onFinishLoading: PropTypes.func,
   darkText: PropTypes.bool,

@@ -214,7 +214,7 @@ class CartPage extends PureComponent {
     );
 
     if (this.state.isProcessingPayment) {
-      return <FadeInView style={{ backgroundColor: Config.STUDIO_COLOR }}><DibsLoader showPurchaseFlavorText /></FadeInView>;
+      return <FadeInView style={{ backgroundColor: Config.STUDIO_COLOR }}><DibsLoader showQuote /></FadeInView>;
     }
 
     if (!this.props.cart.length) {

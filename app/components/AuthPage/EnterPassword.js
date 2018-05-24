@@ -101,7 +101,7 @@ class EnterPassword extends PureComponent {
         <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
           <DibsLoader
             dotColor={Config.STUDIO_COLOR}
-            showUpdateText
+            showQuote
             darkText
           />
         </FadeInView>
