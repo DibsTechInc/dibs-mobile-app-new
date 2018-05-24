@@ -95,7 +95,7 @@ class MainPage extends React.PureComponent {
   /**
    * @returns {undefined}
    */
-  componentWillMount() {
+  componentDidMount() {
     this.getUpdates();
   }
 

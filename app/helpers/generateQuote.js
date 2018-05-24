@@ -8,8 +8,8 @@ const quotes = [
   'I lift, therefore I am',
   'Let she who lacks pump do the first set',
   'You can\'t push yourself forward by patting yourself on the back',
-  'If you’re on the treadmill next to me, we are racing.',
-  'You can be sore tomorrow or sorry tomorrow. You decide.',
+  'If you’re on the treadmill next to me, we are racing',
+  'You can be sore tomorrow or sorry tomorrow. You decide',
   'Do the work, be the prize',
   'Caution: Contains Gains',
   'The faster you run, the sooner you\'re done',
@@ -18,7 +18,7 @@ const quotes = [
   'Use it or lose it',
   'Don\'t compare your chapter 2 to someone else\'s chapter 22',
   'Spin to win',
-  'Every day you don\'t work out, someone else does.',
+  'Every day you don\'t work out, someone else does',
 ];
 
 function getRandomIntInclusive(min, max) {

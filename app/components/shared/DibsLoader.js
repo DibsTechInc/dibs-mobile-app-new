@@ -165,7 +165,7 @@ DibsLoader.propTypes = {
   dotColor: PropTypes.string,
   width: stringOrNum,
   duration: PropTypes.number,
-  showQuote: PropTypes.string,
+  showQuote: PropTypes.bool,
   backgroundColor: PropTypes.string,
   onFinishLoading: PropTypes.func,
   darkText: PropTypes.bool,
