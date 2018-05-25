@@ -54,31 +54,7 @@ class App extends Component {
    * @returns {undefined}
    */
   componentWillMount() {
-    this.getUpdates();
     this.getAssets();
-  }
-
-  /**
-   * @returns {undefined}
-   */
-  async getUpdates() {
-    if (__DEV__) {
-      this.setState({ checkedUpdates: true });
-      return;
-    }
-
-    try {
-      const update = await Updates.checkForUpdateAsync();
-      if (update.isAvailable) {
-        await Updates.fetchUpdateAsync();
-        // ... notify user of update ...
-        Updates.reloadFromCache();
-      }
-    } catch (err) {
-      console.log(err);
-    }
-
-    this.setState({ checkedUpdates: true });
   }
 
   /**
