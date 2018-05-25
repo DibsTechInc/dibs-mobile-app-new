@@ -15,7 +15,7 @@ const quotes = [
   'The faster you run, the sooner you\'re done',
   'You can\'t beat science',
   'Something something oats and squats',
-  'Use it or lose it',
+  'Shutup and squat',
   'Don\'t compare your chapter 2 to someone else\'s chapter 22',
   'Spin to win',
   'Every day you don\'t work out, someone else does',

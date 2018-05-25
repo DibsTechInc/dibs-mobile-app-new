@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
-import { Font, ScreenOrientation, Updates } from 'expo';
+import { Font, ScreenOrientation } from 'expo';
 import styled from 'styled-components';
 import { AsyncStorage } from 'react-native';
 import Promise from 'bluebird';

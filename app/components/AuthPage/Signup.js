@@ -136,7 +136,7 @@ class Signup extends PureComponent {
     if (this.state.isLoading) {
       return (
         <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <DibsLoader dotColor={Config.STUDIO_COLOR} />
+          <DibsLoader showQuote darkText dotColor={Config.STUDIO_COLOR} />
         </FadeInView>
       );
     }
