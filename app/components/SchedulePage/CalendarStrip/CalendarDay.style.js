@@ -10,13 +10,13 @@ export default StyleSheet.create({
     borderRadius: 43 / 2,
   },
   dateName: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: 'flex-font-heavy',
     textAlign: 'center',
   },
   dateNumber: {
     fontSize: 18,
-    fontFamily: 'flex-font-heavy',
+    fontFamily: 'flex-font',
     textAlign: 'center',
   },
   disabledDateName: {
@@ -27,19 +27,19 @@ export default StyleSheet.create({
   },
   disabledDateNumber: {
     fontSize: 10,
-    fontFamily: 'flex-font-heavy',
+    fontFamily: 'flex-font',
     color: 'darkgray',
     textAlign: 'center',
   },
   highlightDateNameStyle: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: 'flex-font-heavy',
     fontWeight: 'bold',
     textAlign: 'center',
   },
   highlightDateNumberStyle: {
     fontSize: 16,
-    fontFamily: 'flex-font-heavy',
+    fontFamily: 'flex-font',
     fontWeight: 'bold',
     textAlign: 'center',
   },

@@ -183,7 +183,7 @@ class Signup extends PureComponent {
               title="I have read and agreed to the terms"
               checked={this.state.tAndC}
               containerStyle={{ backgroundColor: DEFAULT_BG, position: 'absolute', bottom: 0, left: -22 }}
-              textStyle={{ fontFamily: 'flex-font', fontSize: 12 }}
+              textStyle={{ fontFamily: 'flex-font', fontSize: 14 }}
               onPress={this.handleOnCheck}
               size={20}
             />

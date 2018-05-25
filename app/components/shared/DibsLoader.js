@@ -1,11 +1,10 @@
 import React from 'react';
-import { Text } from 'react-native';
 import PropTypes from 'prop-types';
 import { Animated } from 'react-native';
 import styled from 'styled-components';
+
 import { WHITE, BLACK } from '../../constants';
 import { FadeInView, CustomStatusBar } from './';
-import { NormalText } from '../styled';
 import { generateQuote } from '../../helpers';
 
 const LoaderView = styled.View`
@@ -23,8 +22,10 @@ const DotContainer = styled.View`
 `;
 
 const FadeInViewText = styled.Text`
+  color: ${props => (props.darkText ? BLACK : WHITE)};
   margin-bottom: 50px;
-  color: ${props => props.darkText ? BLACK : WHITE};
+  padding-horizontal: 15;
+  text-align: center;
 `;
 
 const DibsLoaderDot = props => (
@@ -161,7 +162,7 @@ const stringOrNum = PropTypes.oneOfType([
   PropTypes.number,
 ]);
 
-DibsLoader.propTypes = {
+DibsLoader.propTypes = { /* eslint-disable react/no-unused-prop-types */
   maxDotRadius: stringOrNum,
   dotColor: PropTypes.string,
   width: stringOrNum,
