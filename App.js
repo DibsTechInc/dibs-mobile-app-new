@@ -90,7 +90,7 @@ class App extends Component {
           <Navigator userToken={this.state.userToken} />
         ) : (
           <StyledLoadingPage>
-            {this.state.errorOccurred ? null : <DibsLoader />}
+            {this.state.errorOccurred ? null : <DibsLoader showQuote />}
           </StyledLoadingPage>
         )}
       </Provider>

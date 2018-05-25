@@ -1,4 +1,5 @@
 import React from 'react';
+import { Text } from 'react-native';
 import PropTypes from 'prop-types';
 import { Animated } from 'react-native';
 import styled from 'styled-components';
@@ -21,7 +22,7 @@ const DotContainer = styled.View`
   width: ${props => (props.width / 3)};
 `;
 
-const FadeInViewText = NormalText.extend`
+const FadeInViewText = styled.Text`
   margin-bottom: 50px;
   color: ${props => props.darkText ? BLACK : WHITE};
 `;
