@@ -46,7 +46,7 @@ const MainPageHeader = SpaceBetweenRow.extend`
 const Content = styled.View`
   flex: 1;
   justify-content: ${props => (props.hasUpcomingClasses ? 'center' : 'flex-end')};
-  margin-bottom: ${props => (props.hasUpcomingClasses ? 190 : 80)};
+  margin-bottom: ${props => (props.hasUpcomingClasses ? 190 : (HEIGHT / 10))};
   padding-horizontal: 40;
 `;
 

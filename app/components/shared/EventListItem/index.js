@@ -38,7 +38,7 @@ const Price = HeavyText.extend`
 
 const ScheduleText = styled.Text`
   color: ${DARK_TEXT_GREY};
-  font-size: 12;
+  font-size: 14;
 `;
 
 /**

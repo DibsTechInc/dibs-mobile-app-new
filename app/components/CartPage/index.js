@@ -28,7 +28,6 @@ import {
 } from '../../constants';
 
 import {
-  CustomStatusBar,
   DibsLoader,
   PaymentInfo,
   EventListItem,
@@ -41,11 +40,11 @@ import Header from '../Header';
 
 import { NormalText } from '../styled';
 
-const StyledScrollView = styled.ScrollView`
+const Container = styled.ScrollView`
   flex: 1;
 `;
 
-const StyledCheckoutView = styled.View`
+const CheckoutView = styled.View`
   justify-content: space-between;
   align-items: center;
   border-top-width: 1;
@@ -54,23 +53,23 @@ const StyledCheckoutView = styled.View`
   background-color: ${WHITE};
 `;
 
-const StyledSwipeText = NormalText.extend`
+const SwipeText = NormalText.extend`
   text-align: center;
   color: ${WHITE};
   flex: 1;
 `;
 
-const StyledSwipeArrows = NormalText.extend`
+const SwipeArrows = NormalText.extend`
   color: ${WHITE};
   position: absolute;
   right: 40px;
 `;
 
-const StyledSavingsText = NormalText.extend`
+const SavingsText = NormalText.extend`
   color: ${BLACK};
 `;
 
-const StyledContinueButton = styled.TouchableOpacity`
+const ContinueButton = styled.TouchableOpacity`
   padding-right: 10px;
   padding-top: 15px;
   padding-bottom: 15px;
@@ -179,7 +178,7 @@ class CartPage extends PureComponent {
       : `Place your order for ${this.props.formattedCartTotal}`;
 
     const purchaseButton = [
-      <StyledContinueButton />,
+      <ContinueButton />,
     ];
 
     const notReadyForPurchase = (!(this.props.creditCard.expMonth) || this.props.creditCard.loading || this.state.isUpdatingCard);
@@ -202,12 +201,12 @@ class CartPage extends PureComponent {
           leftButtonsActivationDistance={150}
         >
           <View style={{ flexDirection: 'row', position: 'relative' }}>
-            <StyledSwipeText>
+            <SwipeText>
               Swipe to pay
-            </StyledSwipeText>
-            <StyledSwipeArrows>
+            </SwipeText>
+            <SwipeArrows>
               {'>>'}
-            </StyledSwipeArrows>
+            </SwipeArrows>
           </View>
         </Swipeable>
       </View>
@@ -223,9 +222,8 @@ class CartPage extends PureComponent {
 
     return (
       <FadeInView style={{ backgroundColor: SOFT_GREY }}>
-        <CustomStatusBar backgroundColor={Config.STUDIO_COLOR} barStyle="light-content" />
         <Header title="My Cart" showCart={false} />
-        <StyledScrollView>
+        <Container>
           {this.props.cart.map(item => (
             <EventListItem
               key={item.eventid}
@@ -239,15 +237,15 @@ class CartPage extends PureComponent {
           />
           <PromoField />
           <CartTransaction />
-        </StyledScrollView>
-        <StyledCheckoutView>
+        </Container>
+        <CheckoutView>
           <View style={{ justifyContent: 'center', alignItems: 'center', width: '100%', paddingVertical: 15 }}>
-            <StyledSavingsText>
+            <SavingsText>
               {renderValueBackMessage}
-            </StyledSavingsText>
+            </SavingsText>
           </View>
           {renderPurchaseButton}
-        </StyledCheckoutView>
+        </CheckoutView>
       </FadeInView>
     );
   }
