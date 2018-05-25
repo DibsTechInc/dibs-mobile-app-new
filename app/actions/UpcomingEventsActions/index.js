@@ -97,7 +97,7 @@ export function setCurrentDateToFirstEventPrevMonth() {
         && eventStart.isAfter(currentDate.clone().startOf('month').subtract(1, 'month'));
     });
     if (!eventPrevMonth) {
-      return dispatch(setUpcomingEventsCurrentDate(moment().tz(Config.STUDIO_TZ).startOf('month')));
+      return dispatch(setUpcomingEventsCurrentDate(moment().tz(Config.STUDIO_TZ).startOf('day')));
     }
     const { start_time: startTime, mainTZ } = eventPrevMonth; // data is sorted in API by event start time ASC
     return dispatch(setUpcomingEventsCurrentDate(moment.tz(startTime, mainTZ).startOf('day')));

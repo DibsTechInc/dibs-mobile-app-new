@@ -146,7 +146,7 @@ class Signup extends PureComponent {
         <CustomStatusBar backgroundColor={'transparent'} barStyle="dark-content" />
         <ScrollView keyboardShouldPersistTaps="always" contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', height: '60%', position: 'relative' }}>
           <StyledText>
-          Just need a few details before we get started
+          Just a few details before we get started
           </StyledText>
           <InputField
             value={this.props.navigation.state.params.email || ''}

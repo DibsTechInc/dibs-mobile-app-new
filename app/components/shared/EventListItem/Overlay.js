@@ -3,18 +3,18 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { View } from 'react-native';
 import { connect } from 'react-redux';
-import { LIGHT_GREY, WHITE, TEXT_GREY, BLACK, SOFT_GREY } from '../../../constants';
+import { LIGHT_GREY, TEXT_GREY, BLACK, SOFT_GREY, TRANSPARENT } from '../../../constants';
 import { fadeColor } from '../../../helpers';
 import { addToCart, removeOneEventItem } from '../../../actions';
 import { Overlay as StyledOverlay, FlexRow, NormalText } from '../../styled';
 import Icon from '../../shared/Icon';
 
 const EventOverlay = StyledOverlay.extend`
-  background: ${props => props.background};
+  background-color: ${props => props.background};
   elevation: 3;
   justify-content: flex-end;
   shadow-color: ${BLACK};
-  shadow-opacity: 0.075;
+  shadow-opacity: 0.05;
   shadow-radius: 2;
   z-index: 3;
 `;
@@ -88,7 +88,7 @@ class Overlay extends React.PureComponent {
     return (
       <EventOverlay
         background={this.props.soldOut ?
-          fadeColor(SOFT_GREY, 0.4) : fadeColor(WHITE, 0.85)
+          fadeColor(SOFT_GREY, 0.4) : TRANSPARENT
         }
       >
         {this.props.quantity ? (
