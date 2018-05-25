@@ -112,7 +112,7 @@ class LandingPage extends Component {
               />
             </StyledButtonsView>
           </FadeInView>
-          <About />
+          <About studioName={this.props.studioName} />
         </Swiper>
       </View>
     );
