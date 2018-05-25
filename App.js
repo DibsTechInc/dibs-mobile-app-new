@@ -47,7 +47,6 @@ class App extends Component {
       fetchedAssets: false,
       userToken: null,
       errorOccurred: false,
-      checkedUpdates: false,
     };
   }
   /**
@@ -87,7 +86,7 @@ class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        {(this.state.fetchedAssets && this.state.checkedUpdates) ? (
+        {(this.state.fetchedAssets) ? (
           <Navigator userToken={this.state.userToken} />
         ) : (
           <StyledLoadingPage>

@@ -110,12 +110,11 @@ class MainPage extends React.PureComponent {
     try {
       const update = await Updates.checkForUpdateAsync();
       if (update.isAvailable) {
-        await Updates.fetchUpdateAsync();
         Alert.alert(
           'A wild update has appeared!',
           'Your app will now refresh to get the latest goodies',
           [
-            { text: 'Continue', onPress: () => Updates.reloadFromCache() },
+            { text: 'Continue', onPress: () => Updates.reload() },
           ],
           { cancelable: false }
         );
