@@ -6,7 +6,7 @@ import moment from 'moment-timezone';
 import { View } from 'react-native';
 
 import Config from '../../../../config.json';
-import { TRANSPARENT } from '../../../constants';
+import { HEIGHT } from '../../../constants';
 import theme from './theme';
 import {
   getUpcomingEventsCurrentDate,
@@ -87,9 +87,8 @@ class CalendarComponent extends React.PureComponent {
       <View style={{ position: 'relative' }}>
         <Calendar
           style={{
-            height: 350,
+            height: (HEIGHT / 3),
             backgroundColor: Config.STUDIO_COLOR,
-            marginTop: 30,
           }}
           theme={theme}
           current={this.props.currentDate}
@@ -111,7 +110,7 @@ class CalendarComponent extends React.PureComponent {
           style={{
             position: 'absolute',
             left: 70,
-            top: 45,
+            top: 15,
           }}
         />
         <CalendarArrow
@@ -120,7 +119,7 @@ class CalendarComponent extends React.PureComponent {
           style={{
             position: 'absolute',
             right: 70,
-            top: 45,
+            top: 15,
           }}
         />
       </View>

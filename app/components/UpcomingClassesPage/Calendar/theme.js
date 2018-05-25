@@ -1,5 +1,5 @@
 import Config from '../../../../config.json';
-import { WHITE } from '../../../constants';
+import { WHITE, HEIGHT } from '../../../constants';
 
 export default {
   'stylesheet.calendar.header': {
@@ -9,15 +9,18 @@ export default {
     header: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      paddingLeft: 10,
-      paddingRight: 10,
       alignItems: 'center',
-      marginBottom: 25,
     },
   },
   'stylesheet.calendar.main': {
     container: { backgroundColor: Config.STUDIO_COLOR, paddingHorizontal: 15 },
-    monthView: { backgroundColor: Config.STUDIO_COLOR, paddingTop: 10 },
+    monthView: { backgroundColor: Config.STUDIO_COLOR, paddingTop: 2 },
+    week: {
+      marginTop: (HEIGHT / 200),
+      marginBottom: (HEIGHT / 200),
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+    },
   },
   'stylesheet.day.basic': {
     disabledText: {

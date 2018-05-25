@@ -9,7 +9,7 @@ import { withNavigation } from 'react-navigation';
 import { Svg, Path } from 'react-native-svg';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 
-import { WHITE, HEIGHT, MAIN_ROUTE, LIGHT_GREY } from '../../../constants';
+import { WHITE, HEIGHT, MAIN_ROUTE, LIGHT_GREY, UPCOMING_CLASS_ROUTE } from '../../../constants';
 import {
   setUpcomingEventSliderExpandedTrue,
   setUpcomingEventSliderExpandedFalse,
@@ -19,7 +19,6 @@ import Header from '../../Header';
 import NoEvents from './NoEvents';
 
 const FULL_HEIGHT = HEIGHT - (isIphoneX() ? 100 : 80);
-const SHORTENED_HEIGHT = HEIGHT / 2.25;
 
 const Panel = styled.View`
   align-items: center;
@@ -55,8 +54,8 @@ class UpcomingClassSlider extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      dragTop: SHORTENED_HEIGHT,
-      dragBottom: SHORTENED_HEIGHT,
+      dragTop: props.shortenedHeight,
+      dragBottom: props.shortenedHeight,
       expanded: false,
       expanding: false,
       headerTop: new Animated.Value(-100),
@@ -84,7 +83,7 @@ class UpcomingClassSlider extends React.PureComponent {
   onDragStart() {
     this.setState({
       dragTop: FULL_HEIGHT,
-      dragBottom: SHORTENED_HEIGHT,
+      dragBottom: this.props.shortenedHeight,
     });
   }
   /**
@@ -92,7 +91,7 @@ class UpcomingClassSlider extends React.PureComponent {
    * @returns {undefined}
    */
   onDragEnd(pos) {
-    if (!this.props.expanded && pos > (SHORTENED_HEIGHT + 30)) this.handleDragUp();
+    if (!this.props.expanded && pos > (this.props.shortenedHeight + 30)) this.handleDragUp();
     else if (!this.props.expanded || pos < (FULL_HEIGHT - 30)) this.handleDragDown();
     else this.handleDragUp();
   }
@@ -125,7 +124,7 @@ class UpcomingClassSlider extends React.PureComponent {
     await new Promise(res => this.setState({ expanding: true }, res));
     await Promise.all([
       new Promise(res => this.slider.transitionTo({
-        toValue: SHORTENED_HEIGHT,
+        toValue: this.props.shortenedHeight,
         duration: 100,
         onAnimationEnd: res,
       })),
@@ -195,10 +194,15 @@ UpcomingClassSlider.propTypes = {
   expanded: PropTypes.bool.isRequired,
   setUpcomingEventSliderExpandedTrue: PropTypes.func.isRequired,
   setUpcomingEventSliderExpandedFalse: PropTypes.func.isRequired,
+  shortenedHeight: PropTypes.number.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state, props) => ({
   expanded: state.animation.upcomingEventSliderExpanded,
+  shortenedHeight: (
+    props.navigation.state.key === UPCOMING_CLASS_ROUTE && HEIGHT < 600 ?
+      HEIGHT / 3 : HEIGHT / 2.25
+  ),
 });
 const mapDispatchToProps = {
   setUpcomingEventSliderExpandedTrue,
