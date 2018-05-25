@@ -109,7 +109,7 @@ Notification.defaultProps = {
   width: 20,
 };
 
-Notification.propTypes = {
+Notification.propTypes = { /* eslint-disable react/no-unused-prop-types */
   notificationCount: PropTypes.number,
   backgroundColor: PropTypes.string,
   notificationTextColor: PropTypes.string,
@@ -120,4 +120,5 @@ Notification.propTypes = {
   ]),
   children: PropTypes.element,
   top: PropTypes.number,
+  right: PropTypes.number,
 };

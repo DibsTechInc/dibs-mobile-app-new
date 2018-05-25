@@ -38,7 +38,7 @@ const SvgContainer = styled.View`
   left: 0;
   position: absolute;
   right: 0;
-  top: 10;
+  top: 15;
   width: 100%;
 `;
 
@@ -169,8 +169,8 @@ class UpcomingClassSlider extends React.PureComponent {
           <Panel roundEdge={this.props.expanded}>
             {!this.props.expanded && (
               <SvgContainer>
-                <Svg width={60} height={3}>
-                  <Path d="M 0 1.5 L 60 1.5" stroke={LIGHT_GREY} strokeWidth={3} />
+                <Svg width={60} height={5}>
+                  <Path d="M 3 1.5 L 57 1.5" stroke={LIGHT_GREY} strokeWidth={5} strokeLinecap="round" />
                 </Svg>
               </SvgContainer>
             )}

@@ -42,7 +42,8 @@ const ScheduleText = styled.Text`
 `;
 
 /**
- * @class EventListItem for SchedulePage and CartPage
+ * for SchedulePage and CartPage
+ * @class EventListItem
  * @extends {React.PureComponent}
  */
 class EventListItem extends React.PureComponent {
@@ -83,7 +84,7 @@ class EventListItem extends React.PureComponent {
     this.overlayTimeout = setTimeout(() => {
       this.setState({ showOverlay: false });
       this.overlayTimeout = null;
-    }, 1e4);
+    }, 5000);
   }
   /**
    * render
