@@ -15,10 +15,11 @@ const quotes = [
   'The faster you run, the sooner you\'re done',
   'You can\'t beat science',
   'Something something oats and squats',
-  'Shutup and squat',
+  'Shut up and squat',
   'Don\'t compare your chapter 2 to someone else\'s chapter 22',
   'Spin to win',
   'Every day you don\'t work out, someone else does',
+  'Gym, tan, laundry',
 ];
 
 function getRandomIntInclusive(min, max) {

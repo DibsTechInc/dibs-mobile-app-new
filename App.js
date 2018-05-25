@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
-import { Font, ScreenOrientation } from 'expo';
+import { Font, ScreenOrientation, Updates } from 'expo';
 import styled from 'styled-components';
 import { AsyncStorage } from 'react-native';
 import Promise from 'bluebird';
@@ -53,7 +53,26 @@ class App extends Component {
    * @returns {undefined}
    */
   componentWillMount() {
+    this.getUpdates();
     this.getAssets();
+  }
+
+    /**
+   * @returns {undefined}
+   */
+  async getUpdates() {
+    if (__DEV__) {
+      return;
+    }
+
+    try {
+      const update = await Updates.checkForUpdateAsync();
+      if (update.isAvailable) {
+        Updates.reload();
+      }
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   /**
@@ -76,7 +95,8 @@ class App extends Component {
       this.setState({ fetchedAssets: true, userToken: token });
       if (token) await new Promise(res => store.dispatch(syncUserEvents(res)));
     } catch (err) {
-      this.setState({ fetchingAssets: false, errorOccurred: true });
+      this.setState({ fetchedAssets: false, errorOccurred: true });
+      Updates.reload();
       console.log(err);
     }
   }
