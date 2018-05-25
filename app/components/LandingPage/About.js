@@ -1,5 +1,6 @@
 
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Text } from 'react-native';
 import styled from 'styled-components';
 
@@ -20,11 +21,15 @@ class About extends Component {
   render() {
     return (
       <StyledView>
-        <Text>About Core Collective - Placeholder</Text>
+        <Text>About {this.props.studioName} - Placeholder</Text>
         <Text>Custom text / images / image background</Text>
       </StyledView>
     );
   }
 }
+
+About.propTypes = {
+  studioName: PropTypes.string,
+};
 
 export default About;
