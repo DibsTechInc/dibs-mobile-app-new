@@ -95,13 +95,15 @@ class UpcomingEvent extends PureComponent {
       <FadeInView
         style={{
           paddingTop: this.props.forReceiptPage ? 10 : 0,
-          paddingBottom: isIphoneX() ? 80 : 60,
+          paddingBottom: isIphoneX() ? 80 : +(!this.props.forReceiptPage && 60),
           backgroundColor: WHITE,
         }}
       >
         <ScrollView
           ref={node => this.scrollView = node}
-          style={{ paddingTop: this.props.forReceiptPage ? 10 : 0, marginBottom: 60 }}
+          style={{
+            paddingTop: this.props.forReceiptPage ? 10 : 0,
+          }}
         >
           <EventRow>
             <EventInfo>
@@ -120,18 +122,14 @@ class UpcomingEvent extends PureComponent {
                 <EventText numberOfLines={1}>
                   {this.props.instructorName}
                 </EventText>
-                {!this.props.forReceiptPage && (
+                {(this.props.quantity > 1 || this.props.isWaitlist) && (
                   <EventText numberOfLines={1}>
                     {this.props.isWaitlist ? 'Waitlisted' : `${this.props.quantity} spot${this.props.quantity > 1 ? 's' : ''}`}
                   </EventText>
                 )}
               </View>
             </EventInfo>
-            {this.props.forReceiptPage ? (
-              <EventText>
-                {this.props.quantity} spot{this.props.quantity > 1 ? 's' : ''}
-              </EventText>
-            ) : (
+            {this.props.forReceiptPage ? null : (
               <View style={{ alignItems: 'center' }}>
                 {this.props.dropping ? (
                   <DibsLoader dotColor={Config.STUDIO_COLOR} maxDotRadius={10} width={160} />
@@ -172,7 +170,7 @@ class UpcomingEvent extends PureComponent {
                 {classDescriptionHTML}
               </DesciptionText>
             </View>
-            <View style={{ paddingBottom: 10 }}>
+            <View style={{ paddingBottom: 60 }}>
               <HeavyText>
                 Drop Policy:
               </HeavyText>
