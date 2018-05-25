@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { View, Animated } from 'react-native';
+import { View, Animated, Easing } from 'react-native';
 
 import { WHITE, RED } from '../../constants';
 import { NormalText } from '../styled';
@@ -58,7 +58,8 @@ export default class Notification extends React.PureComponent {
         this.state.animValue,
         {
           toValue: 1,
-          duration: 300,
+          duration: 500,
+          easing: Easing.bezier(0.2, 0.15, 0.13, 1.07),
         }
       ).start(res));
       await new Promise(res => this.setState({ animValue: new Animated.Value(0), showPulse: false }, res));
