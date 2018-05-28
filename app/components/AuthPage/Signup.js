@@ -16,7 +16,10 @@ import { promisify } from 'bluebird';
 import { signUpUser } from '../../actions';
 import { MaterialButton, CustomStatusBar, FadeInView, InputField } from '../shared';
 import { TERMS_AND_CONDITIONS_ROUTE, MAIN_ROUTE, LOGIN_ROUTE, DEFAULT_BG } from '../../constants';
-import { getStudioName } from '../../selectors';
+import {
+  getStudioName,
+  getStudio,
+} from '../../selectors';
 import Config from '../../../config.json';
 import DibsLoader from '../shared/DibsLoader';
 
@@ -92,11 +95,11 @@ class Signup extends PureComponent {
       email: this.props.navigation.state.params.email,
       fullname: this.state.fullName,
       password: this.state.password,
-      signupStudioId: 20456,
-      signupMethod: 'widget',
-      signupStudioSource: 'mb',
+      signupStudioId: this.props.studio.studioid,
+      signupMethod: 'widget', // TODO: UPDATE BACKEND TO CHECK FOR MOBILE SIGNUPS
+      signupStudioSource: this.props.studio.source,
       referredBy: undefined,
-      signupDibsStudioId: 4,
+      signupDibsStudioId: this.props.studio.id,
       attempt: 0,
     };
 
@@ -140,7 +143,7 @@ class Signup extends PureComponent {
         </FadeInView>
       );
     }
-
+    console.log(this.props.studio, '???')
     return (
       <FadeInView>
         <CustomStatusBar backgroundColor={'transparent'} barStyle="dark-content" />
@@ -215,6 +218,7 @@ Signup.propTypes = {
 
 const mapStateToProps = state => ({
   studioName: getStudioName(state),
+  studio: getStudio(state),
 });
 
 const mapDispatchToProps = {
