@@ -120,7 +120,10 @@ function generateDetailedUpcomingEvents(items, currency, timeFormat, shortDateFo
         time.format(timeFormat) : time.format('hA')
     );
 
-    const formattedDescription = createTextVersion(item.description);
+    let formattedDescription = createTextVersion(item.description);
+    if (!formattedDescription || formattedDescription.length <= 1) {
+      formattedDescription = 'No class description.';
+    }
 
     return {
       ...item,

@@ -88,9 +88,6 @@ class UpcomingEvent extends PureComponent {
    * @returns {JSX} XML
    */
   render() {
-    const classDescriptionHTML = this.props.formattedDescription
-      ? this.props.formattedDescription : 'No Class Description.';
-
     return (
       <FadeInView
         style={{
@@ -167,7 +164,7 @@ class UpcomingEvent extends PureComponent {
                 Class Description:
               </HeavyText>
               <DesciptionText>
-                {classDescriptionHTML}
+                {this.props.formattedDescription}
               </DesciptionText>
             </View>
             <View style={{ paddingBottom: 60 }}>
