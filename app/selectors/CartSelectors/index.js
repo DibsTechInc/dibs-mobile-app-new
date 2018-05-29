@@ -1,6 +1,13 @@
 import { uniq } from 'lodash';
 import { createSelector } from 'reselect';
-import { getScheduleEvents } from '../EventsSelectors';
+import moment from 'moment-timezone';
+import Decimal from 'decimal.js';
+import { format as formatCurrency } from 'currency-formatter';
+
+import { getEventsData } from '../EventsSelectors';
+import { getUserPasses } from '../UserSelectors/Passes';
+import { getStudioCustomTimeFormat, getStudioCurrency } from '../StudioSelectors';
+import { getUpcomingEventsData } from '../UpcomingEventsSelectors';
 
 /**
  * @param {Object} state in store
@@ -56,7 +63,66 @@ export const getCartEventNames = createSelector(
 );
 
 export const getCartEvents = createSelector(
-  getCartEventIds,
-  getScheduleEvents,
-  (eventids, events) => eventids.map(eventid => events.find(event => event.id === eventid))
+  [
+    getCartData,
+    getEventsData,
+  ],
+  (cartItems, events) => cartItems.reduce(
+    (acc, cartEvent) => {
+      const arrayEvent = acc.find(e => e.eventid === cartEvent.eventid);
+      if (!arrayEvent) {
+        const eventData = events.find(e => e.id === cartEvent.eventid);
+        const { passid, quantity, ...cartEventData } = cartEvent;
+        acc.push({ ...eventData, ...cartEventData, quantity, passids: [{ passid, quantity }] });
+        return acc;
+      }
+      arrayEvent.quantity += cartEvent.quantity;
+      arrayEvent.passids.push({ passid: cartEvent.passid, quantity: cartEvent.quantity });
+      return acc;
+    },
+    []
+  )
+);
+
+export const getDetailedCartEvents = createSelector(
+  [
+    getCartEvents,
+    getStudioCurrency,
+    getUserPasses,
+    getStudioCustomTimeFormat,
+    getUpcomingEventsData,
+  ],
+  (events, currency, userPasses, timeFormat, upcomingEvents) => events.map(({ instructor, location, ...event }) => {
+    const formatLocalTime = time => moment(time).tz(event.mainTZ).format(timeFormat);
+
+    // Getting the proper subtotal since each item in the cart is eventid/passid combo
+    const displayedPrice = event.passids.reduce((acc, { passid, quantity }) => {
+      if (!passid) return acc.plus(Decimal(event.price).times(quantity));
+      const pass = userPasses.find(p => p.id === passid);
+      const passValue = pass && pass.passValue;
+      let adjustedPrice = Decimal(Math.min(event.price, passValue || 0));
+      adjustedPrice = adjustedPrice.times(quantity);
+      return acc.plus(adjustedPrice);
+    }, Decimal(0));
+    const maxSeatsReached = Boolean(
+      (event.quantity + event.current_enrollment) === event.maximum_enrollment
+      || event.quantity === 4
+    );
+    const bookedEvent = upcomingEvents.find(userEvent => userEvent.eventid === event.eventid);
+
+    return {
+      ...event,
+      startTimeInLocalTZ: formatLocalTime(event.start_time),
+      endTimeInLocalTZ: formatLocalTime(event.end_time),
+      instructorName: instructor.name,
+      locationName: location.name,
+      formattedRoundedPrice: formatCurrency(displayedPrice.toNumber(), { precision: 0, code: currency }),
+      seatsRemaining: event.seats_remaining,
+      soldOut: event.seats_remaining <= 0,
+      seatsSold: event.current_enrollment,
+      maxSeatsReached,
+      taxRate: location.tax_rate,
+      userHasBooked: Boolean(bookedEvent),
+    };
+  })
 );

@@ -162,6 +162,7 @@ class Button extends React.PureComponent {
 Button.defaultProps = {
   showOverlay() {},
   userHasBooked: false,
+  waitlisted: false,
 };
 
 Button.propTypes = {
@@ -174,7 +175,7 @@ Button.propTypes = {
   taxRate: PropTypes.number.isRequired,
   name: PropTypes.string.isRequired,
   start_time: PropTypes.string.isRequired,
-  waitlisted: PropTypes.bool.isRequired,
+  waitlisted: PropTypes.bool,
   soldOut: PropTypes.bool.isRequired,
   locationName: PropTypes.string.isRequired,
   instructorName: PropTypes.string.isRequired,
