@@ -63,16 +63,26 @@ class App extends Component {
    * @returns {undefined}
    */
   componentDidMount() {
-    this.userPollInterval = setInterval(() => {
-      if (!this.state.fetchedAssets) return;
-      store.dispatch(requestUserData());
-      store.dispatch(requestCreditCardInfo());
-      store.dispatch(requestUserEvents());
+    this.userPollInterval = setInterval(async () => {
+      try {
+        const token = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
+        if (!token) return;
+        store.dispatch(requestUserData());
+        store.dispatch(requestCreditCardInfo());
+        store.dispatch(requestUserEvents());
+      } catch (err) {
+        console.error(err);
+      }
     }, USER_POLL_INTERVAL);
-    this.eventRefreshInterval = setInterval(() => {
-      if (!this.state.fetchedAssets) return;
-      store.dispatch(removeExpiredEvents());
-      store.dispatch(requestEventData());
+    this.eventRefreshInterval = setInterval(async () => {
+      try {
+        const token = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
+        if (!token) return;
+        store.dispatch(removeExpiredEvents());
+        store.dispatch(requestEventData());
+      } catch (err) {
+        console.error(err);
+      }
     }, EVENT_POLL_INTERVAL);
   }
   /**
@@ -118,7 +128,7 @@ class App extends Component {
           'flex-font': SourceSansProRegular,
           'flex-font-heavy': SourceSansProBold,
         }),
-        store.dispatch(requestUserData()),
+        token && store.dispatch(requestUserData()),
         token && store.dispatch(requestCreditCardInfo()),
         token && store.dispatch(requestUserEvents()),
       ]);
