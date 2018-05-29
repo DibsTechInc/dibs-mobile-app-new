@@ -18,7 +18,9 @@ import { MaterialButton, CustomStatusBar, FadeInView, InputField } from '../shar
 import { TERMS_AND_CONDITIONS_ROUTE, MAIN_ROUTE, LOGIN_ROUTE, DEFAULT_BG } from '../../constants';
 import {
   getStudioName,
-  getStudio,
+  getStudioSource,
+  getStudioId,
+  getDibsStudioId,
 } from '../../selectors';
 import Config from '../../../config.json';
 import DibsLoader from '../shared/DibsLoader';
@@ -95,11 +97,11 @@ class Signup extends PureComponent {
       email: this.props.navigation.state.params.email,
       fullname: this.state.fullName,
       password: this.state.password,
-      signupStudioId: this.props.studio.studioid,
+      signupStudioId: this.props.studioId,
       signupMethod: 'widget', // TODO: UPDATE BACKEND TO CHECK FOR MOBILE SIGNUPS
-      signupStudioSource: this.props.studio.source,
+      signupStudioSource: this.props.studioSource,
       referredBy: undefined,
-      signupDibsStudioId: this.props.studio.id,
+      signupDibsStudioId: this.props.dibsStudioId,
       attempt: 0,
     };
 
@@ -108,6 +110,7 @@ class Signup extends PureComponent {
       await promisify(this.props.signUpUser.bind(this, payload))();
       return this.props.navigation.navigate(MAIN_ROUTE);
     } catch (err) {
+      console.log(err)
       this.setState({ isLoading: false });
       if (err.message === 'Account disabled') {
         return this.props.navigation.navigate(LOGIN_ROUTE, { accountDisabled: true, email: this.props.navigation.state.params.email });
@@ -143,7 +146,7 @@ class Signup extends PureComponent {
         </FadeInView>
       );
     }
-    console.log(this.props.studio, '???')
+
     return (
       <FadeInView>
         <CustomStatusBar backgroundColor={'transparent'} barStyle="dark-content" />
@@ -211,14 +214,19 @@ class Signup extends PureComponent {
 }
 
 Signup.propTypes = {
-  navigation: PropTypes.shape(),
-  studioName: PropTypes.string,
-  signUpUser: PropTypes.func,
+  navigation: PropTypes.shape().isRequired,
+  studioName: PropTypes.string.isRequired,
+  signUpUser: PropTypes.func.isRequired,
+  studioSource: PropTypes.string.isRequired,
+  studioId: PropTypes.number.isRequired,
+  dibsStudioId: PropTypes.number.isRequired,
 };
 
 const mapStateToProps = state => ({
   studioName: getStudioName(state),
-  studio: getStudio(state),
+  studioSource: getStudioSource(state),
+  studioId: getStudioId(state),
+  dibsStudioId: getDibsStudioId(state),
 });
 
 const mapDispatchToProps = {

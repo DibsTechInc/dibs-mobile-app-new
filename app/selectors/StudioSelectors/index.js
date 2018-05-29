@@ -63,6 +63,14 @@ export function getDibsStudioId(state) {
 
 /**
  * @param {Object} state in store
+ * @returns {number} Dibs studio id
+ */
+export function getStudioId(state) {
+  return getStudioData(state).studioid || null;
+}
+
+/**
+ * @param {Object} state in store
  * @returns {Object} studio country
  */
 export function getStudioCountry(state) {
