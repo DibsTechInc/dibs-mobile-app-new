@@ -18,6 +18,7 @@ import {
   syncUserEvents,
   removeExpiredEvents,
   requestEventData,
+  setStudio,
 } from './app/actions';
 
 // Native apps can only load downloaded fronts stored in assets/fonts folder
@@ -104,7 +105,14 @@ class App extends Component {
   async getAssets() {
     try {
       const token = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
-      await Promise.promisify(cb => store.dispatch(requestStudioData(cb)))();
+      let studioData = await AsyncStorage.getItem(Config.STUDIO_DATA_KEY);
+      studioData = JSON.parse(studioData);
+
+      if (studioData) {
+        store.dispatch(setStudio(studioData));
+        store.dispatch(requestStudioData());
+      } else await store.dispatch(requestStudioData());
+
       await Promise.all([
         Font.loadAsync({
           'flex-font': SourceSansProRegular,
