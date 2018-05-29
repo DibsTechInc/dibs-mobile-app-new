@@ -14,9 +14,9 @@ const LoaderContainer = styled.View`
 `;
 
 const LoaderBackground = styled.View`
-  background-color: ${props => fadeColor(props.color, 0.5)};
+  background-color: ${props => fadeColor(props.color, 0.75)};
   bottom: 0;
-  height: 4;
+  height: 3;
   left: 0;
   position: absolute;
   right: 0;
@@ -91,7 +91,7 @@ class LinearLoader extends React.PureComponent {
             {this.state.quote}
           </QuoteText>
         }
-        <View style={{ width: this.props.width, position: 'relative' }}>
+        <View style={{ width: this.props.width, position: 'relative', overflow: 'hidden', height: 5 }}>
           <LoaderBackground
             color={this.props.color}
             width={this.props.width}
@@ -99,7 +99,7 @@ class LinearLoader extends React.PureComponent {
           <Animated.View
             style={{
               backgroundColor: this.props.color,
-              bottom: 1,
+              bottom: 0,
               height: 3,
               left: Animated.multiply(this.props.width, this.state.barLeftProgress),
               position: 'absolute',

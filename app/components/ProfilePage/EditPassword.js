@@ -8,7 +8,7 @@ import Promise from 'bluebird';
 
 import { updateUserPassword } from '../../actions/UserActions';
 import { MaterialButton, FadeInView, InputField, LinearLoader } from '../shared';
-import { DEFAULT_BG, GREY } from '../../constants';
+import { DEFAULT_BG, LIGHT_GREY } from '../../constants';
 import Config from '../../../config.json';
 import Header from '../Header';
 import { NormalText } from '../styled';
@@ -128,7 +128,7 @@ class EditPassword extends PureComponent {
             <MaterialButton
               onPress={this.handleOnPress}
               disabled={!validSubmission}
-              backgroundColor={!validSubmission ? GREY : Config.STUDIO_COLOR}
+              backgroundColor={!validSubmission ? LIGHT_GREY : Config.STUDIO_COLOR}
               text="Update"
               style={{ width: '75%', height: 40 }}
             />

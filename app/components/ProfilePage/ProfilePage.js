@@ -19,7 +19,7 @@ import {
 
 import Header from '../Header';
 import { FadeInView } from '../shared';
-import { SOFT_GREY, WHITE } from '../../constants/ColorConstants';
+import { SOFT_GREY, WHITE, GREY } from '../../constants/ColorConstants';
 import {
   getUserFirstName,
   getUserLastName,
@@ -59,7 +59,7 @@ class ProfilePage extends PureComponent {
    * @returns {undefined}
    */
   async handleLogout() {
-    await new Promise(res => this.props.logOutUser(res));
+    await this.props.logOutUser();
     this.props.navigation.navigate(LANDING_ROUTE);
   }
   /**
@@ -74,6 +74,12 @@ class ProfilePage extends PureComponent {
    * @returns {JSX} XML
    */
   render() {
+    const titleBoxStyle = {
+      flex: 1,
+      marginLeft: 15,
+      flexDirection: 'row',
+      minHeight: 50,
+    };
     return (
       <FadeInView style={{ backgroundColor: SOFT_GREY }}>
         <Header title="My Account" />
@@ -83,41 +89,51 @@ class ProfilePage extends PureComponent {
             <SettingsList.Item
               hasNavArrow={false}
               title="PERSONAL DETAILS"
-              titleStyle={{ color: 'darkgray' }}
+              titleStyle={{ color: GREY }}
+              titleBoxStyle={titleBoxStyle}
             />
             <SettingsList.Item
               title="Name"
               titleInfo={`${this.props.userFirstName} ${this.props.userLastName}`}
               onPress={this.handleEditUsernameRoute}
+              titleBoxStyle={titleBoxStyle}
             />
             <SettingsList.Item
               title="Email"
               titleInfo={this.props.email}
               onPress={this.handleEditEmailRoute}
+              titleBoxStyle={titleBoxStyle}
             />
             <SettingsList.Item
               title="Password"
               titleInfo="••••"
               onPress={this.handleEditPasswordRoute}
+              titleBoxStyle={titleBoxStyle}
             />
-            <SettingsList.Header headerStyle={{ marginTop: -20 }} />
+            <SettingsList.Header
+              headerStyle={{ marginTop: -20 }}
+            />
             <SettingsList.Item
               hasNavArrow={false}
               title="ACCOUNT DETAILS"
-              titleStyle={{ color: 'darkgray' }}
+              titleStyle={{ color: GREY }}
+              titleBoxStyle={titleBoxStyle}
             />
             <SettingsList.Item
               title="Payment"
               onPress={this.handleEditCCRoute}
+              titleBoxStyle={titleBoxStyle}
             />
             <SettingsList.Item
               title="Settings"
               onPress={this.handleSettingsRoute}
+              titleBoxStyle={titleBoxStyle}
             />
             <SettingsList.Item
               hasNavArrow={false}
               title="Logout"
               onPress={this.handleLogout}
+              titleBoxStyle={titleBoxStyle}
             />
           </SettingsList>
         </View>

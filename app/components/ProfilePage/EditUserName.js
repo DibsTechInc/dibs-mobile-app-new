@@ -10,7 +10,7 @@ import Promise from 'bluebird';
 
 import { updateUser } from '../../actions';
 import { MaterialButton, LinearLoader, FadeInView, InputField } from '../shared';
-import { DEFAULT_BG, GREY } from '../../constants';
+import { DEFAULT_BG, LIGHT_GREY } from '../../constants';
 import Config from '../../../config.json';
 import Header from '../Header';
 import { NormalText } from '../styled';
@@ -116,7 +116,7 @@ class EditUserName extends PureComponent {
               onPress={this.handleOnPress}
               text="Update"
               disabled={!validSubmission}
-              backgroundColor={!validSubmission ? GREY : Config.STUDIO_COLOR}
+              backgroundColor={!validSubmission ? LIGHT_GREY : Config.STUDIO_COLOR}
               style={{ width: '75%', height: 40 }}
             />
           </StyledButtonView>

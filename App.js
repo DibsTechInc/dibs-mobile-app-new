@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { AsyncStorage } from 'react-native';
 import Promise from 'bluebird';
 
-import { WHITE } from './app/constants';
+import { WHITE, USER_POLL_INTERVAL, EVENT_POLL_INTERVAL } from './app/constants';
 import store from './app/store'; // lol App store...
 import Config from './config.json';
 import Navigator from './app/router';
@@ -16,6 +16,9 @@ import {
   requestCreditCardInfo,
   requestUserEvents,
   syncUserEvents,
+  removeExpiredEvents,
+  requestEventData,
+  setStudio,
 } from './app/actions';
 
 // Native apps can only load downloaded fronts stored in assets/fonts folder
@@ -56,8 +59,30 @@ class App extends Component {
     this.getUpdates();
     this.getAssets();
   }
-
-    /**
+  /**
+   * @returns {undefined}
+   */
+  componentDidMount() {
+    this.userPollInterval = setInterval(() => {
+      if (!this.state.fetchedAssets) return;
+      store.dispatch(requestUserData());
+      store.dispatch(requestCreditCardInfo());
+      store.dispatch(requestUserEvents());
+    }, USER_POLL_INTERVAL);
+    this.eventRefreshInterval = setInterval(() => {
+      if (!this.state.fetchedAssets) return;
+      store.dispatch(removeExpiredEvents());
+      store.dispatch(requestEventData());
+    }, EVENT_POLL_INTERVAL);
+  }
+  /**
+   * @returns {undefined}
+   */
+  componentWillUnmount() {
+    clearInterval(this.userPollInterval);
+    clearInterval(this.eventRefreshInterval);
+  }
+  /**
    * @returns {undefined}
    */
   async getUpdates() {
@@ -74,26 +99,32 @@ class App extends Component {
       console.log(err);
     }
   }
-
   /**
    * @returns {undefined}
    */
   async getAssets() {
     try {
       const token = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
-      await Promise.promisify(cb => store.dispatch(requestStudioData(cb)))();
+      let studioData = await AsyncStorage.getItem(Config.STUDIO_DATA_KEY);
+      studioData = JSON.parse(studioData);
+
+      if (studioData) {
+        store.dispatch(setStudio(studioData));
+        store.dispatch(requestStudioData());
+      } else await store.dispatch(requestStudioData());
+
       await Promise.all([
         Font.loadAsync({
           'flex-font': SourceSansProRegular,
           'flex-font-heavy': SourceSansProBold,
         }),
-        token && Promise.promisify(cb => store.dispatch(requestUserData(cb)))(),
-        token && new Promise(res => store.dispatch(requestCreditCardInfo(res))),
-        token && new Promise(res => store.dispatch(requestUserEvents(res))),
+        store.dispatch(requestUserData()),
+        token && store.dispatch(requestCreditCardInfo()),
+        token && store.dispatch(requestUserEvents()),
       ]);
 
       this.setState({ fetchedAssets: true, userToken: token });
-      if (token) await new Promise(res => store.dispatch(syncUserEvents(res)));
+      if (token) await store.dispatch(syncUserEvents());
     } catch (err) {
       this.setState({ fetchedAssets: false, errorOccurred: true });
       Updates.reload();

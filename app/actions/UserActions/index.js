@@ -65,10 +65,9 @@ export function recordStudioVisit() {
 }
 
 /**
- * @param {function} callback on complete
  * @returns {function} thunk
  */
-export function requestUserData(callback) {
+export function requestUserData() {
   return async function innerRequestUserData(dispatch, getState, dibsFetch) {
     try {
       const res = await dibsFetch('/api/user', {
@@ -76,7 +75,7 @@ export function requestUserData(callback) {
         requiresAuth: true,
       });
       if (res.success) {
-        dispatch(setUser(res.user));
+        dispatch(refreshUser(res.user));
         dispatch(recordStudioVisit());
         dispatch(requestCreditCardInfo());
         dispatch(requestUserEvents());
@@ -86,9 +85,7 @@ export function requestUserData(callback) {
       }
     } catch (err) {
       Alert.alert('Uh oh!', 'Something went wrong loading the app.');
-      callback(err);
     }
-    callback();
   };
 }
 

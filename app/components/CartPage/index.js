@@ -38,7 +38,7 @@ import Config from '../../../config.json';
 import NoItems from './NoItems';
 import Header from '../Header';
 
-import { NormalText } from '../styled';
+import { NormalText, FlexCenter } from '../styled';
 
 const Container = styled.ScrollView`
   flex: 1;
@@ -215,7 +215,9 @@ class CartPage extends PureComponent {
     if (this.state.isProcessingPayment) {
       return (
         <FadeInView style={{ backgroundColor: Config.STUDIO_COLOR }}>
-          <LinearLoader showQuote />
+          <FlexCenter>
+            <LinearLoader showQuote />
+          </FlexCenter>
         </FadeInView>
       );
     }
