@@ -5,6 +5,7 @@ import {
   View,
 } from 'react-native';
 import SettingsList from 'react-native-settings-list';
+
 import {
   ABOUT_ROUTE,
   FAQ_ROUTE,
@@ -15,11 +16,14 @@ import {
   EDIT_PASSWORD_ROUTE,
   EDIT_EMAIL_ROUTE,
   EDIT_CC_ROUTE,
-} from '../../constants/RouteConstants';
+  SOFT_GREY,
+  DEFAULT_BG,
+  GREY,
+  LIGHT_GREY,
+} from '../../constants';
 
 import Header from '../Header';
 import { FadeInView } from '../shared';
-import { SOFT_GREY, WHITE, GREY } from '../../constants/ColorConstants';
 import {
   getUserFirstName,
   getUserLastName,
@@ -81,10 +85,10 @@ class ProfilePage extends PureComponent {
       minHeight: 50,
     };
     return (
-      <FadeInView style={{ backgroundColor: SOFT_GREY }}>
+      <FadeInView style={{ backgroundColor: DEFAULT_BG }}>
         <Header title="My Account" />
         <View style={{ backgroundColor: SOFT_GREY, flex: 1 }}>
-          <SettingsList borderColor={WHITE} defaultItemSize={50}>
+          <SettingsList borderColor={LIGHT_GREY} defaultItemSize={50}>
             <SettingsList.Header headerStyle={{ marginTop: -20 }} />
             <SettingsList.Item
               hasNavArrow={false}
