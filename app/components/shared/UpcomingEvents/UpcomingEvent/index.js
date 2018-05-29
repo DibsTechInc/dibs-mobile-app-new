@@ -8,7 +8,11 @@ import { isIphoneX } from 'react-native-iphone-x-helper';
 import Config from '../../../../../config.json';
 import { WHITE, DARK_TEXT_GREY } from '../../../../constants';
 import { getDroppingUpcomingEvent } from '../../../../selectors';
-import { dropUserFromEvent, removeFromWaitlist } from '../../../../actions';
+import {
+  dropUserFromEvent,
+  removeFromWaitlist,
+  setUpcomingEventSliderExpandedFalse,
+} from '../../../../actions';
 import FadeInView from '../../FadeInView';
 import TransactionBreakdown from '../../TransactionBreakdown';
 import MaterialButton from '../../MaterialButton';
@@ -54,6 +58,7 @@ class UpcomingEvent extends PureComponent {
    */
   constructor(props) {
     super(props);
+    this.onScrollEnd = this.onScrollEnd.bind(this);
     this.startCancel = this.startCancel.bind(this);
     this.removeFromClass = this.removeFromClass.bind(this);
   }
@@ -62,7 +67,20 @@ class UpcomingEvent extends PureComponent {
    * @returns {undefined}
    */
   componentWillReceiveProps(props) {
-    if (props.expanded !== this.props.expanded) this.scrollView.scrollTo({ y: 0, animated: false });
+    if (props.expanded !== this.props.expanded) {
+      this.scrollView.scrollTo({ y: 0, animated: false });
+    }
+  }
+  /**
+   * @param {Object} ev the scroll event
+   * @returns {undefined}
+   */
+  onScrollEnd(ev) {
+    if (ev.nativeEvent.contentOffset.y < -20 && !this.props.forReceiptPage) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      this.props.setUpcomingEventSliderExpandedFalse();
+    }
   }
   /**
    * @returns {undefined}
@@ -101,6 +119,7 @@ class UpcomingEvent extends PureComponent {
           style={{
             paddingTop: this.props.forReceiptPage ? 10 : 0,
           }}
+          onScrollEndDrag={this.onScrollEnd}
         >
           <EventRow>
             <EventInfo>
@@ -209,6 +228,7 @@ UpcomingEvent.propTypes = {
   isWaitlist: PropTypes.bool,
   removeFromWaitlist: PropTypes.func.isRequired,
   eventid: PropTypes.number.isRequired,
+  setUpcomingEventSliderExpandedFalse: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
@@ -218,6 +238,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   dropUserFromEvent,
   removeFromWaitlist,
+  setUpcomingEventSliderExpandedFalse,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(UpcomingEvent);

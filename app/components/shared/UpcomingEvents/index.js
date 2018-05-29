@@ -57,7 +57,7 @@ class UpcomingEvents extends PureComponent {
   }
 }
 
-UpcomingEvents.defaultProps = { expanded: true };
+UpcomingEvents.defaultProps = { expanded: true, forReceiptPage: false };
 
 UpcomingEvents.propTypes = {
   forReceiptPage: PropTypes.bool,
