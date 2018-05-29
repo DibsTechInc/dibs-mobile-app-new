@@ -79,6 +79,7 @@ class Button extends React.PureComponent {
     if (this.props.waitlisted) return WHITE;
     if (this.props.maxSeatsReached && this.props.has_waitlist) return lightenDarkenColor(GREY, 16);
     if (this.props.soldOut) return WHITE;
+    if (this.props.userHasBooked) return WHITE;
     return Config.STUDIO_COLOR;
   }
   /**
@@ -88,6 +89,7 @@ class Button extends React.PureComponent {
     if (this.props.waitlisted) return 'Waitlisted';
     if (this.props.soldOut && this.props.has_waitlist) return 'Waitlist';
     if (this.props.soldOut) return 'Sold Out';
+    if (this.props.userHasBooked) return 'Booked';
     return 'Book';
   }
   /**
@@ -97,6 +99,7 @@ class Button extends React.PureComponent {
     if (this.props.waitlisted || (this.props.soldOut && !this.props.has_waitlist)) {
       return GREY;
     }
+    if (this.props.userHasBooked) return Config.STUDIO_COLOR;
     return WHITE;
   }
   /**
@@ -135,6 +138,7 @@ class Button extends React.PureComponent {
     }
     const shouldHaveBorder =
       this.props.waitlisted
+      || this.props.userHasBooked
       || (this.props.soldOut && !this.props.has_waitlist);
     return (
       <MaterialButton
@@ -142,7 +146,7 @@ class Button extends React.PureComponent {
           width: 80,
           height: 40,
           borderWidth: Number(shouldHaveBorder),
-          borderColor: GREY,
+          borderColor: this.props.userHasBooked ? Config.STUDIO_COLOR : GREY,
         }}
         backgroundColor={this.getBackgroundColor()}
         text={this.getText()}
@@ -157,6 +161,7 @@ class Button extends React.PureComponent {
 
 Button.defaultProps = {
   showOverlay() {},
+  userHasBooked: false,
 };
 
 Button.propTypes = {
@@ -175,6 +180,7 @@ Button.propTypes = {
   instructorName: PropTypes.string.isRequired,
   quantity: PropTypes.number.isRequired,
   showOverlay: PropTypes.func,
+  userHasBooked: PropTypes.bool,
 };
 
 const mapStateToProps = null; // state => ({});

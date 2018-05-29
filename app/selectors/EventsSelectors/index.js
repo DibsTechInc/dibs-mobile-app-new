@@ -162,7 +162,7 @@ export const getScheduleEvents = createUnboundedSelector(
       quantity: quantityInCart,
       maxSeatsReached,
       taxRate: location.tax_rate,
-      seatsUserBooked: bookedEvent ? bookedEvent.quantity : 0,
+      userHasBooked: Boolean(bookedEvent),
       waitlisted: bookedEvent ? bookedEvent.isWaitlist : false,
       passid,
       valueBack,
