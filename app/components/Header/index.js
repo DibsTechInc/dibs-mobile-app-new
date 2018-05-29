@@ -57,26 +57,30 @@ class Header extends React.PureComponent {
       <View style={{ height: 80 + (isIphoneX() ? 20 : 0), overflow: 'hidden' }}>
         <CustomStatusBar backgroundColor={Config.STUDIO_COLOR} barStyle="light-content" />
         <StudioColoredTop>
-          {this.props.upcomingEventSliderExpanded || this.props.isSliderHeader ? (
-            <View style={{ width: 30, marginLeft: 15 }}>
-              <XIcon
-                onPress={this.props.setUpcomingEventSliderExpandedFalse}
+          <View style={{ width: 60 }}>
+            {this.props.upcomingEventSliderExpanded || this.props.isSliderHeader ? (
+              <View style={{ width: 30, marginLeft: 15 }}>
+                <XIcon
+                  onPress={this.props.setUpcomingEventSliderExpandedFalse}
+                  stroke={WHITE}
+                  strokeWidth={3}
+                  size={20}
+                />
+              </View>
+            ) : (
+              <BackArrow
+                onPress={this.goBack}
+                style={{ marginLeft: 15 }}
                 stroke={WHITE}
-                strokeWidth={3}
-                size={20}
               />
-            </View>
-          ) : (
-            <BackArrow
-              onPress={this.goBack}
-              style={{ marginLeft: 15 }}
-              stroke={WHITE}
-            />
-          )}
+            )}
+          </View>
           <PageTitle>
             {this.props.title}
           </PageTitle>
-          <CartIcon iconColor={WHITE} />
+          <View style={{ width: 60 }}>
+            <CartIcon iconColor={WHITE} />
+          </View>
         </StudioColoredTop>
       </View>
     );

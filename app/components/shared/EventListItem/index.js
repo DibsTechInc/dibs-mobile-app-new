@@ -147,6 +147,7 @@ class EventListItem extends React.PureComponent {
 EventListItem.defaultProps = {
   has_waitlist: false,
   isCartEvent: false,
+  waitlisted: false,
 };
 
 EventListItem.propTypes = {
@@ -159,7 +160,7 @@ EventListItem.propTypes = {
   endTimeInLocalTZ: PropTypes.string.isRequired,
   locationName: PropTypes.string.isRequired,
   soldOut: PropTypes.bool.isRequired,
-  waitlisted: PropTypes.bool.isRequired,
+  waitlisted: PropTypes.bool,
   has_waitlist: PropTypes.bool,
   quantity: PropTypes.number.isRequired,
   isCartEvent: PropTypes.bool,

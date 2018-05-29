@@ -14,7 +14,7 @@ import {
   getCartValueBack,
   getFormattedCartTotal,
   getCartIsPurchasing,
-  getCartEvents,
+  getDetailedCartEvents,
 } from '../../selectors';
 import { submitCartForPurchase } from '../../actions';
 import {
@@ -264,7 +264,7 @@ CartPage.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  cart: getCartEvents(state),
+  cart: getDetailedCartEvents(state),
   formattedValueBack: getFormattedCartValueBack(state),
   valueBack: getCartValueBack(state),
   formattedCartTotal: getFormattedCartTotal(state),
