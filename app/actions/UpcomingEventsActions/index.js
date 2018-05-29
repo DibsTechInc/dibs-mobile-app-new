@@ -30,10 +30,9 @@ export const {
 });
 
 /**
- * @param {function} callback on complete
  * @returns {function} thunk
  */
-export function requestUserEvents(callback = () => {}) {
+export function requestUserEvents() {
   return async function innerRequestUserEvents(dispatch, getState, dibsFetch) {
     const state = getState();
     if (state.upcomingEvents.loading) return;
@@ -57,18 +56,16 @@ export function requestUserEvents(callback = () => {}) {
       Alert.alert('Uh oh!', 'Something went wrong getting your upcoming classes.');
     }
     dispatch(setUpcomingEventsLoadingFalse());
-    callback();
   };
 }
 
 /**
- * @param {function} callback on complete
  * @returns {function} thunk
  */
-export function syncUserEvents(callback = () => {}) {
+export function syncUserEvents() {
   return async function innerSyncUserEvents(dispatch, getState, dibsFetch) {
     const state = getState();
-    if (state.upcomingEvents.syncing) return;
+    if (state.upcomingEvents.syncing) return null;
     try {
       dispatch(setSyncingEventsTrue());
       const { source, studioid } = getState().studio.data;
@@ -80,7 +77,7 @@ export function syncUserEvents(callback = () => {}) {
       console.log(err);
     }
     dispatch(setSyncingEventsFalse());
-    dispatch(requestUserEvents(callback));
+    return dispatch(requestUserEvents());
   };
 }
 

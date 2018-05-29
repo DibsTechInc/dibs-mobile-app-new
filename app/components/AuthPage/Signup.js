@@ -98,7 +98,7 @@ class Signup extends PureComponent {
       fullname: this.state.fullName,
       password: this.state.password,
       signupStudioId: this.props.studioId,
-      signupMethod: 'Mobile app',
+      signupMethod: 'Mobile App',
       signupStudioSource: this.props.studioSource,
       referredBy: undefined,
       signupDibsStudioId: this.props.dibsStudioId,

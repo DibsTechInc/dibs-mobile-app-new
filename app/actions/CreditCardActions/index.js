@@ -14,10 +14,9 @@ export const {
 });
 
 /**
- * @param {function} callback on complete
  * @returns {function} thunk
  */
-export function requestCreditCardInfo(callback = () => {}) {
+export function requestCreditCardInfo() {
   return async function innerRequestCreditCardInfo(dispatch, getState, dibsFetch) {
     if (getState().creditCard.loading) return;
     dispatch(setCreditCardLoadingTrue());
@@ -33,7 +32,6 @@ export function requestCreditCardInfo(callback = () => {}) {
       Alert.alert('Uh oh!', 'Something went wrong getting your billing information.');
     }
     dispatch(setCreditCardLoadingFalse());
-    callback();
   };
 }
 
