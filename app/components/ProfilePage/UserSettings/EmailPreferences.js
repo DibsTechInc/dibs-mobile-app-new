@@ -55,12 +55,8 @@ class EmailPreferences extends PureComponent {
     const stateMap = { transactionsPref: 'transactional', marketingPref: 'non-transactional' };
 
     this.setState({ isLoading: true });
-    const response = await new Promise(res => this.props.updateUserEmailPreferences(stateMap[type], this.props.email, res));
-
-    this.setState({
-      isLoading: false,
-      message: response.code === 200 ? 'Your email preferences have been updated' : response.message,
-    });
+    await this.props.updateUserEmailPreferences(stateMap[type], this.props.email);
+    this.setState({ isLoading: false });
   }
 
   /**
@@ -83,7 +79,6 @@ class EmailPreferences extends PureComponent {
 
     return (
       <MaterialPanel
-        height={'21.5%'}
         style={{ shadowOffset: { width: 3, height: 3 } }}
         heading="Email Preferences"
         headingRight={this.props.isUpdatingEmailPreferences ? 'Cancel' : 'Change'}

@@ -10,7 +10,7 @@ import { FadeInView, MaterialPanel } from '../../shared';
 import Config from '../../../../config.json';
 import { getUserEmail } from '../../../selectors';
 import { disableUserAccount } from '../../../actions';
-import { LANDING_ROUTE } from '../../../constants';
+import { LANDING_ROUTE, WHITE } from '../../../constants';
 
 class DeleteDialog extends PureComponent {
   render() {
@@ -143,7 +143,7 @@ class DisableAccount extends PureComponent {
       >
         <GiftedForm
           formName="deactivateAccountForm"
-          style={{ backgroundColor: 'white' }}
+          style={{ backgroundColor: WHITE }}
           clearOnClose
         >
           <GiftedForm.SubmitWidget
@@ -151,6 +151,7 @@ class DisableAccount extends PureComponent {
             widgetStyles={{
               submitButton: {
                 backgroundColor: Config.STUDIO_COLOR,
+                borderRadius: 5,
                 margin: 0,
                 marginTop: 20,
               },
