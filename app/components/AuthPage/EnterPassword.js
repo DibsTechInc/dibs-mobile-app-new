@@ -12,7 +12,7 @@ import { KeyboardAccessoryView } from 'react-native-keyboard-accessory';
 import Config from '../../../config.json';
 
 import { submitLogin, reactivateUserAccount } from '../../actions';
-import { FadeInView, InputField, DibsLoader, MaterialButton } from '../shared';
+import { FadeInView, InputField, LinearLoader, MaterialButton } from '../shared';
 import { DEFAULT_BG } from '../../constants';
 
 import { NormalText } from '../styled';
@@ -99,10 +99,9 @@ class EnterPassword extends PureComponent {
     if (this.state.isLoading) {
       return (
         <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <DibsLoader
-            dotColor={Config.STUDIO_COLOR}
+          <LinearLoader
+            color={Config.STUDIO_COLOR}
             showQuote
-            darkText
           />
         </FadeInView>
       );

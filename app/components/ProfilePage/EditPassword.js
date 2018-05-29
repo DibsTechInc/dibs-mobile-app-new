@@ -7,7 +7,7 @@ import { KeyboardAccessoryView } from 'react-native-keyboard-accessory';
 import Promise from 'bluebird';
 
 import { updateUserPassword } from '../../actions/UserActions';
-import { MaterialButton, FadeInView, InputField, DibsLoader } from '../shared';
+import { MaterialButton, FadeInView, InputField, LinearLoader } from '../shared';
 import { DEFAULT_BG, GREY } from '../../constants';
 import Config from '../../../config.json';
 import Header from '../Header';
@@ -77,7 +77,7 @@ class EditPassword extends PureComponent {
     if (this.state.isLoading) {
       return (
         <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <DibsLoader dotColor={Config.STUDIO_COLOR} />
+          <LinearLoader color={Config.STUDIO_COLOR} />
         </FadeInView>
       );
     }

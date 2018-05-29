@@ -9,7 +9,7 @@ import { LANDING_ROUTE } from '../../constants';
 import { getStudioDomain } from '../../selectors';
 import { createPasswordResetLink } from '../../actions';
 import { HeavyText } from '../styled';
-import { DibsLoader, MaterialButton, FadeInView } from '../shared';
+import { LinearLoader, MaterialButton, FadeInView } from '../shared';
 
 const MessageContainer = styled.View`
   align-items: center;
@@ -77,7 +77,7 @@ class PasswordReset extends React.PureComponent {
     return (
       <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
         {this.state.loading ? (
-          <DibsLoader dotColor={Config.STUDIO_COLOR} />
+          <LinearLoader color={Config.STUDIO_COLOR} />
         ) : (
           <MessageContainer>
             <Header>

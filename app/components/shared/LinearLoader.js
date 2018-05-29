@@ -1,0 +1,127 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+import styled from 'styled-components';
+import { Animated, View } from 'react-native';
+
+import { WHITE } from '../../constants';
+import { fadeColor, generateQuote } from '../../helpers';
+
+const LoaderContainer = styled.View`
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+`;
+
+const LoaderBackground = styled.View`
+  background-color: ${props => fadeColor(props.color, 0.5)};
+  bottom: 0;
+  height: 4;
+  left: 0;
+  position: absolute;
+  right: 0;
+  width: ${props => props.width};
+`;
+
+const QuoteText = styled.Text`
+  color: ${props => props.color};
+  margin-bottom: 50px;
+  padding-horizontal: 15;
+  text-align: center;
+`;
+
+/**
+ * @class LinearLoader
+ * @extends {React.PureComponent}
+ */
+class LinearLoader extends React.PureComponent {
+  /**
+   * @constructor
+   * @constructs LinearLoader
+   * @param {Object} props for component
+   */
+  constructor(props) {
+    super(props);
+    this.state = {
+      barWidthProgress: new Animated.Value(0),
+      barLeftProgress: new Animated.Value(0),
+      quote: generateQuote(),
+    };
+  }
+  /**
+   * @returns {undefined}
+   */
+  componentDidMount() {
+    this.cycleAnimation();
+  }
+  /**
+   * @returns {undefined}
+   */
+  cycleAnimation() {
+    Animated.sequence([
+      Animated.timing(
+        this.state.barWidthProgress,
+        { toValue: 1, duration: 750 }
+      ),
+      Animated.timing(
+        this.state.barLeftProgress,
+        { toValue: 1, duration: 750 }
+      ),
+      Animated.parallel([
+        Animated.timing(
+          this.state.barWidthProgress,
+          { toValue: 0, duration: 0 }
+        ),
+        Animated.timing(
+          this.state.barLeftProgress,
+          { toValue: 0, duration: 0 }
+        ),
+      ]),
+    ]).start(() => this.cycleAnimation());
+  }
+  /**
+   * render
+   * @returns {JSX.Element} HTML
+   */
+  render() {
+    return (
+      <LoaderContainer>
+        {this.props.showQuote &&
+          <QuoteText color={this.props.color}>
+            {this.state.quote}
+          </QuoteText>
+        }
+        <View style={{ width: this.props.width, position: 'relative' }}>
+          <LoaderBackground
+            color={this.props.color}
+            width={this.props.width}
+          />
+          <Animated.View
+            style={{
+              backgroundColor: this.props.color,
+              bottom: 1,
+              height: 3,
+              left: Animated.multiply(this.props.width, this.state.barLeftProgress),
+              position: 'absolute',
+              width: Animated.multiply(this.props.width, this.state.barWidthProgress),
+            }}
+          />
+        </View>
+      </LoaderContainer>
+    );
+  }
+}
+
+LinearLoader.defaultProps = {
+  color: WHITE,
+  width: 200,
+  showQuote: false,
+};
+
+LinearLoader.propTypes = {
+  color: PropTypes.string,
+  width: PropTypes.number,
+  showQuote: PropTypes.bool,
+};
+
+export default LinearLoader;

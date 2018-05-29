@@ -8,7 +8,7 @@ import { getAppliedPromoCode, getPromoCodeIsSubmitting, getPromoCodeError, getPr
 import { verifyPromoCode, clearPromoCodeError, clearPromoCodeNotice, clearPromoCode } from '../../actions';
 import MaterialPanel from '../shared/MaterialPanel';
 import MaterialButton from '../shared/MaterialButton';
-import DibsLoader from '../shared/DibsLoader';
+import LinearLoader from '../shared/LinearLoader';
 import { FlexRow, NormalText } from '../styled';
 
 const PromoCodeText = NormalText.extend`
@@ -104,8 +104,8 @@ class PromoField extends PureComponent {
       >
         {this.props.submitting ? (
           <LoaderContainer>
-            <DibsLoader
-              dotColor={Config.STUDIO_COLOR}
+            <LinearLoader
+              color={Config.STUDIO_COLOR}
               width={150}
             />
           </LoaderContainer>

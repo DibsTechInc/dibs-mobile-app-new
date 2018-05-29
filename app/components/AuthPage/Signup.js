@@ -23,7 +23,7 @@ import {
   getDibsStudioId,
 } from '../../selectors';
 import Config from '../../../config.json';
-import DibsLoader from '../shared/DibsLoader';
+import LinearLoader from '../shared/LinearLoader';
 
 import { NormalText } from '../styled';
 
@@ -110,7 +110,7 @@ class Signup extends PureComponent {
       await promisify(this.props.signUpUser.bind(this, payload))();
       return this.props.navigation.navigate(MAIN_ROUTE);
     } catch (err) {
-      console.log(err)
+      console.log(err);
       this.setState({ isLoading: false });
       if (err.message === 'Account disabled') {
         return this.props.navigation.navigate(LOGIN_ROUTE, { accountDisabled: true, email: this.props.navigation.state.params.email });
@@ -142,7 +142,7 @@ class Signup extends PureComponent {
     if (this.state.isLoading) {
       return (
         <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <DibsLoader showQuote darkText dotColor={Config.STUDIO_COLOR} />
+          <LinearLoader showQuote color={Config.STUDIO_COLOR} />
         </FadeInView>
       );
     }
@@ -152,7 +152,7 @@ class Signup extends PureComponent {
         <CustomStatusBar backgroundColor={'transparent'} barStyle="dark-content" />
         <ScrollView keyboardShouldPersistTaps="always" contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', height: '60%', position: 'relative' }}>
           <StyledText>
-          Just a few details before we get started
+            Just a few details before we get started
           </StyledText>
           <InputField
             value={this.props.navigation.state.params.email || ''}

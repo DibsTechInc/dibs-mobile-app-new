@@ -9,7 +9,7 @@ import { KeyboardAccessoryView } from 'react-native-keyboard-accessory';
 import Promise from 'bluebird';
 
 import { updateUser } from '../../actions';
-import { MaterialButton, DibsLoader, FadeInView, InputField } from '../shared';
+import { MaterialButton, LinearLoader, FadeInView, InputField } from '../shared';
 import { DEFAULT_BG, GREY } from '../../constants';
 import Config from '../../../config.json';
 import Header from '../Header';
@@ -77,7 +77,7 @@ class EditUserName extends PureComponent {
     if (this.state.isLoading) {
       return (
         <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <DibsLoader dotColor={Config.STUDIO_COLOR} />
+          <LinearLoader color={Config.STUDIO_COLOR} />
         </FadeInView>
       );
     }

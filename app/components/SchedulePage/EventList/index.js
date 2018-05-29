@@ -14,7 +14,7 @@ import {
   getScheduleCurrentDateIsToday,
   getScheduleCurrentDateIsAfterInterval,
 } from '../../../selectors';
-import DibsLoader from '../../shared/DibsLoader';
+import LinearLoader from '../../shared/LinearLoader';
 import { NormalText } from '../../styled';
 import EventListItem from '../../shared/EventListItem';
 
@@ -72,7 +72,7 @@ class EventList extends React.PureComponent {
         <ScrollContainer>
           {this.props.isLoading && !this.props.events.length ? (
             <ContainerWithMargin>
-              <DibsLoader dotColor={Config.STUDIO_COLOR} />
+              <LinearLoader color={Config.STUDIO_COLOR} />
             </ContainerWithMargin>
           ) : null}
           {!this.props.isLoading && !this.props.events.length && (

@@ -9,7 +9,7 @@ import { WHITE } from './app/constants';
 import store from './app/store'; // lol App store...
 import Config from './config.json';
 import Navigator from './app/router';
-import DibsLoader from './app/components/shared/DibsLoader';
+import LinearLoader from './app/components/shared/LinearLoader';
 import {
   requestStudioData,
   requestUserData,
@@ -110,7 +110,7 @@ class App extends Component {
           <Navigator userToken={this.state.userToken} />
         ) : (
           <StyledLoadingPage>
-            {this.state.errorOccurred ? null : <DibsLoader showQuote />}
+            {this.state.errorOccurred ? null : <LinearLoader showQuote />}
           </StyledLoadingPage>
         )}
       </Provider>

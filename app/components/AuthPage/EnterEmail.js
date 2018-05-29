@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import Promise from 'bluebird';
 import styled from 'styled-components';
 
-import { FadeInView, InputField, DibsLoader, MaterialButton } from '../shared';
+import { FadeInView, InputField, LinearLoader, MaterialButton } from '../shared';
 import { validateEmail } from '../../actions/UserActions';
 
 import { DEFAULT_BG } from '../../constants';
@@ -84,7 +84,7 @@ class EnterEmail extends PureComponent {
     if (this.state.isLoading) {
       return (
         <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <DibsLoader dotColor={Config.STUDIO_COLOR} />
+          <LinearLoader color={Config.STUDIO_COLOR} />
         </FadeInView>
       );
     }

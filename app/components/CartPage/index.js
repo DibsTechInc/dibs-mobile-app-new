@@ -28,7 +28,7 @@ import {
 } from '../../constants';
 
 import {
-  DibsLoader,
+  LinearLoader,
   PaymentInfo,
   EventListItem,
 } from '../shared';
@@ -215,7 +215,7 @@ class CartPage extends PureComponent {
     if (this.state.isProcessingPayment) {
       return (
         <FadeInView style={{ backgroundColor: Config.STUDIO_COLOR }}>
-          <DibsLoader showQuote />
+          <LinearLoader showQuote />
         </FadeInView>
       );
     }
