@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { ActivityIndicator } from 'react-native';
+
 import { WHITE } from '../../constants';
 import Config from '../../../config.json';
 import { lightenDarkenColor } from '../../helpers';
@@ -34,13 +36,17 @@ class MaterialButton extends React.PureComponent {
         {...this.props}
         underlayColor={underlayColor}
       >
-        <StyledText
-          fontSize={this.props.fontSize}
-          textColor={this.props.textColor}
-          style={this.props.textStyle}
-        >
-          {this.props.text}
-        </StyledText>
+        {this.props.loading ? (
+          <ActivityIndicator size="small" color={WHITE} />
+        ) : (
+          <StyledText
+            fontSize={this.props.fontSize}
+            textColor={this.props.textColor}
+            style={this.props.textStyle}
+          >
+            {this.props.text}
+          </StyledText>
+        )}
       </StyledMaterial>
     );
   }
@@ -55,22 +61,22 @@ MaterialButton.defaultProps = {
   backgroundColor: Config.STUDIO_COLOR,
   textColor: WHITE,
   borderRadius: '5px',
+  loading: false,
 };
-
-const stringOrNum = PropTypes.oneOfType([
-  PropTypes.string,
-  PropTypes.number,
-]).isRequired;
 
 MaterialButton.propTypes = {
   style: PropTypes.shape(),
   textStyle: PropTypes.shape(),
   text: PropTypes.string.isRequired,
   onPress: PropTypes.func.isRequired,
-  fontSize: stringOrNum,
+  fontSize: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+  ]).isRequired,
   disabled: PropTypes.bool,
   backgroundColor: PropTypes.string.isRequired,
   textColor: PropTypes.string.isRequired,
+  loading: PropTypes.bool,
 };
 
 export default MaterialButton;

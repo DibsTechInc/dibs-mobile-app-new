@@ -16,7 +16,6 @@ import {
 import FadeInView from '../../FadeInView';
 import TransactionBreakdown from '../../TransactionBreakdown';
 import MaterialButton from '../../MaterialButton';
-import DibsLoader from '../../DibsLoader';
 import { NormalText, HeavyText, SpaceBetweenRow } from '../../../styled';
 import Map from './Map';
 
@@ -77,8 +76,6 @@ class UpcomingEvent extends PureComponent {
    */
   onScrollEnd(ev) {
     if (ev.nativeEvent.contentOffset.y < -20 && !this.props.forReceiptPage) {
-      ev.preventDefault();
-      ev.stopPropagation();
       this.props.setUpcomingEventSliderExpandedFalse();
     }
   }
@@ -147,15 +144,12 @@ class UpcomingEvent extends PureComponent {
             </EventInfo>
             {this.props.forReceiptPage ? null : (
               <View style={{ alignItems: 'center' }}>
-                {this.props.dropping ? (
-                  <DibsLoader dotColor={Config.STUDIO_COLOR} maxDotRadius={10} width={160} />
-                ) : (
-                  <MaterialButton
-                    text={this.props.isWaitlist ? 'Cancel' : 'Drop'}
-                    style={{ width: 80, height: 40 }}
-                    onPress={this.startCancel}
-                  />
-                )}
+                <MaterialButton
+                  text={this.props.isWaitlist ? 'Cancel' : 'Drop'}
+                  style={{ width: 80, height: 40 }}
+                  onPress={this.startCancel}
+                  loading={this.props.dropping}
+                />
               </View>
             )}
           </EventRow>

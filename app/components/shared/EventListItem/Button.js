@@ -9,7 +9,6 @@ import Config from '../../../../config.json';
 import { GREY, WHITE, DARK_TEXT_GREY } from '../../../constants/index';
 import { addToCart, addToWaitlist } from '../../../actions';
 import { lightenDarkenColor } from '../../../helpers';
-import DibsLoader from '../../shared/DibsLoader';
 import MaterialButton from '../../shared/MaterialButton';
 import { HeavyText } from '../../styled';
 
@@ -127,15 +126,6 @@ class Button extends React.PureComponent {
         </StudioColoredQuantity>
       );
     }
-    if (this.state.waitlisting) {
-      return (
-        <DibsLoader
-          width={80}
-          maxDotRadius={10}
-          dotColor={Config.STUDIO_COLOR}
-        />
-      );
-    }
     const shouldHaveBorder =
       this.props.waitlisted
       || this.props.userHasBooked
@@ -154,6 +144,7 @@ class Button extends React.PureComponent {
         fontSize={this.props.waitlisted ? 14 : 14}
         onPress={this.onPress}
         disabled={this.props.waitlisted}
+        loading={this.state.waitlisting}
       />
     );
   }
