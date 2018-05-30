@@ -21,11 +21,11 @@ class BackArrow extends React.PureComponent {
         onPress={this.props.onPress}
         activeOpacity={1}
       >
-        <Svg height={18} width={18}>
+        <Svg height={25} width={25}>
           <Path
             stroke={this.props.stroke}
             strokeWidth={1.5}
-            d="M 7.2 3 L 1.2 9 L 7.2 15"
+            d="M 10 3 L 1.7 12.5 L 10 22"
             fill="none"
             strokeLinecap="round"
           />

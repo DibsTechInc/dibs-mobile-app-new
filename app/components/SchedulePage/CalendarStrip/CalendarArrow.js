@@ -9,7 +9,7 @@ const ArrowContainer = styled.TouchableOpacity`
   align-items: center;
   flex: 0.1;
   justify-content: center;
-  padding-${props => (props.rightArrow ? 'right' : 'left')}: 5;
+  padding-${props => (props.rightArrow ? 'right' : 'left')}: 7;
   padding-vertical: 10;
 `;
 
@@ -31,14 +31,14 @@ class CalendarArrow extends React.PureComponent {
         rightArrow={this.props.rightArrow}
       >
         {!this.props.disabled && (
-          <Svg height={18} width={18}>
+          <Svg height={25} width={25}>
             <Path
               stroke={WHITE}
               strokeWidth={1.5}
-              d="M 7.2 3 L 1.2 9 L 7.2 15"
+              d="M 10 3 L 1.7 12.5 L 10 22"
               fill="none"
               strokeLinecap="round"
-              transform={`rotate(${this.props.rightArrow ? 180 : 0}, 9, 9)`}
+              transform={`rotate(${this.props.rightArrow ? 180 : 0}, 12.5, 12.5)`}
             />
           </Svg>
         )}
