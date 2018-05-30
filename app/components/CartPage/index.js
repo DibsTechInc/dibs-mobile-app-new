@@ -18,7 +18,6 @@ import {
 } from '../../selectors';
 import { submitCartForPurchase } from '../../actions';
 import {
-  SOFT_GREY,
   LIGHT_GREY,
   GREY,
   WHITE,
@@ -271,7 +270,7 @@ class CartPage extends PureComponent {
     }
 
     return (
-      <FadeInView style={{ backgroundColor: SOFT_GREY }}>
+      <FadeInView style={{ backgroundColor: WHITE }}>
         <Header title="My Cart" showCart={false} />
         <Container>
           {this.props.cart.map(item => (

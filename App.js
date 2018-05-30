@@ -50,6 +50,7 @@ class App extends Component {
       fetchedAssets: false,
       userToken: null,
       errorOccurred: false,
+      loadedFont: false,
     };
   }
   /**
@@ -57,6 +58,7 @@ class App extends Component {
    */
   componentWillMount() {
     this.getUpdates();
+    this.getFonts();
     this.getAssets();
   }
   /**
@@ -109,6 +111,16 @@ class App extends Component {
       console.log(err);
     }
   }
+/**
+   * @returns {undefined}
+   */
+  async getFonts() {
+    await Font.loadAsync({
+      'flex-font': SourceSansProRegular,
+      'flex-font-heavy': SourceSansProBold,
+    });
+    this.setState({ fontLoaded: true });
+  }
   /**
    * @returns {undefined}
    */
@@ -124,10 +136,6 @@ class App extends Component {
       } else await store.dispatch(requestStudioData());
 
       await Promise.all([
-        Font.loadAsync({
-          'flex-font': SourceSansProRegular,
-          'flex-font-heavy': SourceSansProBold,
-        }),
         token && store.dispatch(requestUserData()),
         token && store.dispatch(requestCreditCardInfo()),
         token && store.dispatch(requestUserEvents()),
@@ -151,7 +159,7 @@ class App extends Component {
           <Navigator userToken={this.state.userToken} />
         ) : (
           <StyledLoadingPage>
-            {this.state.errorOccurred ? null : <LinearLoader showQuote />}
+            {(this.state.errorOccurred || !this.state.fontLoaded) ? null : <LinearLoader showQuote />}
           </StyledLoadingPage>
         )}
       </Provider>

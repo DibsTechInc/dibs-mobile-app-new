@@ -17,7 +17,7 @@ class CustomWebView extends PureComponent {
           uri: this.props.url,
         }}
         bounces={false}
-        scrollEnabled={false}
+        scrollEnabled
         style={{ flex: 1 }}
       />
     );

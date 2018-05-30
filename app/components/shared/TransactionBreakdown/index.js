@@ -12,13 +12,6 @@ const StyledBreakDownView = styled.View`
   height: auto;
 `;
 
-const StyledLine = styled.View`
-  margin-top: 20px;
-  margin-bottom: 20px;
-  border-width: 0.5px;
-  border-color: ${LIGHT_GREY};
-`;
-
 /**
  * @class TransactionBreakdown
  * @extends {Component}
@@ -60,7 +53,7 @@ class TransactionBreakdown extends PureComponent {
 
           {this.props.discountAmount > 0 &&
             <BreakdownRow label="Discount Amount" value={this.props.formattedDiscountAmount} />}
-          <StyledLine />
+
           <BreakdownRow
             label="Total"
             labelStyle={{ fontFamily: 'flex-font-heavy' }}
