@@ -1,5 +1,4 @@
 import React from 'react';
-import { Alert } from 'react-native';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
@@ -95,8 +94,8 @@ class MainPage extends React.PureComponent {
   /**
    * @returns {undefined}
    */
-  componentDidMount() {
-    this.getUpdates();
+  async componentWillMount() {
+    await this.getUpdates();
   }
 
   /**
@@ -107,21 +106,11 @@ class MainPage extends React.PureComponent {
       return;
     }
 
-    try {
-      const update = await Updates.checkForUpdateAsync();
-      if (update.isAvailable) {
-        Alert.alert(
-          'A wild update has appeared!',
-          'Your app will now refresh to get the latest goodies',
-          [
-            { text: 'Continue', onPress: () => Updates.reload() },
-          ],
-          { cancelable: false }
-        );
-      }
-    } catch (err) {
-      Alert.alert('There is an update available, restart your app to download');
-      console.log(err);
+    const update = await Updates.checkForUpdateAsync();
+
+    if (update.isAvailable) {
+      await Updates.fetchUpdateAsync();
+      Updates.reloadFromCache();
     }
   }
 

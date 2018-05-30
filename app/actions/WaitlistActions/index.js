@@ -33,7 +33,7 @@ export function addToWaitlist(eventid) {
       return Alert.alert('Uh oh!', res.message);
     } catch (err) {
       console.log(err); // todo real error handling
-      return Alert.alert('Uh oh!', 'Something went wrong adding you to the waitlist.');
+      return Alert.alert('Uh oh!', err);
     }
   };
 }
@@ -61,7 +61,7 @@ export function removeFromWaitlist(eventid) {
       Alert.alert('Uh oh!', res.message);
     } catch (err) {
       console.log(err); // todo real error handling
-      Alert.alert('Uh oh!', 'Something went wrong removing you from the waitlist.');
+      Alert.alert('Uh oh!', err);
     }
     dispatch(setDroppingEventFalse());
   };
