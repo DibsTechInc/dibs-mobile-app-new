@@ -22,6 +22,4 @@ class HomeIcon extends React.PureComponent {
   }
 }
 
-HomeIcon.propTypes = {};
-
 export default HomeIcon;
