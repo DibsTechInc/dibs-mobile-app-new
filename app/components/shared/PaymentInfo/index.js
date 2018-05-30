@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 
 import { LiteCreditCardInput } from 'react-native-credit-card-input';
 import { FadeInView, MaterialPanel } from '../../shared';
+import { GREY } from '../../../constants';
 import Config from '../../../../config.json';
 import { updateCreditCard } from '../../../actions/CreditCardActions';
 import CreditCardDisplay from './CreditCardDisplay';
@@ -214,7 +215,7 @@ class PaymentInfo extends PureComponent {
           heading="Payment Info"
           headingRight={editLabel}
           headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}
-          headerStyle={{ marginLeft: 10 }}
+          headerStyle={{ marginLeft: 10, color: GREY }}
         >
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <ActivityIndicator />
@@ -230,7 +231,7 @@ class PaymentInfo extends PureComponent {
         heading="Payment Info"
         headingRight={editLabel}
         headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}
-        headerStyle={{ marginLeft: 10 }}
+        headerStyle={{ marginLeft: 10, color: GREY }}
         onPressHeadingRight={this.props.setEditCC}
       >
         <FadeInView>

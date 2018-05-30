@@ -1,9 +1,12 @@
 import React, { PureComponent } from 'react';
+import { View } from 'react-native';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { getConfirmedTransactionsByEvent } from '../../selectors';
+import { GREY } from '../../constants';
 import { clearConfirmation } from '../../actions';
 import { UpcomingEvents, FadeInView } from '../shared';
+import { NormalText } from '../styled';
 import Header from '../Header';
 
 /**

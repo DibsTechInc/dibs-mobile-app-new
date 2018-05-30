@@ -15,7 +15,7 @@ const Link = styled.TouchableOpacity`
 const LinkText = HeavyText.extend`
   text-align: center;
   color: ${WHITE};
-  font-size: 14;
+  font-size: 16;
   margin-top: -10;
 `;
 

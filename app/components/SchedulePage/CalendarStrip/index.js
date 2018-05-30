@@ -25,7 +25,7 @@ const Container = styled.View`
 const CalendarHeader = HeavyText.extend`
   color: ${WHITE};
   text-align: center;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: bold;
   margin-bottom: 8;
   margin-top: 4;

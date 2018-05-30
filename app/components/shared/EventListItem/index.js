@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { View } from 'react-native';
 
-import { WHITE, LIGHT_GREY, DARK_TEXT_GREY } from '../../../constants';
+import { WHITE, LIGHT_GREY, DARK_TEXT_GREY, BLACK, GREY } from '../../../constants';
 import { FlexRow, FlexCenter, RightAlignedColumn, HeavyText, NormalText } from '../../styled';
 import Button from './Button';
 import Overlay from './Overlay';
@@ -13,8 +13,8 @@ const Container = FlexRow.extend`
   border-bottom-width: 1;
   border-bottom-color: ${LIGHT_GREY};
   overflow: hidden;
-  padding-top: 10;
-  padding-bottom: ${props => (props.showOverlay ? 40 : 10)};
+  padding-top: 20;
+  padding-bottom: ${props => (props.showOverlay ? 40 : 20)};
   position: relative;
 `;
 
@@ -38,7 +38,7 @@ const Price = HeavyText.extend`
 
 const ScheduleText = NormalText.extend`
   color: ${DARK_TEXT_GREY};
-  font-size: 14;
+  font-size: 16;
 `;
 
 /**
@@ -142,7 +142,7 @@ class EventListItem extends React.PureComponent {
               {this.props.instructorName}
             </ScheduleText>
             {this.props.isCartEvent ? (
-              <ScheduleText numberOfLines={1}>
+              <ScheduleText numberOfLines={1} style={{ color: this.props.isCartEvent ? GREY : BLACK }}>
                 {this.props.formattedRoundedPrice}
               </ScheduleText>
             ) : null}

@@ -249,7 +249,7 @@ class Signup extends PureComponent {
               checkedColor={Config.STUDIO_COLOR}
               checked={this.state.tAndC}
               containerStyle={{ backgroundColor: DEFAULT_BG, position: 'absolute', top: -5, left: -22 }}
-              textStyle={{ fontFamily: 'flex-font', fontSize: 14 }}
+              textStyle={{ fontFamily: 'flex-font', fontSize: 16 }}
               onPress={this.handleOnCheck}
               size={20}
             />

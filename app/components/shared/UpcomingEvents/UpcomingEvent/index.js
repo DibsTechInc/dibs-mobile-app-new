@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 
 import Config from '../../../../../config.json';
-import { WHITE, DARK_TEXT_GREY } from '../../../../constants';
+import { WHITE, DARK_TEXT_GREY, GREY } from '../../../../constants';
 import { getDroppingUpcomingEvent } from '../../../../selectors';
 import {
   dropUserFromEvent,
@@ -32,17 +32,21 @@ const EventInfo = styled.View`
 
 const HeavyEventText = HeavyText.extend`
   color: ${DARK_TEXT_GREY};
-  font-size: 14;
+  font-size: 16;
 `;
 
 const EventText = NormalText.extend`
   color: ${DARK_TEXT_GREY};
-  font-size: 14;
+  font-size: 16;
 `;
 
 const DesciptionText = NormalText.extend`
   margin-top: 15px;
   margin-bottom: 15px;
+`;
+
+const HeaderText = HeavyText.extend`
+  color: ${GREY};
 `;
 
 /**
@@ -120,6 +124,9 @@ class UpcomingEvent extends PureComponent {
         >
           <EventRow>
             <EventInfo>
+              {this.props.expanded && <View style={{ marginBottom: 20 }}>
+                <NormalText style={{ fontSize: 16, color: GREY, fontFamily: 'flex-font-heavy' }}>Items</NormalText>
+              </View>}
               <View style={{ marginBottom: 10 }}>
                 <HeavyEventText>
                   {this.props.shortDayOfWeek} {this.props.shortEventDate}
@@ -173,17 +180,17 @@ class UpcomingEvent extends PureComponent {
           />
           <View style={{ margin: 10, marginLeft: 10 }}>
             <View>
-              <HeavyText>
-                Class Description:
-              </HeavyText>
+              <HeaderText>
+                Class Description
+              </HeaderText>
               <DesciptionText>
                 {this.props.formattedDescription}
               </DesciptionText>
             </View>
             <View style={{ paddingBottom: 60 }}>
-              <HeavyText>
-                Drop Policy:
-              </HeavyText>
+              <HeaderText>
+                Drop Policy
+              </HeaderText>
               <DesciptionText>
                 {Config.STUDIO_DROP_POLICY}
               </DesciptionText>

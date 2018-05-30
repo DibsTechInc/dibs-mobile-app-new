@@ -166,7 +166,7 @@ class UpcomingClassSlider extends React.PureComponent {
           allowDragging={Boolean(!this.props.expanded && this.props.events.length)}
         >
           <Panel roundEdge={this.props.expanded}>
-            {!this.props.expanded && (
+            {!this.props.expanded && this.props.events.length && (
               <SvgContainer>
                 <Svg width={60} height={5}>
                   <Path d="M 3 1.5 L 57 1.5" stroke={LIGHT_GREY} strokeWidth={5} strokeLinecap="round" />

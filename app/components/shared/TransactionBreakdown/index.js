@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { MaterialPanel } from '../../shared';
-import { LIGHT_GREY } from '../../../constants/ColorConstants';
+import { GREY } from '../../../constants/ColorConstants';
 
 import BreakdownRow from './BreakdownRow';
 
@@ -25,7 +25,7 @@ class TransactionBreakdown extends PureComponent {
       <MaterialPanel
         heading="Order Summary"
         style={{ shadowOffset: { width: 3, height: 3 } }}
-        headerStyle={{ marginLeft: 10 }}
+        headerStyle={{ marginLeft: 10, color: GREY }}
       >
         <StyledBreakDownView>
           <BreakdownRow label="Subtotal" value={this.props.formattedSubtotal} />

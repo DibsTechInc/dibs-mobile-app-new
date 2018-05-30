@@ -8,7 +8,7 @@ import { MaterialPanel } from '../../shared';
 import { getUserSuppressionList } from '../../../selectors';
 import { updateUserEmailPreferences } from '../../../actions';
 import Config from '../../../../config.json';
-import { WHITE } from '../../../constants';
+import { WHITE, GREY } from '../../../constants';
 
 /**
  * @class EmailPreferences
@@ -71,7 +71,7 @@ class EmailPreferences extends PureComponent {
           heading="Email Preferences"
           headingRight={this.props.isUpdatingEmailPreferences ? 'Cancel' : 'Change'}
           headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}
-          headerStyle={{ marginLeft: 10 }}
+          headerStyle={{ marginLeft: 10, color: GREY }}
           onPressHeadingRight={this.props.setEditEmailPreferences}
         />
       );
@@ -83,7 +83,7 @@ class EmailPreferences extends PureComponent {
         heading="Email Preferences"
         headingRight={this.props.isUpdatingEmailPreferences ? 'Cancel' : 'Change'}
         headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}
-        headerStyle={{ marginLeft: 10 }}
+        headerStyle={{ marginLeft: 10, color: GREY }}
         onPressHeadingRight={this.props.setEditEmailPreferences}
       >
         <GiftedForm
@@ -110,7 +110,7 @@ class EmailPreferences extends PureComponent {
                 borderColor: WHITE,
               },
               switchTitle: {
-                fontSize: 14,
+                fontSize: 16,
                 fontFamily: 'flex-font',
               },
             }}
@@ -130,7 +130,7 @@ class EmailPreferences extends PureComponent {
                 borderColor: WHITE,
               },
               switchTitle: {
-                fontSize: 14,
+                fontSize: 16,
                 fontFamily: 'flex-font',
               },
             }}

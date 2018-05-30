@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import Config from '../../../config.json';
-import { RED, DARK_TEXT_GREY } from '../../constants';
+import { RED, DARK_TEXT_GREY, GREY } from '../../constants';
 import { getAppliedPromoCode, getPromoCodeIsSubmitting, getPromoCodeError, getPromoCodeNotice } from '../../selectors';
 import { verifyPromoCode, clearPromoCodeError, clearPromoCodeNotice, clearPromoCode } from '../../actions';
 import MaterialPanel from '../shared/MaterialPanel';
@@ -19,7 +19,7 @@ const PromoCodeText = NormalText.extend`
 const PromoCodeInput = styled.TextInput`
   border-bottom-width: 1px;
   flex: 2;
-  font-size: 14;
+  font-size: 16;
   font-family: flex-font;
   height: 40px;
   margin-right: 20px;
@@ -101,7 +101,7 @@ class PromoField extends PureComponent {
     return (
       <MaterialPanel
         style={{ shadowOffset: { width: 3, height: 3 } }}
-        headerStyle={{ marginLeft: 10 }}
+        headerStyle={{ marginLeft: 10, color: GREY }}
         heading="Promo Code"
       >
         {this.props.submitting ? (
@@ -125,7 +125,7 @@ class PromoField extends PureComponent {
             )}
             <MaterialButton
               text={this.props.currentPromoCode ? 'Clear' : 'Apply'}
-              fontSize="14"
+              fontSize="16"
               style={{ width: 80, height: 40 }}
               onPress={this.handlePress}
               disabled={!this.state.promoCode}

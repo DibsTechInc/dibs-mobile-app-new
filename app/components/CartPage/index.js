@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { View } from 'react-native';
+import { View, Text } from 'react-native';
 import { withNavigation, NavigationActions } from 'react-navigation';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -22,6 +22,7 @@ import {
   WHITE,
   BLACK,
   RECEIPT_ROUTE,
+  GREY,
 } from '../../constants';
 
 import {
@@ -165,8 +166,8 @@ class CartPage extends PureComponent {
    */
   render() {
     const renderValueBackMessage = this.props.valueBack > 0 ?
-      `Place your order to earn ${this.props.formattedValueBack} in credit back`
-      : `Place your order for ${this.props.formattedCartTotal}`;
+      `Book now to earn ${this.props.formattedValueBack} in credit back`
+      : `Book now for ${this.props.formattedCartTotal}`;
 
     const notReadyForPurchase = !CartPage.getIsReadyForPurchase(this.props, this.state);
 
@@ -196,13 +197,18 @@ class CartPage extends PureComponent {
       <FadeInView style={{ backgroundColor: WHITE }}>
         <Header title="My Cart" showCart={false} />
         <Container>
-          {this.props.cart.map(item => (
-            <EventListItem
-              key={item.eventid}
-              isCartEvent
-              {...item}
-            />
-          ))}
+          <View>
+            <View style={{ marginLeft: 20, marginTop: 20 }}>
+              <Text style={{ fontSize: 16, color: GREY, fontFamily: 'flex-font-heavy' }}>Items</Text>
+            </View>
+            {this.props.cart.map(item => (
+              <EventListItem
+                key={item.eventid}
+                isCartEvent
+                {...item}
+              />
+            ))}
+          </View>
           <PaymentInfo
             isUpdatingCard={this.state.isUpdatingCard}
             setEditCC={this.setEditCC}
