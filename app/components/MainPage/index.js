@@ -17,6 +17,7 @@ import {
   UPCOMING_CLASS_ROUTE,
   HEIGHT,
   DRAWER_OPEN,
+  WIDTH,
 } from '../../constants';
 import {
   getUserFirstName,
@@ -39,10 +40,11 @@ import UpcomingEventSlider from './UpcomingEventSlider';
 const BackgroundImage = styled.Image`
   left: 0;
   height: ${HEIGHT};
-  opacity: 0.25;
+  opacity: 0.35;
   position: absolute;
   right: 0;
   top: 0;
+  width: ${WIDTH};
 `;
 
 const MainPageHeader = SpaceBetweenRow.extend`

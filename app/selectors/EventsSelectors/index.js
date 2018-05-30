@@ -141,7 +141,7 @@ export const getScheduleEvents = createUnboundedSelector(
                                            .reduce((acc, quantity) => acc + quantity, 0);
     const maxSeatsReached = Boolean(
       (quantityInCart + event.current_enrollment) === event.maximum_enrollment
-      || quantityInCart === 4
+      || quantityInCart === (Config.MAXIMUM_CART_QUANTITY || 4)
     );
     const bookedEvent = upcomingEvents.find(userEvent => userEvent.eventid === event.id);
     const passid = getPassId(event.id);
