@@ -51,6 +51,7 @@ class CartIcon extends React.PureComponent {
           <Image
             source={this.props.fromSideMenu ? GreyCartImg : WhiteCartImg}
             style={{ width: 20, height: 20, margin: 20 }}
+            resizeMode="contain"
           />
         </Notification>
       </TouchableOpacity>

@@ -19,6 +19,7 @@ class ActivityIcon extends React.PureComponent {
       <Image
         source={this.props.fromSideMenu ? GreyActivityImg : WhiteActivityImg}
         style={{ width: 18, height: 18, margin: 20 }}
+        resizeMode="contain"
       />
     );
   }

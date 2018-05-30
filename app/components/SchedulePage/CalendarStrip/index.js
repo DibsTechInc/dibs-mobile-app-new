@@ -8,15 +8,13 @@ import {
 } from 'react-native';
 import styled from 'styled-components';
 import moment from 'moment-timezone';
-import { Svg, Path } from 'react-native-svg';
 
 import { setScheduleCurrentDate, addDaysToScheduleCurrentDate } from '../../../actions';
 import CalendarDay from './CalendarDay';
 import { WHITE } from '../../../constants';
 import Config from '../../../../config.json';
 import { FlexRow, FlexCenter, HeavyText } from '../../styled';
-
-// Just a shallow array of 7 elements
+import CalendarArrow from './CalendarArrow';
 
 const Container = styled.View`
   overflow: hidden;
@@ -31,12 +29,6 @@ const CalendarHeader = HeavyText.extend`
   font-weight: bold;
   margin-bottom: 8;
   margin-top: 4;
-`;
-
-const ArrowContainer = styled.TouchableOpacity`
-  align-items: center;
-  flex: 0.1;
-  justify-content: center;
 `;
 
 const DatesContainer = FlexCenter.extend`
@@ -236,23 +228,10 @@ class CalendarStrip extends PureComponent {
           {this.formatCalendarHeader()}
         </CalendarHeader>
         <FlexRow>
-          <ArrowContainer
-            onPress={this.getPreviousDays}
+          <CalendarArrow
             disabled={canGoBack}
-            activeOpacity={1}
-          >
-            {!canGoBack && (
-              <Svg width="20" height="25">
-                <Path
-                  stroke={WHITE}
-                  strokeWidth="1.75"
-                  strokeLinecap="round"
-                  fill="none"
-                  d="M 18 2 L 10 12.5 L 18 23"
-                />
-              </Svg>
-            )}
-          </ArrowContainer>
+            onPress={this.getPreviousDays}
+          />
           <DatesContainer>
             {this.getDatesForWeek().map(({ date }, index) => {
               if (this.props.calendarAnimation) {
@@ -271,20 +250,10 @@ class CalendarStrip extends PureComponent {
               );
             })}
           </DatesContainer>
-          <ArrowContainer
+          <CalendarArrow
             onPress={this.getNextDays}
-            activeOpacity={1}
-          >
-            <Svg width="20" height="25">
-              <Path
-                stroke={WHITE}
-                strokeWidth="1.75"
-                strokeLinecap="round"
-                fill="none"
-                d="M 2 2 L 10 12.5 L 2 23"
-              />
-            </Svg>
-          </ArrowContainer>
+            rightArrow
+          />
         </FlexRow>
       </Container>
     );

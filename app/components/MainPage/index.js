@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { NavigationActions } from 'react-navigation';
-import { Svg, Path } from 'react-native-svg';
+import { Svg, Path, LinearGradient, Stop, Defs, G } from 'react-native-svg';
 import { Updates } from 'expo';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 
@@ -18,6 +18,7 @@ import {
   HEIGHT,
   DRAWER_OPEN,
   WIDTH,
+  DARK_TEXT_GREY,
 } from '../../constants';
 import {
   getUserFirstName,
@@ -80,11 +81,14 @@ const IconRow = FlexRow.extend`
 
 const IconBorder = () => (
   <Svg width={2} height={50}>
-    <Path
-      strokeWidth={1}
-      stroke={WHITE}
-      d="M 1 0 L 1 50"
-    />
+    <Defs>
+      <LinearGradient id="linear_grad" x1="0" y1="0" x2="0" y2="100%">
+        <Stop offset="0%" stopColor={DARK_TEXT_GREY} />
+        <Stop offset="50%" stopColor={WHITE} />
+        <Stop offset="100%" stopColor={DARK_TEXT_GREY} />
+      </LinearGradient>
+    </Defs>
+    <Path stroke="url(#linear_grad)" d="M 1 0 L 1 50" strokeWidth="1" fillRule="nonzero" />
   </Svg>
 );
 
