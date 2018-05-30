@@ -246,7 +246,7 @@ export function submitCartForPurchase() {
       }
     } catch (err) {
       console.log(err);
-      Alert.alert('Uh oh!', err);
+      Alert.alert('Uh oh!', 'Something went wrong checking out your cart.');
     }
     const eventids = uniq(cart.data.map(({ eventid }) => eventid));
     dispatch(requestEventData({ eventids }));

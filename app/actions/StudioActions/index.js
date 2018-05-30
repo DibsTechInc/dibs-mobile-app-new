@@ -36,10 +36,7 @@ export function requestStudioData() {
       return;
     } catch (err) {
       console.log(err);
-      Alert.alert(
-        'Uh oh!',
-        'Something went wrong loading your app.'
-      );
+      Alert.alert('Something went wrong loading your app.');
     }
   };
 }

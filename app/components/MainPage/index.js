@@ -58,7 +58,7 @@ const Content = styled.View`
   flex: 1;
   justify-content: ${props => (props.hasUpcomingClasses ? 'center' : 'flex-end')};
   margin-bottom: ${props => (props.hasUpcomingClasses ? 190 : (HEIGHT / 10))};
-  padding-horizontal: 40;
+  padding-horizontal: ${WIDTH / 10};
 `;
 
 const Greeting = HeavyText.extend`
@@ -112,7 +112,6 @@ class MainPage extends React.PureComponent {
   async componentWillMount() {
     await this.getUpdates();
   }
-
   /**
    * @returns {undefined}
    */
@@ -128,7 +127,6 @@ class MainPage extends React.PureComponent {
       Updates.reloadFromCache();
     }
   }
-
   /**
    * @returns {undefined}
    */
