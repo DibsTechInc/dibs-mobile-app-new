@@ -3,9 +3,11 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import {
   View,
+  Alert,
 } from 'react-native';
 import SettingsList from 'react-native-settings-list';
 import styled from 'styled-components';
+import email from 'react-native-email';
 
 import {
   ABOUT_ROUTE,
@@ -17,6 +19,7 @@ import {
   EDIT_PASSWORD_ROUTE,
   EDIT_EMAIL_ROUTE,
   EDIT_CC_ROUTE,
+  TERMS_AND_CONDITIONS_ROUTE,
   DEFAULT_BG,
   GREY,
   LIGHT_GREY,
@@ -24,13 +27,15 @@ import {
 } from '../../constants';
 
 import Header from '../Header';
-import { FadeInView } from '../shared';
+import { FadeInView, SwipableButton } from '../shared';
 import {
   getUserFirstName,
   getUserLastName,
+  getUserId,
   getUserEmail,
 } from '../../selectors';
 import { logOutUser } from '../../actions';
+import Config from '../../../config.json';
 
 const BottomBuffer = styled.View`
   background-color: ${WHITE};
@@ -68,6 +73,11 @@ class ProfilePage extends PureComponent {
 
     this.handleFAQRoute = this.handleOnPress.bind(this, FAQ_ROUTE);
     this.handleContactRoute = this.handleOnPress.bind(this, CONTACT_ROUTE);
+
+    this.handleOnPressNavStudioTerms = this.handleOnPress.bind(this, TERMS_AND_CONDITIONS_ROUTE, { url: Config.STUDIO_TERMS_LINK });
+    this.handleOnPressNavDibsTerms = this.handleOnPress.bind(this, TERMS_AND_CONDITIONS_ROUTE, { url: Config.DIBS_TERMS_LINK });
+
+    this.handleEmail = this.handleEmail.bind(this);
   }
   /**
    * @returns {undefined}
@@ -80,8 +90,24 @@ class ProfilePage extends PureComponent {
    * @param {string} route the route constant
    * @returns {undefined}
    */
-  handleOnPress(route) {
-    this.props.navigation.navigate(route);
+  handleOnPress(route, state) {
+    this.props.navigation.navigate(route, state);
+  }
+
+  // handleTermsAndConditions(urlObj) {
+  //   this.props.navigation.navigate(TERMS_AND_CONDITIONS_ROUTE, urlObj);
+  // }
+  /**
+   * @returns {undefined}
+   */
+  handleEmail() {
+    email(Config.STUDIO_EMAIL, {
+      // Optional additional arguments
+      cc: '', // string or array of email addresses
+      bcc: '', // string or array of email addresses
+      subject: `User ID ${this.props.userId} Support Ticket`,
+      body: '',
+    }).catch(err => Alert.alert('Email Client Failed', err));
   }
   /**
    * @returns {JSX} XML
@@ -94,6 +120,16 @@ class ProfilePage extends PureComponent {
       flexDirection: 'row',
       minHeight: 50,
     };
+
+    const logoutBoxStyle = {
+      ...titleBoxStyle,
+      backgroundColor: Config.STUDIO_COLOR,
+      marginLeft: 0,
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: 65,
+    };
+
     return (
       <FadeInView style={{ backgroundColor: DEFAULT_BG }}>
         <Header title="My Account" />
@@ -143,19 +179,53 @@ class ProfilePage extends PureComponent {
               titleStyle={{ fontFamily: 'flex-font', fontSize: 14 }}
             />
             <SettingsList.Item
-              title="Settings"
+              title="Additional Settings"
               onPress={this.handleSettingsRoute}
               titleBoxStyle={titleBoxStyle}
               titleStyle={{ fontFamily: 'flex-font', fontSize: 14 }}
             />
+            <BottomBuffer />
+            <SettingsList.Header
+              headerStyle={{ marginTop: -20 }}
+            />
             <SettingsList.Item
               hasNavArrow={false}
-              title="Logout"
-              onPress={this.handleLogout}
+              title="CONTACT US"
+              titleStyle={{ color: GREY, fontFamily: 'flex-font-heavy', fontSize: 14 }}
+              titleBoxStyle={titleBoxStyle}
+            />
+            <SettingsList.Item
+              title="Email Flex Studios"
+              onPress={this.handleEmail}
               titleBoxStyle={titleBoxStyle}
               titleStyle={{ fontFamily: 'flex-font', fontSize: 14 }}
             />
-            <BottomBuffer />
+            <SettingsList.Header
+              headerStyle={{ marginTop: -20 }}
+            />
+            <SettingsList.Item
+              hasNavArrow={false}
+              title="TERMS & PRIVACY POLICY"
+              titleStyle={{ color: GREY, fontFamily: 'flex-font-heavy', fontSize: 14 }}
+              titleBoxStyle={titleBoxStyle}
+            />
+            <SettingsList.Item
+              title="Flex Studios"
+              onPress={this.handleOnPressNavStudioTerms}
+              titleBoxStyle={titleBoxStyle}
+              titleStyle={{ fontFamily: 'flex-font', fontSize: 14 }}
+            />
+            <SettingsList.Item
+              title="Dibs"
+              onPress={this.handleOnPressNavDibsTerms}
+              titleBoxStyle={{ ...titleBoxStyle, marginBottom: 25 }}
+              titleStyle={{ fontFamily: 'flex-font', fontSize: 14 }}
+            />
+            <SwipableButton
+              swipeText="Swipe to logout"
+              notReadyForPurchase={false}
+              onLeftButtonsActivate={this.handleLogout}
+            />
           </SettingsList>
         </View>
       </FadeInView>
@@ -169,12 +239,14 @@ ProfilePage.propTypes = {
   userLastName: PropTypes.string.isRequired,
   logOutUser: PropTypes.func.isRequired,
   email: PropTypes.string.isRequired,
+  userId: PropTypes.number,
 };
 
 const mapStateToProps = state => ({
   userFirstName: getUserFirstName(state),
   userLastName: getUserLastName(state),
   email: getUserEmail(state),
+  userId: getUserId(state),
 });
 
 const mapDispatchToProps = {
@@ -182,3 +254,13 @@ const mapDispatchToProps = {
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProfilePage);
+
+/*
+<SettingsList.Item
+              hasNavArrow={false}
+              title="Logout"
+              onPress={this.handleLogout}
+              titleBoxStyle={logoutBoxStyle}
+              titleStyle={{ fontFamily: 'flex-font', fontSize: 14, color: WHITE }}
+            />
+*/
