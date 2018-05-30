@@ -19,19 +19,19 @@ export const {
 export function requestCreditCardInfo() {
   return async function innerRequestCreditCardInfo(dispatch, getState, dibsFetch) {
     if (getState().creditCard.loading) return;
-    dispatch(setCreditCardLoadingTrue());
     try {
       const res = await dibsFetch('/api/user/credit_card', {
         method: 'GET',
         requiresAuth: true,
       });
       if (res.success) dispatch(setCreditCard(res.creditCard));
-      else if (res.message !== 'The user does not have a card') console.log(res.message, 'requestCCInfoAction')
+      else if (res.message !== 'The user does not have a card') {
+        Alert.alert('Uh oh!', res.message);
+      }
     } catch (err) {
       console.log(err);
       Alert.alert('Uh oh!', 'Something went wrong getting your billing information.');
     }
-    dispatch(setCreditCardLoadingFalse());
   };
 }
 

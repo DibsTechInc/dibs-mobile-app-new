@@ -15,6 +15,8 @@ import {
   getFormattedCartTotal,
   getCartIsPurchasing,
   getDetailedCartEvents,
+  getCCExpMonth,
+  getCCIsLoading,
 } from '../../selectors';
 import { submitCartForPurchase } from '../../actions';
 import {
@@ -86,7 +88,7 @@ class CartPage extends PureComponent {
    * @returns {boolean} if ready for purchase
    */
   static getIsReadyForPurchase(props, state) {
-    return props.creditCard.expMonth && (!props.creditCard.loading) && (!state.isUpdatingCard);
+    return props.creditCardExpMonth && (!props.creditCardLoading) && (!state.isUpdatingCard);
   }
   /**
    * @constructor
@@ -320,7 +322,6 @@ CartPage.propTypes = {
   valueBack: PropTypes.number.isRequired,
   formattedCartTotal: PropTypes.string.isRequired,
   submitCartForPurchase: PropTypes.func,
-  creditCard: PropTypes.shape(),
   confirmedPurchases: PropTypes.arrayOf(PropTypes.shape()),
   purchasing: PropTypes.bool.isRequired,
 };
@@ -330,9 +331,10 @@ const mapStateToProps = state => ({
   formattedValueBack: getFormattedCartValueBack(state),
   valueBack: getCartValueBack(state),
   formattedCartTotal: getFormattedCartTotal(state),
-  creditCard: state.creditCard,
   confirmedPurchases: getConfirmationState(state),
   purchasing: getCartIsPurchasing(state),
+  creditCardExpMonth: getCCExpMonth(state),
+  creditCardLoading: getCCIsLoading(state),
 });
 
 const mapDispatchToProps = {

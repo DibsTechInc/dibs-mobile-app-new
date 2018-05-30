@@ -56,10 +56,10 @@ class App extends Component {
   /**
    * @returns {undefined}
    */
-  componentWillMount() {
-    this.getUpdates();
-    this.getFonts();
-    this.getAssets();
+  async componentWillMount() {
+    await this.getUpdates();
+    await this.getFonts();
+    await this.getAssets();
   }
   /**
    * @returns {undefined}
@@ -67,19 +67,19 @@ class App extends Component {
   componentDidMount() {
     this.userPollInterval = setInterval(async () => {
       try {
-        const token = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
-        if (!token) return;
-        store.dispatch(requestUserData());
-        store.dispatch(requestCreditCardInfo());
-        store.dispatch(requestUserEvents());
+        const checkToken = async () => Boolean(await AsyncStorage.getItem(Config.USER_TOKEN_KEY));
+        if (!(await checkToken())) return;
+        await store.dispatch(requestUserData());
+        if (!(await checkToken())) return;
+        await store.dispatch(requestCreditCardInfo(false));
+        if (!(await checkToken())) return;
+        await store.dispatch(requestUserEvents());
       } catch (err) {
         console.error(err);
       }
     }, USER_POLL_INTERVAL);
     this.eventRefreshInterval = setInterval(async () => {
       try {
-        const token = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
-        if (!token) return;
         store.dispatch(removeExpiredEvents());
         store.dispatch(requestEventData());
       } catch (err) {

@@ -33,7 +33,7 @@ import {
 import { logOutUser } from '../../actions';
 
 const BottomBuffer = styled.View`
-  background-color: ${LIGHT_GREY};
+  background-color: ${WHITE};
   bottom: -1;
   height: 1;
   left: 0;

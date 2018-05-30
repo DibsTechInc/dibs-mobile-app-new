@@ -238,7 +238,7 @@ export function updateUserPassword(payload, callback) {
  * @param {function} callback callback
  * @returns {function} redux thunk
  */
-export function updateUserEmailPreferences(list, email, callback) {
+export function updateUserEmailPreferences(list) {
   return async function innerUpdateUserEmailPreferences(dispatch, getState, dibsFetch) {
     try {
       const res = await dibsFetch(`/api/user/email/suppression-list/${list}`, {
@@ -248,11 +248,8 @@ export function updateUserEmailPreferences(list, email, callback) {
       if (res.success) {
         dispatch(refreshUser(res.user));
       }
-
-      callback(res);
     } catch (err) {
       console.log(err);
-      callback(err);
     }
   };
 }
