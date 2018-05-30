@@ -18,7 +18,7 @@ class CalendarIcon extends React.PureComponent {
     return (
       <Image
         source={this.props.fromSideMenu ? GreyCalendarImg : WhiteCalendarImg}
-        style={{ width: 18, height: 18, margin: 20 }}
+        style={{ width: 18, height: 20, margin: 20 }}
       />
     );
   }
