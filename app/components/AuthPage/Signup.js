@@ -11,9 +11,18 @@ import styled from 'styled-components';
 import { KeyboardAccessoryView } from 'react-native-keyboard-accessory';
 import { promisify } from 'bluebird';
 
+import PhoneInput from 'react-native-phone-input';
+import CountryPicker from 'react-native-country-picker-modal';
+
 import { signUpUser } from '../../actions';
 import { MaterialButton, CustomStatusBar, FadeInView, InputField } from '../shared';
-import { TERMS_AND_CONDITIONS_ROUTE, MAIN_ROUTE, LOGIN_ROUTE, DEFAULT_BG } from '../../constants';
+import {
+  TERMS_AND_CONDITIONS_ROUTE,
+  MAIN_ROUTE,
+  LOGIN_ROUTE,
+  DEFAULT_BG,
+  GREY,
+} from '../../constants';
 import {
   getStudioName,
   getStudioSource,
@@ -59,7 +68,11 @@ class Signup extends PureComponent {
       tAndC: false,
       errorMessage: '',
       isLoading: false,
+      cca2: 'US',
     };
+
+    this.onPressFlag = this.onPressFlag.bind(this);
+    this.selectCountry = this.selectCountry.bind(this)
 
     this.handleOnPress = this.handleOnPress.bind(this);
     this.checkForm = this.checkForm.bind(this);
@@ -68,37 +81,27 @@ class Signup extends PureComponent {
     this.handleOnPressNavDibsTerms = this.handleOnPressNav.bind(this, { url: Config.DIBS_TERMS_LINK });
   }
 
-  /**
-   * @returns {Object} object containing canShowButton and canRegister booleans
-   */
-  checkForm() {
-    const nameLength = this.state.fullName.length && this.state.fullName.split(' ').length;
-    const passwordLength = this.state.password.length;
-    const tAndC = this.state.tAndC;
-
-    const isValidFullName = nameLength > 1 && nameLength <= 6;
-    const isValidPassword = passwordLength >= 6;
-
-    return {
-      canShowButton: nameLength && passwordLength && tAndC,
-      canRegister: isValidFullName && isValidPassword && tAndC,
-    };
+  componentDidMount() {
+    this.setState({ pickerData: this.phone.getPickerData() });
   }
 
   /**
    * @returns {undefined}
    */
   async handleOnPress() {
-    const canRegister = this.checkForm().canRegister;
+    const canRegister = this.checkForm();
 
     if (!canRegister) {
       return Alert.alert('Please check the form and try again');
     }
 
+    const phone = this.phone.getValue();
+
     const payload = {
       email: this.props.navigation.state.params.email,
       fullname: this.state.fullName,
       password: this.state.password,
+      phone,
       signupStudioId: this.props.studioId,
       signupMethod: 'Mobile App',
       signupStudioSource: this.props.studioSource,
@@ -137,6 +140,31 @@ class Signup extends PureComponent {
     this.props.navigation.navigate(TERMS_AND_CONDITIONS_ROUTE, urlObj);
   }
 
+  onPressFlag() {
+    this.countryPicker.openModal();
+  }
+
+  selectCountry(country) {
+    this.phone.selectCountry(country.cca2.toLowerCase());
+    this.setState({ cca2: country.cca2 });
+  }
+
+    /**
+   * @returns {Object} object containing canShowButton and canRegister booleans
+   */
+  checkForm() {
+    const isValidPhoneNumber = this.phone.isValidNumber();
+
+    const nameLength = this.state.fullName.length && this.state.fullName.split(' ').length;
+    const passwordLength = this.state.password.length;
+    const tAndC = this.state.tAndC;
+
+    const isValidFullName = nameLength > 1 && nameLength <= 6;
+    const isValidPassword = passwordLength >= 6;
+
+    return isValidFullName && isValidPassword && tAndC && isValidPhoneNumber;
+  }
+
   /**
    * @returns {JSX} XML
    */
@@ -158,6 +186,7 @@ class Signup extends PureComponent {
           </StyledText>
           <InputField
             value={this.props.navigation.state.params.email || ''}
+            inputStyle={{ color: GREY }}
             editable={false}
             style={{ width: 250 }}
             containerStyle={{ marginBottom: 20 }}
@@ -178,23 +207,50 @@ class Signup extends PureComponent {
             style={{ width: 250 }}
             containerStyle={{ marginBottom: 20 }}
           />
-          <View style={{ width: 250, height: 30, position: 'relative', marginTop: 20, flexDirection: 'row' }}>
+          <PhoneInput
+            ref={(ref) => {
+              this.phone = ref;
+            }}
+            onPressFlag={this.onPressFlag}
+            textStyle={{ fontFamily: 'flex-font' }}
+            textProps={{ placeholder: 'Mobile number' }}
+            style={{ width: 250, borderBottomWidth: 1, paddingBottom: 5, marginTop: 10, borderBottomColor: Config.STUDIO_COLOR }}
+          />
+
+          <CountryPicker
+            ref={(ref) => {
+              this.countryPicker = ref;
+            }}
+            onChange={value => this.selectCountry(value)}
+            translation="eng"
+            cca2={this.state.cca2}
+            closeable
+            filterable
+            styles={{
+              countryName: { fontFamily: 'flex-font' },
+              input: { fontFamily: 'flex-font' },
+              letterText: { fontFamily: 'flex-font' },
+            }}
+          >
+            <View />
+          </CountryPicker>
+          <View style={{ width: 250, height: 30, position: 'relative', marginTop: 15, flexDirection: 'row' }}>
             <CheckBox
               title=""
               checkedColor={Config.STUDIO_COLOR}
               checked={this.state.tAndC}
-              containerStyle={{ backgroundColor: DEFAULT_BG, position: 'absolute', bottom: 0, left: -22 }}
+              containerStyle={{ backgroundColor: DEFAULT_BG, position: 'absolute', top: -5, left: -22 }}
               textStyle={{ fontFamily: 'flex-font', fontSize: 14 }}
               onPress={this.handleOnCheck}
               size={20}
             />
-            <View style={{ position: 'absolute', width: '90%', left: 22, bottom: 3 }}>
+            <View style={{ position: 'absolute', width: '90%', left: 22, top: 10 }}>
               <NormalText style={{ flex: 1, flexWrap: 'wrap' }}>
                 I have read and agreed to the <LinkedText onPress={this.handleOnPressNavStudioTerms}>
                   {this.props.studioName}
                 </LinkedText> and <LinkedText onPress={this.handleOnPressNavDibsTerms}>
                 Dibs
-              </LinkedText> Terms and Conditions
+              </LinkedText> Terms and Conditions.
               </NormalText>
             </View>
           </View>
