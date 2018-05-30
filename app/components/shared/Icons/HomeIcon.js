@@ -16,7 +16,8 @@ class HomeIcon extends React.PureComponent {
     return (
       <Image
         source={HomeImage}
-        style={{ width: 18, height: 21, margin: 20 }}
+        style={{ width: 18, height: 18, margin: 20 }}
+        resizeMode="contain"
       />
     );
   }

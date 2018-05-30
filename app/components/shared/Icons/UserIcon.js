@@ -18,7 +18,12 @@ class UserIcon extends React.PureComponent {
     return (
       <Image
         source={this.props.fromSideMenu ? GreyUserImg : WhiteUserImg}
-        style={{ width: 18, height: 20, margin: 20 }}
+        style={{
+          width: this.props.fromSideMenu ? 18 : 27,
+          height: this.props.fromSideMenu ? 18 : 27,
+          margin: 20,
+        }}
+        resizeMode="contain"
       />
     );
   }

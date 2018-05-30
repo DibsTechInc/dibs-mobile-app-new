@@ -144,7 +144,7 @@ export function dropUserFromEvent(eventid) {
       }
     } catch (err) {
       console.log(err);
-      Alert.alert('Uh oh!', err);
+      Alert.alert('Uh oh!', 'Something went wrong dropping your class.');
     }
     dispatch(setDroppingEventFalse());
   };

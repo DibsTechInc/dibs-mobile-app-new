@@ -17,6 +17,7 @@ class TrashIcon extends React.PureComponent {
       <Image
         source={TrashImg}
         style={{ width: 15, height: 15, margin: 20 }}
+        resizeMode="contain"
       />
     );
   }
