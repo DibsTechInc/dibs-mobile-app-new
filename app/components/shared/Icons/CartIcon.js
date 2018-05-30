@@ -3,9 +3,14 @@ import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { withNavigation } from 'react-navigation';
+import { Image, TouchableOpacity } from 'react-native';
+
 import { CART_ROUTE, MAIN_ROUTE } from '../../../constants';
 import { getTotalQuantityInCart } from '../../../selectors';
-import Icon from '../Icon';
+import Notification from '../Notification';
+
+import WhiteCartImg from '../../../../assets/img/cart-white.png';
+import GreyCartImg from '../../../../assets/img/cart-grey.png';
 
 /**
  * @class CartIcon
@@ -35,14 +40,20 @@ class CartIcon extends React.PureComponent {
    */
   render() {
     return (
-      <Icon
-        iconName="shopping-cart"
-        iconColor={this.props.iconColor}
+      <TouchableOpacity
+        activeOpacity={1}
         onPress={this.openCart}
-        notification={{
-          notificationCount: this.props.quantityInCart,
-        }}
-      />
+      >
+        <Notification
+          notificationCount={this.props.quantityInCart}
+          right={2}
+        >
+          <Image
+            source={this.props.fromSideMenu ? GreyCartImg : WhiteCartImg}
+            style={{ width: 20, height: 20, margin: 20 }}
+          />
+        </Notification>
+      </TouchableOpacity>
     );
   }
 }
@@ -51,7 +62,6 @@ CartIcon.defaultProps = { fromSideMenu: false };
 
 CartIcon.propTypes = {
   quantityInCart: PropTypes.number.isRequired,
-  iconColor: PropTypes.string.isRequired,
   navigation: PropTypes.shape().isRequired,
   fromSideMenu: PropTypes.bool,
 };

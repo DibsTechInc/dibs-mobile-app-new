@@ -21,26 +21,21 @@ class BurgerIcon extends React.PureComponent {
         onPress={this.props.onPress}
         activeOpacity={1}
       >
-        <Svg height={20} width={20}>
+        <Svg height={16} width={16}>
           <Path
             stroke={WHITE}
-            strokeWidth={3}
-            d="M 0 1.5 L 25 1.5"
+            strokeWidth={1.5}
+            d="M 0 1 L 18 1"
           />
           <Path
             stroke={WHITE}
-            strokeWidth={3}
-            d="M 0 8.5 L 25 8.5"
+            strokeWidth={1.5}
+            d="M 0 8 L 18 8"
           />
           <Path
             stroke={WHITE}
-            strokeWidth={3}
-            d="M 0 15.5 L 25 15.5"
-          />
-          <Path
-            stroke={WHITE}
-            strokeWidth={3}
-            d="M 0 22.5 L 25 22.5"
+            strokeWidth={1.5}
+            d="M 0 15 L 18 15"
           />
         </Svg>
       </TouchableOpacity>

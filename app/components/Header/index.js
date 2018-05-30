@@ -63,8 +63,8 @@ class Header extends React.PureComponent {
                 <XIcon
                   onPress={this.props.setUpcomingEventSliderExpandedFalse}
                   stroke={WHITE}
-                  strokeWidth={3}
-                  size={20}
+                  strokeWidth={1.5}
+                  size={18}
                 />
               </View>
             ) : (

@@ -217,7 +217,7 @@ export function submitCartForPurchase() {
         body: {
           cart: cartData,
           promoCode,
-          purchasePlace: 'widget',
+          purchasePlace: 'Mobile App',
         },
       });
 

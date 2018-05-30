@@ -23,7 +23,15 @@ import {
   getStudioName,
   getUserHasUpcomingEvents,
 } from '../../selectors';
-import { FadeInView, CustomStatusBar, BurgerIcon, CartIcon } from '../shared';
+import {
+  FadeInView,
+  CustomStatusBar,
+  BurgerIcon,
+  CartIcon,
+  CalendarIcon,
+  UserIcon,
+  ActivityIcon,
+} from '../shared';
 import { HeavyText, FlexRow, SpaceBetweenRow } from '../styled';
 import IconLink from './IconLink';
 import UpcomingEventSlider from './UpcomingEventSlider';
@@ -153,25 +161,24 @@ class MainPage extends React.PureComponent {
           </Welcome>
           <IconRow>
             <IconLink
-              iconName="calendar"
-              text={'BOOK'}
+              text="BOOK"
               route={SCHEDULE_ROUTE}
               alignItems="flex-start"
+              renderIcon={() => <CalendarIcon />}
             />
             <IconBorder />
             <IconLink
-              iconName="arrow-up"
               text={'UPCOMING'}
               route={UPCOMING_CLASS_ROUTE}
               alignItems="center"
+              renderIcon={() => <ActivityIcon />}
             />
             <IconBorder />
             <IconLink
-              iconName="user"
-              text={'ACCOUNT'}
+              text="ACCOUNT"
               route={PROFILE_ROUTE}
-              lastIcon
               alignItems="flex-end"
+              renderIcon={() => <UserIcon />}
             />
           </IconRow>
         </Content>

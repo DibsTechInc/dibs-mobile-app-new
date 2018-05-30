@@ -56,11 +56,7 @@ class NavLink extends React.PureComponent {
       <TouchableContainer onPress={this.openRoute}>
         <RowView>
           <IconContainer>
-            <Icon
-              iconName={this.props.iconName}
-              size={20}
-              color={DARK_TEXT_GREY}
-            />
+            {this.props.renderIcon()}
           </IconContainer>
           <LinkText>
             {this.props.label}
@@ -72,10 +68,10 @@ class NavLink extends React.PureComponent {
 }
 
 NavLink.propTypes = {
-  iconName: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
   route: PropTypes.string.isRequired,
   navigation: PropTypes.shape().isRequired,
+  renderIcon: PropTypes.func.isRequired,
 };
 
 export default withNavigation(NavLink);
