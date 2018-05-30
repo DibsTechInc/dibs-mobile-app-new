@@ -96,25 +96,23 @@ class EditPassword extends PureComponent {
             value={this.state.currentPassword}
             onChangeText={currentPassword => this.setState({ currentPassword })}
             placeholder="Current password"
-            style={{ width: 250 }}
+            style={{ width: 250, fontFamily: 'flex-font' }}
             containerStyle={{ marginBottom: 20 }}
           />
           <InputField
-            value={this.state.newPassword}
             autoCapitalize="none"
             secureTextEntry
             onChangeText={newPassword => this.setState({ newPassword })}
             placeholder="New password"
-            style={{ width: 250 }}
+            style={{ width: 250, fontFamily: 'flex-font' }}
             containerStyle={{ marginBottom: 20 }}
           />
           <InputField
-            value={this.state.newPasswordConfirmation}
             autoCapitalize="none"
             secureTextEntry
             onChangeText={newPasswordConfirmation => this.setState({ newPasswordConfirmation })}
             placeholder="Confirm new password"
-            style={{ width: 250 }}
+            style={{ width: 250, fontFamily: 'flex-font' }}
             containerStyle={{ marginBottom: 20 }}
           />
           {this.state.resultMessage.length && <StyledText>{this.state.resultMessage}</StyledText>}

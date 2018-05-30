@@ -32,7 +32,7 @@ export const MaterialPanelView = styled.View`
   border-color: ${LIGHT_GREY};
   border-left-width: 0;
   border-top-width: 0;
-  border-width: 0.3;
+  border-bottom-width: 1;
   elevation: 3;
   height: ${props => (props.height ? props.height : 'auto')};
   padding-horizontal: 10px;

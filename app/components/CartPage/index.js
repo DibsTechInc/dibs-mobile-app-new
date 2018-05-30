@@ -111,9 +111,7 @@ class CartPage extends PureComponent {
     if (CartPage.getIsReadyForPurchase(this.props, this.state)) {
       this.animateSwipe();
     }
-    this.swipeAnimInterval = setInterval(() => {
-      if (CartPage.getIsReadyForPurchase(this.props, this.state)) this.animateSwipe();
-    }, 6e3);
+    this.resetAnimInterval(false);
   }
   /**
    * @param {Object} props previous props
@@ -121,6 +119,7 @@ class CartPage extends PureComponent {
    * @returns {undefined}
    */
   componentDidUpdate(props) {
+    this.resetAnimInterval();
     if (this.props.confirmedPurchases.length) {
       this.props.navigation.navigate(RECEIPT_ROUTE);
     } else if (props.purchasing && !this.props.purchasing) {
@@ -169,6 +168,20 @@ class CartPage extends PureComponent {
    */
   endPurchase() {
     this.setState({ isProcessingPayment: false });
+  }
+  /**
+   * @param {boolean} resetAnimation if true resets swipe animation
+   * @returns {undefined}
+   */
+  resetAnimInterval(resetAnimation = true) {
+    if (this.swipeAnimInterval) {
+      clearInterval(this.swipeAnimInterval);
+      this.swipeAnimInterval = null;
+    }
+    if (resetAnimation) Animated.timing(this.state.animValue, { toValue: 0, duration: 0 }).start();
+    this.swipeAnimInterval = setInterval(() => {
+      if (CartPage.getIsReadyForPurchase(this.props, this.state)) this.animateSwipe();
+    }, 6e3);
   }
   /**
    * @returns {undefined}
@@ -241,7 +254,7 @@ class CartPage extends PureComponent {
           <Animated.View
             style={{
               backgroundColor: WHITE,
-              opacity: 0.25,
+              opacity: 0.18,
               position: 'absolute',
               height: 70,
               width: 30,

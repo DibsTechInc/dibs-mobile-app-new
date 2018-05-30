@@ -6,7 +6,7 @@ import { format as formatCurrency } from 'currency-formatter';
 
 import { getEventsData } from '../EventsSelectors';
 import { getUserPasses } from '../UserSelectors/Passes';
-import { getStudioCustomTimeFormat, getStudioCurrency } from '../StudioSelectors';
+import { getStudioCustomTimeFormat, getStudioCurrency, getStudioShortDateFormat } from '../StudioSelectors';
 import { getUpcomingEventsData } from '../UpcomingEventsSelectors';
 
 /**
@@ -91,9 +91,11 @@ export const getDetailedCartEvents = createSelector(
     getUserPasses,
     getStudioCustomTimeFormat,
     getUpcomingEventsData,
+    getStudioShortDateFormat,
   ],
-  (events, currency, userPasses, timeFormat, upcomingEvents) => events.map(({ instructor, location, ...event }) => {
+  (events, currency, userPasses, timeFormat, upcomingEvents, shortDateFormat) => events.map(({ instructor, location, ...event }) => {
     const formatLocalTime = time => moment(time).tz(event.mainTZ).format(timeFormat);
+    const localStartTime = moment.tz(event.start_time, event.mainTZ);
 
     // Getting the proper subtotal since each item in the cart is eventid/passid combo
     const displayedPrice = event.passids.reduce((acc, { passid, quantity }) => {
@@ -112,6 +114,8 @@ export const getDetailedCartEvents = createSelector(
 
     return {
       ...event,
+      shortDayOfWeek: localStartTime.format('ddd'),
+      shortEventDate: localStartTime.format(shortDateFormat),
       startTimeInLocalTZ: formatLocalTime(event.start_time),
       endTimeInLocalTZ: formatLocalTime(event.end_time),
       instructorName: instructor.name,
