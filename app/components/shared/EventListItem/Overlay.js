@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { View } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
 import { LIGHT_GREY, TEXT_GREY, BLACK, SOFT_GREY, TRANSPARENT } from '../../../constants';
 import { fadeColor } from '../../../helpers';
 import { addToCart, removeOneEventItem } from '../../../actions';
 import { Overlay as StyledOverlay, FlexRow, NormalText } from '../../styled';
-import Icon from '../../shared/Icon';
+import { TrashIcon, MinusIcon, PlusIcon } from '../../shared';
 
 const EventOverlay = StyledOverlay.extend`
   background-color: ${props => props.background};
@@ -95,13 +95,13 @@ class Overlay extends React.PureComponent {
           <ControlsContainer>
             <CartControls>
               <IconContainer>
-                <Icon
-                  size={15}
-                  iconName={this.props.quantity > 1 ? 'minus' : 'trash'}
-                  iconColor={TEXT_GREY}
-                  padding={10}
-                  onPress={this.removeFromCart}
-                />
+                <TouchableOpacity activeOpacity={1} onPress={this.removeFromCart}>
+                  {this.props.quantity > 1 ? (
+                    <MinusIcon />
+                  ) : (
+                    <TrashIcon />
+                  )}
+                </TouchableOpacity>
               </IconContainer>
               <Quantity>
                 {this.props.quantity}
@@ -110,13 +110,9 @@ class Overlay extends React.PureComponent {
                 <View style={{ width: 50, height: 15 }} />
               ) : (
                 <IconContainer>
-                  <Icon
-                    size={15}
-                    iconName="plus"
-                    iconColor={TEXT_GREY}
-                    padding={10}
-                    onPress={this.addToCart}
-                  />
+                  <TouchableOpacity activeOpacity={1} onPress={this.addToCart}>
+                    <PlusIcon />
+                  </TouchableOpacity>
                 </IconContainer>
               )}
             </CartControls>

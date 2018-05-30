@@ -4,6 +4,7 @@ import moment from 'moment-timezone';
 import Decimal from 'decimal.js';
 import { format as formatCurrency } from 'currency-formatter';
 
+import Config from '../../../config.json';
 import { getEventsData } from '../EventsSelectors';
 import { getUserPasses } from '../UserSelectors/Passes';
 import { getStudioCustomTimeFormat, getStudioCurrency, getStudioShortDateFormat } from '../StudioSelectors';
@@ -108,7 +109,7 @@ export const getDetailedCartEvents = createSelector(
     }, Decimal(0));
     const maxSeatsReached = Boolean(
       (event.quantity + event.current_enrollment) === event.maximum_enrollment
-      || event.quantity === 4
+      || event.quantity === (Config.MAXIMUM_CART_QUANTITY || 4)
     );
     const bookedEvent = upcomingEvents.find(userEvent => userEvent.eventid === event.eventid);
 

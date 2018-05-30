@@ -153,12 +153,14 @@ export function applyFreeClassPromoToCart() {
  */
 export function refreshCart() {
   return function innerRefreshCart(dispatch, getState) {
-    const cartData = getState().cart.data;
+    const { cart, events } = getState();
     dispatch(setCartVisibleTrue());
     dispatch(clearCart());
-    cartData.forEach(cartEvent => [...Array(cartEvent.quantity)].forEach(() => {
+    cart.data.forEach(cartEvent => [...Array(cartEvent.quantity)].forEach(() => {
       const nextPassId = getUsersNextPassId(getState())(cartEvent.eventid);
+      const selectedEvent = events.data.find(ev => ev.id === cartEvent.eventid) || {};
       cartEvent.passid = nextPassId;
+      cartEvent.price = selectedEvent.price;
       dispatch(addToCart(cartEvent));
     }));
     dispatch(setCartVisibleFalse());
@@ -225,7 +227,8 @@ export function submitCartForPurchase() {
         dispatch(refreshUser(res.user));
         dispatch(setTransactionsConfirmed(res.transactions));
         dispatch(clearCart());
-        dispatch(requestUserEvents());
+        await dispatch(requestUserEvents());
+        dispatch(refreshCart());
         // dispatch(requestUserTransactions()); implement with transaction history
         // dispatch(performTransactionAnalytics(resp.transactions)); not sure works with native
         dispatch(clearPromoCodeData());

@@ -45,6 +45,7 @@ class Button extends React.PureComponent {
     this.getBackgroundColor = this.getBackgroundColor.bind(this);
     this.getText = this.getText.bind(this);
     this.getTextColor = this.getTextColor.bind(this);
+    this.addToCart = this.addToCart.bind(this);
   }
   /**
    * @returns {undefined}
@@ -60,16 +61,17 @@ class Button extends React.PureComponent {
         ]
       );
     }
-    return this.props.addToCart({
-      eventid: this.props.eventid,
-      passid: this.props.passid,
-      price: this.props.price,
-      taxRate: this.props.taxRate,
-      name: this.props.name,
-      start_time: this.props.start_time,
-      locationName: this.props.locationName,
-      instructorName: this.props.instructorName,
-    });
+    if (this.props.userHasBooked) {
+      return Alert.alert(
+        'Are you sure?',
+        `You already have a spot booked in ${this.props.name}, are you sure you want to book another?`,
+        [
+          { text: 'Yes', onPress: this.addToCart },
+          { text: 'No', onPress: () => { } },
+        ]
+      );
+    }
+    return this.addToCart();
   }
   /**
    * @returns {string} color for button
@@ -100,6 +102,21 @@ class Button extends React.PureComponent {
     }
     if (this.props.userHasBooked) return Config.STUDIO_COLOR;
     return WHITE;
+  }
+  /**
+   * @returns {undefined}
+   */
+  addToCart() {
+    return this.props.addToCart({
+      eventid: this.props.eventid,
+      passid: this.props.passid,
+      price: this.props.price,
+      taxRate: this.props.taxRate,
+      name: this.props.name,
+      start_time: this.props.start_time,
+      locationName: this.props.locationName,
+      instructorName: this.props.instructorName,
+    });
   }
   /**
    * @returns {undefined}
@@ -136,7 +153,7 @@ class Button extends React.PureComponent {
           width: 80,
           height: 40,
           borderWidth: Number(shouldHaveBorder),
-          borderColor: this.props.userHasBooked ? Config.STUDIO_COLOR : GREY,
+          borderColor: this.props.waitlisted ? GREY : Config.STUDIO_COLOR,
         }}
         backgroundColor={this.getBackgroundColor()}
         text={this.getText()}

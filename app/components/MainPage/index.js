@@ -18,6 +18,7 @@ import {
   HEIGHT,
   WIDTH,
   DRAWER_OPEN,
+  WIDTH,
 } from '../../constants';
 import {
   getUserFirstName,
@@ -41,10 +42,11 @@ const BackgroundImage = styled.Image`
   left: 0;
   width: ${WIDTH};
   height: ${HEIGHT};
-  opacity: 0.25;
+  opacity: 0.35;
   position: absolute;
   right: 0;
   top: 0;
+  width: ${WIDTH};
 `;
 
 const MainPageHeader = SpaceBetweenRow.extend`

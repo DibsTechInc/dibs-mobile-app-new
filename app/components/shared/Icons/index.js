@@ -4,5 +4,8 @@ export { default as BurgerIcon } from './BurgerIcon';
 export { default as CalendarIcon } from './CalendarIcon';
 export { default as CartIcon } from './CartIcon';
 export { default as HomeIcon } from './HomeIcon';
+export { default as MinusIcon } from './MinusIcon';
+export { default as PlusIcon } from './PlusIcon';
+export { default as TrashIcon } from './TrashIcon';
 export { default as UserIcon } from './UserIcon';
 export { default as XIcon } from './XIcon';
