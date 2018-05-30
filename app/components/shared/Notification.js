@@ -101,13 +101,13 @@ export default class Notification extends React.PureComponent {
 Notification.defaultProps = {
   backgroundColor: RED,
   fontSize: '12px',
-  height: 20,
+  height: 18,
   marginRight: 5,
   notificationTextColor: WHITE,
   radius: 10,
   right: 7,
   top: 10,
-  width: 20,
+  width: 18,
 };
 
 Notification.propTypes = { /* eslint-disable react/no-unused-prop-types */
