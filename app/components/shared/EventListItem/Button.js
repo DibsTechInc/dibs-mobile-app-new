@@ -158,7 +158,7 @@ class Button extends React.PureComponent {
         backgroundColor={this.getBackgroundColor()}
         text={this.getText()}
         textColor={this.getTextColor()}
-        fontSize={this.props.waitlisted ? 14 : 14}
+        fontSize={16} // checkfontz
         onPress={this.onPress}
         disabled={this.props.waitlisted}
         loading={this.state.waitlisting}

@@ -53,7 +53,7 @@ class MaterialButton extends React.PureComponent {
 }
 
 MaterialButton.defaultProps = {
-  fontSize: 14,
+  fontSize: 16,
   style: {
     height: 50,
   },

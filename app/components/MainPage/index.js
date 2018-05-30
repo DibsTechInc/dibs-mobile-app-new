@@ -67,7 +67,7 @@ const Greeting = HeavyText.extend`
 
 const Welcome = styled.Text`
   color: ${LIGHT_GREY};
-  font-size: 14;
+  font-size: 16;
   font-family: 'flex-font';
 `;
 

@@ -144,7 +144,7 @@ class EnterPassword extends PureComponent {
           <StyledButtonView>
             <MaterialButton
               onPress={this.handleOnPress}
-              text="Login"
+              text="Log in"
               style={{ width: '75%', height: 40 }}
             />
           </StyledButtonView>

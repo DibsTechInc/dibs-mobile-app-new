@@ -10,7 +10,7 @@ import { FadeInView, MaterialPanel } from '../../shared';
 import Config from '../../../../config.json';
 import { getUserEmail } from '../../../selectors';
 import { disableUserAccount } from '../../../actions';
-import { LANDING_ROUTE, WHITE } from '../../../constants';
+import { LANDING_ROUTE, WHITE, GREY } from '../../../constants';
 
 /**
  * @class DeleteDialog
@@ -141,7 +141,7 @@ class DisableAccount extends PureComponent {
           heading="Deactivate Account"
           headingRight={this.props.isUpdatingDisableAccount ? 'Cancel' : 'Change'}
           headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}
-          headerStyle={{ marginLeft: 10 }}
+          headerStyle={{ marginLeft: 10, color: GREY }}
           onPressHeadingRight={this.props.setEditDisableAccount}
         />
       );
@@ -154,7 +154,7 @@ class DisableAccount extends PureComponent {
         heading="Deactivate Account"
         headingRight={this.props.isUpdatingDisableAccount ? 'Cancel' : 'Change'}
         headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}
-        headerStyle={{ marginLeft: 10 }}
+        headerStyle={{ marginLeft: 10, color: GREY }}
         onPressHeadingRight={this.props.setEditDisableAccount}
       >
         <GiftedForm
@@ -172,7 +172,7 @@ class DisableAccount extends PureComponent {
                 marginTop: 20,
               },
               textSubmitButton: {
-                fontSize: 14,
+                fontSize: 16,
                 fontFamily: 'flex-font',
               },
             }}

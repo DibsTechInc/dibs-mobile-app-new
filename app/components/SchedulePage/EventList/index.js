@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 import { View } from 'react-native';
 
-import { WHITE, DARK_TEXT_GREY } from '../../../constants';
+import { DARK_TEXT_GREY, SOFT_GREY } from '../../../constants';
 import Config from '../../../../config.json';
 import {
   getScheduleEvents,
@@ -19,7 +19,7 @@ import { NormalText } from '../../styled';
 import EventListItem from '../../shared/EventListItem';
 
 const ScrollContainer = styled.ScrollView`
-  background: ${WHITE};
+  background: ${SOFT_GREY};
 `;
 
 const ContainerWithMargin = styled.View`
@@ -31,12 +31,12 @@ const ContainerWithMargin = styled.View`
 const NoEventsText = NormalText.extend`
   text-align: center;
   color: ${DARK_TEXT_GREY};
-  font-size: 14;
+  font-size: 16;
   width: 75%;
 `;
 
 const IPhoneXPadding = styled.View`
-  background: ${WHITE};
+  background: ${SOFT_GREY};
   height: ${Number(isIphoneX()) * 25};
   width: 100%;
 `;
