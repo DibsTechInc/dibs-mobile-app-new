@@ -10,6 +10,14 @@ export function getCCState(state) {
 }
 
 /**
+ * @param {Object} state in Redux store
+ * @returns {Object} credit card info in store
+ */
+export function getCCIsLoading(state) {
+  return Boolean(getCCState(state).loading);
+}
+
+/**
  * @param {Object} state in store
  * @returns {string} last 4 of the cc
  */

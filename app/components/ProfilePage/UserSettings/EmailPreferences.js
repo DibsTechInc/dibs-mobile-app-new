@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { MaterialPanel } from '../../shared';
-import { getUserEmail, getUserSuppressionList } from '../../../selectors';
+import { getUserSuppressionList } from '../../../selectors';
 import { updateUserEmailPreferences } from '../../../actions';
 import Config from '../../../../config.json';
 import { WHITE } from '../../../constants';
@@ -55,7 +55,7 @@ class EmailPreferences extends PureComponent {
     const stateMap = { transactionsPref: 'transactional', marketingPref: 'non-transactional' };
 
     this.setState({ isLoading: true });
-    await new Promise(res => this.props.updateUserEmailPreferences(stateMap[type], this.props.email, res));
+    await this.props.updateUserEmailPreferences(stateMap[type]);
     this.setState({ isLoading: false });
   }
 
@@ -149,11 +149,10 @@ EmailPreferences.propTypes = {
   isUpdatingEmailPreferences: PropTypes.bool,
   setEditEmailPreferences: PropTypes.func,
   suppressionList: PropTypes.shape(),
-  email: PropTypes.string,
+  updateUserEmailPreferences: PropTypes.func,
 };
 
 const mapStateToProps = state => ({
-  email: getUserEmail(state),
   suppressionList: getUserSuppressionList(state),
 });
 

@@ -28,7 +28,7 @@ class InputField extends React.PureComponent {
    * @returns {undefined}
    */
   componentDidMount() {
-    if (this.props.customFocus) this.focusListener = this.props.navigation.addListener('didFocus', () => this._textInput.focus());
+    if (this.props.customFocus) this.focusListener = this.props.navigation.addListener('didFocus', () => this.textInput.focus());
   }
 
   /**
@@ -67,6 +67,7 @@ class InputField extends React.PureComponent {
           <Label style={{
             ...this.props.labelStyle,
             fontFamily: 'flex-font',
+            fontSize: 14,
           }}
           >
             {this.props.label}
@@ -75,10 +76,11 @@ class InputField extends React.PureComponent {
         <TextInput
           onFocus={this.onFocus}
           onBlur={this.onBlur}
-          ref={(ref) => { this._textInput = ref; }}
+          ref={ref => this.textInput = ref}
           style={{
             ...this.props.inputStyle,
             fontFamily: 'flex-font',
+            fontSize: 14,
           }}
           {...this.props}
         />
