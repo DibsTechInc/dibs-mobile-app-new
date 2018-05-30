@@ -3,8 +3,6 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import {
   Alert,
-  TouchableOpacity,
-  Text,
   View,
   ScrollView,
 } from 'react-native';

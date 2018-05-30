@@ -39,9 +39,11 @@ export const getConfirmedTransactionsByEvent = createSelector(
       const { id } = transaction;
 
       let formattedDescription = createTextVersion(confirmedEvent.description);
+
       if (!formattedDescription || formattedDescription.length <= 1) {
         formattedDescription = 'No class description.';
       }
+
       const amount = new Decimal(transaction.amount).minus(transaction.studio_credits_spent)
                                                     .minus(transaction.raf_credits_spent)
                                                     .toNumber();

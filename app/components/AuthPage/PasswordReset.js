@@ -8,7 +8,7 @@ import Config from '../../../config.json';
 import { LANDING_ROUTE } from '../../constants';
 import { getStudioDomain } from '../../selectors';
 import { createPasswordResetLink } from '../../actions';
-import { HeavyText } from '../styled';
+import { HeavyText, NormalText } from '../styled';
 import { LinearLoader, MaterialButton, FadeInView } from '../shared';
 
 const MessageContainer = styled.View`
@@ -20,8 +20,7 @@ const Header = HeavyText.extend`
   margin-bottom: 15;
 `;
 
-const Message = styled.Text`
-  font-family: flex-font;
+const Message = NormalText.extend`
   text-align: center;
   width: 300;
 `;

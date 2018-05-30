@@ -83,7 +83,7 @@ export function requestUserData() {
         dispatch(logOutUser());
       }
     } catch (err) {
-      Alert.alert('Uh oh!', 'Something went wrong loading the app.');
+      Alert.alert('Uh oh!', err);
     }
   };
 }
@@ -116,7 +116,7 @@ export function validateEmail(email, callback) {
       return callback(null);
     } catch (err) {
       console.log(err);
-      Alert.alert('Uh oh!', 'Something went wrong validating your email.');
+      Alert.alert('Uh oh!', err);
       return callback(null);
     }
   };

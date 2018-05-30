@@ -51,15 +51,16 @@ class App extends Component {
       userToken: null,
       errorOccurred: false,
       loadedFont: false,
+      checkedUpdates: false,
     };
   }
   /**
    * @returns {undefined}
    */
-  componentWillMount() {
-    this.getUpdates();
-    this.getFonts();
-    this.getAssets();
+  async componentWillMount() {
+    await this.getFonts();
+    await this.getUpdates();
+    await this.getAssets();
   }
   /**
    * @returns {undefined}
@@ -98,18 +99,16 @@ class App extends Component {
    * @returns {undefined}
    */
   async getUpdates() {
-    if (__DEV__) {
-      return;
+    if (!__DEV__) {
+      const update = await Updates.checkForUpdateAsync();
+
+      if (update.isAvailable) {
+        await Updates.fetchUpdateAsync();
+        Updates.reloadFromCache();
+      }
     }
 
-    try {
-      const update = await Updates.checkForUpdateAsync();
-      if (update.isAvailable) {
-        Updates.reload();
-      }
-    } catch (err) {
-      console.log(err);
-    }
+    this.setState({ checkedUpdates: true });
   }
 /**
    * @returns {undefined}
@@ -119,6 +118,7 @@ class App extends Component {
       'flex-font': SourceSansProRegular,
       'flex-font-heavy': SourceSansProBold,
     });
+
     this.setState({ fontLoaded: true });
   }
   /**
@@ -155,7 +155,7 @@ class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        {(this.state.fetchedAssets) ? (
+        {(this.state.fetchedAssets && this.state.checkedUpdates) ? (
           <Navigator userToken={this.state.userToken} />
         ) : (
           <StyledLoadingPage>
