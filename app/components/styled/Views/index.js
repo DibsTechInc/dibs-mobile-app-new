@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { Dimensions } from 'react-native';
-import { WHITE, BLACK, LIGHT_GREY } from '../../../constants';
+import { WHITE, LIGHT_GREY } from '../../../constants';
 import Config from '../../../../config.json';
 
 export const FlexCenter = styled.View`

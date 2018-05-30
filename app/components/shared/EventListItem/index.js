@@ -23,7 +23,8 @@ const PriceColumn = FlexCenter.extend`
 `;
 
 const CenterColumn = styled.View`
-  flex-basis: 45%;
+  flex-basis: ${props => (props.isCartEvent ? '70%' : '45%')};
+  margin-left: ${props => (props.isCartEvent ? '5%' : 0)};
   padding-horizontal: 5;
 `;
 
@@ -54,7 +55,7 @@ class EventListItem extends React.PureComponent {
    */
   constructor(props) {
     super(props);
-    this.state = { showOverlay: props.isCartEvent };
+    this.state = { showOverlay: false };
     this.showOverlayAndStartTimer = this.showOverlayAndStartTimer.bind(this);
   }
   /**
@@ -99,23 +100,25 @@ class EventListItem extends React.PureComponent {
         ) ? (
           <Overlay {...this.props} />
         ) : null}
-        <PriceColumn>
-          {this.props.passid ? (
-            <RightAlignedColumn>
-              <ScheduleText>
-                Credit back
-              </ScheduleText>
-              <Price style={{ fontSize: 16 }}>
-                +{this.props.formattedValueBack}
+        {this.props.isCartEvent ? null : (
+          <PriceColumn>
+            {this.props.passid ? (
+              <RightAlignedColumn>
+                <ScheduleText>
+                  Credit back
+                </ScheduleText>
+                <Price style={{ fontSize: 16 }}>
+                  +{this.props.formattedValueBack}
+                </Price>
+              </RightAlignedColumn>
+            ) : (
+              <Price>
+                {this.props.formattedRoundedPrice}
               </Price>
-            </RightAlignedColumn>
-          ) : (
-            <Price>
-              {this.props.formattedRoundedPrice}
-            </Price>
-          )}
-        </PriceColumn>
-        <CenterColumn>
+            )}
+          </PriceColumn>
+        )}
+        <CenterColumn isCartEvent={this.props.isCartEvent}>
           <View style={{ marginBottom: 10 }}>
             <HeavyText>
               {this.props.startTimeInLocalTZ} - {this.props.endTimeInLocalTZ}
@@ -131,6 +134,11 @@ class EventListItem extends React.PureComponent {
             <ScheduleText numberOfLines={1}>
               {this.props.instructorName}
             </ScheduleText>
+            {this.props.isCartEvent ? (
+              <ScheduleText numberOfLines={1}>
+                {this.props.formattedRoundedPrice}
+              </ScheduleText>
+            ) : null}
           </View>
         </CenterColumn>
         <ButtonColumn>

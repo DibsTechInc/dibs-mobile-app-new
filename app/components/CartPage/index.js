@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { View } from 'react-native';
+import { View, Animated } from 'react-native';
 import { withNavigation, NavigationActions } from 'react-navigation';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -38,7 +38,7 @@ import Config from '../../../config.json';
 import NoItems from './NoItems';
 import Header from '../Header';
 
-import { NormalText, FlexCenter } from '../styled';
+import { NormalText, FlexCenter, HeavyText } from '../styled';
 
 const Container = styled.ScrollView`
   flex: 1;
@@ -51,18 +51,15 @@ const CheckoutView = styled.View`
   border-color: ${LIGHT_GREY};
   elevation: 3;
   background-color: ${WHITE};
+  shadow-color: ${BLACK};
+  shadow-opacity: 0.02;
+  elevation: 3;
 `;
 
-const SwipeText = NormalText.extend`
+const SwipeText = HeavyText.extend`
   text-align: center;
   color: ${WHITE};
   flex: 1;
-`;
-
-const SwipeArrows = NormalText.extend`
-  color: ${WHITE};
-  position: absolute;
-  right: 40px;
 `;
 
 const SavingsText = NormalText.extend`
@@ -84,6 +81,15 @@ const ContinueButton = styled.TouchableOpacity`
  */
 class CartPage extends PureComponent {
   /**
+   * @static
+   * @param {Object} props to test
+   * @param {Object} state to test
+   * @returns {boolean} if ready for purchase
+   */
+  static getIsReadyForPurchase(props, state) {
+    return props.creditCard.expMonth && (!props.creditCard.loading) && (!state.isUpdatingCard);
+  }
+  /**
    * @constructor
    * @constructs CartPage
    * @param {Object} props for component
@@ -93,14 +99,26 @@ class CartPage extends PureComponent {
     this.state = {
       isUpdatingCard: false,
       isProcessingPayment: false,
+      animValue: new Animated.Value(0),
     };
     this.toPreviousPage = this.toPreviousPage.bind(this);
     this.setEditCC = this.setEditCC.bind(this);
     this.handlePurchase = this.handlePurchase.bind(this);
   }
-
+  /**
+   * @returns {undefined}
+   */
+  componentDidMount() {
+    if (CartPage.getIsReadyForPurchase(this.props, this.state)) {
+      this.animateSwipe();
+    }
+    this.swipeAnimInterval = setInterval(() => {
+      if (CartPage.getIsReadyForPurchase(this.props, this.state)) this.animateSwipe();
+    }, 6e3);
+  }
   /**
    * @param {Object} props previous props
+   * @param {Object} state previous state
    * @returns {undefined}
    */
   componentDidUpdate(props) {
@@ -110,7 +128,12 @@ class CartPage extends PureComponent {
       this.endPurchase();
     }
   }
-
+  /**
+   * @returns {undefined}
+   */
+  componentWillUnmount() {
+    if (this.swipeAnimInterval) clearInterval(this.swipeAnimInterval);
+  }
   /**
    * @param {bool} bool the state of the editing
    * @returns {undefined}
@@ -120,7 +143,21 @@ class CartPage extends PureComponent {
       isUpdatingCard: !this.state.isUpdatingCard,
     });
   }
-
+  /**
+   * @returns {undefined}
+   */
+  animateSwipe() {
+    Animated.sequence([
+      Animated.timing(
+        this.state.animValue,
+        { toValue: 1, duration: 2e3 }
+      ),
+      Animated.timing(
+        this.state.animValue,
+        { toValue: 0, duration: 0 }
+      ),
+    ]).start();
+  }
    /**
    * @returns {undefined}
    */
@@ -128,14 +165,12 @@ class CartPage extends PureComponent {
     this.setState({ isProcessingPayment: true });
     this.props.submitCartForPurchase();
   }
-
   /**
    * @returns {undefined}
    */
   endPurchase() {
     this.setState({ isProcessingPayment: false });
   }
-
   /**
    * @returns {undefined}
    */
@@ -168,7 +203,6 @@ class CartPage extends PureComponent {
 
     this.props.navigation.dispatch(navigateAction);
   }
-
   /**
    * @returns {JSX} XML
    */
@@ -181,7 +215,7 @@ class CartPage extends PureComponent {
       <ContinueButton />,
     ];
 
-    const notReadyForPurchase = (!(this.props.creditCard.expMonth) || this.props.creditCard.loading || this.state.isUpdatingCard);
+    const notReadyForPurchase = !CartPage.getIsReadyForPurchase(this.props, this.state);
     const renderButtonColor = notReadyForPurchase ? LIGHT_GREY : Config.STUDIO_COLOR;
     const renderLeftButtons = notReadyForPurchase ? null : purchaseButton;
 
@@ -189,25 +223,35 @@ class CartPage extends PureComponent {
       <View style={{ overflow: 'hidden', backgroundColor: Config.STUDIO_COLOR, width: WIDTH }}>
         <Swipeable
           contentContainerStyle={{
+            alignItems: 'center',
+            flexDirection: 'row',
             backgroundColor: renderButtonColor,
-            paddingTop: 15,
-            paddingBottom: 15,
+            height: 45,
             marginBottom: Number(isIphoneX()) && 45,
             borderWidth: 1,
             borderColor: renderButtonColor,
+            overflow: 'hidden',
           }}
           leftButtons={renderLeftButtons}
           onLeftButtonsActivate={this.handlePurchase}
           leftButtonsActivationDistance={150}
         >
-          <View style={{ flexDirection: 'row', position: 'relative' }}>
-            <SwipeText>
-              Swipe to pay
-            </SwipeText>
-            <SwipeArrows>
-              {'>>'}
-            </SwipeArrows>
-          </View>
+          <SwipeText>
+            Swipe to pay
+          </SwipeText>
+          <Animated.View
+            style={{
+              backgroundColor: WHITE,
+              opacity: 0.25,
+              position: 'absolute',
+              height: 70,
+              width: 30,
+              top: -10,
+              transform: [{ rotate: '20deg' }],
+              left: Animated.add(-0.5 * WIDTH, Animated.multiply(2 * WIDTH, this.state.animValue)),
+            }}
+            pointerEvents="none"
+          />
         </Swipeable>
       </View>
     );
