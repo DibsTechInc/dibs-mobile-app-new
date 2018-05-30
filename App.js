@@ -58,13 +58,8 @@ class App extends Component {
    * @returns {undefined}
    */
   async componentWillMount() {
-<<<<<<< HEAD
     await this.getFonts();
     await this.getUpdates();
-=======
-    await this.getUpdates();
-    await this.getFonts();
->>>>>>> 31e8eb55647035bc70db5970c266b1a7eb958401
     await this.getAssets();
   }
   /**
