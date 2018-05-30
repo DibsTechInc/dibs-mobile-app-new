@@ -1,11 +1,9 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { View, Animated } from 'react-native';
+import { View } from 'react-native';
 import { withNavigation, NavigationActions } from 'react-navigation';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import Swipeable from 'react-native-swipeable';
-import { isIphoneX } from 'react-native-iphone-x-helper';
 
 import FadeInView from '../shared/FadeInView';
 import {
@@ -21,17 +19,16 @@ import {
 import { submitCartForPurchase } from '../../actions';
 import {
   LIGHT_GREY,
-  GREY,
   WHITE,
   BLACK,
   RECEIPT_ROUTE,
-  WIDTH,
 } from '../../constants';
 
 import {
   LinearLoader,
   PaymentInfo,
   EventListItem,
+  SwipableButton,
 } from '../shared';
 import CartTransaction from './CartTransaction';
 import PromoField from './PromoField';
@@ -39,7 +36,7 @@ import Config from '../../../config.json';
 import NoItems from './NoItems';
 import Header from '../Header';
 
-import { NormalText, FlexCenter, HeavyText } from '../styled';
+import { NormalText, FlexCenter } from '../styled';
 
 const Container = styled.ScrollView`
   flex: 1;
@@ -57,23 +54,8 @@ const CheckoutView = styled.View`
   elevation: 3;
 `;
 
-const SwipeText = HeavyText.extend`
-  text-align: center;
-  color: ${WHITE};
-  flex: 1;
-`;
-
 const SavingsText = NormalText.extend`
   color: ${BLACK};
-`;
-
-const ContinueButton = styled.TouchableOpacity`
-  padding-right: 10px;
-  padding-top: 15px;
-  padding-bottom: 15px;
-  background-color: ${props => (props.hasDisabledColor ? GREY : Config.STUDIO_COLOR)};
-  border-width: 1px;
-  border-color: ${props => (props.hasDisabledColor ? GREY : Config.STUDIO_COLOR)};;
 `;
 
 /**
@@ -100,20 +82,10 @@ class CartPage extends PureComponent {
     this.state = {
       isUpdatingCard: false,
       isProcessingPayment: false,
-      animValue: new Animated.Value(0),
     };
     this.toPreviousPage = this.toPreviousPage.bind(this);
     this.setEditCC = this.setEditCC.bind(this);
     this.handlePurchase = this.handlePurchase.bind(this);
-  }
-  /**
-   * @returns {undefined}
-   */
-  componentDidMount() {
-    if (CartPage.getIsReadyForPurchase(this.props, this.state)) {
-      this.animateSwipe();
-    }
-    this.resetAnimInterval(false);
   }
   /**
    * @param {Object} props previous props
@@ -121,7 +93,6 @@ class CartPage extends PureComponent {
    * @returns {undefined}
    */
   componentDidUpdate(props) {
-    this.resetAnimInterval();
     if (this.props.confirmedPurchases.length) {
       this.props.navigation.navigate(RECEIPT_ROUTE);
     } else if (props.purchasing && !this.props.purchasing) {
@@ -143,21 +114,6 @@ class CartPage extends PureComponent {
       isUpdatingCard: !this.state.isUpdatingCard,
     });
   }
-  /**
-   * @returns {undefined}
-   */
-  animateSwipe() {
-    Animated.sequence([
-      Animated.timing(
-        this.state.animValue,
-        { toValue: 1, duration: 2e3 }
-      ),
-      Animated.timing(
-        this.state.animValue,
-        { toValue: 0, duration: 0 }
-      ),
-    ]).start();
-  }
    /**
    * @returns {undefined}
    */
@@ -171,20 +127,7 @@ class CartPage extends PureComponent {
   endPurchase() {
     this.setState({ isProcessingPayment: false });
   }
-  /**
-   * @param {boolean} resetAnimation if true resets swipe animation
-   * @returns {undefined}
-   */
-  resetAnimInterval(resetAnimation = true) {
-    if (this.swipeAnimInterval) {
-      clearInterval(this.swipeAnimInterval);
-      this.swipeAnimInterval = null;
-    }
-    if (resetAnimation) Animated.timing(this.state.animValue, { toValue: 0, duration: 0 }).start();
-    this.swipeAnimInterval = setInterval(() => {
-      if (CartPage.getIsReadyForPurchase(this.props, this.state)) this.animateSwipe();
-    }, 6e3);
-  }
+
   /**
    * @returns {undefined}
    */
@@ -225,49 +168,14 @@ class CartPage extends PureComponent {
       `Place your order to earn ${this.props.formattedValueBack} in credit back`
       : `Place your order for ${this.props.formattedCartTotal}`;
 
-    const purchaseButton = [
-      <ContinueButton />,
-    ];
-
     const notReadyForPurchase = !CartPage.getIsReadyForPurchase(this.props, this.state);
-    const renderButtonColor = notReadyForPurchase ? LIGHT_GREY : Config.STUDIO_COLOR;
-    const renderLeftButtons = notReadyForPurchase ? null : purchaseButton;
 
     const renderPurchaseButton = (
-      <View style={{ overflow: 'hidden', backgroundColor: Config.STUDIO_COLOR, width: WIDTH }}>
-        <Swipeable
-          contentContainerStyle={{
-            alignItems: 'center',
-            flexDirection: 'row',
-            backgroundColor: renderButtonColor,
-            height: 45,
-            marginBottom: Number(isIphoneX()) && 45,
-            borderWidth: 1,
-            borderColor: renderButtonColor,
-            overflow: 'hidden',
-          }}
-          leftButtons={renderLeftButtons}
-          onLeftButtonsActivate={this.handlePurchase}
-          leftButtonsActivationDistance={150}
-        >
-          <SwipeText>
-            Swipe to pay
-          </SwipeText>
-          <Animated.View
-            style={{
-              backgroundColor: WHITE,
-              opacity: 0.18,
-              position: 'absolute',
-              height: 70,
-              width: 30,
-              top: -10,
-              transform: [{ rotate: '20deg' }],
-              left: Animated.add(-0.5 * WIDTH, Animated.multiply(2 * WIDTH, this.state.animValue)),
-            }}
-            pointerEvents="none"
-          />
-        </Swipeable>
-      </View>
+      <SwipableButton
+        swipeText="Swipe to pay"
+        notReadyForPurchase={notReadyForPurchase}
+        onLeftButtonsActivate={this.handlePurchase}
+      />
     );
 
     if (this.state.isProcessingPayment) {

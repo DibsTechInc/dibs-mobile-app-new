@@ -96,7 +96,7 @@ class LandingPage extends Component {
           <FadeInView>
             <StyledWelcomeView>
               <NormalText>Welcome to {this.props.studioName}!</NormalText>
-              <StyledGrayText>Swipe to learn more</StyledGrayText>
+              <StyledGrayText>Press continue to sign in</StyledGrayText>
               {this.props.navigation.state.params &&
                 this.props.navigation.state.params.accountReactivated &&
                 <NormalText>
@@ -112,7 +112,6 @@ class LandingPage extends Component {
               />
             </StyledButtonsView>
           </FadeInView>
-          <About studioName={this.props.studioName} />
         </Swiper>
       </View>
     );
@@ -133,3 +132,9 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps)(LandingPage);
+
+/*
+  <About studioName={this.props.studioName} />
+  Swipe to learn more
+  WILL ADD IN LATER WHEN FLEX PROVIDES US WITH DETAILS
+*/

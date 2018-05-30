@@ -206,8 +206,8 @@ export function submitCartForPurchase() {
 
     const cartData = cart.data.map(item => ({
       ...item,
-      source: studio.source,
-      studioid: studio.studioid,
+      source: studio.data.source,
+      studioid: studio.data.studioid,
     }));
 
     try {

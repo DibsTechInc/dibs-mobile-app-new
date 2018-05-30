@@ -16,6 +16,7 @@ import {
   PROFILE_ROUTE,
   UPCOMING_CLASS_ROUTE,
   HEIGHT,
+  WIDTH,
   DRAWER_OPEN,
 } from '../../constants';
 import {
@@ -38,6 +39,7 @@ import UpcomingEventSlider from './UpcomingEventSlider';
 
 const BackgroundImage = styled.Image`
   left: 0;
+  width: ${WIDTH};
   height: ${HEIGHT};
   opacity: 0.25;
   position: absolute;
