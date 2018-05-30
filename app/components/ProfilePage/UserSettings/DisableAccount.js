@@ -12,7 +12,14 @@ import { getUserEmail } from '../../../selectors';
 import { disableUserAccount } from '../../../actions';
 import { LANDING_ROUTE, WHITE } from '../../../constants';
 
+/**
+ * @class DeleteDialog
+ * @extends {Component}
+ */
 class DeleteDialog extends PureComponent {
+  /**
+   * @returns {JSX} XML
+   */
   render() {
     return (
       <FadeInView>
@@ -48,7 +55,16 @@ DeleteDialog.propTypes = {
   handleDelete: PropTypes.func,
 };
 
+/**
+ * @class DisableAccount
+ * @extends {Component}
+ */
 class DisableAccount extends PureComponent {
+   /**
+   * @constructor
+   * @param {object} props from parent
+   * @constructs DisableAccount
+   */
   constructor(props) {
     super(props);
 
@@ -122,7 +138,7 @@ class DisableAccount extends PureComponent {
         <MaterialPanel
           height={100}
           style={{ shadowOffset: { width: 3, height: 3 } }}
-          heading="Disable Account"
+          heading="Deactivate Account"
           headingRight={this.props.isUpdatingDisableAccount ? 'Cancel' : 'Change'}
           headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}
           headerStyle={{ marginLeft: 10 }}
@@ -135,7 +151,7 @@ class DisableAccount extends PureComponent {
       <MaterialPanel
         height={'20%'}
         style={{ shadowOffset: { width: 3, height: 3 } }}
-        heading="Disable Account"
+        heading="Deactivate Account"
         headingRight={this.props.isUpdatingDisableAccount ? 'Cancel' : 'Change'}
         headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}
         headerStyle={{ marginLeft: 10 }}

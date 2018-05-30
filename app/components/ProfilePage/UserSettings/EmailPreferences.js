@@ -94,6 +94,7 @@ class EmailPreferences extends PureComponent {
             purchaseReceiptsAndClassUpdates: !this.state.transactionsPref,
             specialOffersAndStudioNews: !this.state.marketingPref,
           }}
+          scrollEnabled={false}
         >
           <GiftedForm.SwitchWidget
             name="purchaseReceiptsAndClassUpdates" // mandatory

@@ -81,6 +81,9 @@ class Signup extends PureComponent {
     this.handleOnPressNavDibsTerms = this.handleOnPressNav.bind(this, { url: Config.DIBS_TERMS_LINK });
   }
 
+  /**
+   * @returns {undefined}
+   */
   componentDidMount() {
     this.setState({ pickerData: this.phone.getPickerData() });
   }
@@ -140,10 +143,17 @@ class Signup extends PureComponent {
     this.props.navigation.navigate(TERMS_AND_CONDITIONS_ROUTE, urlObj);
   }
 
+  /**
+   * @returns {undefined}
+   */
   onPressFlag() {
     this.countryPicker.openModal();
   }
 
+  /**
+   * @param{object} country picker object
+   * @returns {undefined}
+   */
   selectCountry(country) {
     this.phone.selectCountry(country.cca2.toLowerCase());
     this.setState({ cca2: country.cca2 });
