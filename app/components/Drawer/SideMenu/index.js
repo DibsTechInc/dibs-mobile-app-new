@@ -18,7 +18,14 @@ import {
   getUsersFirstPassName,
   getUserHasFlashCredit,
 } from '../../../selectors';
-import { CartIcon, XIcon } from '../../shared';
+import {
+  CartIcon,
+  XIcon,
+  CalendarIcon,
+  UserIcon,
+  ActivityIcon,
+  HomeIcon,
+} from '../../shared';
 import { SpaceBetweenRow, HeavyText } from '../../styled';
 import BalanceDisplay from './BalanceDisplay';
 import NavLink from './NavLink';
@@ -77,9 +84,9 @@ class SideMenu extends React.PureComponent {
         <StyledCloseButtonContainer style={{ justifyContent: 'flex-start' }}>
           <XIcon
             onPress={this.close}
-            size={25}
+            size={18}
             stroke={Config.STUDIO_COLOR}
-            strokeWidth={2}
+            strokeWidth={1.5}
           />
         </StyledCloseButtonContainer>
         <StyledHeader>
@@ -100,24 +107,24 @@ class SideMenu extends React.PureComponent {
           />
         )}
         <NavLink
-          iconName="home"
           label="Main"
           route={MAIN_ROUTE}
+          renderIcon={() => <HomeIcon />}
         />
         <NavLink
-          iconName="user"
           label="Account"
           route={PROFILE_ROUTE}
+          renderIcon={() => <UserIcon fromSideMenu />}
         />
         <NavLink
-          iconName="calendar"
           label="Schedule"
           route={SCHEDULE_ROUTE}
+          renderIcon={() => <CalendarIcon fromSideMenu />}
         />
         <NavLink
-          iconName="arrow-up"
           label="Upcoming Classes"
           route={UPCOMING_CLASS_ROUTE}
+          renderIcon={() => <ActivityIcon fromSideMenu />}
         />
       </StyledContainer>
     );

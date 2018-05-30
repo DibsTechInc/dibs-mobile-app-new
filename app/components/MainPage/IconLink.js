@@ -5,19 +5,18 @@ import { withNavigation } from 'react-navigation';
 import { View } from 'react-native';
 
 import { WHITE } from '../../constants';
-import { NormalText } from '../styled';
-import { Icon } from '../shared';
+import { HeavyText } from '../styled';
 
 const Link = styled.TouchableOpacity`
   align-items: ${props => props.alignItems};
   justify-content: space-between;
 `;
 
-const LinkText = NormalText.extend`
+const LinkText = HeavyText.extend`
   text-align: center;
   color: ${WHITE};
-  font-size: 10;
-  margin-top: 5;
+  font-size: 14;
+  margin-top: -10;
 `;
 
 /**
@@ -53,12 +52,7 @@ class IconLink extends React.PureComponent {
           alignItems={this.props.alignItems}
         >
           <View style={{ alignItems: 'center' }}>
-            <Icon
-              padding={0}
-              iconName={this.props.iconName}
-              style={{ color: WHITE }}
-              onPress={this.onPress}
-            />
+            {this.props.renderIcon()}
             <LinkText>
               {this.props.text}
             </LinkText>
@@ -74,8 +68,7 @@ IconLink.defaultProps = {
 };
 
 IconLink.propTypes = {
-  lastIcon: PropTypes.bool,
-  iconName: PropTypes.string.isRequired,
+  renderIcon: PropTypes.func.isRequired,
   text: PropTypes.string.isRequired,
   route: PropTypes.string.isRequired,
   navigation: PropTypes.shape(),

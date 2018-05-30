@@ -48,12 +48,18 @@ export default class Notification extends React.PureComponent {
     this.state = { showPulse: false, animValue: new Animated.Value(0) };
   }
   /**
+   * @returns {undefined}
+   */
+  componentDidMount() {
+    this.canSetState = true;
+  }
+  /**
    * @param {Object} props component will receive
    * @returns {undefined}
    */
   async componentWillReceiveProps(props) {
     if (props.notificationCount && props.notificationCount !== this.props.notificationCount) {
-      await new Promise(res => this.setState({ showPulse: true }, res));
+      if (this.canSetState) await new Promise(res => this.setState({ showPulse: true }, res));
       await new Promise(res => Animated.timing(
         this.state.animValue,
         {
@@ -62,8 +68,14 @@ export default class Notification extends React.PureComponent {
           easing: Easing.bezier(0.2, 0.15, 0.13, 1.07),
         }
       ).start(res));
-      await new Promise(res => this.setState({ animValue: new Animated.Value(0), showPulse: false }, res));
+      if (this.canSetState) await new Promise(res => this.setState({ animValue: new Animated.Value(0), showPulse: false }, res));
     }
+  }
+  /**
+   * @returns {undefined}
+   */
+  componentWillUnmount() {
+    this.canSetState = false;
   }
   /**
  * @returns {JSX} XML

@@ -132,7 +132,10 @@ export function signUpUser(payload, callback) {
     try {
       const res = await dibsFetch('/api/user/register', {
         method: 'POST',
-        body: payload,
+        body: {
+          ...payload,
+          signupMethod: 'Mobile App',
+        },
       });
       if (res.success) {
         dispatch(setUser(res.user));
