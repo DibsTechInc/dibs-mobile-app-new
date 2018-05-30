@@ -19,6 +19,8 @@ const PromoCodeText = NormalText.extend`
 const PromoCodeInput = styled.TextInput`
   border-bottom-width: 1px;
   flex: 2;
+  font-size: 14;
+  font-family: flex-font;
   height: 40px;
   margin-right: 20px;
   margin-left: 10px;

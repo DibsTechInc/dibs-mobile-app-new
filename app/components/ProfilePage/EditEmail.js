@@ -101,7 +101,7 @@ class EditEmail extends PureComponent {
             value={this.state.email}
             onChangeText={email => this.setState({ email })}
             placeholder={this.props.email}
-            style={{ width: 250 }}
+            style={{ width: 250, fontFamily: 'flex-font' }}
             containerStyle={{ marginBottom: 20 }}
           />
           {this.state.resultMessage.length && <StyledText>{this.state.resultMessage}</StyledText>}

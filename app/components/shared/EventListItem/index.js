@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { View } from 'react-native';
 
 import { WHITE, LIGHT_GREY, DARK_TEXT_GREY } from '../../../constants';
-import { FlexRow, FlexCenter, RightAlignedColumn, HeavyText } from '../../styled';
+import { FlexRow, FlexCenter, RightAlignedColumn, HeavyText, NormalText } from '../../styled';
 import Button from './Button';
 import Overlay from './Overlay';
 
@@ -36,7 +36,7 @@ const Price = HeavyText.extend`
   font-size: 20;
 `;
 
-const ScheduleText = styled.Text`
+const ScheduleText = NormalText.extend`
   color: ${DARK_TEXT_GREY};
   font-size: 14;
 `;
@@ -120,8 +120,16 @@ class EventListItem extends React.PureComponent {
         <CenterColumn isCartEvent={this.props.isCartEvent}>
           <View style={{ marginBottom: 10 }}>
             <HeavyText>
-              {this.props.startTimeInLocalTZ} - {this.props.endTimeInLocalTZ}
+              {this.props.isCartEvent ?
+                `${this.props.shortDayOfWeek} ${this.props.shortEventDate}`
+                  : `${this.props.startTimeInLocalTZ} - ${this.props.endTimeInLocalTZ}`
+              }
             </HeavyText>
+            {this.props.isCartEvent ? (
+              <ScheduleText numberOfLines={1}>
+                {this.props.startTimeInLocalTZ} - {this.props.endTimeInLocalTZ}
+              </ScheduleText>
+            ) : null}
             <ScheduleText numberOfLines={1}>
               {this.props.locationName}
             </ScheduleText>
@@ -158,6 +166,8 @@ EventListItem.defaultProps = {
 };
 
 EventListItem.propTypes = {
+  shortDayOfWeek: PropTypes.string,
+  shortEventDate: PropTypes.string,
   formattedRoundedPrice: PropTypes.string.isRequired,
   passid: PropTypes.number,
   formattedValueBack: PropTypes.string,

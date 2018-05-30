@@ -94,14 +94,14 @@ class EditUserName extends PureComponent {
             value={this.state.firstName}
             onChangeText={firstName => this.setState({ firstName })}
             placeholder={this.props.firstName}
-            style={{ width: 250 }}
+            style={{ width: 250, fontFamily: 'flex-font' }}
             containerStyle={{ marginBottom: 20 }}
           />
           <InputField
             value={this.state.fullName}
             onChangeText={lastName => this.setState({ lastName })}
             placeholder={this.props.lastName}
-            style={{ width: 250 }}
+            style={{ width: 250, fontFamily: 'flex-font' }}
             containerStyle={{ marginBottom: 20 }}
           />
           {this.state.resultMessage.length && <StyledText>{this.state.resultMessage}</StyledText>}

@@ -103,7 +103,7 @@ class ProfilePage extends PureComponent {
             <SettingsList.Item
               hasNavArrow={false}
               title="PERSONAL DETAILS"
-              titleStyle={{ color: GREY }}
+              titleStyle={{ color: GREY, fontFamily: 'flex-font-heavy', fontSize: 14 }}
               titleBoxStyle={titleBoxStyle}
             />
             <SettingsList.Item
@@ -111,18 +111,21 @@ class ProfilePage extends PureComponent {
               titleInfo={`${this.props.userFirstName} ${this.props.userLastName}`}
               onPress={this.handleEditUsernameRoute}
               titleBoxStyle={titleBoxStyle}
+              titleStyle={{ fontFamily: 'flex-font', fontSize: 14 }}
             />
             <SettingsList.Item
               title="Email"
               titleInfo={this.props.email}
               onPress={this.handleEditEmailRoute}
               titleBoxStyle={titleBoxStyle}
+              titleStyle={{ fontFamily: 'flex-font', fontSize: 14 }}
             />
             <SettingsList.Item
               title="Password"
               titleInfo="••••"
               onPress={this.handleEditPasswordRoute}
               titleBoxStyle={titleBoxStyle}
+              titleStyle={{ fontFamily: 'flex-font', fontSize: 14 }}
             />
             <SettingsList.Header
               headerStyle={{ marginTop: -20 }}
@@ -130,24 +133,27 @@ class ProfilePage extends PureComponent {
             <SettingsList.Item
               hasNavArrow={false}
               title="ACCOUNT DETAILS"
-              titleStyle={{ color: GREY }}
+              titleStyle={{ color: GREY, fontFamily: 'flex-font-heavy', fontSize: 14 }}
               titleBoxStyle={titleBoxStyle}
             />
             <SettingsList.Item
               title="Payment"
               onPress={this.handleEditCCRoute}
               titleBoxStyle={titleBoxStyle}
+              titleStyle={{ fontFamily: 'flex-font', fontSize: 14 }}
             />
             <SettingsList.Item
               title="Settings"
               onPress={this.handleSettingsRoute}
               titleBoxStyle={titleBoxStyle}
+              titleStyle={{ fontFamily: 'flex-font', fontSize: 14 }}
             />
             <SettingsList.Item
               hasNavArrow={false}
               title="Logout"
               onPress={this.handleLogout}
               titleBoxStyle={titleBoxStyle}
+              titleStyle={{ fontFamily: 'flex-font', fontSize: 14 }}
             />
             <BottomBuffer />
           </SettingsList>

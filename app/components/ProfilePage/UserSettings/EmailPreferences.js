@@ -108,6 +108,10 @@ class EmailPreferences extends PureComponent {
                 backgroundColor: WHITE,
                 borderColor: WHITE,
               },
+              switchTitle: {
+                fontSize: 14,
+                fontFamily: 'flex-font',
+              },
             }}
           />
 
@@ -123,6 +127,10 @@ class EmailPreferences extends PureComponent {
               rowContainer: {
                 backgroundColor: WHITE,
                 borderColor: WHITE,
+              },
+              switchTitle: {
+                fontSize: 14,
+                fontFamily: 'flex-font',
               },
             }}
           />

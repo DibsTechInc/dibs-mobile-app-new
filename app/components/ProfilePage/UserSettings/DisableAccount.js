@@ -155,6 +155,10 @@ class DisableAccount extends PureComponent {
                 margin: 0,
                 marginTop: 20,
               },
+              textSubmitButton: {
+                fontSize: 14,
+                fontFamily: 'flex-font',
+              },
             }}
             onSubmit={this.handleOnSubmit}
           />
