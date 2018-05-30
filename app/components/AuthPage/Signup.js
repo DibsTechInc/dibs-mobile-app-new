@@ -38,6 +38,10 @@ const StyledText = NormalText.extend`
   margin-bottom: 7%;
 `;
 
+const LinkedText = NormalText.extend`
+  color: ${Config.STUDIO_COLOR};
+`;
+
 /**
  * @class Signup
  * @extends PureComponent
@@ -174,25 +178,27 @@ class Signup extends PureComponent {
             onChangeText={password => this.setState({ password })}
             placeholder="Password (6 char min)"
             style={{ width: 250 }}
-            containerStyle={{ marginBottom: 30 }}
+            containerStyle={{ marginBottom: 20 }}
           />
-          <View style={{ width: 250, justifyContent: 'space-between', marginBottom: 10 }}>
-            <TouchableOpacity style={{ marginBottom: 10 }} onPress={this.handleOnPressNavStudioTerms}>
-              <Text style={{ color: Config.STUDIO_COLOR, fontFamily: 'flex-font' }}>{this.props.studioName} Terms</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={this.handleOnPressNavDibsTerms}>
-              <Text style={{ color: Config.STUDIO_COLOR, fontFamily: 'flex-font' }}>Dibs Terms</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={{ width: 250, height: 30, position: 'relative', marginTop: 35 }}>
+          <View style={{ width: 250, height: 30, position: 'relative', marginTop: 20, flexDirection: 'row' }}>
             <CheckBox
-              title="I have read and agreed to the terms"
+              title=""
+              checkedColor={Config.STUDIO_COLOR}
               checked={this.state.tAndC}
               containerStyle={{ backgroundColor: DEFAULT_BG, position: 'absolute', bottom: 0, left: -22 }}
               textStyle={{ fontFamily: 'flex-font', fontSize: 14 }}
               onPress={this.handleOnCheck}
               size={20}
             />
+            <View style={{ position: 'absolute', width: '90%', left: 22, bottom: 3 }}>
+              <NormalText style={{ flex: 1, flexWrap: 'wrap' }}>
+                I have read and agreed to the <LinkedText onPress={this.handleOnPressNavStudioTerms}>
+                  {this.props.studioName}
+                </LinkedText> and <LinkedText onPress={this.handleOnPressNavDibsTerms}>
+                Dibs
+              </LinkedText> Terms and Conditions
+              </NormalText>
+            </View>
           </View>
         </ScrollView>
         <KeyboardAccessoryView

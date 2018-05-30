@@ -165,21 +165,21 @@ class MainPage extends React.PureComponent {
           <IconRow>
             <IconLink
               iconName="calendar"
-              text={'BOOK\nCLASSES'}
+              text={'BOOK'}
               route={SCHEDULE_ROUTE}
               alignItems="flex-start"
             />
             <IconBorder />
             <IconLink
               iconName="arrow-up"
-              text={'VIEW\nUPCOMING'}
+              text={'UPCOMING'}
               route={UPCOMING_CLASS_ROUTE}
               alignItems="center"
             />
             <IconBorder />
             <IconLink
               iconName="user"
-              text={'MANAGE\nACCOUNT'}
+              text={'ACCOUNT'}
               route={PROFILE_ROUTE}
               lastIcon
               alignItems="flex-end"

@@ -6,13 +6,21 @@ import { connect } from 'react-redux';
 import Promise from 'bluebird';
 import styled from 'styled-components';
 
-import { FadeInView, InputField, LinearLoader, MaterialButton } from '../shared';
+import {
+  FadeInView,
+  InputField,
+  LinearLoader,
+  MaterialButton,
+} from '../shared';
 import { validateEmail } from '../../actions/UserActions';
 
 import { DEFAULT_BG } from '../../constants';
 import Config from '../../../config.json';
 
-import { NormalText } from '../styled';
+import {
+  NormalText,
+  FlexCenter,
+} from '../styled';
 
 const StyledButtonView = styled.View`
   padding: 8px;
@@ -84,7 +92,9 @@ class EnterEmail extends PureComponent {
     if (this.state.isLoading) {
       return (
         <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <LinearLoader color={Config.STUDIO_COLOR} />
+          <FlexCenter>
+            <LinearLoader showQuote color={Config.STUDIO_COLOR} />
+          </FlexCenter>
         </FadeInView>
       );
     }

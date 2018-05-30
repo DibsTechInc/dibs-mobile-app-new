@@ -7,7 +7,7 @@ const quotes = [
   'Exercise. Not extra fries',
   'I lift, therefore I am',
   'Let she who lacks pump do the first set',
-  'You can\'t push yourself forward by patting yourself on the back',
+  'The first lift is getting off the couch',
   'If you’re on the treadmill next to me, we are racing',
   'You can be sore tomorrow or sorry tomorrow. You decide',
   'Do the work, be the prize',
@@ -16,10 +16,12 @@ const quotes = [
   'You can\'t beat science',
   'Something something oats and squats',
   'Shut up and squat',
-  'Don\'t compare your chapter 2 to someone else\'s chapter 22',
+  'Rock that post-workout glow',
   'Spin to win',
   'Every day you don\'t work out, someone else does',
   'Gym, tan, laundry',
+  'Motivation is fleeting. Discipline is not.',
+  'The body achieves what the mind believes.',
 ];
 
 function getRandomIntInclusive(min, max) {

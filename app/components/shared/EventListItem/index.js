@@ -32,7 +32,6 @@ const ButtonColumn = FlexCenter.extend`
 `;
 
 const Price = HeavyText.extend`
-  color: ${DARK_TEXT_GREY};
   font-size: 20;
 `;
 

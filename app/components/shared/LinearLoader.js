@@ -5,6 +5,7 @@ import { Animated, View } from 'react-native';
 
 import { WHITE } from '../../constants';
 import { fadeColor, generateQuote } from '../../helpers';
+import { NormalText } from '../../components/styled';
 
 const LoaderContainer = styled.View`
   align-items: center;
@@ -23,7 +24,7 @@ const LoaderBackground = styled.View`
   width: ${props => props.width};
 `;
 
-const QuoteText = styled.Text`
+const QuoteText = NormalText.extend`
   color: ${props => props.color};
   margin-bottom: 50px;
   padding-horizontal: 15;
