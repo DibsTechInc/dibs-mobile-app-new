@@ -55,7 +55,7 @@ class EmailPreferences extends PureComponent {
     const stateMap = { transactionsPref: 'transactional', marketingPref: 'non-transactional' };
 
     this.setState({ isLoading: true });
-    await this.props.updateUserEmailPreferences(stateMap[type], this.props.email);
+    await new Promise(res => this.props.updateUserEmailPreferences(stateMap[type], this.props.email, res));
     this.setState({ isLoading: false });
   }
 
