@@ -5,6 +5,7 @@ import {
   View,
 } from 'react-native';
 import SettingsList from 'react-native-settings-list';
+import styled from 'styled-components';
 
 import {
   ABOUT_ROUTE,
@@ -16,10 +17,10 @@ import {
   EDIT_PASSWORD_ROUTE,
   EDIT_EMAIL_ROUTE,
   EDIT_CC_ROUTE,
-  SOFT_GREY,
   DEFAULT_BG,
   GREY,
   LIGHT_GREY,
+  WHITE,
 } from '../../constants';
 
 import Header from '../Header';
@@ -30,6 +31,15 @@ import {
   getUserEmail,
 } from '../../selectors';
 import { logOutUser } from '../../actions';
+
+const BottomBuffer = styled.View`
+  background-color: ${LIGHT_GREY};
+  bottom: -1;
+  height: 1;
+  left: 0;
+  position: absolute;
+  right: 0;
+`;
 
 /**
  * @class ProfileScreen
@@ -73,12 +83,12 @@ class ProfilePage extends PureComponent {
   handleOnPress(route) {
     this.props.navigation.navigate(route);
   }
-
   /**
    * @returns {JSX} XML
    */
   render() {
     const titleBoxStyle = {
+      backgroundColor: WHITE,
       flex: 1,
       marginLeft: 15,
       flexDirection: 'row',
@@ -87,8 +97,8 @@ class ProfilePage extends PureComponent {
     return (
       <FadeInView style={{ backgroundColor: DEFAULT_BG }}>
         <Header title="My Account" />
-        <View style={{ backgroundColor: SOFT_GREY, flex: 1 }}>
-          <SettingsList borderColor={LIGHT_GREY} defaultItemSize={50}>
+        <View style={{ backgroundColor: DEFAULT_BG, flex: 1 }}>
+          <SettingsList backgroundColor={WHITE} borderColor={LIGHT_GREY} defaultItemSize={50}>
             <SettingsList.Header headerStyle={{ marginTop: -20 }} />
             <SettingsList.Item
               hasNavArrow={false}
@@ -139,6 +149,7 @@ class ProfilePage extends PureComponent {
               onPress={this.handleLogout}
               titleBoxStyle={titleBoxStyle}
             />
+            <BottomBuffer />
           </SettingsList>
         </View>
       </FadeInView>

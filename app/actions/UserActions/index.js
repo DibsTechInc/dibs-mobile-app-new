@@ -32,7 +32,7 @@ export function refreshUser(user) {
  * @param {function} callback on complete
  * @returns {function} thunk
  */
-export function logOutUser(callback = () => {}) {
+export function logOutUser() {
   return async function innerLogOutUser(dispatch) {
     try {
       await AsyncStorage.removeItem(Config.USER_TOKEN_KEY);
@@ -40,7 +40,6 @@ export function logOutUser(callback = () => {}) {
       dispatch(removeCreditCard());
       dispatch(setUpcomingEvents([]));
       dispatch(clearCart());
-      callback();
     } catch (err) {
       console.log(err);
     }
