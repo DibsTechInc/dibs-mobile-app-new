@@ -234,7 +234,11 @@ class CartPage extends PureComponent {
     const renderLeftButtons = notReadyForPurchase ? null : purchaseButton;
 
     const renderPurchaseButton = (
-      <View style={{ overflow: 'hidden', backgroundColor: Config.STUDIO_COLOR, width: WIDTH }}>
+      <View style={{
+        overflow: 'hidden',
+        backgroundColor: notReadyForPurchase ? LIGHT_GREY : Config.STUDIO_COLOR,
+        width: WIDTH,
+      }}>
         <Swipeable
           contentContainerStyle={{
             alignItems: 'center',

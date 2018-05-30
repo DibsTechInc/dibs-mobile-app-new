@@ -239,15 +239,16 @@ class CalendarStrip extends PureComponent {
           <ArrowContainer
             onPress={this.getPreviousDays}
             disabled={canGoBack}
+            activeOpacity={1}
           >
             {!canGoBack && (
-              <Svg width="20" height="20">
+              <Svg width="20" height="25">
                 <Path
                   stroke={WHITE}
-                  strokeWidth="2"
+                  strokeWidth="1.75"
                   strokeLinecap="round"
                   fill="none"
-                  d="M 18 1 L 10 10 L 18 18"
+                  d="M 18 2 L 10 12.5 L 18 23"
                 />
               </Svg>
             )}
@@ -270,14 +271,17 @@ class CalendarStrip extends PureComponent {
               );
             })}
           </DatesContainer>
-          <ArrowContainer onPress={this.getNextDays}>
-            <Svg width="20" height="20">
+          <ArrowContainer
+            onPress={this.getNextDays}
+            activeOpacity={1}
+          >
+            <Svg width="20" height="25">
               <Path
                 stroke={WHITE}
-                strokeWidth="2"
+                strokeWidth="1.75"
                 strokeLinecap="round"
                 fill="none"
-                d="M 2 2 L 10 10 L 2 18"
+                d="M 2 2 L 10 12.5 L 2 23"
               />
             </Svg>
           </ArrowContainer>

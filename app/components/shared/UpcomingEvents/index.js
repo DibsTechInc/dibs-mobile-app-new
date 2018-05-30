@@ -30,8 +30,9 @@ class UpcomingEvents extends PureComponent {
     const containerStyle = { flex: 1, height: HEIGHT };
     const paginationStyle = {
       backgroundColor: WHITE,
-      height: 25,
+      height: isIphoneX() ? 45 : 25,
       paddingVertical: 5,
+      paddingBottom: isIphoneX() ? 18 : 5,
       position: 'absolute',
       flex: 0,
       top: HEIGHT - (isIphoneX() ? 140 : 105),
