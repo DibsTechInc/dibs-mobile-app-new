@@ -171,52 +171,11 @@ class CartPage extends PureComponent {
     const notReadyForPurchase = !CartPage.getIsReadyForPurchase(this.props, this.state);
 
     const renderPurchaseButton = (
-<<<<<<< HEAD
       <SwipableButton
         swipeText="Swipe to pay"
         notReadyForPurchase={notReadyForPurchase}
         onLeftButtonsActivate={this.handlePurchase}
       />
-=======
-      <View style={{
-        overflow: 'hidden',
-        backgroundColor: notReadyForPurchase ? LIGHT_GREY : Config.STUDIO_COLOR,
-        width: WIDTH,
-      }}>
-        <Swipeable
-          contentContainerStyle={{
-            alignItems: 'center',
-            flexDirection: 'row',
-            backgroundColor: renderButtonColor,
-            height: 45,
-            marginBottom: Number(isIphoneX()) && 45,
-            borderWidth: 1,
-            borderColor: renderButtonColor,
-            overflow: 'hidden',
-          }}
-          leftButtons={renderLeftButtons}
-          onLeftButtonsActivate={this.handlePurchase}
-          leftButtonsActivationDistance={150}
-        >
-          <SwipeText>
-            Swipe to pay
-          </SwipeText>
-          <Animated.View
-            style={{
-              backgroundColor: WHITE,
-              opacity: 0.18,
-              position: 'absolute',
-              height: 70,
-              width: 30,
-              top: -10,
-              transform: [{ rotate: '20deg' }],
-              left: Animated.add(-0.5 * WIDTH, Animated.multiply(2 * WIDTH, this.state.animValue)),
-            }}
-            pointerEvents="none"
-          />
-        </Swipeable>
-      </View>
->>>>>>> 5c64720c65966f035694255543a71fea784e000b
     );
 
     if (this.state.isProcessingPayment) {

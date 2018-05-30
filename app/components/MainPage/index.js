@@ -18,7 +18,6 @@ import {
   HEIGHT,
   WIDTH,
   DRAWER_OPEN,
-  WIDTH,
 } from '../../constants';
 import {
   getUserFirstName,
