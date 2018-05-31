@@ -69,7 +69,7 @@ class App extends Component {
       fetchedAssets: false,
       userToken: null,
       errorOccurred: false,
-      loadedFont: false,
+      fontLoaded: false,
       imageLoaded: false,
       checkedUpdates: false,
     };
@@ -202,16 +202,14 @@ class App extends Component {
    * @returns {JSX} XML
    */
   render() {
-    const loadingComplete = this.state.fetchedAssets &&
-      this.state.checkedUpdates &&
-      this.state.fontLoaded &&
-      this.state.imageLoaded;
-
     if (this.state.errorOccurred || !this.state.fontLoaded) {
       return null;
     }
 
-    if (loadingComplete) {
+    if (this.state.fetchedAssets &&
+      this.state.checkedUpdates &&
+      this.state.fontLoaded &&
+      this.state.imageLoaded) {
       return (
         <Provider store={store}>
           <Navigator userToken={this.state.userToken} />
