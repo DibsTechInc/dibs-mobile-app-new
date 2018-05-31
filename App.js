@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
-import { Font, ScreenOrientation, Updates } from 'expo';
+import { Font, ScreenOrientation, Updates, Asset } from 'expo';
 import styled from 'styled-components';
 import { AsyncStorage, Alert } from 'react-native';
 import Promise from 'bluebird';
@@ -20,6 +20,25 @@ import {
   requestEventData,
   setStudio,
 } from './app/actions';
+
+import MainPage from './assets/img/main-page.png';
+import ActivityGrey from './assets/img/activity-grey.png';
+import ActivityWhite from './assets/img/activity-white.png';
+import CalendarGrey from './assets/img/calendar-grey.png';
+import CalendarWhite from './assets/img/calendar-white.png';
+import CartGrey from './assets/img/cart-grey.png';
+import CartWhite from './assets/img/cart-white.png';
+import MainGrey from './assets/img/main-grey.png';
+import Amex from './assets/img/stp_card_amex.png';
+import Diners from './assets/img/stp_card_diners.png';
+import Discover from './assets/img/stp_card_discover.png';
+import JCB from './assets/img/stp_card_jcb.png';
+import MasterCard from './assets/img/stp_card_mastercard.png';
+import Unknown from './assets/img/stp_card_unknown.png';
+import Visa from './assets/img/stp_card_visa.png';
+import TrashGrey from './assets/img/trash-grey.png';
+import UserGrey from './assets/img/user-grey.png';
+import UserWhite from './assets/img/user-white.png';
 
 // Native apps can only load downloaded fronts stored in assets/fonts folder
 import SourceSansProBold from './assets/fonts/SourceSansPro-Bold.ttf';
@@ -51,6 +70,7 @@ class App extends Component {
       userToken: null,
       errorOccurred: false,
       loadedFont: false,
+      imageLoaded: false,
       checkedUpdates: false,
     };
   }
@@ -60,6 +80,7 @@ class App extends Component {
   async componentWillMount() {
     await this.getUpdates();
     await this.getFonts();
+    await this.getImages();
     await this.getAssets();
   }
   /**
@@ -110,7 +131,7 @@ class App extends Component {
 
     this.setState({ checkedUpdates: true });
   }
-/**
+  /**
    * @returns {undefined}
    */
   async getFonts() {
@@ -120,6 +141,33 @@ class App extends Component {
     });
 
     this.setState({ fontLoaded: true });
+  }
+  /**
+   * @returns {undefined}
+   */
+  async getImages() {
+    await Asset.loadAsync([
+      MainPage,
+      ActivityGrey,
+      ActivityWhite,
+      CalendarGrey,
+      CalendarWhite,
+      CartGrey,
+      CartWhite,
+      MainGrey,
+      Amex,
+      Diners,
+      Discover,
+      JCB,
+      MasterCard,
+      Unknown,
+      Visa,
+      TrashGrey,
+      UserGrey,
+      UserWhite,
+    ]);
+
+    this.setState({ imageLoaded: true });
   }
   /**
    * @returns {undefined}
@@ -154,9 +202,14 @@ class App extends Component {
    * @returns {JSX} XML
    */
   render() {
+    const loadingComplete = this.state.fetchedAssets &&
+      this.state.checkedUpdates &&
+      this.state.fontLoaded &&
+      this.state.imageLoaded;
+
     return (
       <Provider store={store}>
-        {(this.state.fetchedAssets && this.state.checkedUpdates) ? (
+        {loadingComplete ? (
           <Navigator userToken={this.state.userToken} />
         ) : (
           <StyledLoadingPage>
