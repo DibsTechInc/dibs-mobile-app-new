@@ -24,7 +24,7 @@ class CalendarArrow extends React.PureComponent {
         <Path
           fill="none"
           stroke={WHITE}
-          strokeWidth="1.7"
+          strokeWidth="2.5"
           strokeLinecap="round"
           d="M 7 2 L 13 10 L 7 18"
           transform={`rotate(${this.props.direction === 'left' ? 180 : 0}, 10, 10)`}
