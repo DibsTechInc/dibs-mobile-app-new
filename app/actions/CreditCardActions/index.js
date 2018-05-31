@@ -20,14 +20,16 @@ export const {
 export function requestCreditCardInfo(showAlert = true) {
   return async function innerRequestCreditCardInfo(dispatch, getState, dibsFetch) {
     if (getState().creditCard.loading) return;
+    dispatch(setCreditCardLoadingTrue());
     try {
       const res = await dibsFetch('/api/user/credit_card', {
         method: 'GET',
         requiresAuth: true,
       });
+      dispatch(setCreditCardLoadingFalse());
       if (res.success) dispatch(setCreditCard(res.creditCard));
       else if (showAlert && res.message !== 'The user does not have a card') dispatch(enqueueApiError({ title: 'Uh oh!', message: res.message }));
-      else if (!showAlert) throw new Error('Failed to get the user\'s billing info');
+      else if (res.message !== 'The user does not have a card') throw new Error('Failed to get the user\'s billing info');
     } catch (err) {
       console.log(err);
       if (showAlert) dispatch(enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong getting your billing information.' }));

@@ -87,21 +87,29 @@ class App extends Component {
    * @returns {undefined}
    */
   componentDidMount() {
-    this.userPollInterval = setInterval(async () => {
-      try {
-        const checkToken = async () => Boolean(await AsyncStorage.getItem(Config.USER_TOKEN_KEY));
-        if (!(await checkToken())) return;
-        await store.dispatch(requestUserData(false));
-        if (!(await checkToken())) return;
-        await store.dispatch(requestCreditCardInfo(false));
-        if (!(await checkToken())) return;
-        await store.dispatch(requestUserEvents(false));
-      } catch (err) {
-        console.error(err);
-      }
-    }, USER_POLL_INTERVAL);
+    // this.userPollInterval = setInterval(async () => {
+    //   try {
+    //     if (
+    //       !(await AsyncStorage.getItem(Config.USER_TOKEN_KEY))
+    //       || !store.getState().user.id
+    //       || !store.getState().studio.data
+    //     ) return;
+    //     await Promise.all([
+    //       store.dispatch(requestUserData(false)),
+    //       store.dispatch(requestCreditCardInfo(false)),
+    //       store.dispatch(requestUserEvents(false)),
+    //     ]);
+    //   } catch (err) {
+    //     console.error(err);
+    //   }
+    // }, USER_POLL_INTERVAL);
     this.eventRefreshInterval = setInterval(async () => {
       try {
+        if (
+          !(await AsyncStorage.getItem(Config.USER_TOKEN_KEY))
+          || !store.getState().user.id
+          || !store.getState().studio.data
+        ) return;
         store.dispatch(removeExpiredEvents());
         store.dispatch(requestEventData({}, false));
       } catch (err) {
@@ -113,7 +121,7 @@ class App extends Component {
    * @returns {undefined}
    */
   componentWillUnmount() {
-    clearInterval(this.userPollInterval);
+    // clearInterval(this.userPollInterval);
     clearInterval(this.eventRefreshInterval);
   }
   /**
