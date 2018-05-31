@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Provider } from 'react-redux';
 import { Font, ScreenOrientation, Updates, Asset } from 'expo';
 import styled from 'styled-components';
-import { AsyncStorage } from 'react-native';
+import { AsyncStorage, View } from 'react-native';
 import Promise from 'bluebird';
 
 import { WHITE, EVENT_POLL_INTERVAL } from './app/constants';
@@ -11,6 +11,7 @@ import Config from './config.json';
 import Navigator from './app/router';
 import LinearLoader from './app/components/shared/LinearLoader';
 import ErrorPage from './app/components/ErrorPage';
+import AlertModal from './app/components/AlertModal';
 import {
   requestStudioData,
   requestUserData,
@@ -21,6 +22,7 @@ import {
   requestEventData,
   setStudio,
   logFatalError,
+  enqueueApiError,
 } from './app/actions';
 
 import MainPage from './assets/img/main-page.png';
@@ -221,7 +223,10 @@ class App extends Component {
     if (this.state.errorOccurred) {
       return (
         <Provider store={store}>
-          <ErrorPage />
+          <View style={{ flex: 1 }}>
+            <ErrorPage />
+            <AlertModal />
+          </View>
         </Provider>
       );
     }
@@ -232,20 +237,26 @@ class App extends Component {
       this.state.imageLoaded) {
       return (
         <Provider store={store}>
-          <Navigator userToken={this.state.userToken} />
+          <View style={{ flex: 1 }}>
+            <Navigator userToken={this.state.userToken} />
+            <AlertModal />
+          </View>
         </Provider>
       );
     }
 
     return (
       <Provider store={store}>
-        {(this.state.fetchedAssets && this.state.imageLoaded) ? (
-          <Navigator userToken={this.state.userToken} />
-        ) : (
-          <StyledLoadingPage>
-            {(this.state.errorOccurred || !this.state.fontLoaded) ? null : <LinearLoader showQuote />}
-          </StyledLoadingPage>
-        )}
+        <View style={{ flex: 1 }}>
+          {(this.state.fetchedAssets && this.state.imageLoaded) ? (
+            <Navigator userToken={this.state.userToken} />
+          ) : (
+            <StyledLoadingPage>
+              {(this.state.errorOccurred || !this.state.fontLoaded) ? null : <LinearLoader showQuote />}
+            </StyledLoadingPage>
+          )}
+          <AlertModal />
+        </View>
       </Provider>
     );
   }
