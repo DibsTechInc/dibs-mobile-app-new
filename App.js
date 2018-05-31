@@ -19,6 +19,7 @@ import {
   removeExpiredEvents,
   requestEventData,
   setStudio,
+  setDroppingEventFalse,
 } from './app/actions';
 
 import MainPage from './assets/img/main-page.png';
@@ -52,6 +53,8 @@ const StyledLoadingPage = styled.View`
   flex: 5;
 `;
 
+const UPDATER_TRACKER_KEY = 'UPD8TERMAN';
+
 /**
  * @class App
  * @extends Component
@@ -71,7 +74,6 @@ class App extends Component {
       errorOccurred: false,
       fontLoaded: false,
       imageLoaded: false,
-      checkedUpdates: false,
       isReady: false,
     };
   }
@@ -79,6 +81,16 @@ class App extends Component {
    * @returns {undefined}
    */
   async componentWillMount() {
+    const setToken = await AsyncStorage.getItem(UPDATER_TRACKER_KEY);
+
+    if (!setToken) {
+      await AsyncStorage.setItem(UPDATER_TRACKER_KEY, 'checked');
+      Updates.reload();
+      return;
+    }
+
+    await this.getImages();
+    await this.getFonts();
     await this.getAssets();
   }
   /**
@@ -121,21 +133,6 @@ class App extends Component {
   componentWillUnmount() {
     // clearInterval(this.userPollInterval);
     clearInterval(this.eventRefreshInterval);
-  }
-  /**
-   * @returns {undefined}
-   */
-  async getUpdates() {
-    if (!__DEV__) {
-      const update = await Updates.checkForUpdateAsync();
-
-      if (update.isAvailable) {
-        await Updates.fetchUpdateAsync();
-        Updates.reloadFromCache();
-      }
-    }
-
-    this.setState({ checkedUpdates: true });
   }
   /**
    * @returns {undefined}
@@ -195,10 +192,6 @@ class App extends Component {
         token && store.dispatch(requestUserEvents(false)),
       ]);
 
-      await this.getUpdates();
-      await this.getFonts();
-      await this.getImages();
-
       this.setState({ fetchedAssets: true, userToken: token });
       if (token) await store.dispatch(syncUserEvents());
     } catch (err) {
@@ -214,7 +207,7 @@ class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        {(this.state.fetchedAssets && this.state.checkedUpdates && this.state.imageLoaded) ? (
+        {(this.state.fetchedAssets && this.state.imageLoaded) ? (
           <Navigator userToken={this.state.userToken} />
         ) : (
           <StyledLoadingPage>

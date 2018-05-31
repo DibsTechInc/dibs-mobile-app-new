@@ -35,6 +35,8 @@ const StyledGrayText = NormalText.extend`
   color: ${DARK_TEXT_GREY};
 `;
 
+const UPDATER_TRACKER_KEY = 'UPD8TERMAN';
+
 /**
  * @class LandingPage
  * @extends Component
@@ -55,6 +57,12 @@ class LandingPage extends Component {
     };
 
     this.handleOnChangeIndex = this.handleOnChangeIndex.bind(this);
+  }
+  /**
+   * @returns {undefined}
+   */
+  async componentDidMount() {
+    await AsyncStorage.removeItem(UPDATER_TRACKER_KEY);
   }
 
   /**
