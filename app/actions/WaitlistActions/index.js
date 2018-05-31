@@ -1,5 +1,3 @@
-import { Alert } from 'react-native';
-
 import {
   requestUserEvents,
   removeUpcomingEvent,
@@ -8,7 +6,7 @@ import {
 } from '../UpcomingEventsActions';
 import { refreshUser } from '../UserActions';
 import { requestEventData } from '../EventActions';
-import {  } from '../index';
+import { enqueueApiError } from '../AlertsActions';
 
 /**
  * @param {number} eventid to add to waitlist
@@ -27,13 +25,13 @@ export function addToWaitlist(eventid) {
       if (res.success) {
         dispatch(refreshUser(res.user));
         dispatch(requestUserEvents());
-        return Alert.alert('Success', `You were added to the waitlist for ${eventName}.`);
+        return dispatch(enqueueApiError({ title: 'Success', message: `You were added to the waitlist for ${eventName}.` }));
       }
       if (res.refreshEvent) dispatch(requestEventData({ eventids: [eventid] }));
-      return Alert.alert('Uh oh!', res.message);
+      return dispatch(enqueueApiError({ title: 'Uh oh!', message: res.message }));
     } catch (err) {
       console.log(err); // todo real error handling
-      return Alert.alert('Uh oh!', 'Something went wrong adding you to the waitlist.');
+      return dispatch(enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong adding you to the waitlist.' }));
     }
   };
 }
@@ -55,13 +53,13 @@ export function removeFromWaitlist(eventid) {
       if (res.success) {
         dispatch(removeUpcomingEvent(eventid));
         dispatch(setDroppingEventFalse());
-        Alert.alert('Success', 'You were removed from the waitlist.');
+        dispatch(enqueueApiError({ title: 'Success', message: 'You were removed from the waitlist.' }));
         return;
       }
-      Alert.alert('Uh oh!', res.message);
+      dispatch(enqueueApiError({ title: 'Uh oh!', message: res.message }));
     } catch (err) {
       console.log(err); // todo real error handling
-      Alert.alert('Uh oh!', 'Something went wrong removing you from the waitlist.');
+      dispatch(enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong removing you from the waitlist.' }));
     }
     dispatch(setDroppingEventFalse());
   };

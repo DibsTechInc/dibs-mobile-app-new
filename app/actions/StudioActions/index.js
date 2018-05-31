@@ -1,6 +1,7 @@
 import { createActions } from 'redux-actions';
-import { Alert, AsyncStorage } from 'react-native';
+import { AsyncStorage } from 'react-native';
 import Config from '../../../config.json';
+import { enqueueApiError } from '../';
 
 export const {
   setStudio,
@@ -29,12 +30,12 @@ export function requestStudioData(showAlert = true) {
         dispatch(setStudioLoadingFalse());
         return;
       }
-      if (showAlert) Alert.alert('Error requesting studio data', res.message);
+      if (showAlert) dispatch(enqueueApiError({ text: 'Something went wrong loading your app.', message: res.message }));
       else throw new Error('Failed to get the studio data');
       return;
     } catch (err) {
       console.log(err);
-      if (showAlert) Alert.alert('Something went wrong loading your app.');
+      if (showAlert) dispatch(enqueueApiError({ title: 'Something went wrong loading your app.' }));
       else throw err;
     }
   };

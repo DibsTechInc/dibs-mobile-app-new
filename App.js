@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { AsyncStorage, Alert } from 'react-native';
 import Promise from 'bluebird';
 
-import { WHITE, USER_POLL_INTERVAL, EVENT_POLL_INTERVAL } from './app/constants';
+import { WHITE, EVENT_POLL_INTERVAL } from './app/constants';
 import store from './app/store'; // lol App store... - Dylan
 import Config from './config.json';
 import Navigator from './app/router';
