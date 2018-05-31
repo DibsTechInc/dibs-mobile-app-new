@@ -221,7 +221,7 @@ class ProfilePage extends PureComponent {
             <SettingsList.Item
               title="Dibs"
               onPress={this.handleOnPressNavDibsTerms}
-              titleBoxStyle={{ ...titleBoxStyle, marginBottom: 25 }}
+              titleBoxStyle={{ ...titleBoxStyle, marginBottom: 5 }}
               titleStyle={{ fontFamily: 'flex-font', fontSize: 16 }}
             />
             <SwipableButton
@@ -258,12 +258,3 @@ const mapDispatchToProps = {
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProfilePage);
 
-/*
-<SettingsList.Item
-              hasNavArrow={false}
-              title="Logout"
-              onPress={this.handleLogout}
-              titleBoxStyle={logoutBoxStyle}
-              titleStyle={{ fontFamily: 'flex-font', fontSize: 16, color: WHITE }}
-            />
-*/
