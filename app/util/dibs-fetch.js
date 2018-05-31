@@ -27,7 +27,13 @@ async function dibsFetch(refreshToken, path, {
   const options = { headers, ...opts };
   if (body) options.body = JSON.stringify(body);
   let res = await fetch(`${Config.DIBS_HOST}${path}`, options);
-  if (type === 'json') res = await res.json();
+  if (type === 'json') {
+    try {
+      res = await res.json();
+    } catch (err) {
+      throw err;
+    }
+  }
   if ((requiresAuth || /login|register/.test(path)) && res.success) refreshToken(path, res);
   return res;
 }
