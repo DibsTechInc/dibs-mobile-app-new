@@ -124,9 +124,13 @@ class UpcomingEvent extends PureComponent {
         >
           <EventRow>
             <EventInfo>
-              {this.props.expanded && <View style={{ marginBottom: 20 }}>
-                <NormalText style={{ fontSize: 16, color: GREY, fontFamily: 'flex-font-heavy' }}>Items</NormalText>
-              </View>}
+              {this.props.expanded &&
+                <View style={{ marginBottom: 20 }}>
+                  <NormalText style={{ fontSize: 16, color: GREY, fontFamily: 'flex-font-heavy' }}>
+                    Items
+                  </NormalText>
+                </View>
+              }
               <View style={{ marginBottom: 10 }}>
                 <HeavyEventText>
                   {this.props.shortDayOfWeek} {this.props.shortEventDate}
@@ -150,14 +154,12 @@ class UpcomingEvent extends PureComponent {
               </View>
             </EventInfo>
             {this.props.forReceiptPage ? null : (
-              <View style={{ alignItems: 'center' }}>
-                <MaterialButton
-                  text={this.props.isWaitlist ? 'Cancel' : 'Drop'}
-                  style={{ width: 80, height: 40 }}
-                  onPress={this.startCancel}
-                  loading={this.props.dropping}
-                />
-              </View>
+              <MaterialButton
+                text={this.props.isWaitlist ? 'Cancel' : 'Drop'}
+                style={{ width: 80, height: 40 }}
+                onPress={this.startCancel}
+                loading={this.props.dropping}
+              />
             )}
           </EventRow>
           <Map

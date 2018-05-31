@@ -154,7 +154,7 @@ class MainPage extends React.PureComponent {
         <CustomStatusBar backgroundColor={'transparent'} barStyle="light-content" />
         <BackgroundImage source={backgroundImg} />
         <MainPageHeader>
-          <BurgerIcon onPress={this.navigateToDrawer} style={{ marginLeft: 20 }} />
+          <BurgerIcon onPress={this.navigateToDrawer} style={{ marginLeft: 10, padding: 10 }} />
           <CartIcon iconColor={WHITE} />
         </MainPageHeader>
         <Content hasUpcomingClasses={this.props.hasUpcomingClasses}>
