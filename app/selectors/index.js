@@ -9,3 +9,4 @@ export * from './UserSelectors/Passes';
 export * from './UpcomingEventsSelectors';
 export * from './CreditCardSelectors';
 export * from './ConfirmationSelectors';
+export * from './AlertsSelectors';

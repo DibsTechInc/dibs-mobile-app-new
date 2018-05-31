@@ -18,7 +18,7 @@ class FadeInView extends React.PureComponent {
       this.state.fadeAnim,
       {
         toValue: 1,
-        duration: 500,
+        duration: this.props.duration,
       }
     ).start();
   }
@@ -40,9 +40,12 @@ class FadeInView extends React.PureComponent {
   }
 }
 
+FadeInView.defaultProps = { duration: 500 };
+
 FadeInView.propTypes = {
   style: PropTypes.shape(),
   children: PropTypes.oneOfType([PropTypes.node, PropTypes.arrayOf(PropTypes.node)]),
+  duration: PropTypes.number,
 };
 
 export default FadeInView;

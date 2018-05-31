@@ -1,7 +1,6 @@
 import { createActions } from 'redux-actions';
 import { cloneDeep, uniq } from 'lodash';
 import moment from 'moment';
-import { Alert } from 'react-native';
 
 import {
   getUsersNextPassId,
