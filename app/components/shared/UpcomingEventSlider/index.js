@@ -168,8 +168,8 @@ class UpcomingClassSlider extends React.PureComponent {
           <Panel roundEdge={this.props.expanded}>
             {!this.props.expanded && this.props.events.length && (
               <SvgContainer>
-                <Svg width={60} height={5}>
-                  <Path d="M 3 1.5 L 57 1.5" stroke={LIGHT_GREY} strokeWidth={5} strokeLinecap="round" />
+                <Svg width={60} height={4}>
+                  <Path d="M 3 2 L 57 2" stroke={LIGHT_GREY} strokeWidth={4} strokeLinecap="round" />
                 </Svg>
               </SvgContainer>
             )}
