@@ -79,11 +79,10 @@ export function requestUserData(showAlert = true) {
         dispatch(recordStudioVisit());
         dispatch(requestCreditCardInfo());
         dispatch(requestUserEvents());
-      } else {
+      } else if (showAlert) {
         await AsyncStorage.removeItem(Config.USER_TOKEN_KEY);
         dispatch(logOutUser());
-      }
-      if (!showAlert) {
+      } else {
         throw new Error('Failed to get user data');
       }
     } catch (err) {
