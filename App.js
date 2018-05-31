@@ -180,7 +180,7 @@ class App extends Component {
       if (studioData) {
         studioData = JSON.parse(studioData);
         store.dispatch(setStudio(studioData));
-        store.dispatch(requestStudioData(false));
+        store.dispatch(requestStudioData(false)).catch(console.error);
       } else await store.dispatch(requestStudioData(false));
 
       await Promise.all([
@@ -192,6 +192,7 @@ class App extends Component {
       this.setState({ fetchedAssets: true, userToken: token });
       if (token) await store.dispatch(syncUserEvents());
     } catch (err) {
+      AsyncStorage.clear();
       Alert.alert('Something went wrong loading your app. Please close the app and try again.');
       this.setState({ fetchedAssets: false, errorOccurred: true });
       console.log(err);
