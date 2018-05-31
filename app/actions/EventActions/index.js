@@ -1,9 +1,10 @@
 import moment from 'moment';
 import { createActions } from 'redux-actions';
 import { stringify } from 'qs';
-import { Alert } from 'react-native';
+
 import { getEventsOnCurrentDate } from '../../selectors/EventsSelectors';
 import { getStudioName } from '../../selectors/StudioSelectors';
+import { enqueueApiError } from '../index';
 
 const getDateAsString = date => (
   typeof date.toISOString === 'function' ? date.toISOString() : date.toString()
@@ -56,10 +57,10 @@ export function requestEventData({ eventids } = {}, showAlert = true) {
       const res = await dibsFetch(path, { method: 'GET' });
 
       if (res.success) dispatch(setEvents(res.events));
-      else if (showAlert) Alert.alert('Uh oh!', res.message);
+      else if (showAlert) dispatch(enqueueApiError({ title: 'Uh oh!', message: res.message }));
     } catch (err) {
       console.log(err);
-      if (showAlert) Alert.alert('Uh oh!', `Something went wrong getting classes for ${getStudioName(getState())}`);
+      if (showAlert) dispatch(enqueueApiError({ title: 'Uh oh!', message: `Something went wrong getting classes for ${getStudioName(getState())}` }));
     }
     dispatch(removeKeyFromFetchingEvents(currentDate));
   };
