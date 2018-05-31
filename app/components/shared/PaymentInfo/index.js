@@ -149,6 +149,7 @@ class PaymentInfo extends PureComponent {
 
     const creditCardInput = (
       <LiteCreditCardInput
+        autoFocus={this.props.isUpdatingCard}
         cardScale={0.7}
         labels={labels}
         allowScroll
