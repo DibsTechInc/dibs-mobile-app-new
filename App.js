@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Provider } from 'react-redux';
 import { Font, ScreenOrientation, Updates } from 'expo';
 import styled from 'styled-components';
-import { AsyncStorage } from 'react-native';
+import { AsyncStorage, Alert } from 'react-native';
 import Promise from 'bluebird';
 
 import { WHITE, USER_POLL_INTERVAL, EVENT_POLL_INTERVAL } from './app/constants';
@@ -70,11 +70,11 @@ class App extends Component {
       try {
         const checkToken = async () => Boolean(await AsyncStorage.getItem(Config.USER_TOKEN_KEY));
         if (!(await checkToken())) return;
-        await store.dispatch(requestUserData());
+        await store.dispatch(requestUserData(false));
         if (!(await checkToken())) return;
         await store.dispatch(requestCreditCardInfo(false));
         if (!(await checkToken())) return;
-        await store.dispatch(requestUserEvents());
+        await store.dispatch(requestUserEvents(false));
       } catch (err) {
         console.error(err);
       }
@@ -82,7 +82,7 @@ class App extends Component {
     this.eventRefreshInterval = setInterval(async () => {
       try {
         store.dispatch(removeExpiredEvents());
-        store.dispatch(requestEventData());
+        store.dispatch(requestEventData({}, false));
       } catch (err) {
         console.error(err);
       }
@@ -128,24 +128,25 @@ class App extends Component {
     try {
       const token = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
       let studioData = await AsyncStorage.getItem(Config.STUDIO_DATA_KEY);
-      studioData = JSON.parse(studioData);
 
       if (studioData) {
+        studioData = JSON.parse(studioData);
         store.dispatch(setStudio(studioData));
-        store.dispatch(requestStudioData());
-      } else await store.dispatch(requestStudioData());
+        store.dispatch(requestStudioData(false));
+      } else await store.dispatch(requestStudioData(false));
 
       await Promise.all([
-        token && store.dispatch(requestUserData()),
-        token && store.dispatch(requestCreditCardInfo()),
-        token && store.dispatch(requestUserEvents()),
+        token && store.dispatch(requestUserData(false)),
+        token && store.dispatch(requestCreditCardInfo(false)),
+        token && store.dispatch(requestUserEvents(false)),
       ]);
 
       this.setState({ fetchedAssets: true, userToken: token });
       if (token) await store.dispatch(syncUserEvents());
     } catch (err) {
+      Alert.alert('Something went wrong loading your app. Please close the app and try again.');
       this.setState({ fetchedAssets: false, errorOccurred: true });
-      Updates.reload();
+      // Updates.reload();
       console.log(err);
     }
   }

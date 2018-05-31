@@ -29,9 +29,11 @@ export const {
 
 /**
  * requestEventData from the server
+ * @param {Object} [options={}] for request
+ * @param {boolean} [showAlert=true] only show native alerts if true
  * @returns {function} dispatches actions for async request
  */
-export function requestEventData({ eventids } = {}) {
+export function requestEventData({ eventids } = {}, showAlert = true) {
   return async function innerRequestEventData(dispatch, getState, dibsFetch) {
     let currentDate;
     try {
@@ -52,11 +54,12 @@ export function requestEventData({ eventids } = {}) {
       path += data;
 
       const res = await dibsFetch(path, { method: 'GET' });
+
       if (res.success) dispatch(setEvents(res.events));
-      else Alert.alert('Uh oh!', res.message);
+      else if (showAlert) Alert.alert('Uh oh!', res.message);
     } catch (err) {
       console.log(err);
-      Alert.alert('Uh oh!', `Something went wrong getting classes for ${getStudioName(getState())}`);
+      if (showAlert) Alert.alert('Uh oh!', `Something went wrong getting classes for ${getStudioName(getState())}`);
     }
     dispatch(removeKeyFromFetchingEvents(currentDate));
   };

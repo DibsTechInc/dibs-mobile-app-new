@@ -64,9 +64,10 @@ export function recordStudioVisit() {
 }
 
 /**
+ * @param {boolean} [showAlert=true] if false will not show native alert on fail
  * @returns {function} thunk
  */
-export function requestUserData() {
+export function requestUserData(showAlert = true) {
   return async function innerRequestUserData(dispatch, getState, dibsFetch) {
     try {
       const res = await dibsFetch('/api/user', {
@@ -79,12 +80,16 @@ export function requestUserData() {
         dispatch(requestCreditCardInfo());
         dispatch(requestUserEvents());
       } else {
-        AsyncStorage.clear();
+        await AsyncStorage.removeItem(Config.USER_TOKEN_KEY);
         dispatch(logOutUser());
+      }
+      if (!showAlert) {
+        throw new Error('Failed to get user data');
       }
     } catch (err) {
       console.log(err);
-      Alert.alert('Uh oh!', 'Something went wrong loading your account.');
+      if (showAlert) Alert.alert('Uh oh!', 'Something went wrong loading your account.');
+      else throw err;
     }
   };
 }

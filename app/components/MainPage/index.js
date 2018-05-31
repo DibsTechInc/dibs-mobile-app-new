@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { NavigationActions } from 'react-navigation';
-import { Svg, Path, LinearGradient, Stop, Defs, G } from 'react-native-svg';
+import { Svg, Path, LinearGradient, Stop, Defs } from 'react-native-svg';
 import { Updates } from 'expo';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 
