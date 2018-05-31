@@ -59,8 +59,10 @@ export function updateCreditCard({ ccNum, ccCVC, expiration }, callback = () => 
         },
       });
       if (res.success) dispatch(setCreditCard(res.card));
+      else enqueueApiError({ title: 'Uh oh!', message: res.message });
     } catch (err) {
-      console.log(err, 'caught error in catch');
+      console.log(err);
+      enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong updating your credit card.' });
     }
     dispatch(setCreditCardLoadingFalse());
     callback();
