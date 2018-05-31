@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
-import { Font, ScreenOrientation, Updates, Asset } from 'expo';
+import { Font, ScreenOrientation, Updates, Asset, AppLoading } from 'expo';
 import styled from 'styled-components';
 import { AsyncStorage, Alert } from 'react-native';
 import Promise from 'bluebird';
@@ -72,15 +72,13 @@ class App extends Component {
       fontLoaded: false,
       imageLoaded: false,
       checkedUpdates: false,
+      isReady: false,
     };
   }
   /**
    * @returns {undefined}
    */
   async componentWillMount() {
-    await this.getUpdates();
-    await this.getFonts();
-    await this.getImages();
     await this.getAssets();
   }
   /**
@@ -197,6 +195,10 @@ class App extends Component {
         token && store.dispatch(requestUserEvents(false)),
       ]);
 
+      await this.getUpdates();
+      await this.getFonts();
+      await this.getImages();
+
       this.setState({ fetchedAssets: true, userToken: token });
       if (token) await store.dispatch(syncUserEvents());
     } catch (err) {
@@ -210,25 +212,16 @@ class App extends Component {
    * @returns {JSX} XML
    */
   render() {
-    if (this.state.errorOccurred || !this.state.fontLoaded) {
-      return <StyledLoadingPage />;
-    }
-
-    if (this.state.fetchedAssets &&
-      this.state.checkedUpdates &&
-      this.state.fontLoaded &&
-      this.state.imageLoaded) {
-      return (
-        <Provider store={store}>
-          <Navigator userToken={this.state.userToken} />
-        </Provider>
-      );
-    }
-
     return (
-      <StyledLoadingPage>
-        <LinearLoader showQuote />
-      </StyledLoadingPage>
+      <Provider store={store}>
+        {(this.state.fetchedAssets && this.state.checkedUpdates && this.state.imageLoaded) ? (
+          <Navigator userToken={this.state.userToken} />
+        ) : (
+          <StyledLoadingPage>
+            {(this.state.errorOccurred || !this.state.fontLoaded) ? null : <LinearLoader showQuote />}
+          </StyledLoadingPage>
+        )}
+      </Provider>
     );
   }
 }
