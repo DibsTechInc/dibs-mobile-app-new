@@ -1,7 +1,7 @@
 import React from 'react';
 import { withNavigation } from 'react-navigation';
 import PropTypes from 'prop-types';
-import { TextInput } from 'react-native';
+import { TextInput, Text } from 'react-native';
 import { StudioColorBottomBorder, HeavyText } from '../styled';
 
 const Label = HeavyText.extend`

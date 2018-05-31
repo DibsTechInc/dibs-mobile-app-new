@@ -6,7 +6,7 @@ import { AsyncStorage, Alert } from 'react-native';
 import Promise from 'bluebird';
 
 import { WHITE, USER_POLL_INTERVAL, EVENT_POLL_INTERVAL } from './app/constants';
-import store from './app/store'; // lol App store...
+import store from './app/store'; // lol App store... - Dylan
 import Config from './config.json';
 import Navigator from './app/router';
 import LinearLoader from './app/components/shared/LinearLoader';
@@ -194,7 +194,6 @@ class App extends Component {
     } catch (err) {
       Alert.alert('Something went wrong loading your app. Please close the app and try again.');
       this.setState({ fetchedAssets: false, errorOccurred: true });
-      // Updates.reload();
       console.log(err);
     }
   }
