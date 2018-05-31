@@ -207,16 +207,22 @@ class App extends Component {
       this.state.fontLoaded &&
       this.state.imageLoaded;
 
-    return (
-      <Provider store={store}>
-        {loadingComplete ? (
+    if (this.state.errorOccurred || !this.state.fontLoaded) {
+      return null;
+    }
+
+    if (loadingComplete) {
+      return (
+        <Provider store={store}>
           <Navigator userToken={this.state.userToken} />
-        ) : (
-          <StyledLoadingPage>
-            {(this.state.errorOccurred || !this.state.fontLoaded) ? null : <LinearLoader showQuote />}
-          </StyledLoadingPage>
-        )}
-      </Provider>
+        </Provider>
+      );
+    }
+
+    return (
+      <StyledLoadingPage>
+        <LinearLoader showQuote />
+      </StyledLoadingPage>
     );
   }
 }
