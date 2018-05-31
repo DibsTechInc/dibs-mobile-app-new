@@ -7,7 +7,7 @@ import styled from 'styled-components';
 
 import Config from '../../../../config.json';
 import { GREY, WHITE, DARK_TEXT_GREY } from '../../../constants/index';
-import { addToCart, addToWaitlist } from '../../../actions';
+import { addToCart, addToWaitlist, enqueueNotice } from '../../../actions';
 import { lightenDarkenColor } from '../../../helpers';
 import MaterialButton from '../../shared/MaterialButton';
 import { HeavyText } from '../../styled';
@@ -52,24 +52,24 @@ class Button extends React.PureComponent {
    */
   onPress() {
     if (this.props.maxSeatsReached) {
-      return Alert.alert(
-        'Add to Waitlist',
-        `Do you want to be added to the waitlist for ${this.props.name}?`,
-        [
+      return this.props.enqueueNotice({
+        title: 'Add to Waitlist',
+        message: `Do you want to be added to the waitlist for ${this.props.name}?`,
+        buttons: [
           { text: 'Yes', onPress: this.addToWaitlist },
           { text: 'No', onPress: () => {} },
-        ]
-      );
+        ],
+      });
     }
     if (this.props.userHasBooked) {
-      return Alert.alert(
-        'Are you sure?',
-        `You already have a spot booked in ${this.props.name}, are you sure you want to book another?`,
-        [
+      return this.props.enqueueNotice({
+        title: 'Are you sure?',
+        message: `You already have a spot booked in ${this.props.name}, are you sure you want to book another?`,
+        buttons: [
           { text: 'Yes', onPress: this.addToCart },
           { text: 'No', onPress: () => { } },
-        ]
-      );
+        ],
+      });
     }
     return this.addToCart();
   }
@@ -190,12 +190,14 @@ Button.propTypes = {
   quantity: PropTypes.number.isRequired,
   showOverlay: PropTypes.func,
   userHasBooked: PropTypes.bool,
+  enqueueNotice: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = null; // state => ({});
 const mapDispatchToProps = {
   addToCart,
   addToWaitlist,
+  enqueueNotice,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Button);

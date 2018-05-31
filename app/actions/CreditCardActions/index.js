@@ -1,5 +1,5 @@
 import { createActions } from 'redux-actions';
-import { Alert } from 'react-native';
+import { enqueueApiError } from '../';
 
 export const {
   setCreditCard,
@@ -26,11 +26,11 @@ export function requestCreditCardInfo(showAlert = true) {
         requiresAuth: true,
       });
       if (res.success) dispatch(setCreditCard(res.creditCard));
-      else if (showAlert && res.message !== 'The user does not have a card') Alert.alert('Uh oh!', res.message);
-      else throw new Error('Failed to get the user\'s billing info');
+      else if (showAlert && res.message !== 'The user does not have a card') dispatch(enqueueApiError({ title: 'Uh oh!', message: res.message }));
+      else if (!showAlert) throw new Error('Failed to get the user\'s billing info');
     } catch (err) {
       console.log(err);
-      if (showAlert) Alert.alert('Uh oh!', 'Something went wrong getting your billing information.');
+      if (showAlert) dispatch(enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong getting your billing information.' }));
       else throw err;
     }
   };

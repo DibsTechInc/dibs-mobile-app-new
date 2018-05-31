@@ -18,6 +18,7 @@ import {
   refreshUser,
   setTransactionsConfirmed,
   requestUserEvents,
+  enqueueApiError,
 } from '../';
 
 const range = n => [...Array(n)]; // JS implementation of Python's range() fn
@@ -242,11 +243,11 @@ export function submitCartForPurchase() {
         if (res.removedEvents.every(r => r.reason === 'PRICE_CHANGE')) {
           message = 'Oh dang! The classes you chose had their price increase more than 5 minutes ago. Please refresh and try again';
         }
-        Alert.alert('Uh oh!', message);
+        dispatch(enqueueApiError({ title: 'Uh oh!', message }));
       }
     } catch (err) {
       console.log(err);
-      Alert.alert('Uh oh!', 'Something went wrong checking out your cart.');
+      dispatch(enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong checking out your cart.' }));
     }
     const eventids = uniq(cart.data.map(({ eventid }) => eventid));
     dispatch(requestEventData({ eventids }));

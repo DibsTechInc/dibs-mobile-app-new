@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
 
+import alerts from './AlertsReducer';
 import events from './EventsReducer';
 import studio from './StudioReducer';
 import user from './UserReducer';
@@ -11,6 +12,7 @@ import confirmation from './ConfirmationReducer';
 import animation from './AnimationReducer';
 
 export default combineReducers({
+  alerts,
   events,
   studio,
   user,
