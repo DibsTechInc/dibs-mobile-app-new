@@ -218,15 +218,15 @@ class ProfilePage extends PureComponent {
             <SettingsList.Item
               title="Dibs"
               onPress={this.handleOnPressNavDibsTerms}
-              titleBoxStyle={{ ...titleBoxStyle, marginBottom: 5 }}
+              titleBoxStyle={{ ...titleBoxStyle, marginBottom: 7 }}
               titleStyle={{ fontFamily: 'flex-font', fontSize: 16 }}
             />
-            <SwipableButton
-              swipeText="Swipe to logout"
-              notReadyForPurchase={false}
-              onLeftButtonsActivate={this.handleLogout}
-            />
           </SettingsList>
+          <SwipableButton
+            swipeText="Swipe to logout"
+            notReadyForPurchase={false}
+            onLeftButtonsActivate={this.handleLogout}
+          />
         </View>
       </FadeInView>
     );

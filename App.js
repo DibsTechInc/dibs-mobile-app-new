@@ -6,7 +6,7 @@ import { AsyncStorage, Alert } from 'react-native';
 import Promise from 'bluebird';
 
 import { WHITE, USER_POLL_INTERVAL, EVENT_POLL_INTERVAL } from './app/constants';
-import store from './app/store'; // lol App store...
+import store from './app/store'; // lol App store... - Dylan
 import Config from './config.json';
 import Navigator from './app/router';
 import LinearLoader from './app/components/shared/LinearLoader';
@@ -69,7 +69,7 @@ class App extends Component {
       fetchedAssets: false,
       userToken: null,
       errorOccurred: false,
-      loadedFont: false,
+      fontLoaded: false,
       imageLoaded: false,
       checkedUpdates: false,
     };
@@ -195,7 +195,6 @@ class App extends Component {
       AsyncStorage.clear();
       Alert.alert('Something went wrong loading your app. Please close the app and try again.');
       this.setState({ fetchedAssets: false, errorOccurred: true });
-      // Updates.reload();
       console.log(err);
     }
   }
@@ -203,21 +202,25 @@ class App extends Component {
    * @returns {JSX} XML
    */
   render() {
-    const loadingComplete = this.state.fetchedAssets &&
+    if (this.state.errorOccurred || !this.state.fontLoaded) {
+      return <StyledLoadingPage />;
+    }
+
+    if (this.state.fetchedAssets &&
       this.state.checkedUpdates &&
       this.state.fontLoaded &&
-      this.state.imageLoaded;
+      this.state.imageLoaded) {
+      return (
+        <Provider store={store}>
+          <Navigator userToken={this.state.userToken} />
+        </Provider>
+      );
+    }
 
     return (
-      <Provider store={store}>
-        {loadingComplete ? (
-          <Navigator userToken={this.state.userToken} />
-        ) : (
-          <StyledLoadingPage>
-            {(this.state.errorOccurred || !this.state.fontLoaded) ? null : <LinearLoader showQuote />}
-          </StyledLoadingPage>
-        )}
-      </Provider>
+      <StyledLoadingPage>
+        <LinearLoader showQuote />
+      </StyledLoadingPage>
     );
   }
 }

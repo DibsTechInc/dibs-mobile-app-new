@@ -63,7 +63,7 @@ class Header extends React.PureComponent {
                 <XIcon
                   onPress={this.props.setUpcomingEventSliderExpandedFalse}
                   stroke={WHITE}
-                  strokeWidth={1.5}
+                  strokeWidth={2.5}
                   size={18}
                 />
               </View>
@@ -72,6 +72,7 @@ class Header extends React.PureComponent {
                 onPress={this.goBack}
                 style={{ marginLeft: 15 }}
                 stroke={WHITE}
+                strokeWidth={2.5}
               />
             )}
           </View>

@@ -196,8 +196,7 @@ class Signup extends PureComponent {
             value={this.props.navigation.state.params.email || ''}
             inputStyle={{ color: GREY }}
             editable={false}
-            style={{ width: 250 }}
-            containerStyle={{ marginBottom: 20 }}
+            containerStyle={{ marginBottom: 20, width: 250 }}
           />
           <InputField
             customFocus
@@ -205,8 +204,7 @@ class Signup extends PureComponent {
             inputStyle={{ color: GREY }}
             onChangeText={fullName => this.setState({ fullName })}
             placeholder="First and last name"
-            style={{ width: 250 }}
-            containerStyle={{ marginBottom: 20 }}
+            containerStyle={{ marginBottom: 20, width: 250 }}
           />
           <InputField
             value={this.state.password}
@@ -214,8 +212,7 @@ class Signup extends PureComponent {
             inputStyle={{ color: GREY }}
             onChangeText={password => this.setState({ password })}
             placeholder="Password (6 char min)"
-            style={{ width: 250 }}
-            containerStyle={{ marginBottom: 20 }}
+            containerStyle={{ marginBottom: 20, width: 250 }}
           />
           <PhoneInput
             ref={(ref) => {
@@ -226,7 +223,6 @@ class Signup extends PureComponent {
             textProps={{ placeholder: 'Mobile number' }}
             style={{ width: 250, borderBottomWidth: 1, paddingBottom: 5, marginTop: 10, borderBottomColor: Config.STUDIO_COLOR }}
           />
-
           <CountryPicker
             ref={(ref) => {
               this.countryPicker = ref;
@@ -247,14 +243,17 @@ class Signup extends PureComponent {
           <View style={{ width: 250, height: 30, position: 'relative', marginTop: 15, flexDirection: 'row' }}>
             <CheckBox
               title=""
+              iconType="material-community"
+              checkedIcon="checkbox-marked"
+              uncheckedIcon="checkbox-blank-outline"
               checkedColor={Config.STUDIO_COLOR}
               checked={this.state.tAndC}
-              containerStyle={{ backgroundColor: DEFAULT_BG, position: 'absolute', top: -5, left: -22 }}
+              containerStyle={{ backgroundColor: DEFAULT_BG, position: 'absolute', top: -10, left: -22 }}
               textStyle={{ fontFamily: 'flex-font', fontSize: 16 }}
               onPress={this.handleOnCheck}
               size={20}
             />
-            <View style={{ position: 'absolute', width: '90%', left: 22, top: 10 }}>
+            <View style={{ position: 'absolute', width: '90%', left: 22, top: 5 }}>
               <NormalText style={{ flex: 1, flexWrap: 'wrap' }}>
                 I have read & agreed to the <LinkedText onPress={this.handleOnPressNavStudioTerms}>
                   {this.props.studioName}
