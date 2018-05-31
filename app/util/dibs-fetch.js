@@ -1,5 +1,29 @@
 import { AsyncStorage } from 'react-native';
+
 import Config from '../../config.json';
+import store from '../store';
+import { enqueueConnectionError } from '../actions';
+
+let lastCheck;
+
+/**
+ * @returns {undefined}
+ */
+async function checkNetworkConnection() {
+  if (lastCheck && (Date.now() - lastCheck < 15e3)) return;
+  const googleCall = await fetch('https://google.com', {
+    headers: {
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      Pragma: 'no-cache',
+      Expires: 0,
+    },
+  });
+  lastCheck = Date.now();
+  if (googleCall.status !== 200) {
+    store.dispatch(enqueueConnectionError({ title: 'Uh oh!', message: 'You must be connected to the internet to use this app.' }));
+    throw new Error('Not connected to the internet');
+  }
+}
 
 /**
  * @param {function} refreshToken when making authenticated requests
@@ -13,6 +37,7 @@ async function dibsFetch(refreshToken, path, {
   requiresAuth = false,
   ...opts
 } = {}) {
+  await checkNetworkConnection();
   const headers = {};
   switch (type) {
     case 'json':

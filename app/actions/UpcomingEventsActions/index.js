@@ -1,9 +1,8 @@
 import { createActions } from 'redux-actions';
 import moment from 'moment-timezone';
-import { Alert } from 'react-native';
 
 import Config from '../../../config.json';
-import { refreshUser } from '../';
+import { refreshUser, enqueueApiError } from '../';
 
 export const {
   setUpcomingEvents,
@@ -52,13 +51,13 @@ export function requestUserEvents(showAlert = true) {
           dispatch(setUpcomingEventsCurrentDate(minDate));
         }
       } else if (showAlert) {
-        Alert.alert('Uh oh!', res.message);
+        dispatch(enqueueApiError({ title: 'Uh oh!', message: res.message }));
       } else { // if it does not handle the error with an alert it throws an error
         throw new Error('Failed to get upcoming classes on initial load');
       }
     } catch (err) {
       console.log(err);
-      if (showAlert) Alert.alert('Uh oh!', 'Something went wrong getting your upcoming classes.');
+      if (showAlert) dispatch(enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong getting your upcoming classes.' }));
       else throw err;
     }
     dispatch(setUpcomingEventsLoadingFalse());
@@ -144,13 +143,13 @@ export function dropUserFromEvent(eventid) {
       if (res.success) {
         dispatch(removeUpcomingEvent(eventid));
         dispatch(refreshUser(res.user));
-        Alert.alert('Success!', `You were dropped from ${eventName}`);
+        dispatch(enqueueApiError({ title: 'Success!', message: `You were dropped from ${eventName}` }));
       } else {
-        Alert.alert('Uh oh!', res.message);
+        dispatch(enqueueApiError({ title: 'Uh oh!', message: res.message }));
       }
     } catch (err) {
       console.log(err);
-      Alert.alert('Uh oh!', 'Something went wrong dropping your class.');
+      dispatch(enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong dropping your class.' }));
     }
     dispatch(setDroppingEventFalse());
   };

@@ -1,4 +1,4 @@
-import { AsyncStorage, Alert } from 'react-native';
+import { AsyncStorage } from 'react-native';
 import { createAction } from 'redux-actions';
 import {
   LOGIN_ROUTE,
@@ -13,6 +13,7 @@ import {
   setUpcomingEvents,
   clearCart,
   refreshCart,
+  enqueueApiError,
 } from '../index';
 
 export const setUser = createAction('SET_USER', payload => payload);
@@ -87,7 +88,7 @@ export function requestUserData(showAlert = true) {
       }
     } catch (err) {
       console.log(err);
-      if (showAlert) Alert.alert('Uh oh!', 'Something went wrong loading your account.');
+      if (showAlert) dispatch(enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong loading your account.' }));
       else throw err;
     }
   };
@@ -117,11 +118,11 @@ export function validateEmail(email, callback) {
       if (res.message === 'No user with that email') {
         return callback(REGISTER_ROUTE);
       }
-      Alert.alert('Uh oh!', res.message);
+      dispatch(enqueueApiError({ title: 'Uh oh!', message: res.message }));
       return callback(null);
     } catch (err) {
       console.log(err);
-      Alert.alert('Uh oh!', 'Something went wrong validating your email.');
+      dispatch(enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong validating your email.' }));
       return callback(null);
     }
   };
