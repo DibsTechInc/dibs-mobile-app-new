@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import {
-  Alert,
   View,
   ScrollView,
 } from 'react-native';
@@ -14,7 +13,7 @@ import { promisify } from 'bluebird';
 import PhoneInput from 'react-native-phone-input';
 import CountryPicker from 'react-native-country-picker-modal';
 
-import { signUpUser } from '../../actions';
+import { signUpUser, enqueueUserError } from '../../actions';
 import { MaterialButton, CustomStatusBar, FadeInView, InputField } from '../shared';
 import {
   TERMS_AND_CONDITIONS_ROUTE,
@@ -72,7 +71,7 @@ class Signup extends PureComponent {
     };
 
     this.onPressFlag = this.onPressFlag.bind(this);
-    this.selectCountry = this.selectCountry.bind(this)
+    this.selectCountry = this.selectCountry.bind(this);
 
     this.handleOnPress = this.handleOnPress.bind(this);
     this.checkForm = this.checkForm.bind(this);
@@ -85,7 +84,14 @@ class Signup extends PureComponent {
    * @returns {undefined}
    */
   componentDidMount() {
-    this.setState({ pickerData: this.phone.getPickerData() });
+    this.setState({ pickerData: this.phone.getPickerData() }); // eslint-disable-line
+  }
+
+  /**
+   * @returns {undefined}
+   */
+  onPressFlag() {
+    this.countryPicker.openModal();
   }
 
   /**
@@ -95,7 +101,7 @@ class Signup extends PureComponent {
     const canRegister = this.checkForm();
 
     if (!canRegister) {
-      return Alert.alert('Please check the form and try again');
+      return this.props.enqueueUserError({ title: 'Please check the form and try again' });
     }
 
     const phone = this.phone.getValue();
@@ -140,13 +146,6 @@ class Signup extends PureComponent {
    */
   handleOnPressNav(urlObj) {
     this.props.navigation.navigate(TERMS_AND_CONDITIONS_ROUTE, urlObj);
-  }
-
-  /**
-   * @returns {undefined}
-   */
-  onPressFlag() {
-    this.countryPicker.openModal();
   }
 
   /**
@@ -290,6 +289,7 @@ Signup.propTypes = {
   studioSource: PropTypes.string.isRequired,
   studioId: PropTypes.number.isRequired,
   dibsStudioId: PropTypes.number.isRequired,
+  enqueueUserError: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
@@ -301,6 +301,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   signUpUser,
+  enqueueUserError,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Signup);

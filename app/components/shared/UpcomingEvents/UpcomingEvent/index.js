@@ -12,6 +12,7 @@ import {
   dropUserFromEvent,
   removeFromWaitlist,
   setUpcomingEventSliderExpandedFalse,
+  enqueueNotice,
 } from '../../../../actions';
 import FadeInView from '../../FadeInView';
 import TransactionBreakdown from '../../TransactionBreakdown';
@@ -87,14 +88,14 @@ class UpcomingEvent extends PureComponent {
    * @returns {undefined}
    */
   startCancel() {
-    Alert.alert(
-      'Are you sure?',
-      `Do you want to drop ${this.props.name}?`,
-      [
+    this.props.enqueueNotice({
+      title: 'Are you sure?',
+      message: `Do you want to drop ${this.props.name}?`,
+      buttons: [
         { text: 'Yes', onPress: this.removeFromClass },
         { text: 'No', onPress: () => { } },
-      ]
-    );
+      ],
+    });
   }
   /**
    * @returns {undefined}
@@ -233,6 +234,7 @@ UpcomingEvent.propTypes = {
   removeFromWaitlist: PropTypes.func.isRequired,
   eventid: PropTypes.number.isRequired,
   setUpcomingEventSliderExpandedFalse: PropTypes.func.isRequired,
+  enqueueNotice: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
@@ -243,6 +245,7 @@ const mapDispatchToProps = {
   dropUserFromEvent,
   removeFromWaitlist,
   setUpcomingEventSliderExpandedFalse,
+  enqueueNotice,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(UpcomingEvent);

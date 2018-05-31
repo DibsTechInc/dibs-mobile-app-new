@@ -1,10 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import {
-  View,
-  Alert,
-} from 'react-native';
+import { View } from 'react-native';
 import SettingsList from 'react-native-settings-list';
 import styled from 'styled-components';
 import email from 'react-native-email';
@@ -34,7 +31,7 @@ import {
   getUserId,
   getUserEmail,
 } from '../../selectors';
-import { logOutUser } from '../../actions';
+import { logOutUser, enqueueUserError } from '../../actions';
 import Config from '../../../config.json';
 
 const BottomBuffer = styled.View`
@@ -107,7 +104,7 @@ class ProfilePage extends PureComponent {
       bcc: '', // string or array of email addresses
       subject: `User ID ${this.props.userId} Support Ticket`,
       body: '',
-    }).catch(err => Alert.alert('Email Client Failed', err));
+    }).catch(() => this.props.enqueueUserError({ title: 'Uh oh!', message: 'Something went wrong opening your mail client' }));
   }
   /**
    * @returns {JSX} XML
@@ -243,6 +240,7 @@ ProfilePage.propTypes = {
   logOutUser: PropTypes.func.isRequired,
   email: PropTypes.string.isRequired,
   userId: PropTypes.number,
+  enqueueUserError: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
@@ -254,6 +252,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   logOutUser,
+  enqueueUserError,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProfilePage);
