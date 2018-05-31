@@ -122,15 +122,16 @@ class UpcomingEvent extends PureComponent {
           }}
           onScrollEndDrag={this.onScrollEnd}
         >
+
+          {this.props.expanded &&
+            <View style={{ margin: 10 }}>
+              <NormalText style={{ fontSize: 16, color: GREY, fontFamily: 'flex-font-heavy' }}>
+                Items
+                  </NormalText>
+            </View>
+          }
           <EventRow>
             <EventInfo>
-              {this.props.expanded &&
-                <View style={{ marginBottom: 20 }}>
-                  <NormalText style={{ fontSize: 16, color: GREY, fontFamily: 'flex-font-heavy' }}>
-                    Items
-                  </NormalText>
-                </View>
-              }
               <View style={{ marginBottom: 10 }}>
                 <HeavyEventText>
                   {this.props.shortDayOfWeek} {this.props.shortEventDate}
