@@ -203,7 +203,7 @@ class App extends Component {
    */
   render() {
     if (this.state.errorOccurred || !this.state.fontLoaded) {
-      return null;
+      return <StyledLoadingPage />;
     }
 
     if (this.state.fetchedAssets &&

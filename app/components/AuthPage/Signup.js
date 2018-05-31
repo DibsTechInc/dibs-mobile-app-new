@@ -244,6 +244,9 @@ class Signup extends PureComponent {
           <View style={{ width: 250, height: 30, position: 'relative', marginTop: 15, flexDirection: 'row' }}>
             <CheckBox
               title=""
+              iconType="material-community"
+              checkedIcon="checkbox-marked"
+              uncheckedIcon="checkbox-blank-outline"
               checkedColor={Config.STUDIO_COLOR}
               checked={this.state.tAndC}
               containerStyle={{ backgroundColor: DEFAULT_BG, position: 'absolute', top: -10, left: -22 }}
