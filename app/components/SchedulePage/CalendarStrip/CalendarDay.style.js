@@ -5,9 +5,9 @@ export default StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 0,
-    width: 48,
-    height: 48,
-    borderRadius: 48 / 2,
+    width: 43,
+    height: 43,
+    borderRadius: 43 / 2,
   },
   dateName: {
     fontSize: 16,

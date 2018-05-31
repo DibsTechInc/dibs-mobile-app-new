@@ -34,7 +34,7 @@ class CalendarArrow extends React.PureComponent {
           <Svg height={25} width={25}>
             <Path
               stroke={WHITE}
-              strokeWidth={1.5}
+              strokeWidth={2.5}
               d="M 10 3 L 1.7 12.5 L 10 22"
               fill="none"
               strokeLinecap="round"

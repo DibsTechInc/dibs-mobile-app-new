@@ -86,7 +86,7 @@ class SideMenu extends React.PureComponent {
             onPress={this.close}
             size={18}
             stroke={Config.STUDIO_COLOR}
-            strokeWidth={1.5}
+            strokeWidth={2.5}
           />
         </StyledCloseButtonContainer>
         <StyledHeader>
