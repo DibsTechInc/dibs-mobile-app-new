@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
-import { Font, ScreenOrientation, Updates, Asset, AppLoading } from 'expo';
+import { Font, ScreenOrientation, Updates, Asset } from 'expo';
 import styled from 'styled-components';
-import { AsyncStorage, Alert } from 'react-native';
+import { AsyncStorage } from 'react-native';
 import Promise from 'bluebird';
 
 import { WHITE, EVENT_POLL_INTERVAL } from './app/constants';
@@ -10,6 +10,7 @@ import store from './app/store'; // lol App store... - Dylan
 import Config from './config.json';
 import Navigator from './app/router';
 import LinearLoader from './app/components/shared/LinearLoader';
+import ErrorPage from './app/components/ErrorPage';
 import {
   requestStudioData,
   requestUserData,
@@ -19,7 +20,7 @@ import {
   removeExpiredEvents,
   requestEventData,
   setStudio,
-  setDroppingEventFalse,
+  logFatalError,
 } from './app/actions';
 
 import MainPage from './assets/img/main-page.png';
@@ -183,7 +184,6 @@ class App extends Component {
       if (studioData) {
         studioData = JSON.parse(studioData);
         store.dispatch(setStudio(studioData));
-        store.dispatch(requestStudioData(false)).catch(console.error);
       } else await store.dispatch(requestStudioData(false));
 
       await Promise.all([
@@ -193,18 +193,50 @@ class App extends Component {
       ]);
 
       this.setState({ fetchedAssets: true, userToken: token });
+      if (await AsyncStorage.getItem(Config.STUDIO_DATA_KEY)) await store.dispatch(requestStudioData(false));
       if (token) await store.dispatch(syncUserEvents());
     } catch (err) {
       AsyncStorage.clear();
-      Alert.alert('Something went wrong loading your app. Please close the app and try again.');
+      store.dispatch(logFatalError(err));
       this.setState({ fetchedAssets: false, errorOccurred: true });
-      console.log(err);
     }
+  }
+  /**
+   * @param {Error} err that was thrown
+   * @returns {undefined}
+   */
+  componentDidCatch(err) {
+    console.log(err);
+    store.dispatch(logFatalError(err));
+    this.setState({ errorOccurred: true });
   }
   /**
    * @returns {JSX} XML
    */
   render() {
+    if (!this.state.fontLoaded) {
+      return <StyledLoadingPage />;
+    }
+
+    if (this.state.errorOccurred) {
+      return (
+        <Provider store={store}>
+          <ErrorPage />
+        </Provider>
+      );
+    }
+
+    if (this.state.fetchedAssets &&
+      this.state.checkedUpdates &&
+      this.state.fontLoaded &&
+      this.state.imageLoaded) {
+      return (
+        <Provider store={store}>
+          <Navigator userToken={this.state.userToken} />
+        </Provider>
+      );
+    }
+
     return (
       <Provider store={store}>
         {(this.state.fetchedAssets && this.state.imageLoaded) ? (
