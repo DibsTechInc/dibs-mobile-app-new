@@ -203,6 +203,7 @@ class Signup extends PureComponent {
           <InputField
             customFocus
             value={this.state.fullName}
+            inputStyle={{ color: GREY }}
             onChangeText={fullName => this.setState({ fullName })}
             placeholder="First and last name"
             style={{ width: 250 }}
@@ -211,6 +212,7 @@ class Signup extends PureComponent {
           <InputField
             value={this.state.password}
             secureTextEntry
+            inputStyle={{ color: GREY }}
             onChangeText={password => this.setState({ password })}
             placeholder="Password (6 char min)"
             style={{ width: 250 }}
@@ -255,7 +257,7 @@ class Signup extends PureComponent {
             />
             <View style={{ position: 'absolute', width: '90%', left: 22, top: 10 }}>
               <NormalText style={{ flex: 1, flexWrap: 'wrap' }}>
-                I have read and agreed to the <LinkedText onPress={this.handleOnPressNavStudioTerms}>
+                I have read & agreed to the <LinkedText onPress={this.handleOnPressNavStudioTerms}>
                   {this.props.studioName}
                 </LinkedText> and <LinkedText onPress={this.handleOnPressNavDibsTerms}>
                 Dibs
