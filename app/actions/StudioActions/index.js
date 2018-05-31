@@ -13,10 +13,10 @@ export const {
 });
 
 /**
- * @param {function} callback on complete
- * @returns {function} dispatches actions for async request
+ * @param {boolean} [showAlert=true] if false will not show native alert on fail
+ * @returns {function} thunk
  */
-export function requestStudioData() {
+export function requestStudioData(showAlert = true) {
   return async function innerRequestStudioData(dispatch, getState, dibsFetch) {
     if (getState().studio.loading) return;
     try {
@@ -29,14 +29,13 @@ export function requestStudioData() {
         dispatch(setStudioLoadingFalse());
         return;
       }
-      Alert.alert(
-        'Error requesting studio data',
-        res.message
-      );
+      if (showAlert) Alert.alert('Error requesting studio data', res.message);
+      else throw new Error('Failed to get the studio data');
       return;
     } catch (err) {
       console.log(err);
-      Alert.alert('Something went wrong loading your app.');
+      if (showAlert) Alert.alert('Something went wrong loading your app.');
+      else throw err;
     }
   };
 }

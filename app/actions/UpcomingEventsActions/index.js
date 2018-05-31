@@ -30,9 +30,10 @@ export const {
 });
 
 /**
+ * @param {boolean} [showAlert=true] if false will not show native alert on fail
  * @returns {function} thunk
  */
-export function requestUserEvents() {
+export function requestUserEvents(showAlert = true) {
   return async function innerRequestUserEvents(dispatch, getState, dibsFetch) {
     const state = getState();
     if (state.upcomingEvents.loading) return;
@@ -50,10 +51,15 @@ export function requestUserEvents() {
           const minDate = moment(Math.min(...eventDates)).tz(Config.STUDIO_TZ).startOf('day');
           dispatch(setUpcomingEventsCurrentDate(minDate));
         }
-      } else Alert.alert('Uh oh!', res.message);
+      } else if (showAlert) {
+        Alert.alert('Uh oh!', res.message);
+      } else { // if it does not handle the error with an alert it throws an error
+        throw new Error('Failed to get upcoming classes on initial load');
+      }
     } catch (err) {
       console.log(err);
-      Alert.alert('Uh oh!', 'Something went wrong getting your upcoming classes.');
+      if (showAlert) Alert.alert('Uh oh!', 'Something went wrong getting your upcoming classes.');
+      else throw err;
     }
     dispatch(setUpcomingEventsLoadingFalse());
   };
@@ -77,7 +83,7 @@ export function syncUserEvents() {
       console.log(err);
     }
     dispatch(setSyncingEventsFalse());
-    return dispatch(requestUserEvents());
+    return dispatch(requestUserEvents(false));
   };
 }
 

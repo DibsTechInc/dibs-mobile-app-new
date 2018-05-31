@@ -14,9 +14,10 @@ export const {
 });
 
 /**
+ * @param {boolean} [showAlert=true] if false will not show native alert on fail
  * @returns {function} thunk
  */
-export function requestCreditCardInfo() {
+export function requestCreditCardInfo(showAlert = true) {
   return async function innerRequestCreditCardInfo(dispatch, getState, dibsFetch) {
     if (getState().creditCard.loading) return;
     try {
@@ -25,12 +26,12 @@ export function requestCreditCardInfo() {
         requiresAuth: true,
       });
       if (res.success) dispatch(setCreditCard(res.creditCard));
-      else if (res.message !== 'The user does not have a card') {
-        Alert.alert('Uh oh!', res.message);
-      }
+      else if (showAlert && res.message !== 'The user does not have a card') Alert.alert('Uh oh!', res.message);
+      else throw new Error('Failed to get the user\'s billing info');
     } catch (err) {
       console.log(err);
-      Alert.alert('Uh oh!', 'Something went wrong getting your billing information.');
+      if (showAlert) Alert.alert('Uh oh!', 'Something went wrong getting your billing information.');
+      else throw err;
     }
   };
 }
