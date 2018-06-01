@@ -147,7 +147,7 @@ export const getScheduleEvents = createUnboundedSelector(
     const passid = getPassId(event.id);
     const passValue = getPassValue(event.id);
     const valueBack = passValue ? Math.max(0, Decimal(passValue || 0).minus(event.price).toDecimalPlaces(2).toNumber()) : 0;
-    const price = (!passid && fixedPrice) ? Math.min(event.price, fixedPrice) : event.price;
+    const price = (!passid && fixedPrice && event.can_apply_pass) ? Math.min(event.price, fixedPrice) : event.price;
     return {
       ...event,
       eventid: event.id,

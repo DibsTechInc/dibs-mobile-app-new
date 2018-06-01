@@ -82,9 +82,9 @@ class AlertModal extends React.PureComponent {
           <FlexRow style={{ justifyContent: 'space-around' }}>
             {this.props.buttons.map(({ onPress, text }) => (
               <Button
+                key={text}
                 onPress={onPress}
                 activeOpacity={1}
-                key={Math.random() * Date.now()}
               >
                 <ButtonText>
                   {text}
