@@ -216,29 +216,11 @@ class App extends Component {
    * @returns {JSX} XML
    */
   render() {
-    if (!this.state.fontLoaded) {
-      return <StyledLoadingPage />;
-    }
-
     if (this.state.errorOccurred) {
       return (
         <Provider store={store}>
           <View style={{ flex: 1 }}>
             <ErrorPage />
-            <AlertModal />
-          </View>
-        </Provider>
-      );
-    }
-
-    if (this.state.fetchedAssets &&
-      this.state.checkedUpdates &&
-      this.state.fontLoaded &&
-      this.state.imageLoaded) {
-      return (
-        <Provider store={store}>
-          <View style={{ flex: 1 }}>
-            <Navigator userToken={this.state.userToken} />
             <AlertModal />
           </View>
         </Provider>
@@ -252,7 +234,7 @@ class App extends Component {
             <Navigator userToken={this.state.userToken} />
           ) : (
             <StyledLoadingPage>
-              {(this.state.errorOccurred || !this.state.fontLoaded) ? null : <LinearLoader showQuote />}
+              {(!this.state.fontLoaded) ? <LinearLoader /> : <LinearLoader showQuote />}
             </StyledLoadingPage>
           )}
           <AlertModal />
