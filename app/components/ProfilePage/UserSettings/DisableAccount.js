@@ -65,7 +65,7 @@ class DisableAccount extends PureComponent {
    * @returns {undefined}
    */
   async handleDelete() {
-    if (this.props.inputValue !== this.props.userEmail) {
+    if (this.props.inputValue.toLowerCase() !== this.props.userEmail.toLowerCase()) {
       this.props.enqueueUserError({
         title: 'Uh oh!',
         message: 'The email you provided is incorrect.',
@@ -73,12 +73,10 @@ class DisableAccount extends PureComponent {
       return;
     }
 
-    const response = await new Promise(res => this.props.disableUserAccount(res));
+    const { success } = await this.props.disableUserAccount();
 
-    if (response.code === 200) {
+    if (success) {
       this.props.navigation.navigate(LANDING_ROUTE);
-    } else {
-      this.setState({ errorMessage: response.message });
     }
   }
 

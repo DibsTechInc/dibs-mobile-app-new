@@ -189,8 +189,6 @@ class App extends Component {
 
       await Promise.all([
         token && store.dispatch(requestUserData(false)),
-        token && store.dispatch(requestCreditCardInfo(false)),
-        token && store.dispatch(requestUserEvents(false)),
       ]);
 
       this.setState({ fetchedAssets: true, userToken: token });

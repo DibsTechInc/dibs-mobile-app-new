@@ -92,8 +92,6 @@ class UpcomingClassSlider extends React.PureComponent {
    */
   onDragEnd(pos) {
     if (!this.props.expanded && pos > (this.props.shortenedHeight + 30)) this.handleDragUp();
-    else if (!this.props.expanded || pos < (FULL_HEIGHT - 30)) this.handleDragDown();
-    else this.handleDragUp();
   }
   /**
    * @returns {undefined}

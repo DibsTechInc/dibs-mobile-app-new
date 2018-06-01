@@ -78,7 +78,7 @@ export function requestUserData(showAlert = true) {
       if (res.success) {
         dispatch(refreshUser(res.user));
         dispatch(recordStudioVisit());
-        dispatch(requestCreditCardInfo(false));
+        dispatch(requestCreditCardInfo());
         dispatch(requestUserEvents());
       } else if (showAlert) {
         await AsyncStorage.removeItem(Config.USER_TOKEN_KEY);
@@ -287,10 +287,9 @@ export function createPasswordResetLink(email, callback = () => {}) {
 }
 
 /**
- * @param {function} callback callback
  * @returns {function} redux thunk
  */
-export function disableUserAccount(callback) {
+export function disableUserAccount() {
   return async function innerDisableUserAccount(dispatch, getState, dibsFetch) {
     try {
       const res = await dibsFetch('/api/user', {
@@ -298,16 +297,13 @@ export function disableUserAccount(callback) {
         method: 'DELETE',
       });
 
-      if (res.success) {
-        dispatch(logOutUser());
-      }
-
-      dispatch(enqueueApiError({ title: 'Uh oh!', message: `${res.message}.` }));
-      callback(res);
+      if (res.success) dispatch(logOutUser());
+      else dispatch(enqueueApiError({ title: 'Uh oh!', message: `${res.message}.` }));
+      return res;
     } catch (err) {
-      dispatch(enqueueApiError({ title: 'Uh oh!', message: 'There was a problem deactivating your account.' }));
       console.log(err);
-      callback(err);
+      dispatch(enqueueApiError({ title: 'Uh oh!', message: 'There was a problem deactivating your account.' }));
+      return { success: false };
     }
   };
 }
