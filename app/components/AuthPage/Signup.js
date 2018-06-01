@@ -21,6 +21,7 @@ import {
   LOGIN_ROUTE,
   DEFAULT_BG,
   GREY,
+  HEIGHT,
 } from '../../constants';
 import {
   getStudioName,
@@ -209,7 +210,7 @@ class Signup extends PureComponent {
     return (
       <FadeInView>
         <CustomStatusBar backgroundColor={'transparent'} barStyle="dark-content" />
-        <ScrollView keyboardShouldPersistTaps="always" contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', height: '60%', position: 'relative' }}>
+        <ScrollView keyboardShouldPersistTaps="always" contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', height: HEIGHT * 0.50, position: 'relative' }}>
           <StyledText>
             Just a few details before we get started
           </StyledText>
