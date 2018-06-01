@@ -10,7 +10,7 @@ import Promise from 'bluebird';
 
 import { updateUser } from '../../actions';
 import { MaterialButton, LinearLoader, FadeInView, InputField } from '../shared';
-import { DEFAULT_BG, LIGHT_GREY } from '../../constants';
+import { DEFAULT_BG, LIGHT_GREY, BLACK, RED } from '../../constants';
 import Config from '../../../config.json';
 import Header from '../Header';
 import { NormalText } from '../styled';
@@ -25,6 +25,10 @@ const StyledButtonView = styled.View`
 
 const StyledText = NormalText.extend`
   margin-bottom: 7%;
+`;
+
+const ErrorText = StyledText.extend`
+  color: ${props => props.response ? BLACK : RED };
 `;
 
 /**
@@ -45,6 +49,7 @@ class EditUserName extends PureComponent {
       lastName: '',
       resultMessage: '',
       isLoading: false,
+      response: false,
     };
 
     this.handleOnPress = this.handleOnPress.bind(this);
@@ -65,7 +70,8 @@ class EditUserName extends PureComponent {
       isLoading: false,
       firstName: '',
       lastName: '',
-      resultMessage: response.success ? 'Your name has been updated' : response.message,
+      resultMessage: response.success ? 'Your name has been updated!' : response.message,
+      response: response.success,
     });
   }
   /**
@@ -94,17 +100,15 @@ class EditUserName extends PureComponent {
             value={this.state.firstName}
             onChangeText={firstName => this.setState({ firstName })}
             placeholder={this.props.firstName}
-            style={{ width: 250, fontFamily: 'flex-font' }}
-            containerStyle={{ marginBottom: 20 }}
+            containerStyle={{ marginBottom: 20, width: 250 }}
           />
           <InputField
             value={this.state.fullName}
             onChangeText={lastName => this.setState({ lastName })}
             placeholder={this.props.lastName}
-            style={{ width: 250, fontFamily: 'flex-font' }}
-            containerStyle={{ marginBottom: 20 }}
+            containerStyle={{ marginBottom: 20, width: 250 }}
           />
-          {this.state.resultMessage.length && <StyledText>{this.state.resultMessage}</StyledText>}
+          {this.state.resultMessage.length && <ErrorText response={this.state.response}>{this.state.resultMessage}</ErrorText>}
         </ScrollView>
         <KeyboardAccessoryView
           alwaysVisible

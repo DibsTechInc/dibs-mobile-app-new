@@ -122,7 +122,7 @@ export function verifyPromoCode(promoCodeAttempt, product = PROMO_PRODUCT_CLASS)
         dispatch(setPromoCodeNotice(text));
       } else {
         console.log(res);
-        dispatch(setPromoCodeError(res.message));
+        dispatch(setPromoCodeError(`${res.message}.`));
       }
     } catch (err) {
       console.log(err);

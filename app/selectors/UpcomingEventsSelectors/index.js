@@ -126,7 +126,7 @@ function generateDetailedUpcomingEvents(items, currency, timeFormat, shortDateFo
       formattedDescription = 'No class description.';
     }
 
-    const sanitizedDescription = formattedDescription.replace(/[`~!@#$%^&*_|+\=?;:"<>\{\}\[\]\\\/]/g, '').replace(/Theyrsquore\b/g, "They're").trim();
+    const sanitizedDescription = formattedDescription.replace(/[`~!@#$%^&_|+\=?;:"<>\{\}\[\]\\\/]/g, '').replace(/Theyrsquore\b/g, "They're").trim();
 
     return {
       ...item,

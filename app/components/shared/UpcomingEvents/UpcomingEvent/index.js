@@ -114,6 +114,7 @@ class UpcomingEvent extends PureComponent {
           paddingTop: this.props.forReceiptPage ? 10 : 0,
           paddingBottom: isIphoneX() ? 80 : +(!this.props.forReceiptPage && 60),
           backgroundColor: WHITE,
+          marginLeft: 10,
         }}
       >
         <ScrollView
@@ -126,7 +127,7 @@ class UpcomingEvent extends PureComponent {
 
           {this.props.expanded &&
             <View style={{ margin: 10 }}>
-              <NormalText style={{ fontSize: 16, color: GREY, fontFamily: 'flex-font-heavy' }}>
+              <NormalText style={{ fontSize: 16, color: GREY, fontFamily: 'flex-font-heavy', marginLeft: 5 }}>
                 Item(s)
                   </NormalText>
             </View>
@@ -182,7 +183,7 @@ class UpcomingEvent extends PureComponent {
             formattedRAFCreditAmount={this.props.formattedRAFCreditAmount}
             formattedTotal={this.props.formattedTotal}
           />
-          <View style={{ margin: 10, marginLeft: 10 }}>
+          <View style={{ margin: 10, marginLeft: 20 }}>
             <View>
               <HeaderText>
                 Class Description

@@ -49,7 +49,7 @@ const StyledCloseButtonContainer = styled.View`
 
 const StyledHeavyText = HeavyText.extend`
   color: ${DARK_TEXT_GREY};
-  font-size: 20;
+  font-size: 16;
   max-width: 180px;
 `;
 

@@ -13,13 +13,13 @@ const Container = FlexCenter.extend`
 
 const Heading = HeavyText.extend`
   color: ${Config.STUDIO_COLOR};
-  font-size: 14;
+  font-size: 16;
   margin-bottom: 10;
 `;
 
 const Body = NormalText.extend`
   color: ${DARK_TEXT_GREY};
-  font-size: 14;
+  font-size: 16;
   padding-horizontal: 20;
   text-align: center;
 `;

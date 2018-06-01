@@ -28,8 +28,8 @@ export function requestCreditCardInfo(showAlert = true) {
       });
       dispatch(setCreditCardLoadingFalse());
       if (res.success) dispatch(setCreditCard(res.creditCard));
-      else if (showAlert && res.message !== 'The user does not have a card') dispatch(enqueueApiError({ title: 'Uh oh!', message: res.message }));
-      else if (res.message !== 'The user does not have a card') throw new Error('Failed to get the user\'s billing info');
+      else if (showAlert && `${res.message}.` !== 'The user does not have a card') dispatch(enqueueApiError({ title: 'Uh oh!', message: `${res.message}.` }));
+      else if (`${res.message}.` !== 'The user does not have a card') throw new Error('Failed to get the user\'s billing info');
     } catch (err) {
       console.log(err);
       if (showAlert) dispatch(enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong getting your billing information.' }));
@@ -59,7 +59,7 @@ export function updateCreditCard({ ccNum, ccCVC, expiration }, callback = () => 
         },
       });
       if (res.success) dispatch(setCreditCard(res.card));
-      else enqueueApiError({ title: 'Uh oh!', message: res.message });
+      else enqueueApiError({ title: 'Uh oh!', message: `${res.message}.` });
     } catch (err) {
       console.log(err);
       enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong updating your credit card.' });

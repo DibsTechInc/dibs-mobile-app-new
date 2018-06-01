@@ -234,7 +234,7 @@ export function submitCartForPurchase() {
         dispatch(clearPromoCodeData());
         dispatch(clearPackagePromoCode());
       } else {
-        let message = res.message;
+        let message = `${res.message}.`;
         if (res.removedEvents.every(r => r.reason === 'SOLD_OUT')) {
           message = 'Oh dang! The classes you chose were just recently sold out…. please pick another option.';
           res.removedEvents.map(event => dispatch(setEventSoldOut({ eventid: event.eventid })));

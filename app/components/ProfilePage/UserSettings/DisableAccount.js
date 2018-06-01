@@ -92,7 +92,7 @@ class DisableAccount extends PureComponent {
           height={100}
           style={{ shadowOffset: { width: 3, height: 3 } }}
           heading="Deactivate Account"
-          headingRight={this.props.isUpdatingDisableAccount ? 'Cancel' : 'Change'}
+          headingRight={this.props.isUpdatingDisableAccount ? 'Cancel' : '...'}
           headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}
           headerStyle={{ marginLeft: 10, color: GREY }}
           onPressHeadingRight={this.props.setEditDisableAccount}
@@ -104,7 +104,7 @@ class DisableAccount extends PureComponent {
       <MaterialPanel
         style={{ shadowOffset: { width: 3, height: 3 }, overflow: 'visible' }}
         heading="Deactivate Account"
-        headingRight={this.props.isUpdatingDisableAccount ? 'Cancel' : 'Change'}
+        headingRight={this.props.isUpdatingDisableAccount ? 'Cancel' : '...'}
         headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}
         headerStyle={{ marginLeft: 10, color: GREY }}
         onPressHeadingRight={this.props.setEditDisableAccount}

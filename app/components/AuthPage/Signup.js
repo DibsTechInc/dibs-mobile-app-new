@@ -98,10 +98,28 @@ class Signup extends PureComponent {
    * @returns {undefined}
    */
   async handleOnPress() {
-    const canRegister = this.checkForm();
+    const { isValid, formInfo } = this.checkForm();
+    let errorMsg;
 
-    if (!canRegister) {
-      return this.props.enqueueUserError({ title: 'Please check the form and try again' });
+    const {
+      isValidFullName,
+      isValidPassword,
+      tAndC,
+      isValidPhoneNumber,
+    } = formInfo;
+
+    if (!isValidFullName) {
+      errorMsg = 'Please enter a first and last name.';
+    } else if (!isValidPassword) {
+      errorMsg = 'Please make sure your password is at least 6 characters.';
+    } else if (!tAndC) {
+      errorMsg = 'Please agree to the terms and conditions.';
+    } else if (!isValidPhoneNumber) {
+      errorMsg = 'Please check that your phone number is correct.';
+    }
+
+    if (!isValid) {
+      return this.props.enqueueUserError({ title: errorMsg });
     }
 
     const phone = this.phone.getValue();
@@ -170,7 +188,10 @@ class Signup extends PureComponent {
     const isValidFullName = nameLength > 1 && nameLength <= 6;
     const isValidPassword = passwordLength >= 6;
 
-    return isValidFullName && isValidPassword && tAndC && isValidPhoneNumber;
+    return {
+      isValid: isValidFullName && isValidPassword && tAndC && isValidPhoneNumber,
+      formInfo: { isValidFullName, isValidPassword, tAndC, isValidPhoneNumber },
+    };
   }
 
   /**
@@ -201,7 +222,6 @@ class Signup extends PureComponent {
           <InputField
             customFocus
             value={this.state.fullName}
-            inputStyle={{ color: GREY }}
             onChangeText={fullName => this.setState({ fullName })}
             placeholder="First and last name"
             containerStyle={{ marginBottom: 20, width: 250 }}
@@ -209,7 +229,6 @@ class Signup extends PureComponent {
           <InputField
             value={this.state.password}
             secureTextEntry
-            inputStyle={{ color: GREY }}
             onChangeText={password => this.setState({ password })}
             placeholder="Password (6 char min)"
             containerStyle={{ marginBottom: 20, width: 250 }}
