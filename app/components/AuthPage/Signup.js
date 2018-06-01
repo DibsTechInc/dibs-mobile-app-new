@@ -212,7 +212,7 @@ class Signup extends PureComponent {
     return (
       <FadeInView>
         <CustomStatusBar backgroundColor={'transparent'} barStyle="dark-content" />
-        <ScrollView keyboardShouldPersistTaps="always" contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', height: HEIGHT * 0.50, position: 'relative' }}>
+        <ScrollView contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', height: HEIGHT * 0.50 }}>
           <StyledText>
             Just a few details before we get started
           </StyledText>
@@ -223,7 +223,6 @@ class Signup extends PureComponent {
             containerStyle={{ marginBottom: 20, width: 250 }}
           />
           <InputField
-            customFocus
             value={this.state.fullName}
             onChangeText={fullName => this.setState({ fullName })}
             placeholder="First and last name"
