@@ -74,6 +74,8 @@ export const getDetailedUserPasses = createSelector(
     usesLeft: p.totalUses - p.usesCount,
     unlimited: p.studioPackage.unlimited,
     dailyUsageLimit: p.studioPackage.dailyUsageLimit,
+    packageFixedPrice: p.studioPackage.member_class_fixed_price,
+    packageIsAutopay: p.studioPackage.autopay === 'FORCE',
   })).sort((a, b) => (moment(a.expiresAt) - moment(b.expiresAt)))
 );
 
@@ -105,7 +107,13 @@ export const getUsersNextPass = createSelector(
       }
       if (!pass.studioPackage.unlimited) return pass;
 
-      if (pass.studioPackage.unlimited && !pass.autopay && moment.tz(currentEvent.start_time, currentEvent.mainTZ) > moment(pass.expiresAt)) return null;
+      // Onsite passes check pass.autopay because if an autopay fails the pass autopay will be marked as false
+      // Offsite passes need to check packageIsAutopay studioPackage.autopay === 'FORCE
+      // Return null if pass isn't onsite autopay and isn't offsite autopay
+      const isOnsitePassAutopay = pass.autopay && pass.onDibs;
+      const isOffsitePassAutopay = pass.packageIsAutopay && !pass.onDibs;
+      if (pass.studioPackage.unlimited && !isOnsitePassAutopay && !isOffsitePassAutopay && moment.tz(currentEvent.start_time, currentEvent.mainTZ) > moment(pass.expiresAt)) return null;
+
       const cartItem = cartItems.find(item => (item.eventid === eventid && item.passid === pass.id));
       if (cartItem) return null;
 
