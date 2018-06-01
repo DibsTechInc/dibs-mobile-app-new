@@ -22,6 +22,7 @@ import {
   DEFAULT_BG,
   GREY,
   HEIGHT,
+  WIDTH,
 } from '../../constants';
 import {
   getStudioName,
@@ -43,6 +44,7 @@ const StyledButtonView = styled.View`
 
 const StyledText = NormalText.extend`
   margin-bottom: 7%;
+  font-size: ${WIDTH < 400 ? 13 : 16}
 `;
 
 const LinkedText = NormalText.extend`
