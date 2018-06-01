@@ -80,7 +80,7 @@ class EnterEmail extends PureComponent {
     await new Promise(res => this.setState({ isLoading: false, errorText: '' }, res));
 
     if (!route) {
-      this.setState({ isLoading: false, errorText: 'Uh oh, we could not verify this email. Please contact support.' });
+      this.setState({ isLoading: false, errorText: 'Uh oh, we could not verify this email.' });
     } else {
       this.props.navigation.navigate(route, { email, fromReset: false }); // last key for PW reset
     }

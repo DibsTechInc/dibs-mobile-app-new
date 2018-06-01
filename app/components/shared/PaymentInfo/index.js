@@ -205,7 +205,7 @@ class PaymentInfo extends PureComponent {
     let editLabel;
 
     if (hasCC) {
-      editLabel = this.props.isUpdatingCard ? 'Cancel' : 'Change';
+      editLabel = this.props.isUpdatingCard ? 'Cancel' : 'Update';
     }
 
     if (this.props.creditCard.loading) {

@@ -69,7 +69,7 @@ class EmailPreferences extends PureComponent {
           height={100}
           style={{ shadowOffset: { width: 3, height: 3 } }}
           heading="Email Preferences"
-          headingRight={this.props.isUpdatingEmailPreferences ? 'Cancel' : 'Change'}
+          headingRight={this.props.isUpdatingEmailPreferences ? 'Cancel' : '...'}
           headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}
           headerStyle={{ marginLeft: 10, color: GREY }}
           onPressHeadingRight={this.props.setEditEmailPreferences}
@@ -81,7 +81,7 @@ class EmailPreferences extends PureComponent {
       <MaterialPanel
         style={{ shadowOffset: { width: 3, height: 3 } }}
         heading="Email Preferences"
-        headingRight={this.props.isUpdatingEmailPreferences ? 'Cancel' : 'Change'}
+        headingRight={this.props.isUpdatingEmailPreferences ? 'Cancel' : '...'}
         headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}
         headerStyle={{ marginLeft: 10, color: GREY }}
         onPressHeadingRight={this.props.setEditEmailPreferences}

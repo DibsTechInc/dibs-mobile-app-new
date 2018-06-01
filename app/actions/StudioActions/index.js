@@ -30,7 +30,7 @@ export function requestStudioData(showAlert = true) {
         dispatch(setStudioLoadingFalse());
         return;
       }
-      if (showAlert) dispatch(enqueueApiError({ text: 'Something went wrong loading your app.', message: res.message }));
+      if (showAlert) dispatch(enqueueApiError({ text: 'Something went wrong loading your app.', message: `${res.message}.` }));
       else throw new Error('Failed to get the studio data');
       return;
     } catch (err) {

@@ -201,7 +201,6 @@ class Signup extends PureComponent {
           <InputField
             customFocus
             value={this.state.fullName}
-            inputStyle={{ color: GREY }}
             onChangeText={fullName => this.setState({ fullName })}
             placeholder="First and last name"
             containerStyle={{ marginBottom: 20, width: 250 }}
@@ -209,7 +208,6 @@ class Signup extends PureComponent {
           <InputField
             value={this.state.password}
             secureTextEntry
-            inputStyle={{ color: GREY }}
             onChangeText={password => this.setState({ password })}
             placeholder="Password (6 char min)"
             containerStyle={{ marginBottom: 20, width: 250 }}

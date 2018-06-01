@@ -28,7 +28,7 @@ export function addToWaitlist(eventid) {
         return dispatch(enqueueApiError({ title: 'Success', message: `You were added to the waitlist for ${eventName}.` }));
       }
       if (res.refreshEvent) dispatch(requestEventData({ eventids: [eventid] }));
-      return dispatch(enqueueApiError({ title: 'Uh oh!', message: res.message }));
+      return dispatch(enqueueApiError({ title: 'Uh oh!', message: `${res.message}.` }));
     } catch (err) {
       console.log(err); // todo real error handling
       return dispatch(enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong adding you to the waitlist.' }));
@@ -56,7 +56,7 @@ export function removeFromWaitlist(eventid) {
         dispatch(enqueueApiError({ title: 'Success', message: 'You were removed from the waitlist.' }));
         return;
       }
-      dispatch(enqueueApiError({ title: 'Uh oh!', message: res.message }));
+      dispatch(enqueueApiError({ title: 'Uh oh!', message: `${res.message}.` }));
     } catch (err) {
       console.log(err); // todo real error handling
       dispatch(enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong removing you from the waitlist.' }));

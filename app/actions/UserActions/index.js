@@ -118,7 +118,7 @@ export function validateEmail(email, callback) {
       if (res.message === 'No user with that email') {
         return callback(REGISTER_ROUTE);
       }
-      dispatch(enqueueApiError({ title: 'Uh oh!', message: res.message }));
+      dispatch(enqueueApiError({ title: 'Uh oh!', message: `${res.message}.` }));
       return callback(null);
     } catch (err) {
       console.log(err);
@@ -152,9 +152,11 @@ export function signUpUser(payload, callback) {
       if (res.accountDisabled) {
         throw new Error('Account disabled');
       }
+      dispatch(enqueueApiError({ title: 'Uh oh!', message: `${res.message}.` }));
       return callback(res);
     } catch (err) {
       console.log(err);
+      dispatch(enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong during registration.' }));
       return callback(err);
     }
   };
@@ -183,9 +185,11 @@ export function submitLogin(email, password, callback) {
         dispatch(requestUserEvents());
         callback(res);
       } else {
+        dispatch(enqueueApiError({ title: 'Uh oh!', message: `${res.message}.` }));
         callback(res);
       }
     } catch (err) {
+      dispatch(enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong logging you in.' }));
       console.log(err);
     }
   };
@@ -298,8 +302,10 @@ export function disableUserAccount(callback) {
         dispatch(logOutUser());
       }
 
+      dispatch(enqueueApiError({ title: 'Uh oh!', message: `${res.message}.` }));
       callback(res);
     } catch (err) {
+      dispatch(enqueueApiError({ title: 'Uh oh!', message: 'There was a problem deactivating your account.' }));
       console.log(err);
       callback(err);
     }
