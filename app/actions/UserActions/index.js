@@ -78,7 +78,7 @@ export function requestUserData(showAlert = true) {
       if (res.success) {
         dispatch(refreshUser(res.user));
         dispatch(recordStudioVisit());
-        dispatch(requestCreditCardInfo());
+        dispatch(requestCreditCardInfo(false));
         dispatch(requestUserEvents());
       } else if (showAlert) {
         await AsyncStorage.removeItem(Config.USER_TOKEN_KEY);
@@ -181,7 +181,7 @@ export function submitLogin(email, password, callback) {
       if (res.success) {
         dispatch(setUser(res.user));
         dispatch(recordStudioVisit());
-        dispatch(requestCreditCardInfo());
+        dispatch(requestCreditCardInfo(false));
         dispatch(requestUserEvents());
         callback(res);
       } else {
