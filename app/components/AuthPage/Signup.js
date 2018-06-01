@@ -285,19 +285,29 @@ class Signup extends PureComponent {
             </View>
           </View>
         </ScrollView>
-        <KeyboardAccessoryView
-          alwaysVisible
-          hideBorder
-          style={{ backgroundColor: DEFAULT_BG, marginBottom: 25 }}
-        >
-          <StyledButtonView>
+        {WIDTH >= 400 ? (
+          <KeyboardAccessoryView
+            alwaysVisible
+            hideBorder
+            style={{ backgroundColor: DEFAULT_BG, marginBottom: 25 }}
+          >
+            <StyledButtonView>
+              <MaterialButton
+                onPress={this.handleOnPress}
+                text="Register"
+                style={{ width: '75%', height: 40 }}
+              />
+            </StyledButtonView>
+          </KeyboardAccessoryView>
+        ) : (
+          <StyledButtonView style={{ paddingBottom: 20 }}>
             <MaterialButton
               onPress={this.handleOnPress}
               text="Register"
               style={{ width: '75%', height: 40 }}
             />
           </StyledButtonView>
-        </KeyboardAccessoryView>
+        )}
       </FadeInView>
     );
   }

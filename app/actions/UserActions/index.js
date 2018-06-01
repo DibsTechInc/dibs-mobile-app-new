@@ -156,7 +156,12 @@ export function signUpUser(payload, callback) {
       return callback(res);
     } catch (err) {
       console.log(err);
-      dispatch(enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong during registration.' }));
+      if (err.message !== 'Account disabled') {
+        dispatch(enqueueApiError({
+          title: 'Uh oh!',
+          message: 'Something went wrong during registration.',
+        }));
+      }
       return callback(err);
     }
   };

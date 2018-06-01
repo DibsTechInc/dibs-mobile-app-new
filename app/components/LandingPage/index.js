@@ -107,7 +107,7 @@ class LandingPage extends Component {
               <StyledGrayText>Press continue to sign in</StyledGrayText>
               {this.props.navigation.state.params &&
                 this.props.navigation.state.params.accountReactivated &&
-                <NormalText>
+                <NormalText style={{ paddingHorizontal: 10, paddingVertical: 15, textAlign: 'center' }}>
                   Your account has been reactivated, please login again.
                 </NormalText>
               }

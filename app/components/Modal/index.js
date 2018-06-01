@@ -129,6 +129,7 @@ class AlertModal extends React.PureComponent {
               noNavigation
               containerStyle={{ width: 200, marginBottom: 10 }}
               autoFocus
+              autoCapitalize="none"
             />
           ) : null}
           <Border />
