@@ -10,6 +10,9 @@ Alert queue elements have the structure
   title: string,
   message?: string,
   buttons?: [{ text: string, onPress: function }],
+  showInput?: boolean,
+  onChange?: function,
+  placeholder?: string,
 }
 
 callbacks for button press are stored in
@@ -24,6 +27,7 @@ export const {
   enqueueUserError,
   enqueueNotice,
   dequeueAlert,
+  setAlertInputValue,
 } = createActions({
   LOG_FATAL_ERROR: payload => payload,
   ENQUEUE_API_ERROR: payload => ({ type: API_ERROR, ...payload }),
@@ -31,4 +35,5 @@ export const {
   ENQUEUE_USER_ERROR: payload => payload,
   ENQUEUE_NOTICE: payload => ({ type: NOTICE, ...payload }),
   DEQUEUE_ALERT: () => null,
+  SET_ALERT_INPUT_VALUE: payload => payload,
 });

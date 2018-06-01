@@ -29,9 +29,9 @@ class FadeInView extends React.PureComponent {
     return (
       <Animated.View
         style={{
-          ...this.props.style,
-          opacity: this.state.fadeAnim,
           flex: 1,
+          opacity: this.state.fadeAnim,
+          ...this.props.style,
         }}
       >
         {this.props.children}

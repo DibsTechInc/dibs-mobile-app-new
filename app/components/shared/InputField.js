@@ -1,7 +1,7 @@
 import React from 'react';
 import { withNavigation } from 'react-navigation';
 import PropTypes from 'prop-types';
-import { TextInput, Text } from 'react-native';
+import { TextInput } from 'react-native';
 import { StudioColorBottomBorder, HeavyText } from '../styled';
 
 const Label = HeavyText.extend`
@@ -102,6 +102,12 @@ InputField.propTypes = {
   labelStyle: PropTypes.shape(),
   customFocus: PropTypes.bool,
   inputStyle: PropTypes.shape(),
+  noNavigation: PropTypes.bool,
 };
 
-export default withNavigation(InputField);
+const InputFieldWithContext = withNavigation(InputField);
+
+export default ({ noNavigation, ...props }) =>
+  (noNavigation ?
+    <InputField {...props} />
+    : <InputFieldWithContext {...props} />);

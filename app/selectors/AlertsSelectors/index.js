@@ -19,6 +19,14 @@ export function getAlertsQueue(state) {
   return getAlerts(state).queue || [];
 }
 
+/**
+ * @param {Object} state in store
+ * @returns {string} input value in alert
+ */
+export function getAlertInputValue(state) {
+  return getAlerts(state).inputValue || '';
+}
+
 export const getQueueHasMessages = createSelector(
   getAlertsQueue,
   queue => Boolean(queue.length)
@@ -54,4 +62,14 @@ export const getAlertButtons = createSelector(
     }
     return [{ text: 'Ok', onPress: () => store.dispatch(dequeueAlert()) }];
   }
+);
+
+export const getAlertHasInput = createSelector(
+  getAlertsQueueHead,
+  obj => Boolean(obj.showInput)
+);
+
+export const getAlertInputPlaceholder = createSelector(
+  getAlertsQueueHead,
+  obj => (obj.placeholder || '')
 );

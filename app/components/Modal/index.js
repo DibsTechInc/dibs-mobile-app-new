@@ -2,41 +2,62 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import { View } from 'react-native';
 
 import Config from '../../../config.json';
 import {
   WHITE,
   DARK_TEXT_GREY,
+  LIGHT_GREY,
 } from '../../constants';
 import {
   getQueueHasMessages,
   getAlertTitle,
   getAlertMessage,
   getAlertButtons,
+  getAlertInputValue,
+  getAlertHasInput,
+  getAlertInputPlaceholder,
 } from '../../selectors';
+import { setAlertInputValue } from '../../actions';
 import { HeavyText, NormalText, FlexRow } from '../styled';
-import { FadeInView } from '../shared';
+import { FadeInView, InputField } from '../shared';
 
 const Title = HeavyText.extend`
   color: ${DARK_TEXT_GREY};
   margin-bottom: 7;
+  padding-horizontal: 10;
+  padding-vertical: 10;
   text-align: center;
 `;
 
 const Message = NormalText.extend`
+  border-color: ${LIGHT_GREY};
+  border-bottom-width: 1;
   color: ${DARK_TEXT_GREY};
+  margin-bottom: 15;
+  padding-horizontal: 10;
   text-align: center;
 `;
 
+const Border = styled.View`
+  background-color: ${LIGHT_GREY};
+  height: 1;
+  width: 100%;
+`;
+
+const ButtonRow = FlexRow.extend`
+  justify-content: flex-end;
+  width: 100%;
+`;
+
 const Button = styled.TouchableOpacity`
-  padding-horizontal: 10;
-  padding-top: 10;
-  padding-bottom: 5;
+  margin-right: 10;
 `;
 
 const ButtonText = HeavyText.extend`
   color: ${Config.STUDIO_COLOR};
+  padding-horizontal: 10;
+  padding-vertical: 15;
 `;
 
 /**
@@ -45,6 +66,22 @@ const ButtonText = HeavyText.extend`
  */
 class AlertModal extends React.PureComponent {
   /**
+   * @constructor
+   * @constructs AlertModal
+   * @param {Object} props for component
+   */
+  constructor(props) {
+    super(props);
+    this.onChange = this.onChange.bind(this);
+  }
+  /**
+   * @param {Object} value of input
+   * @returns {undefined}
+   */
+  onChange(value) {
+    this.props.setAlertInputValue(value);
+  }
+  /**
    * render
    * @returns {JSX.Element} HTML
    */
@@ -52,34 +89,50 @@ class AlertModal extends React.PureComponent {
     if (!this.props.queueHasMessages) return null;
     return (
       <FadeInView
-        duration={200}
+        duration={100}
         style={{
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
           alignItems: 'center',
           flex: 1,
           right: 0,
-          justifyContent: 'center',
+          justifyContent: this.props.showInput ? 'flex-start' : 'center',
           left: 0,
           position: 'absolute',
           top: 0,
           bottom: 0,
         }}
       >
-        <View
+        <FadeInView
+          duration={250}
           style={{
+            alignItems: 'center',
             backgroundColor: WHITE,
             borderRadius: 5,
-            padding: 10,
-            width: 200,
+            flex: 0,
+            marginTop: this.props.showInput ? 115 : 0,
+            width: 250,
           }}
         >
           <Title>
             {this.props.title}
           </Title>
-          <Message>
-            {this.props.message}
-          </Message>
-          <FlexRow style={{ justifyContent: 'space-around' }}>
+          {this.props.message ? (
+            <Message>
+              {this.props.message}
+            </Message>
+          ) : null}
+          {this.props.showInput ? (
+            <InputField
+              onChangeText={this.onChange}
+              value={this.props.inputValue}
+              placeholder={this.props.placeholder}
+              noNavigation
+              containerStyle={{ width: 200, marginBottom: 10 }}
+              autoFocus
+            />
+          ) : null}
+          <Border />
+          <ButtonRow>
             {this.props.buttons.map(({ onPress, text }) => (
               <Button
                 key={text}
@@ -91,8 +144,8 @@ class AlertModal extends React.PureComponent {
                 </ButtonText>
               </Button>
             ))}
-          </FlexRow>
-        </View>
+          </ButtonRow>
+        </FadeInView>
       </FadeInView>
     );
   }
@@ -102,7 +155,11 @@ AlertModal.propTypes = {
   queueHasMessages: PropTypes.bool.isRequired,
   title: PropTypes.string.isRequired,
   message: PropTypes.string.isRequired,
-  buttons: PropTypes.arrayOf(PropTypes.shape()),
+  buttons: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+  showInput: PropTypes.bool.isRequired,
+  inputValue: PropTypes.string.isRequired,
+  setAlertInputValue: PropTypes.func.isRequired,
+  placeholder: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = state => ({
@@ -110,7 +167,12 @@ const mapStateToProps = state => ({
   title: getAlertTitle(state),
   message: getAlertMessage(state),
   buttons: getAlertButtons(state),
+  inputValue: getAlertInputValue(state),
+  showInput: getAlertHasInput(state),
+  placeholder: getAlertInputPlaceholder(state),
 });
-const mapDispatchToProps = {};
+const mapDispatchToProps = {
+  setAlertInputValue,
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(AlertModal);

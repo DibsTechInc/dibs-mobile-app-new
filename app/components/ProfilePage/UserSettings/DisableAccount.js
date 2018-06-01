@@ -1,59 +1,14 @@
 import React, { PureComponent } from 'react';
-import { Button, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import { connect } from 'react-redux';
 import { GiftedForm } from 'react-native-gifted-form';
 import PropTypes from 'prop-types';
-import Dialog from 'react-native-dialog';
 
-import { FadeInView, MaterialPanel } from '../../shared';
+import { MaterialPanel } from '../../shared';
 import Config from '../../../../config.json';
-import { getUserEmail } from '../../../selectors';
-import { disableUserAccount } from '../../../actions';
+import { getUserEmail, getAlertInputValue } from '../../../selectors';
+import { disableUserAccount, enqueueNotice, enqueueUserError } from '../../../actions';
 import { LANDING_ROUTE, WHITE, GREY } from '../../../constants';
-
-/**
- * @class DeleteDialog
- * @extends {Component}
- */
-class DeleteDialog extends PureComponent {
-  /**
-   * @returns {JSX} XML
-   */
-  render() {
-    return (
-      <FadeInView>
-        <Dialog.Container visible={this.props.dialogVisible}>
-          <Dialog.Title>Deactivate Account</Dialog.Title>
-          <Dialog.Description>
-            Please enter the email address associated with this account
-          </Dialog.Description>
-          <Dialog.Description>
-            {this.props.errorMessage}
-          </Dialog.Description>
-          <Dialog.Input
-            autoCorrect={false}
-            autoCapitalize="none"
-            placeholder="abc@xyz.com"
-            onChangeText={this.props.handleOnChange}
-          />
-          <View style={{ flexDirection: 'row', justifyContent: 'space-around', paddingLeft: 30, paddingRight: 30 }}>
-            <Button title="Cancel" onPress={this.props.handleCancel} />
-            <Button title="Confirm" onPress={this.props.handleDelete} />
-          </View>
-        </Dialog.Container>
-      </FadeInView>
-    );
-  }
-}
-
-DeleteDialog.propTypes = {
-  dialogVisible: PropTypes.bool,
-  errorMessage: PropTypes.string,
-  handleOnChange: PropTypes.func,
-  handleCancel: PropTypes.func,
-  handleDelete: PropTypes.func,
-};
 
 /**
  * @class DisableAccount
@@ -68,14 +23,7 @@ class DisableAccount extends PureComponent {
   constructor(props) {
     super(props);
 
-    this.state = {
-      dialogVisible: false,
-      errorMessage: '',
-      email: '',
-    };
-
-    this.handleOnSubmit = this.handleOnSubmit.bind(this);
-    this.handleCancel = this.handleCancel.bind(this);
+    this.handleOnPress = this.handleOnPress.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.handleOnChange = this.handleOnChange.bind(this);
   }
@@ -88,8 +36,20 @@ class DisableAccount extends PureComponent {
    * @param {function} postSubmit callback
    * @returns {undefined}
    */
-  async handleOnSubmit(isValid, { email, firstName, lastName }, validationResults, postSubmit = null) {
-    this.setState({ dialogVisible: true });
+  async handleOnPress(isValid, { email, firstName, lastName }, validationResults, postSubmit = null) {
+    this.props.enqueueNotice({
+      title: 'Deactivate Account',
+      message: 'Please enter the email address associated with this account',
+      buttons: [{
+        text: 'Cancel',
+        onPress: () => {},
+      }, {
+        text: 'Confirm',
+        onPress: this.handleDelete,
+      }],
+      showInput: true,
+      placeholder: 'abc@xyz.com',
+    });
     postSubmit();
   }
 
@@ -104,17 +64,11 @@ class DisableAccount extends PureComponent {
   /**
    * @returns {undefined}
    */
-  handleCancel() {
-    this.setState({ dialogVisible: false });
-  }
-
-  /**
-   * @returns {undefined}
-   */
   async handleDelete() {
-    if (this.state.email !== this.props.userEmail) {
-      this.setState({
-        errorMessage: 'The email you provided is incorrect',
+    if (this.props.inputValue !== this.props.userEmail) {
+      this.props.enqueueUserError({
+        title: 'Uh oh!',
+        message: 'The email you provided is incorrect.',
       });
       return;
     }
@@ -122,7 +76,6 @@ class DisableAccount extends PureComponent {
     const response = await new Promise(res => this.props.disableUserAccount(res));
 
     if (response.code === 200) {
-      this.setState({ dialogVisible: false });
       this.props.navigation.navigate(LANDING_ROUTE);
     } else {
       this.setState({ errorMessage: response.message });
@@ -149,8 +102,7 @@ class DisableAccount extends PureComponent {
 
     return (
       <MaterialPanel
-        height={'20%'}
-        style={{ shadowOffset: { width: 3, height: 3 } }}
+        style={{ shadowOffset: { width: 3, height: 3 }, overflow: 'visible' }}
         heading="Deactivate Account"
         headingRight={this.props.isUpdatingDisableAccount ? 'Cancel' : '...'}
         headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}
@@ -176,19 +128,11 @@ class DisableAccount extends PureComponent {
                 fontFamily: 'flex-font',
               },
             }}
-            onSubmit={this.handleOnSubmit}
+            onSubmit={this.handleOnPress}
           />
         </GiftedForm>
-        <DeleteDialog
-          dialogVisible={this.state.dialogVisible}
-          handleCancel={this.handleCancel}
-          handleDelete={this.handleDelete}
-          handleOnChange={this.handleOnChange}
-          errorMessage={this.state.errorMessage}
-        />
       </MaterialPanel>
-
-    )
+    );
   }
 }
 
@@ -197,14 +141,20 @@ DisableAccount.propTypes = {
   isUpdatingDisableAccount: PropTypes.bool.isRequired,
   disableUserAccount: PropTypes.func.isRequired,
   navigation: PropTypes.shape().isRequired,
+  enqueueNotice: PropTypes.func.isRequired,
+  enqueueUserError: PropTypes.func.isRequired,
+  inputValue: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = state => ({
   userEmail: getUserEmail(state),
+  inputValue: getAlertInputValue(state),
 });
 
 const mapDispatchToProps = {
   disableUserAccount,
+  enqueueNotice,
+  enqueueUserError,
 };
 
 const connectedDisableAccount = connect(mapStateToProps, mapDispatchToProps)(DisableAccount);
