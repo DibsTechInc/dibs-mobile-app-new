@@ -20,7 +20,7 @@ const StyledLabelText = NormalText.extend`
 
 const StyledValueText = NormalText.extend`
   color: ${Config.STUDIO_COLOR};
-  font-size: 20;
+  font-size: 16;
   margin-bottom: 10;
 `;
 
