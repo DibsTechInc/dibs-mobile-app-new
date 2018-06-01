@@ -122,9 +122,8 @@ class EnterPassword extends PureComponent {
             autoCapitalize="none"
             onSubmitEditing={this.handleOnPress}
             onChangeText={password => this.setState({ password })}
-            containerStyle={{ marginBottom: 10, width: 200 }}
+            containerStyle={{ marginBottom: 10, width: 200, minWidth: 200 }}
             labelStyle={{ marginBottom: 20, textAlign: 'center' }}
-            style={{ minWidth: 200 }}
           />
           <TouchableOpacity
             onPress={this.navigateToPasswordReset}
