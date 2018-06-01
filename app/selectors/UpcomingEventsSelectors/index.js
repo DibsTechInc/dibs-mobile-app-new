@@ -126,6 +126,8 @@ function generateDetailedUpcomingEvents(items, currency, timeFormat, shortDateFo
       formattedDescription = 'No class description.';
     }
 
+    const sanitizedDescription = formattedDescription.replace(/[`~!@#$%^&*_|+\=?;:"<>\{\}\[\]\\\/]/g, '').trim();
+
     return {
       ...item,
       shortDayOfWeek: localStartTime.format('ddd'),
@@ -142,7 +144,7 @@ function generateDetailedUpcomingEvents(items, currency, timeFormat, shortDateFo
       latitude,
       locationName: location.name,
       instructorName: instructor.name,
-      formattedDescription,
+      formattedDescription: sanitizedDescription,
     };
   });
 }

@@ -44,6 +44,8 @@ export const getConfirmedTransactionsByEvent = createSelector(
         formattedDescription = 'No class description.';
       }
 
+      const sanitizedDescription = formattedDescription.replace(/[`~!@#$%^&*_|+\=?;:"<>\{\}\[\]\\\/]/g, '').trim();
+
       const amount = new Decimal(transaction.amount).minus(transaction.studio_credits_spent)
                                                     .minus(transaction.raf_credits_spent)
                                                     .toNumber();
@@ -64,7 +66,7 @@ export const getConfirmedTransactionsByEvent = createSelector(
         quantity: 1,
         valueBack,
         amount,
-        formattedDescription,
+        formattedDescription: sanitizedDescription,
         name: confirmedEvent.name,
         address: confirmedEvent.address,
         latitude,
