@@ -93,7 +93,7 @@ class UpcomingEvent extends PureComponent {
       message: `Do you want to drop ${this.props.name}?`,
       buttons: [
         { text: 'Yes', onPress: this.removeFromClass },
-        { text: 'No', onPress: () => { } },
+        { text: 'Cancel', onPress: () => { } },
       ],
     });
   }

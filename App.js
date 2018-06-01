@@ -11,7 +11,7 @@ import Config from './config.json';
 import Navigator from './app/router';
 import LinearLoader from './app/components/shared/LinearLoader';
 import ErrorPage from './app/components/ErrorPage';
-import AlertModal from './app/components/AlertModal';
+import Modal from './app/components/Modal';
 import {
   requestStudioData,
   requestUserData,
@@ -22,7 +22,6 @@ import {
   requestEventData,
   setStudio,
   logFatalError,
-  enqueueApiError,
 } from './app/actions';
 
 import MainPage from './assets/img/main-page.png';
@@ -221,7 +220,7 @@ class App extends Component {
         <Provider store={store}>
           <View style={{ flex: 1 }}>
             <ErrorPage />
-            <AlertModal />
+            <Modal />
           </View>
         </Provider>
       );
@@ -237,7 +236,7 @@ class App extends Component {
               {(!this.state.fontLoaded) ? <LinearLoader /> : <LinearLoader showQuote />}
             </StyledLoadingPage>
           )}
-          <AlertModal />
+          <Modal />
         </View>
       </Provider>
     );
