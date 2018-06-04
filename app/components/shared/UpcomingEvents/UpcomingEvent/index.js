@@ -126,7 +126,7 @@ class UpcomingEvent extends PureComponent {
 
           {this.props.expanded &&
             <View style={{ margin: 10 }}>
-              <NormalText style={{ fontSize: 16, color: GREY, fontFamily: 'flex-font-heavy', marginLeft: 5 }}>
+              <NormalText style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy', marginLeft: 5 }}>
                 Item(s)
               </NormalText>
             </View>

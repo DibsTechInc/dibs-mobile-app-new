@@ -56,9 +56,9 @@ class TransactionBreakdown extends PureComponent {
 
           <BreakdownRow
             label="Total"
-            labelStyle={{ fontFamily: 'flex-font-heavy' }}
+            labelStyle={{ fontFamily: 'studio-font-heavy' }}
             value={this.props.formattedTotal}
-            valueStyle={{ fontFamily: 'flex-font-heavy', fontSize: 18 }}
+            valueStyle={{ fontFamily: 'studio-font-heavy', fontSize: 18 }}
             dots={false}
           />
         </StyledBreakDownView>

@@ -30,6 +30,7 @@ import {
   getUserLastName,
   getUserId,
   getUserEmail,
+  getStudioName,
 } from '../../selectors';
 import { logOutUser, enqueueUserError } from '../../actions';
 import Config from '../../../config.json';
@@ -102,7 +103,7 @@ class ProfilePage extends PureComponent {
       // Optional additional arguments
       cc: '', // string or array of email addresses
       bcc: '', // string or array of email addresses
-      subject: `User ID ${this.props.userId} Support Ticket`,
+      subject: `User ID ${this.props.userId} Feedback`,
       body: '',
     }).catch(() => this.props.enqueueUserError({ title: 'Uh oh!', message: 'Something went wrong opening your mail client' }));
   }
@@ -118,15 +119,6 @@ class ProfilePage extends PureComponent {
       minHeight: 50,
     };
 
-    const logoutBoxStyle = {
-      ...titleBoxStyle,
-      backgroundColor: Config.STUDIO_COLOR,
-      marginLeft: 0,
-      alignItems: 'center',
-      justifyContent: 'center',
-      minHeight: 65,
-    };
-
     return (
       <FadeInView style={{ backgroundColor: DEFAULT_BG }}>
         <Header title="My Account" />
@@ -136,32 +128,32 @@ class ProfilePage extends PureComponent {
             <SettingsList.Item
               hasNavArrow={false}
               title="Personal Details"
-              titleStyle={{ color: GREY, fontFamily: 'flex-font-heavy', fontSize: 16 }}
+              titleStyle={{ color: GREY, fontFamily: 'studio-font-heavy', fontSize: 16 }}
               titleBoxStyle={titleBoxStyle}
             />
             <SettingsList.Item
               title="Name"
               titleInfo={`${this.props.userFirstName} ${this.props.userLastName}`}
-              titleInfoStyle={{ fontFamily: 'flex-font', fontSize: 16 }}
+              titleInfoStyle={{ fontFamily: 'studio-font', fontSize: 16 }}
               onPress={this.handleEditUsernameRoute}
               titleBoxStyle={titleBoxStyle}
-              titleStyle={{ fontFamily: 'flex-font', fontSize: 16 }}
+              titleStyle={{ fontFamily: 'studio-font', fontSize: 16 }}
             />
             <SettingsList.Item
               title="Email"
               titleInfo={this.props.email}
-              titleInfoStyle={{ fontFamily: 'flex-font', fontSize: 16 }}
+              titleInfoStyle={{ fontFamily: 'studio-font', fontSize: 16 }}
               onPress={this.handleEditEmailRoute}
               titleBoxStyle={titleBoxStyle}
-              titleStyle={{ fontFamily: 'flex-font', fontSize: 16 }}
+              titleStyle={{ fontFamily: 'studio-font', fontSize: 16 }}
             />
             <SettingsList.Item
               title="Password"
               titleInfo="••••"
-              titleInfoStyle={{ fontFamily: 'flex-font', fontSize: 16 }}
+              titleInfoStyle={{ fontFamily: 'studio-font', fontSize: 16 }}
               onPress={this.handleEditPasswordRoute}
               titleBoxStyle={titleBoxStyle}
-              titleStyle={{ fontFamily: 'flex-font', fontSize: 16 }}
+              titleStyle={{ fontFamily: 'studio-font', fontSize: 16 }}
             />
             <SettingsList.Header
               headerStyle={{ marginTop: -20 }}
@@ -169,20 +161,20 @@ class ProfilePage extends PureComponent {
             <SettingsList.Item
               hasNavArrow={false}
               title="Account Details"
-              titleStyle={{ color: GREY, fontFamily: 'flex-font-heavy', fontSize: 16 }}
+              titleStyle={{ color: GREY, fontFamily: 'studio-font-heavy', fontSize: 16 }}
               titleBoxStyle={titleBoxStyle}
             />
             <SettingsList.Item
               title="Payment"
               onPress={this.handleEditCCRoute}
               titleBoxStyle={titleBoxStyle}
-              titleStyle={{ fontFamily: 'flex-font', fontSize: 16 }}
+              titleStyle={{ fontFamily: 'studio-font', fontSize: 16 }}
             />
             <SettingsList.Item
               title="Additional Settings"
               onPress={this.handleSettingsRoute}
               titleBoxStyle={titleBoxStyle}
-              titleStyle={{ fontFamily: 'flex-font', fontSize: 16 }}
+              titleStyle={{ fontFamily: 'studio-font', fontSize: 16 }}
             />
             <BottomBuffer />
             <SettingsList.Header
@@ -191,14 +183,14 @@ class ProfilePage extends PureComponent {
             <SettingsList.Item
               hasNavArrow={false}
               title="Contact Us"
-              titleStyle={{ color: GREY, fontFamily: 'flex-font-heavy', fontSize: 16 }}
+              titleStyle={{ color: GREY, fontFamily: 'studio-font-heavy', fontSize: 16 }}
               titleBoxStyle={titleBoxStyle}
             />
             <SettingsList.Item
-              title="Email Flex Studios"
+              title="Feedback"
               onPress={this.handleEmail}
               titleBoxStyle={titleBoxStyle}
-              titleStyle={{ fontFamily: 'flex-font', fontSize: 16 }}
+              titleStyle={{ fontFamily: 'studio-font', fontSize: 16 }}
             />
             <SettingsList.Header
               headerStyle={{ marginTop: -20 }}
@@ -206,20 +198,20 @@ class ProfilePage extends PureComponent {
             <SettingsList.Item
               hasNavArrow={false}
               title="Terms & Privacy Policy"
-              titleStyle={{ color: GREY, fontFamily: 'flex-font-heavy', fontSize: 16 }}
+              titleStyle={{ color: GREY, fontFamily: 'studio-font-heavy', fontSize: 16 }}
               titleBoxStyle={titleBoxStyle}
             />
             <SettingsList.Item
-              title="Flex Studios"
+              title={this.props.studioName}
               onPress={this.handleOnPressNavStudioTerms}
               titleBoxStyle={titleBoxStyle}
-              titleStyle={{ fontFamily: 'flex-font', fontSize: 16 }}
+              titleStyle={{ fontFamily: 'studio-font', fontSize: 16 }}
             />
             <SettingsList.Item
               title="Dibs"
               onPress={this.handleOnPressNavDibsTerms}
               titleBoxStyle={{ ...titleBoxStyle, marginBottom: 7 }}
-              titleStyle={{ fontFamily: 'flex-font', fontSize: 16 }}
+              titleStyle={{ fontFamily: 'studio-font', fontSize: 16 }}
             />
           </SettingsList>
           <SwipableButton
@@ -241,6 +233,7 @@ ProfilePage.propTypes = {
   email: PropTypes.string.isRequired,
   userId: PropTypes.number,
   enqueueUserError: PropTypes.func.isRequired,
+  studioName: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = state => ({
@@ -248,6 +241,7 @@ const mapStateToProps = state => ({
   userLastName: getUserLastName(state),
   email: getUserEmail(state),
   userId: getUserId(state),
+  studioName: getStudioName(state),
 });
 
 const mapDispatchToProps = {

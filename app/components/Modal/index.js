@@ -46,14 +46,14 @@ const Message = NormalText.extend`
   color: ${DARK_TEXT_GREY};
   margin-bottom: 15;
   padding-horizontal: 10;
-  text-align: center;
+  text-align: left;
 `;
 
-const Border = styled.View`
-  background-color: ${LIGHT_GREY};
-  height: 1;
-  width: 100%;
-`;
+// const Border = styled.View`
+//   background-color: ${LIGHT_GREY};
+//   height: 1;
+//   width: 100%;
+// `;
 
 const ButtonRow = FlexRow.extend`
   justify-content: flex-end;
@@ -71,13 +71,13 @@ const ButtonText = HeavyText.extend`
 `;
 
 /**
- * @class AlertModal
+ * @class Modal
  * @extends {React.PureComponent}
  */
-class AlertModal extends React.PureComponent {
+class Modal extends React.PureComponent {
   /**
    * @constructor
-   * @constructs AlertModal
+   * @constructs Modal
    * @param {Object} props for component
    */
   constructor(props) {
@@ -152,7 +152,6 @@ class AlertModal extends React.PureComponent {
                 autoCapitalize="none"
               />
             ) : null}
-            <Border />
             <ButtonRow>
               {this.props.buttons.map(({ onPress, text }) => (
                 <Button
@@ -173,7 +172,7 @@ class AlertModal extends React.PureComponent {
   }
 }
 
-AlertModal.propTypes = {
+Modal.propTypes = {
   queueHasMessages: PropTypes.bool.isRequired,
   title: PropTypes.string.isRequired,
   message: PropTypes.string.isRequired,
@@ -199,4 +198,4 @@ const mapDispatchToProps = {
   dequeueAlert,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(AlertModal);
+export default connect(mapStateToProps, mapDispatchToProps)(Modal);

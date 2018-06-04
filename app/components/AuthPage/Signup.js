@@ -292,7 +292,7 @@ class Signup extends PureComponent {
                 this.phone = ref;
               }}
               onPressFlag={this.onPressFlag}
-              textStyle={{ fontFamily: 'flex-font' }}
+              textStyle={{ fontFamily: 'studio-font' }}
               textProps={{ placeholder: 'Mobile number' }}
               style={{ width: 250, borderBottomWidth: 1, paddingBottom: 5, marginTop: 10, marginBottom: 30, borderBottomColor: Config.STUDIO_COLOR }}
             />
@@ -306,9 +306,9 @@ class Signup extends PureComponent {
               closeable
               filterable
               styles={{
-                countryName: { fontFamily: 'flex-font' },
-                input: { fontFamily: 'flex-font' },
-                letterText: { fontFamily: 'flex-font' },
+                countryName: { fontFamily: 'studio-font' },
+                input: { fontFamily: 'studio-font' },
+                letterText: { fontFamily: 'studio-font' },
               }}
             >
               <View />
@@ -324,7 +324,7 @@ class Signup extends PureComponent {
               checkedColor={Config.STUDIO_COLOR}
               checked={this.state.tAndC}
               containerStyle={{ backgroundColor: DEFAULT_BG, position: 'absolute', top: -10, left: -22 }}
-              textStyle={{ fontFamily: 'flex-font', fontSize: 16 }}
+              textStyle={{ fontFamily: 'studio-font', fontSize: 16 }}
               onPress={this.handleOnCheck}
               size={20}
             />

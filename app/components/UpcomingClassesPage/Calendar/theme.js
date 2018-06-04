@@ -3,9 +3,9 @@ import { WHITE, HEIGHT } from '../../../constants';
 
 export default {
   'stylesheet.calendar.header': {
-    monthText: { color: WHITE, fontFamily: 'flex-font-heavy', fontSize: 16 },
+    monthText: { color: WHITE, fontFamily: 'studio-font-heavy', fontSize: 16 },
     arrow: { paddingVertical: 0, paddingHorizontal: 30 },
-    dayHeader: { color: WHITE, fontFamily: 'flex-font', fontSize: 16 },
+    dayHeader: { color: WHITE, fontFamily: 'studio-font', fontSize: 16 },
     header: {
       flexDirection: 'row',
       justifyContent: 'space-between',

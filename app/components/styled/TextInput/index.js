@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
 export const DefaultInput = styled.TextInput`
-  font-family: flex-font;
+  font-family: studio-font;
   height: 25;
 `;

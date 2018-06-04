@@ -20,7 +20,7 @@ const PromoCodeInput = styled.TextInput`
   border-bottom-width: 1px;
   flex: 2;
   font-size: 16;
-  font-family: flex-font;
+  font-family: studio-font;
   height: 40px;
   margin-right: 20px;
   margin-left: 10px;

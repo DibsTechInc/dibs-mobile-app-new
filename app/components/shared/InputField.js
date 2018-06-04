@@ -66,7 +66,7 @@ class InputField extends React.PureComponent {
         {this.props.label ? (
           <Label style={{
             ...this.props.labelStyle,
-            fontFamily: 'flex-font',
+            fontFamily: 'studio-font',
             fontSize: 16,
           }}
           >
@@ -79,7 +79,7 @@ class InputField extends React.PureComponent {
           ref={ref => this.textInput = ref}
           style={{
             ...this.props.inputStyle,
-            fontFamily: 'flex-font',
+            fontFamily: 'studio-font',
             fontSize: 16,
           }}
           {...this.props}

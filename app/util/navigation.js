@@ -57,7 +57,7 @@ export const getDrawerConfig = (drawerWidth, drawerPosition, initialRouteName, c
     activeTintColor: 'black',
     inactiveTintColor: 'black',
     labelStyle: {
-      fontFamily: 'flex-font',
+      fontFamily: 'studio-font',
     },
   },
   contentComponent,

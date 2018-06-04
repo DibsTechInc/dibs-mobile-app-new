@@ -153,12 +153,12 @@ class PaymentInfo extends PureComponent {
         cardScale={0.7}
         labels={labels}
         allowScroll
-        labelStyle={{ paddingTop: 10, fontFamily: 'flex-font' }}
+        labelStyle={{ paddingTop: 10, fontFamily: 'studio-font' }}
         validColor="black"
         invalidColor="red"
         placeholderColor="darkgray"
         onChange={this.onChange}
-        inputStyle={{ fontFamily: 'flex-font' }}
+        inputStyle={{ fontFamily: 'studio-font' }}
       />
     );
 

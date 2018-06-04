@@ -141,8 +141,8 @@ class App extends Component {
    */
   async getFonts() {
     await Font.loadAsync({
-      'flex-font': SourceSansProRegular,
-      'flex-font-heavy': SourceSansProBold,
+      'studio-font': SourceSansProRegular,
+      'studio-font-heavy': SourceSansProBold,
     });
 
     this.setState({ fontLoaded: true });

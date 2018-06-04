@@ -199,7 +199,7 @@ class CartPage extends PureComponent {
         <Container>
           <View>
             <View style={{ marginLeft: 20, marginTop: 20 }}>
-              <Text style={{ fontSize: 16, color: GREY, fontFamily: 'flex-font-heavy' }}>Items</Text>
+              <Text style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy' }}>Items</Text>
             </View>
             {this.props.cart.map(item => (
               <EventListItem

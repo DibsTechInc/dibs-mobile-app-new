@@ -111,7 +111,7 @@ class EmailPreferences extends PureComponent {
               },
               switchTitle: {
                 fontSize: 16,
-                fontFamily: 'flex-font',
+                fontFamily: 'studio-font',
               },
             }}
           />
@@ -131,7 +131,7 @@ class EmailPreferences extends PureComponent {
               },
               switchTitle: {
                 fontSize: 16,
-                fontFamily: 'flex-font',
+                fontFamily: 'studio-font',
               },
             }}
           />
