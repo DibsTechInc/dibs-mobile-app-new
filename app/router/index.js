@@ -134,7 +134,7 @@ class Navigator extends Component {
    */
   render() {
     const Nav = createStackNavigator(this.props.userToken);
-    return <Nav />;
+    return <Nav screenProps={{ isLoading: false }} />;
   }
 }
 

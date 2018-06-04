@@ -39,12 +39,12 @@ class DisableAccount extends PureComponent {
   async handleOnPress(isValid, { email, firstName, lastName }, validationResults, postSubmit = null) {
     this.props.enqueueNotice({
       title: 'Deactivate Account',
-      message: 'Please enter the email address associated with this account',
+      message: 'Please enter the email address associated with this account.',
       buttons: [{
-        text: 'Cancel',
+        text: 'CANCEL',
         onPress: () => {},
       }, {
-        text: 'Confirm',
+        text: 'CONFIRM',
         onPress: this.handleDelete,
       }],
       showInput: true,

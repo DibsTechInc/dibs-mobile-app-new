@@ -33,6 +33,7 @@ class FadeInView extends React.PureComponent {
           opacity: this.state.fadeAnim,
           ...this.props.style,
         }}
+        pointerEvents={this.props.touchable}
       >
         {this.props.children}
       </Animated.View>
@@ -40,12 +41,16 @@ class FadeInView extends React.PureComponent {
   }
 }
 
-FadeInView.defaultProps = { duration: 500 };
+FadeInView.defaultProps = {
+  duration: 500,
+  touchable: 'all',
+};
 
 FadeInView.propTypes = {
   style: PropTypes.shape(),
   children: PropTypes.oneOfType([PropTypes.node, PropTypes.arrayOf(PropTypes.node)]),
   duration: PropTypes.number,
+  touchable: PropTypes.string,
 };
 
 export default FadeInView;

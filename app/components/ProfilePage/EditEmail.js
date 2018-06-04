@@ -10,7 +10,7 @@ import Promise from 'bluebird';
 
 import { updateUser } from '../../actions';
 import { MaterialButton, LinearLoader, FadeInView, InputField } from '../shared';
-import { DEFAULT_BG, LIGHT_GREY } from '../../constants';
+import { DEFAULT_BG, LIGHT_GREY, RED } from '../../constants';
 import Config from '../../../config.json';
 import Header from '../Header';
 import { NormalText } from '../styled';
@@ -42,7 +42,8 @@ class EditEmail extends PureComponent {
 
     this.state = {
       email: '',
-      resultMessage: '',
+      successMessage: '',
+      errorMessage: '',
       isLoading: false,
     };
 
@@ -58,7 +59,7 @@ class EditEmail extends PureComponent {
     const isValidEmail = validEmail.test(this.state.email);
 
     if (!isValidEmail) {
-      this.setState({ resultMessage: 'Please enter a valid email address' });
+      this.setState({ errorMessage: 'Please enter a valid email address', successMessage: '' });
       return;
     }
 
@@ -71,7 +72,8 @@ class EditEmail extends PureComponent {
     this.setState({
       isLoading: false,
       email: '',
-      resultMessage: response.success ? 'Your email has been updated' : response.message,
+      successMessage: response.success ? 'Email successfully updated!' : '',
+      errorMessage: !response.success ? response.mesage : '',
     });
   }
   /**
@@ -83,7 +85,7 @@ class EditEmail extends PureComponent {
     if (this.state.isLoading) {
       return (
         <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <LinearLoader color={Config.STUDIO_COLOR} />
+          <LinearLoader showQuote color={Config.STUDIO_COLOR} />
         </FadeInView>
       );
     }
@@ -103,7 +105,8 @@ class EditEmail extends PureComponent {
             placeholder={this.props.email}
             containerStyle={{ marginBottom: 20, width: 250 }}
           />
-          {this.state.resultMessage.length && <StyledText>{this.state.resultMessage}</StyledText>}
+          {this.state.errorMessage.length && <StyledText style={{ position: 'absolute', left: '20%', top: '58%', color: RED, fontSize: 12 }}>{this.state.errorMessage}</StyledText>}
+          {this.state.successMessage.length && <StyledText style={{ position: 'absolute', left: '20%', top: '58%', fontSize: 12 }}>{this.state.successMessage}</StyledText>}
         </ScrollView>
         <KeyboardAccessoryView
           alwaysVisible

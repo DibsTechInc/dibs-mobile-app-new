@@ -30,10 +30,13 @@ const StyledButtonView = styled.View`
 `;
 
 const ErrorText = NormalText.extend`
+  fontSize: 12px;
   color: red;
   position: absolute;
+  left: 26%;
   top: 52%;
 `;
+
 /**
  * @class EnterEmail
  * @extends Component
@@ -54,6 +57,7 @@ class EnterEmail extends PureComponent {
     };
     this.handleOnPress = this.handleOnPress.bind(this);
   }
+
    /**
    * @returns {undefined}
    */
@@ -80,7 +84,8 @@ class EnterEmail extends PureComponent {
     await new Promise(res => this.setState({ isLoading: false, errorText: '' }, res));
 
     if (!route) {
-      this.setState({ isLoading: false, errorText: 'Uh oh, we could not verify this email.' });
+      this.setState({ isLoading: false, errorText: 'Please enter a valid email provider.' });
+      this.props.screenProps.isLoading = false;
     } else {
       this.props.navigation.navigate(route, { email, fromReset: false }); // last key for PW reset
     }

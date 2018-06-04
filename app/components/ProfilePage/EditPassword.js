@@ -1,14 +1,14 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { ScrollView } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import styled from 'styled-components';
 import { KeyboardAccessoryView } from 'react-native-keyboard-accessory';
 import Promise from 'bluebird';
 
 import { updateUserPassword } from '../../actions/UserActions';
 import { MaterialButton, FadeInView, InputField, LinearLoader } from '../shared';
-import { DEFAULT_BG, LIGHT_GREY } from '../../constants';
+import { DEFAULT_BG, LIGHT_GREY, RED } from '../../constants';
 import Config from '../../../config.json';
 import Header from '../Header';
 import { NormalText } from '../styled';
@@ -41,7 +41,10 @@ class EditPassword extends PureComponent {
       currentPassword: '',
       newPassword: '',
       newPasswordConfirmation: '',
-      resultMessage: '',
+      successMessage: '',
+      currentPasswordError: '',
+      passwordConfirmationError: '',
+      samePasswordError: '',
       isLoading: false,
     };
 
@@ -60,8 +63,29 @@ class EditPassword extends PureComponent {
 
     this.setState({ isLoading: true });
     const response = await new Promise(res => this.props.updateUserPassword(payload, res));
+    // if (response.message === 'Grr… the new password and confirmation do not match. Please try again.') {
+    //   this.setState({
+    //     passwordConfirmationError: 'Password confirmation does not match',
+    //   });
+    // }
+
+    // if (response.message === 'Hmm… this is the same as your current password. Please pick a new one!') {
+    //   this.setState({
+    //     samePasswordError: 'New password is same as current password',
+    //   });
+    // }
+
+    // if (response.message === 'Current password is incorrect. Please try again.') {
+    //   this.setState({
+    //     currentPasswordError: 'Current password is incorrect',
+    //   });
+    // }
+
     this.setState({
-      resultMessage: response.success ? 'Your password has been updated' : response.message,
+      passwordConfirmationError: response.message === 'Grr… the new password and confirmation do not match. Please try again.' ? 'Password confirmation does not match' : '',
+      samePasswordError: response.message === 'Hmm… this is the same as your current password. Please pick a new one!' ? 'New password is same as current password' : '',
+      currentPasswordError: response.message === 'Current password is incorrect. Please try again.' ? 'Current password is incorrect' : '',
+      successMessage: response.success ? 'Password updated!' : '',
       currentPassword: '',
       newPassword: '',
       newPasswordConfirmation: '',
@@ -89,30 +113,37 @@ class EditPassword extends PureComponent {
           <StyledText>
             Update your password below
           </StyledText>
-          <InputField
-            customFocus
-            autoCapitalize="none"
-            secureTextEntry
-            value={this.state.currentPassword}
-            onChangeText={currentPassword => this.setState({ currentPassword })}
-            placeholder="Current password"
-            containerStyle={{ marginBottom: 20, width: 250 }}
-          />
+          <View style={{ width: 250, position: 'relative '}}>
+            <InputField
+              customFocus
+              autoCapitalize="none"
+              secureTextEntry
+              value={this.state.currentPassword}
+              onChangeText={currentPassword => this.setState({ currentPassword })}
+              placeholder="Current password"
+              containerStyle={{ marginBottom: 30, width: 250 }}
+            />
+            {this.state.currentPasswordError.length && <StyledText style={{ fontSize: 12, color: RED, position: 'absolute', bottom: -12 }}>{this.state.currentPasswordError}</StyledText>}
+          </View>
           <InputField
             autoCapitalize="none"
             secureTextEntry
             onChangeText={newPassword => this.setState({ newPassword })}
             placeholder="New password"
-            containerStyle={{ marginBottom: 20, width: 250 }}
+            containerStyle={{ marginBottom: 30, width: 250 }}
           />
           <InputField
             autoCapitalize="none"
             secureTextEntry
             onChangeText={newPasswordConfirmation => this.setState({ newPasswordConfirmation })}
             placeholder="Confirm new password"
-            containerStyle={{ marginBottom: 20, width: 250 }}
+            containerStyle={{ marginBottom: 5, width: 250 }}
           />
-          {this.state.resultMessage.length && <StyledText>{this.state.resultMessage}</StyledText>}
+          <View style={{ width: 250 }}>
+            {this.state.passwordConfirmationError.length && <StyledText style={{ fontSize: 12, color: RED }}>{this.state.passwordConfirmationError}</StyledText>}
+            {this.state.samePasswordError.length && <StyledText style={{ fontSize: 12, color: RED }}>{this.state.samePasswordError}</StyledText>}
+            {this.state.successMessage.length && <StyledText style={{ fontSize: 12 }}>{this.state.successMessage}</StyledText>}
+          </View>
         </ScrollView>
         <KeyboardAccessoryView
           alwaysVisible

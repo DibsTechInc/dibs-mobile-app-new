@@ -118,7 +118,6 @@ export function validateEmail(email, callback) {
       if (res.message === 'No user with that email') {
         return callback(REGISTER_ROUTE);
       }
-      dispatch(enqueueApiError({ title: 'Uh oh!', message: `${res.message}.` }));
       return callback(null);
     } catch (err) {
       console.log(err);
@@ -185,7 +184,6 @@ export function submitLogin(email, password, callback) {
         dispatch(requestUserEvents());
         callback(res);
       } else {
-        dispatch(enqueueApiError({ title: 'Uh oh!', message: `${res.message}.` }));
         callback(res);
       }
     } catch (err) {

@@ -23,6 +23,7 @@ import {
   GREY,
   HEIGHT,
   WIDTH,
+  RED,
 } from '../../constants';
 import {
   getStudioName,
@@ -68,9 +69,14 @@ class Signup extends PureComponent {
       fullName: '',
       password: '',
       tAndC: false,
-      errorMessage: '',
+      // errorMessage: '',
       isLoading: false,
       cca2: 'US',
+      formEmptyError: '',
+      nameError: '',
+      passwordError: '',
+      tAndCError: '',
+      phoneError: '',
     };
 
     this.onPressFlag = this.onPressFlag.bind(this);
@@ -97,12 +103,8 @@ class Signup extends PureComponent {
     this.countryPicker.openModal();
   }
 
-  /**
-   * @returns {undefined}
-   */
-  async handleOnPress() {
-    const { isValid, formInfo } = this.checkForm();
-    let errorMsg;
+  setErrorMessages() {
+    const { formInfo } = this.checkForm();
 
     const {
       isValidFullName,
@@ -111,45 +113,94 @@ class Signup extends PureComponent {
       isValidPhoneNumber,
     } = formInfo;
 
-    if (!isValidFullName) {
-      errorMsg = 'Please enter a first and last name.';
-    } else if (!isValidPassword) {
-      errorMsg = 'Please make sure your password is at least 6 characters.';
-    } else if (!tAndC) {
-      errorMsg = 'Please agree to the terms and conditions.';
-    } else if (!isValidPhoneNumber) {
-      errorMsg = 'Please check that your phone number is correct.';
-    }
+    this.setState({
+      nameError: isValidFullName ? '' : 'Please enter a first and last name',
+      passwordError: isValidPassword ? '' : 'Password must be 6 characters',
+      phoneError: isValidPhoneNumber ? '' : 'Invalid phone number',
+      tAndCError: tAndC ? '' : 'Please agree to terms and conditions',
+    });
 
-    if (!isValid) {
-      return this.props.enqueueUserError({ title: errorMsg });
-    }
+    // if (!isValidFullName) {
+    //   this.setState({ nameError: 'Please enter a first and last name.' });
+    // }
 
-    const phone = this.phone.getValue();
+    // if (!isValidPassword) {
+    //   this.setState({ passwordError: 'Password must be 6 characters' });
+    // }
 
-    const payload = {
-      email: this.props.navigation.state.params.email,
-      fullname: this.state.fullName,
-      password: this.state.password,
-      phone,
-      signupStudioId: this.props.studioId,
-      signupStudioSource: this.props.studioSource,
-      referredBy: undefined,
-      signupDibsStudioId: this.props.dibsStudioId,
-      attempt: 0,
-    };
+    // switch (true) {
+    //   case isFormEmpty:
+    //     return this.setState({ formEmptyError: 'Please enter all required fields.' });
+    //   case !isValidFullName:
+    //     return this.setState({ nameError: 'Please enter a first and last name.' });
+    //   case !isValidPassword:
+    //     return this.setState({ passwordError: 'Password must be 6 characters' });
+    //   case !isValidPhoneNumber:
+    //     return this.setState({ phoneError: 'Please make sure your password is at least 6 characters.' });
+    //   case !tAndC:
+    //     return this.setState({ tAndCError: 'Please make sure your password is at least 6 characters.' });
+    //   default:
+    //     return this.setState({ formEmptyError: '', nameError: '', passwordError: '', phoneError: '', tAndCError: '' });
+    // }
+  }
 
-    this.setState({ isLoading: true });
-    try {
-      await promisify(this.props.signUpUser.bind(this, payload))();
-      return this.props.navigation.navigate(MAIN_ROUTE);
-    } catch (err) {
-      console.log(err);
-      this.setState({ isLoading: false });
-      if (err.message === 'Account disabled') {
-        return this.props.navigation.navigate(LOGIN_ROUTE, { accountDisabled: true, email: this.props.navigation.state.params.email });
+  /**
+   * @returns {undefined}
+   */
+  async handleOnPress() {
+    const { isValid } = this.checkForm();
+    this.setErrorMessages();
+    // let errorMsg;
+
+    // const {
+    //   isValidFullName,
+    //   isValidPassword,
+    //   tAndC,
+    //   isValidPhoneNumber,
+    // } = formInfo;
+
+    // switch (true) {
+    //   case isFormEmpty:
+    //     errorMsg = 
+    // }
+
+    // if (!isValidFullName) {
+    //   errorMsg = 'Please enter a first and last name.';
+    // } else if (!isValidPassword) {
+    //   errorMsg = 'Please make sure your password is at least 6 characters.';
+    // } else if (!tAndC) {
+    //   errorMsg = 'Please agree to the terms and conditions.';
+    // } else if (!isValidPhoneNumber) {
+    //   errorMsg = 'Please check that your phone number is correct.';
+    // }
+
+    if (isValid) {
+      const phone = this.phone.getValue();
+
+      const payload = {
+        email: this.props.navigation.state.params.email,
+        fullname: this.state.fullName,
+        password: this.state.password,
+        phone,
+        signupStudioId: this.props.studioId,
+        signupStudioSource: this.props.studioSource,
+        referredBy: undefined,
+        signupDibsStudioId: this.props.dibsStudioId,
+        attempt: 0,
+      };
+
+      this.setState({ isLoading: true });
+      try {
+        await promisify(this.props.signUpUser.bind(this, payload))();
+        return this.props.navigation.navigate(MAIN_ROUTE);
+      } catch (err) {
+        console.log(err);
+        this.setState({ isLoading: false });
+        if (err.message === 'Account disabled') {
+          return this.props.navigation.navigate(LOGIN_ROUTE, { accountDisabled: true, email: this.props.navigation.state.params.email });
+        }
+        return null;
       }
-      return null;
     }
   }
 
@@ -212,56 +263,59 @@ class Signup extends PureComponent {
     return (
       <FadeInView>
         <CustomStatusBar backgroundColor={'transparent'} barStyle="dark-content" />
-        <ScrollView contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', height: HEIGHT * 0.50 }}>
+        <ScrollView contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', height: HEIGHT * 0.50, marginTop: 30 }}>
           <StyledText>
             Just a few details before we get started
           </StyledText>
-          <InputField
-            value={this.props.navigation.state.params.email || ''}
-            inputStyle={{ color: GREY }}
-            editable={false}
-            containerStyle={{ marginBottom: 20, width: 250 }}
-          />
-          <InputField
-            value={this.state.fullName}
-            onChangeText={fullName => this.setState({ fullName })}
-            placeholder="First and last name"
-            containerStyle={{ marginBottom: 20, width: 250 }}
-          />
-          <InputField
-            value={this.state.password}
-            secureTextEntry
-            onChangeText={password => this.setState({ password })}
-            placeholder="Password (6 char min)"
-            containerStyle={{ marginBottom: 20, width: 250 }}
-          />
-          <PhoneInput
-            ref={(ref) => {
-              this.phone = ref;
-            }}
-            onPressFlag={this.onPressFlag}
-            textStyle={{ fontFamily: 'flex-font' }}
-            textProps={{ placeholder: 'Mobile number' }}
-            style={{ width: 250, borderBottomWidth: 1, paddingBottom: 5, marginTop: 10, borderBottomColor: Config.STUDIO_COLOR }}
-          />
-          <CountryPicker
-            ref={(ref) => {
-              this.countryPicker = ref;
-            }}
-            onChange={value => this.selectCountry(value)}
-            translation="eng"
-            cca2={this.state.cca2}
-            closeable
-            filterable
-            styles={{
-              countryName: { fontFamily: 'flex-font' },
-              input: { fontFamily: 'flex-font' },
-              letterText: { fontFamily: 'flex-font' },
-            }}
-          >
-            <View />
-          </CountryPicker>
-          <View style={{ width: 250, height: 30, position: 'relative', marginTop: 15, flexDirection: 'row' }}>
+          <View style={{ position: 'relative' }}>
+            <InputField
+              value={this.state.fullName}
+              onChangeText={fullName => this.setState({ fullName })}
+              placeholder="First and last name"
+              containerStyle={{ marginBottom: 30, width: 250 }}
+            />
+            {this.state.nameError.length && <NormalText style={{ color: RED, position: 'absolute', bottom: 10, fontSize: 12 }}>{this.state.nameError}</NormalText>}
+          </View>
+          <View style={{ position: 'relative' }}>
+            <InputField
+              value={this.state.password}
+              secureTextEntry
+              onChangeText={password => this.setState({ password })}
+              placeholder="Password (6 char min)"
+              containerStyle={{ marginBottom: 30, width: 250 }}
+            />
+            {this.state.passwordError.length && <NormalText style={{ color: RED, position: 'absolute', bottom: 10, fontSize: 12 }}>{this.state.passwordError}</NormalText>}
+          </View>
+          <View style={{ position: 'relative' }}>
+            <PhoneInput
+              ref={(ref) => {
+                this.phone = ref;
+              }}
+              onPressFlag={this.onPressFlag}
+              textStyle={{ fontFamily: 'flex-font' }}
+              textProps={{ placeholder: 'Mobile number' }}
+              style={{ width: 250, borderBottomWidth: 1, paddingBottom: 5, marginTop: 10, marginBottom: 30, borderBottomColor: Config.STUDIO_COLOR }}
+            />
+            <CountryPicker
+              ref={(ref) => {
+                this.countryPicker = ref;
+              }}
+              onChange={value => this.selectCountry(value)}
+              translation="eng"
+              cca2={this.state.cca2}
+              closeable
+              filterable
+              styles={{
+                countryName: { fontFamily: 'flex-font' },
+                input: { fontFamily: 'flex-font' },
+                letterText: { fontFamily: 'flex-font' },
+              }}
+            >
+              <View />
+            </CountryPicker>
+            {this.state.phoneError.length && <NormalText style={{ color: RED, position: 'absolute', bottom: 10, fontSize: 12 }}>{this.state.phoneError}</NormalText>}
+          </View>
+          <View style={{ width: 250, height: 30, position: 'relative', marginTop: 5, flexDirection: 'row' }}>
             <CheckBox
               title=""
               iconType="material-community"
@@ -283,6 +337,7 @@ class Signup extends PureComponent {
               </LinkedText> Terms and Conditions.
               </NormalText>
             </View>
+            {this.state.tAndCError.length && <NormalText style={{ color: RED, position: 'absolute', bottom: -55, fontSize: 12 }}>{this.state.tAndCError}</NormalText>}
           </View>
         </ScrollView>
         <KeyboardAccessoryView

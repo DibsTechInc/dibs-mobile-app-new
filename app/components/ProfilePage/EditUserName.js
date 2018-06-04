@@ -27,10 +27,6 @@ const StyledText = NormalText.extend`
   margin-bottom: 7%;
 `;
 
-const ErrorText = StyledText.extend`
-  color: ${props => props.response ? BLACK : RED };
-`;
-
 /**
  * @class Signup
  * @extends PureComponent
@@ -47,7 +43,8 @@ class EditUserName extends PureComponent {
     this.state = {
       firstName: '',
       lastName: '',
-      resultMessage: '',
+      successMessage: '',
+      errorMessage: '',
       isLoading: false,
       response: false,
     };
@@ -70,7 +67,8 @@ class EditUserName extends PureComponent {
       isLoading: false,
       firstName: '',
       lastName: '',
-      resultMessage: response.success ? 'Your name has been updated!' : response.message,
+      successMessage: response.success ? 'Name successfully updated!' : '',
+      errorMessage: !response.success ? response.message : '',
       response: response.success,
     });
   }
@@ -83,7 +81,7 @@ class EditUserName extends PureComponent {
     if (this.state.isLoading) {
       return (
         <FadeInView style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <LinearLoader color={Config.STUDIO_COLOR} />
+          <LinearLoader showQuote color={Config.STUDIO_COLOR} />
         </FadeInView>
       );
     }
@@ -108,7 +106,8 @@ class EditUserName extends PureComponent {
             placeholder={this.props.lastName}
             containerStyle={{ marginBottom: 20, width: 250 }}
           />
-          {this.state.resultMessage.length && <ErrorText response={this.state.response}>{this.state.resultMessage}</ErrorText>}
+          {this.state.errorMessage.length && <StyledText style={{ position: 'absolute', left: '20%', top: '64%', color: RED, fontSize: 12 }}>{this.state.errorMessage}</StyledText>}
+          {this.state.successMessage.length && <StyledText style={{ position: 'absolute', left: '20%', top: '64%', fontSize: 12 }}>{this.state.successMessage}</StyledText>}
         </ScrollView>
         <KeyboardAccessoryView
           alwaysVisible

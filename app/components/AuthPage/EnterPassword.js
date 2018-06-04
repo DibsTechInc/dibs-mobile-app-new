@@ -31,9 +31,11 @@ const StyledButtonView = styled.View`
 `;
 
 const ErrorText = NormalText.extend`
+  fontSize: 12px;
+  left: 26%;
   color: red;
   position: absolute;
-  top: 60%;
+  top: 50%;
 `;
 
 /**
@@ -77,7 +79,7 @@ class EnterPassword extends PureComponent {
     await new Promise(res => this.setState({ isLoading: false, errorText: '' }, res));
 
     if (response.code !== 200) {
-      this.setState({ isLoading: false, errorText: response.message });
+      this.setState({ isLoading: false, errorText: 'Invalid password' });
       return;
     }
 
@@ -122,9 +124,10 @@ class EnterPassword extends PureComponent {
             autoCapitalize="none"
             onSubmitEditing={this.handleOnPress}
             onChangeText={password => this.setState({ password })}
-            containerStyle={{ marginBottom: 10, width: 200, minWidth: 200 }}
+            containerStyle={{ marginBottom: 30, width: 200, minWidth: 200 }}
             labelStyle={{ marginBottom: 20, textAlign: 'center' }}
           />
+          {this.state.errorText.length && <ErrorText>{this.state.errorText}</ErrorText>}
           <TouchableOpacity
             onPress={this.navigateToPasswordReset}
             style={{ marginBottom: 20 }}
@@ -133,7 +136,6 @@ class EnterPassword extends PureComponent {
               Forgot your password?
             </NormalText>
           </TouchableOpacity>
-          {this.state.errorText.length && <ErrorText>{this.state.errorText}</ErrorText>}
         </ScrollView>
         <KeyboardAccessoryView
           alwaysVisible
