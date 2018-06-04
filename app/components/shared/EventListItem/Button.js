@@ -7,9 +7,44 @@ import styled from 'styled-components';
 import Config from '../../../../config.json';
 import { GREY, WHITE, DARK_TEXT_GREY } from '../../../constants/index';
 import { addToCart, addToWaitlist, enqueueNotice } from '../../../actions';
-import { lightenDarkenColor } from '../../../helpers';
+import { lightenDarkenColor, Enum } from '../../../helpers';
 import MaterialButton from '../../shared/MaterialButton';
 import { HeavyText } from '../../styled';
+
+const ButtonStates = Enum([
+  'Available',
+  'SoldOut',
+  'Waitlist',
+  'Waitlisted',
+  'Booked',
+  'BookedDisabled', // case when you booked a class and cannot book again
+]);
+
+const BACKGROUND_COLOR = {
+  [WHITE]: [ButtonStates.SoldOut, ButtonStates.Waitlisted, ButtonStates.Booked, ButtonStates.BookedDisabled],
+  [lightenDarkenColor(GREY, 16)]: [ButtonStates.Waitlist],
+  [Config.STUDIO_COLOR]: [ButtonStates.Available],
+};
+
+const BORDER_COLOR = {
+  [GREY]: [ButtonStates.BookedDisabled, ButtonStates.SoldOut, ButtonStates.Waitlist, ButtonStates.Waitlisted],
+  [Config.STUDIO_COLOR]: [ButtonStates.Available, ButtonStates.Booked],
+};
+
+const TEXT_COLOR = {
+  [WHITE]: [ButtonStates.Available, ButtonStates.Waitlist],
+  [Config.STUDIO_COLOR]: [ButtonStates.Booked],
+  [GREY]: [ButtonStates.SoldOut, ButtonStates.BookedDisabled, ButtonStates.Waitlisted],
+};
+
+const TEXT = {
+  Book: [ButtonStates.Available],
+  Booked: [ButtonStates.Booked, ButtonStates.BookedDisabled],
+  'Sold Out': [ButtonStates.SoldOut],
+  Waitlist: [ButtonStates.Waitlist],
+  Waitlisted: [ButtonStates.Waitlisted],
+};
+
 
 const StudioColoredQuantity = styled.TouchableOpacity`
   align-items: center;
@@ -32,19 +67,49 @@ const QuantityDisplay = HeavyText.extend`
  */
 class Button extends React.PureComponent {
   /**
+   * @static
+   * @param {Object} props for determining new buton state
+   * @returns {number} current button state based on props
+   */
+  static getButtonState(props) {
+    switch (true) {
+      case Boolean(props.soldOut && props.userHasBooked):
+        return ButtonStates.BookedDisabled;
+
+      case Boolean(props.waitlisted):
+        return ButtonStates.Waitlisted;
+
+      case Boolean(props.soldOut && props.has_waitlist):
+        return ButtonStates.Waitlist;
+
+      case Boolean(props.soldOut):
+        return ButtonStates.SoldOut;
+
+      case Boolean(props.userHasBooked):
+        return ButtonStates.Booked;
+
+      default:
+        return ButtonStates.Available;
+    }
+  }
+  /**
    * @constructor
    * @constructs Button
    * @param {Object} props for component
    */
   constructor(props) {
     super(props);
-    this.state = { waitlisting: false };
-    this.addToWaitlist = this.addToWaitlist.bind(this);
+    this.state = {
+      waitlisting: false,
+      buttonState: Button.getButtonState(props),
+    };
     this.onPress = this.onPress.bind(this);
-    this.getBackgroundColor = this.getBackgroundColor.bind(this);
-    this.getText = this.getText.bind(this);
-    this.getTextColor = this.getTextColor.bind(this);
+    this.addToWaitlist = this.addToWaitlist.bind(this);
     this.addToCart = this.addToCart.bind(this);
+    this.getBackgroundColor = this.getStyleFromObject.bind(this, BACKGROUND_COLOR);
+    this.getBorderColor = this.getStyleFromObject.bind(this, BORDER_COLOR);
+    this.getText = this.getStyleFromObject.bind(this, TEXT);
+    this.getTextColor = this.getStyleFromObject.bind(this, TEXT_COLOR);
   }
   /**
    * @returns {undefined}
@@ -73,34 +138,11 @@ class Button extends React.PureComponent {
     return this.addToCart();
   }
   /**
-   * @returns {string} color for button
+   * @param {Object} obj constant styles object to match based on current state
+   * @return {string} selected style property
    */
-  getBackgroundColor() {
-    if (this.props.waitlisted) return WHITE;
-    if (this.props.maxSeatsReached && this.props.has_waitlist) return lightenDarkenColor(GREY, 16);
-    if (this.props.soldOut) return WHITE;
-    if (this.props.userHasBooked) return WHITE;
-    return Config.STUDIO_COLOR;
-  }
-  /**
-   * @returns {string} text for button
-   */
-  getText() {
-    if (this.props.waitlisted) return 'Waitlisted';
-    if (this.props.soldOut && this.props.has_waitlist) return 'Waitlist';
-    if (this.props.soldOut) return 'Sold Out';
-    if (this.props.userHasBooked) return 'Booked';
-    return 'Book';
-  }
-  /**
-   * @returns {string} text color
-   */
-  getTextColor() {
-    if (this.props.waitlisted || (this.props.soldOut && !this.props.has_waitlist)) {
-      return GREY;
-    }
-    if (this.props.userHasBooked) return Config.STUDIO_COLOR;
-    return WHITE;
+  getStyleFromObject(obj) {
+    return (Object.entries(obj).find(([, states]) => states.includes(this.state.buttonState)) || [])[0];
   }
   /**
    * @returns {undefined}
@@ -142,17 +184,13 @@ class Button extends React.PureComponent {
         </StudioColoredQuantity>
       );
     }
-    const shouldHaveBorder =
-      this.props.waitlisted
-      || this.props.userHasBooked
-      || (this.props.soldOut && !this.props.has_waitlist);
     return (
       <MaterialButton
         style={{
           width: 80,
           height: 40,
-          borderWidth: Number(shouldHaveBorder),
-          borderColor: this.props.waitlisted ? GREY : Config.STUDIO_COLOR,
+          borderWidth: 1,
+          borderColor: this.getBorderColor(),
         }}
         backgroundColor={this.getBackgroundColor()}
         text={this.getText()}

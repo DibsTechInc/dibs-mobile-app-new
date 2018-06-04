@@ -22,7 +22,7 @@ import Map from './Map';
 
 const EventRow = SpaceBetweenRow.extend`
   align-items: center;
-  padding-horizontal: 15;
+  padding-horizontal: 10;
   padding-vertical: 10;
   margin-bottom: 10;
 `;
@@ -114,7 +114,6 @@ class UpcomingEvent extends PureComponent {
           paddingTop: this.props.forReceiptPage ? 10 : 0,
           paddingBottom: isIphoneX() ? 80 : +(!this.props.forReceiptPage && 60),
           backgroundColor: WHITE,
-          marginLeft: 10,
         }}
       >
         <ScrollView
@@ -129,7 +128,7 @@ class UpcomingEvent extends PureComponent {
             <View style={{ margin: 10 }}>
               <NormalText style={{ fontSize: 16, color: GREY, fontFamily: 'flex-font-heavy', marginLeft: 5 }}>
                 Item(s)
-                  </NormalText>
+              </NormalText>
             </View>
           }
           <EventRow>

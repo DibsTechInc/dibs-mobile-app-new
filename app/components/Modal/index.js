@@ -18,9 +18,19 @@ import {
   getAlertHasInput,
   getAlertInputPlaceholder,
 } from '../../selectors';
-import { setAlertInputValue } from '../../actions';
+import { setAlertInputValue, dequeueAlert } from '../../actions';
 import { HeavyText, NormalText, FlexRow } from '../styled';
 import { FadeInView, InputField } from '../shared';
+
+const TouchableContainer = styled.TouchableOpacity`
+  align-items: center;
+  bottom: 0;
+  justify-content: ${props => (props.showInput ? 'flex-start' : 'center')};
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+`;
 
 const Title = HeavyText.extend`
   color: ${DARK_TEXT_GREY};
@@ -72,7 +82,14 @@ class AlertModal extends React.PureComponent {
    */
   constructor(props) {
     super(props);
+    this.onBackgroundPress = this.onBackgroundPress.bind(this);
     this.onChange = this.onChange.bind(this);
+  }
+  /**
+   * @returns {undefined}
+   */
+  onBackgroundPress() {
+    this.props.dequeueAlert();
   }
   /**
    * @param {Object} value of input
@@ -83,7 +100,7 @@ class AlertModal extends React.PureComponent {
   }
   /**
    * render
-   * @returns {JSX.Element} HTML
+   * @returns {JSX.Element} XML
    */
   render() {
     if (!this.props.queueHasMessages) return null;
@@ -92,60 +109,65 @@ class AlertModal extends React.PureComponent {
         duration={100}
         style={{
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          alignItems: 'center',
           flex: 1,
           right: 0,
-          justifyContent: this.props.showInput ? 'flex-start' : 'center',
           left: 0,
           position: 'absolute',
           top: 0,
           bottom: 0,
         }}
       >
-        <FadeInView
-          duration={250}
-          style={{
-            alignItems: 'center',
-            backgroundColor: WHITE,
-            borderRadius: 5,
-            flex: 0,
-            marginTop: this.props.showInput ? 115 : 0,
-            width: 250,
-          }}
+        <TouchableContainer
+          activeOpacity={1}
+          onPress={this.onBackgroundPress}
+          showInput={this.props.showInput}
         >
-          <Title>
-            {this.props.title}
-          </Title>
-          {this.props.message ? (
-            <Message>
-              {this.props.message}
-            </Message>
-          ) : null}
-          {this.props.showInput ? (
-            <InputField
-              onChangeText={this.onChange}
-              value={this.props.inputValue}
-              placeholder={this.props.placeholder}
-              noNavigation
-              containerStyle={{ width: 200, marginBottom: 10 }}
-              autoFocus
-            />
-          ) : null}
-          <Border />
-          <ButtonRow>
-            {this.props.buttons.map(({ onPress, text }) => (
-              <Button
-                key={text}
-                onPress={onPress}
-                activeOpacity={1}
-              >
-                <ButtonText>
-                  {text}
-                </ButtonText>
-              </Button>
-            ))}
-          </ButtonRow>
-        </FadeInView>
+          <FadeInView
+            duration={250}
+            style={{
+              alignItems: 'center',
+              backgroundColor: WHITE,
+              borderRadius: 5,
+              flex: 0,
+              marginTop: this.props.showInput ? 115 : 0,
+              width: 250,
+            }}
+          >
+            <Title>
+              {this.props.title}
+            </Title>
+            {this.props.message ? (
+              <Message>
+                {this.props.message}
+              </Message>
+            ) : null}
+            {this.props.showInput ? (
+              <InputField
+                onChangeText={this.onChange}
+                value={this.props.inputValue}
+                placeholder={this.props.placeholder}
+                noNavigation
+                containerStyle={{ width: 200, marginBottom: 10 }}
+                autoFocus
+                autoCapitalize="none"
+              />
+            ) : null}
+            <Border />
+            <ButtonRow>
+              {this.props.buttons.map(({ onPress, text }) => (
+                <Button
+                  key={text}
+                  onPress={onPress}
+                  activeOpacity={1}
+                >
+                  <ButtonText>
+                    {text}
+                  </ButtonText>
+                </Button>
+              ))}
+            </ButtonRow>
+          </FadeInView>
+        </TouchableContainer>
       </FadeInView>
     );
   }
@@ -160,6 +182,7 @@ AlertModal.propTypes = {
   inputValue: PropTypes.string.isRequired,
   setAlertInputValue: PropTypes.func.isRequired,
   placeholder: PropTypes.string.isRequired,
+  dequeueAlert: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
@@ -173,6 +196,7 @@ const mapStateToProps = state => ({
 });
 const mapDispatchToProps = {
   setAlertInputValue,
+  dequeueAlert,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(AlertModal);
