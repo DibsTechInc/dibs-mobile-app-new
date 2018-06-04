@@ -6,6 +6,8 @@ import { enqueueConnectionError } from '../actions';
 
 let lastCheck;
 
+const HOST = __DEV__ ? 'https://www.ondibs.com' : Config.DIBS_HOST;
+
 /**
  * @returns {undefined}
  */
@@ -51,7 +53,7 @@ async function dibsFetch(refreshToken, path, {
   }
   const options = { headers, ...opts };
   if (body) options.body = JSON.stringify(body);
-  let res = await fetch(`${Config.DIBS_HOST}${path}`, options);
+  let res = await fetch(`${HOST}${path}`, options);
   if (type === 'json') {
     try {
       res = await res.json();
