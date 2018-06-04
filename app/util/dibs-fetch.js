@@ -6,7 +6,7 @@ import { enqueueConnectionError } from '../actions';
 
 let lastCheck;
 
-const HOST = __DEV__ ? 'https://www.ondibs.com' : Config.DIBS_HOST;
+const HOST = __DEV__ ? Config.DIBS_HOST : 'https://www.ondibs.com';
 
 /**
  * @returns {undefined}
