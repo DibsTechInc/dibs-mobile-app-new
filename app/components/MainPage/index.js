@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { NavigationActions } from 'react-navigation';
 import { Svg, Path, LinearGradient, Stop, Defs } from 'react-native-svg';
-import { Updates } from 'expo';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 
 import backgroundImg from '../../../assets/img/main-page.png';
@@ -111,21 +110,6 @@ class MainPage extends React.PureComponent {
    */
   async componentWillMount() {
     await this.getUpdates();
-  }
-  /**
-   * @returns {undefined}
-   */
-  async getUpdates() {
-    if (__DEV__) {
-      return;
-    }
-
-    const update = await Updates.checkForUpdateAsync();
-
-    if (update.isAvailable) {
-      await Updates.fetchUpdateAsync();
-      Updates.reloadFromCache();
-    }
   }
   /**
    * @returns {undefined}

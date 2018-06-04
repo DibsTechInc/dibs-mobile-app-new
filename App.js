@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
-import { Font, ScreenOrientation, Updates, Asset } from 'expo';
+import { Font, ScreenOrientation, Asset } from 'expo';
 import styled from 'styled-components';
 import { AsyncStorage, View } from 'react-native';
 import Promise from 'bluebird';
@@ -55,8 +55,6 @@ const StyledLoadingPage = styled.View`
   flex: 5;
 `;
 
-const UPDATER_TRACKER_KEY = 'UPD8TERMAN';
-
 /**
  * @class App
  * @extends Component
@@ -83,14 +81,6 @@ class App extends Component {
    * @returns {undefined}
    */
   async componentWillMount() {
-    const setToken = await AsyncStorage.getItem(UPDATER_TRACKER_KEY);
-
-    if (!setToken) {
-      await AsyncStorage.setItem(UPDATER_TRACKER_KEY, 'checked');
-      Updates.reload();
-      return;
-    }
-
     await this.getImages();
     await this.getFonts();
     await this.getAssets();
