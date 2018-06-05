@@ -105,7 +105,7 @@ class ProfilePage extends PureComponent {
       bcc: '', // string or array of email addresses
       subject: `User ID ${this.props.userId} Feedback`,
       body: '',
-    }).catch(() => this.props.enqueueUserError({ title: 'Uh oh!', message: 'Something went wrong opening your mail client' }));
+    }).catch(() => this.props.enqueueUserError({ title: 'Error!', message: 'Something went wrong opening your mail client' }));
   }
   /**
    * @returns {JSX} XML

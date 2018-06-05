@@ -236,17 +236,17 @@ export function submitCartForPurchase() {
       } else {
         let message = `${res.message}.`;
         if (res.removedEvents.every(r => r.reason === 'SOLD_OUT')) {
-          message = 'Oh dang! The classes you chose were just recently sold out…. please pick another option.';
+          message = 'Oh no! The classes you chose were just recently sold out…. please pick another option.';
           res.removedEvents.map(event => dispatch(setEventSoldOut({ eventid: event.eventid })));
         }
         if (res.removedEvents.every(r => r.reason === 'PRICE_CHANGE')) {
-          message = 'Oh dang! The classes you chose had their price increase more than 5 minutes ago. Please refresh and try again';
+          message = 'Oh no! The classes you chose had their price increase more than 5 minutes ago. Please refresh and try again';
         }
-        dispatch(enqueueApiError({ title: 'Uh oh!', message }));
+        dispatch(enqueueApiError({ title: 'Error!', message }));
       }
     } catch (err) {
       console.log(err);
-      dispatch(enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong checking out your cart.' }));
+      dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong checking out your cart.' }));
     }
     const eventids = uniq(cart.data.map(({ eventid }) => eventid));
     dispatch(requestEventData({ eventids }));

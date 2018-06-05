@@ -29,13 +29,13 @@ export function requestCreditCardInfo(showAlert = true) {
       dispatch(setCreditCardLoadingFalse());
       if (res.success) dispatch(setCreditCard(res.creditCard));
       else if (showAlert && !['The user does not have a card', 'User action required'].includes(res.message)) {
-        dispatch(enqueueApiError({ title: 'Uh oh!', message: `${res.message}.` }));
+        dispatch(enqueueApiError({ title: 'Error!', message: `${res.message}.` }));
       } else if (!['The user does not have a card', 'User action required'].includes(res.message)) {
         throw new Error('Failed to get the user\'s billing info');
       }
     } catch (err) {
       console.log(err);
-      if (showAlert) dispatch(enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong getting your billing information.' }));
+      if (showAlert) dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong getting your billing information.' }));
       else throw err;
     }
   };
@@ -62,10 +62,10 @@ export function updateCreditCard({ ccNum, ccCVC, expiration }, callback = () => 
         },
       });
       if (res.success) dispatch(setCreditCard(res.card));
-      else enqueueApiError({ title: 'Uh oh!', message: `${res.message}.` });
+      else enqueueApiError({ title: 'Error!', message: `${res.message}.` });
     } catch (err) {
       console.log(err);
-      enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong updating your credit card.' });
+      enqueueApiError({ title: 'Error!', message: 'Something went wrong updating your credit card.' });
     }
     dispatch(setCreditCardLoadingFalse());
     callback();

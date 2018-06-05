@@ -63,23 +63,6 @@ class EditPassword extends PureComponent {
 
     this.setState({ isLoading: true });
     const response = await new Promise(res => this.props.updateUserPassword(payload, res));
-    // if (response.message === 'Grr… the new password and confirmation do not match. Please try again.') {
-    //   this.setState({
-    //     passwordConfirmationError: 'Password confirmation does not match',
-    //   });
-    // }
-
-    // if (response.message === 'Hmm… this is the same as your current password. Please pick a new one!') {
-    //   this.setState({
-    //     samePasswordError: 'New password is same as current password',
-    //   });
-    // }
-
-    // if (response.message === 'Current password is incorrect. Please try again.') {
-    //   this.setState({
-    //     currentPasswordError: 'Current password is incorrect',
-    //   });
-    // }
 
     this.setState({
       passwordConfirmationError: response.message === 'Grr… the new password and confirmation do not match. Please try again.' ? 'Password confirmation does not match' : '',
@@ -113,7 +96,7 @@ class EditPassword extends PureComponent {
           <StyledText>
             Update your password below
           </StyledText>
-          <View style={{ width: 250, position: 'relative '}}>
+          <View style={{ width: 250, position: 'relative' }}>
             <InputField
               customFocus
               autoCapitalize="none"

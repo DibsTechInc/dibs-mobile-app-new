@@ -80,7 +80,7 @@ class PasswordReset extends React.PureComponent {
         ) : (
           <MessageContainer>
             <Header>
-              {this.state.success ? 'Password Reset Link Sent!' : 'Uh oh!'}
+              {this.state.success ? 'Password Reset Link Sent!' : 'Error!'}
             </Header>
             <Message>
               {this.state.success ? successMessage : this.state.message}

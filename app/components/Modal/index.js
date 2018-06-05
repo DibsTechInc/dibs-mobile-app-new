@@ -38,6 +38,7 @@ const Title = HeavyText.extend`
   padding-horizontal: 10;
   padding-vertical: 10;
   text-align: center;
+  margin-top: 10px;
 `;
 
 const Message = NormalText.extend`
@@ -45,7 +46,7 @@ const Message = NormalText.extend`
   border-bottom-width: 1;
   color: ${DARK_TEXT_GREY};
   margin-bottom: 15;
-  padding-horizontal: 10;
+  padding-horizontal: 15;
   text-align: left;
 `;
 

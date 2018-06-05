@@ -88,7 +88,7 @@ export function requestUserData(showAlert = true) {
       }
     } catch (err) {
       console.log(err);
-      if (showAlert) dispatch(enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong loading your account.' }));
+      if (showAlert) dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong loading your account.' }));
       else throw err;
     }
   };
@@ -121,7 +121,7 @@ export function validateEmail(email, callback) {
       return callback(null);
     } catch (err) {
       console.log(err);
-      dispatch(enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong validating your email.' }));
+      dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong validating your email.' }));
       return callback(null);
     }
   };
@@ -151,13 +151,13 @@ export function signUpUser(payload, callback) {
       if (res.accountDisabled) {
         throw new Error('Account disabled');
       }
-      dispatch(enqueueApiError({ title: 'Uh oh!', message: `${res.message}.` }));
+      dispatch(enqueueApiError({ title: 'Error!', message: `${res.message}.` }));
       return callback(res);
     } catch (err) {
       console.log(err);
       if (err.message !== 'Account disabled') {
         dispatch(enqueueApiError({
-          title: 'Uh oh!',
+          title: 'Error!',
           message: 'Something went wrong during registration.',
         }));
       }
@@ -192,7 +192,7 @@ export function submitLogin(email, password, callback) {
         callback(res);
       }
     } catch (err) {
-      dispatch(enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong logging you in.' }));
+      dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong logging you in.' }));
       console.log(err);
     }
   };
@@ -301,11 +301,11 @@ export function disableUserAccount() {
       });
 
       if (res.success) dispatch(logOutUser());
-      else dispatch(enqueueApiError({ title: 'Uh oh!', message: `${res.message}.` }));
+      else dispatch(enqueueApiError({ title: 'Error!', message: `${res.message}.` }));
       return res;
     } catch (err) {
       console.log(err);
-      dispatch(enqueueApiError({ title: 'Uh oh!', message: 'There was a problem deactivating your account.' }));
+      dispatch(enqueueApiError({ title: 'Error!', message: 'There was a problem deactivating your account.' }));
       return { success: false };
     }
   };

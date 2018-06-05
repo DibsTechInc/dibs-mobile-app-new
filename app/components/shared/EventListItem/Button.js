@@ -117,21 +117,21 @@ class Button extends React.PureComponent {
   onPress() {
     if (this.props.maxSeatsReached) {
       return this.props.enqueueNotice({
-        title: 'Add to Waitlist',
-        message: `Do you want to be added to the waitlist for ${this.props.name}?`,
+        title: 'Add to waitlist?',
+        message: 'If a spot opens up, we will book it for you and let you know that you are in.',
         buttons: [
-          { text: 'Yes', onPress: this.addToWaitlist },
-          { text: 'No', onPress: () => {} },
+          { text: 'CANCEL', onPress: () => {} },
+          { text: 'JOIN', onPress: this.addToWaitlist },
         ],
       });
     }
     if (this.props.userHasBooked) {
       return this.props.enqueueNotice({
-        title: 'Are you sure?',
-        message: `You already have a spot booked in ${this.props.name}, are you sure you want to book another?`,
+        title: 'Do you want to book another spot?',
+        message: 'You already have a spot booked in this class. Click ‘yes’ to add this class to your cart.',
         buttons: [
-          { text: 'Yes', onPress: this.addToCart },
-          { text: 'No', onPress: () => { } },
+          { text: 'CANCEL', onPress: () => { } },
+          { text: 'YES', onPress: this.addToCart },
         ],
       });
     }

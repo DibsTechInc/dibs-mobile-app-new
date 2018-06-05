@@ -89,11 +89,11 @@ class UpcomingEvent extends PureComponent {
    */
   startCancel() {
     this.props.enqueueNotice({
-      title: 'Are you sure?',
-      message: `Do you want to drop ${this.props.name}?`,
+      title: 'Remove from waitlist?',
+      message: `Click 'yes' to drop ${this.props.name}.`,
       buttons: [
-        { text: 'Yes', onPress: this.removeFromClass },
-        { text: 'Cancel', onPress: () => { } },
+        { text: 'CANCEL', onPress: () => { } },
+        { text: 'YES', onPress: this.removeFromClass },
       ],
     });
   }
