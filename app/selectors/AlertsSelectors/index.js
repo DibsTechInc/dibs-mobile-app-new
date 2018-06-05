@@ -60,7 +60,10 @@ export const getAlertButtons = createSelector(
         },
       }));
     }
-    return [{ text: 'OK', onPress: () => store.dispatch(dequeueAlert()) }];
+    return [
+      { text: 'OK', onPress: () => store.dispatch(dequeueAlert()) },
+      { text: 'CANCEL', onPress: () => { } },
+    ];
   }
 );
 
