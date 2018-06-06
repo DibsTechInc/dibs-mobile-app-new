@@ -43,7 +43,7 @@ class FadeInView extends React.PureComponent {
 
 FadeInView.defaultProps = {
   duration: 500,
-  touchable: 'all',
+  touchable: 'auto',
 };
 
 FadeInView.propTypes = {

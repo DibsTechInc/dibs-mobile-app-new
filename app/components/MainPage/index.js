@@ -105,12 +105,7 @@ class MainPage extends React.PureComponent {
     super();
     this.navigateToDrawer = this.navigateToDrawer.bind(this);
   }
-  /**
-   * @returns {undefined}
-   */
-  async componentWillMount() {
-    await this.getUpdates();
-  }
+
   /**
    * @returns {undefined}
    */
