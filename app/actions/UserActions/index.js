@@ -190,7 +190,7 @@ export function submitLogin(email, password, callback) {
       if (res.success) {
         dispatch(setUser(res.user));
         dispatch(recordStudioVisit());
-        dispatch(requestCreditCardInfo(false));
+        dispatch(requestCreditCardInfo());
         dispatch(requestUserEvents());
         callback(res);
       } else {
@@ -346,6 +346,9 @@ export function submitPasswordReset(uuId, password) {
       if (success) {
         await AsyncStorage.setItem(Config.USER_TOKEN_KEY, token);
         dispatch(refreshUser(user));
+        dispatch(requestCreditCardInfo());
+        dispatch(requestUserEvents());
+        dispatch(recordStudioVisit());
         dispatch(enqueueNotice({ title: 'Success!', message: 'Your password has been reset.' }));
         return success;
       }
