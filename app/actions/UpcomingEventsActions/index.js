@@ -35,6 +35,7 @@ export const {
 export function requestUserEvents(showAlert = true) {
   return async function innerRequestUserEvents(dispatch, getState, dibsFetch) {
     const state = getState();
+    if (!state.user.id) return;
     if (state.upcomingEvents.loading) return;
     dispatch(setUpcomingEventsLoadingTrue());
     try {

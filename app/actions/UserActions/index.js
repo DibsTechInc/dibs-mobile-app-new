@@ -14,6 +14,7 @@ import {
   clearCart,
   refreshCart,
   enqueueApiError,
+  enqueueNotice,
 } from '../index';
 
 export const setUser = createAction('SET_USER', payload => payload);
@@ -99,7 +100,7 @@ export function requestUserData(showAlert = true) {
  * @param {function} callback on complete
  * @returns {function} thunk
  */
-export function validateEmail(email, callback) {
+export function validateEmail(email) {
   return async function innerValidateEmail(dispatch, getState, dibsFetch) {
     try {
       const res = await dibsFetch('/api/user/email/verify', {
@@ -109,20 +110,24 @@ export function validateEmail(email, callback) {
           validate: true,
         },
       });
+      if (res.hasMobilePhone) {
+        dispatch(setUser({ ...getState().user, hasMobilePhone: res.hasMobilePhone }));
+      }
       if (res.success) {
-        return callback(LOGIN_ROUTE);
+        return LOGIN_ROUTE;
       }
       if (res.message === 'Needs to reset password') {
-        return callback(PASSWORD_RESET_ROUTE);
+        return PASSWORD_RESET_ROUTE;
       }
       if (res.message === 'No user with that email') {
-        return callback(REGISTER_ROUTE);
+        return REGISTER_ROUTE;
       }
-      return callback(null);
+      dispatch(enqueueApiError({ title: 'Uh oh!', message: `${res.message}.` }));
+      return null;
     } catch (err) {
       console.log(err);
-      dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong validating your email.' }));
-      return callback(null);
+      dispatch(enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong validating your email.' }));
+      return null;
     }
   };
 }
@@ -210,6 +215,7 @@ export function updateUser(payload, callback) {
       const res = await dibsFetch('/api/user', {
         method: 'PUT',
         body: payload,
+        requiresAuth: true,
       });
 
       if (res.success) {
@@ -228,22 +234,23 @@ export function updateUser(payload, callback) {
  * @param {function} callback callback function
  * @returns {function} redux thunk
  */
-export function updateUserPassword(payload, callback) {
+export function updateUserPassword(payload) {
   return async function innerUpdateUserPassword(dispatch, getState, dibsFetch) {
     try {
       const res = await dibsFetch('/api/user/update-password', {
         method: 'PUT',
         body: payload,
+        requiresAuth: true,
       });
 
       if (res.success) {
         dispatch(refreshUser(res.user));
       }
 
-      callback(res);
+      return res;
     } catch (err) {
       console.log(err);
-      callback(null);
+      return {};
     }
   };
 }
@@ -259,6 +266,7 @@ export function updateUserEmailPreferences(list) {
     try {
       const res = await dibsFetch(`/api/user/email/suppression-list/${list}`, {
         method: 'PUT',
+        requiresAuth: true,
       });
 
       if (res.success) {
@@ -274,17 +282,82 @@ export function updateUserEmailPreferences(list) {
  * @param {function} callback on complete
  * @returns {function} thunk
  */
-export function createPasswordResetLink(email, callback = () => {}) {
-  return async function innerCreatePasswordResetLink(dispatch, getState, dibsFetch) {
+export function createPasswordReset(email) {
+  return async function innerCreatePasswordReset(dispatch, getState, dibsFetch) {
     try {
-      const { success, message } = await dibsFetch('/api/user/password/reset', {
+      const {
+        success,
+        message,
+        userHasMobilephone,
+      } = await dibsFetch('/api/user/password/reset', {
         method: 'POST',
-        body: { email, fromWidget: true, studioId: Config.DIBS_STUDIO_ID },
+        body: {
+          email,
+          studioId: Config.DIBS_STUDIO_ID,
+          shortCode: true,
+        },
       });
-      return callback(null, { success, message });
+      if (success) return { userHasMobilephone };
+      return dispatch(enqueueApiError({ title: 'Uh oh', message }));
     } catch (err) {
       console.log(err);
-      return callback(null, { success: false, message: 'Something went wrong sending your password reset email.' });
+      return dispatch(enqueueApiError({ title: 'Uh oh', message: 'Something went wrong resetting your password.' }));
+    }
+  };
+}
+
+/**
+ * @param {string} code to verify on the server
+ * @param {string} email the user entered
+ * @returns {function} thunk
+ */
+export function submitPasswordResetCode(code, email) {
+  return async function innerSubmitPasswordResetCode(dispatch, getState, dibsFetch) {
+    try {
+      const { success, uuId, message } = await dibsFetch('/api/user/password/reset', {
+        method: 'PUT',
+        body: { shortCode: code, email },
+      });
+      if (success) {
+        return uuId;
+      }
+      dispatch(enqueueApiError({ title: 'Error!', message }));
+      return null;
+    } catch (err) {
+      console.log(err);
+      dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong verifying your code.' }));
+      return null;
+    }
+  };
+}
+
+/**
+ * @param {string} uuId of password reset instance
+ * @param {string} password new pw set by user
+ * @returns {function} thunk
+ */
+export function submitPasswordReset(uuId, password) {
+  return async function innerSubmitPasswordReset(dispatch, getState, dibsFetch) {
+    try {
+      const { success, token, message } = await dibsFetch(`/api/user/password/reset/${uuId}`, {
+        method: 'PUT',
+        body: { password },
+      });
+      if (success) {
+        await AsyncStorage.setItem(Config.USER_TOKEN_KEY, token);
+        dispatch(enqueueNotice({ title: 'Success!', message: 'Your password has been reset.' }));
+        return success;
+      }
+      if (/expired/.test(message)) {
+        dispatch(enqueueApiError({ title: 'Error!', message }));
+        return false;
+      }
+      dispatch(enqueueApiError({ title: 'Error!', message }));
+      return false;
+    } catch (err) {
+      console.log(err);
+      dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong resetting your password.' }));
+      return false;
     }
   };
 }

@@ -42,9 +42,7 @@ class EditPassword extends PureComponent {
       newPassword: '',
       newPasswordConfirmation: '',
       successMessage: '',
-      currentPasswordError: '',
-      passwordConfirmationError: '',
-      samePasswordError: '',
+      error: '',
       isLoading: false,
     };
 
@@ -55,6 +53,11 @@ class EditPassword extends PureComponent {
    * @returns {undefined}
    */
   async handleOnPress() {
+    if (this.state.newPasswordConfirmation !== this.state.newPassword) {
+      this.setState({ passwordConfirmationError: 'Password confirmation does not match' });
+      return;
+    }
+
     const payload = {
       password: this.state.currentPassword,
       newPassword: this.state.newPassword,
@@ -62,13 +65,18 @@ class EditPassword extends PureComponent {
     };
 
     this.setState({ isLoading: true });
-    const response = await new Promise(res => this.props.updateUserPassword(payload, res));
+    const response = await this.props.updateUserPassword(payload);
+
+    let error = 'Something went wrong updating your password.';
+    if (response && response.message === 'Hmm… this is the same as your current password. Please pick a new one!') {
+      error = 'New password is same as current password';
+    } else if (response && response.message === 'Current password is incorrect. Please try again.') {
+      error = 'Current password is incorrect.';
+    }
 
     this.setState({
-      passwordConfirmationError: response.message === 'Grr… the new password and confirmation do not match. Please try again.' ? 'Password confirmation does not match' : '',
-      samePasswordError: response.message === 'Hmm… this is the same as your current password. Please pick a new one!' ? 'New password is same as current password' : '',
-      currentPasswordError: response.message === 'Current password is incorrect. Please try again.' ? 'Current password is incorrect' : '',
-      successMessage: response.success ? 'Password updated!' : '',
+      error,
+      successMessage: response && response.success ? 'Password updated!' : '',
       currentPassword: '',
       newPassword: '',
       newPasswordConfirmation: '',
@@ -123,8 +131,7 @@ class EditPassword extends PureComponent {
             containerStyle={{ marginBottom: 5, width: 250 }}
           />
           <View style={{ width: 250 }}>
-            {this.state.passwordConfirmationError.length && <StyledText style={{ fontSize: 12, color: RED }}>{this.state.passwordConfirmationError}</StyledText>}
-            {this.state.samePasswordError.length && <StyledText style={{ fontSize: 12, color: RED }}>{this.state.samePasswordError}</StyledText>}
+            {this.state.passwordConfirmationError.length && <StyledText style={{ fontSize: 12, color: RED }}>{this.state.error}</StyledText>}
             {this.state.successMessage.length && <StyledText style={{ fontSize: 12 }}>{this.state.successMessage}</StyledText>}
           </View>
         </ScrollView>
@@ -139,7 +146,7 @@ class EditPassword extends PureComponent {
               disabled={!validSubmission}
               backgroundColor={!validSubmission ? LIGHT_GREY : Config.STUDIO_COLOR}
               text="Update"
-              style={{ width: '75%', height: 40 }}
+              style={{ width: 200, height: 40 }}
             />
           </StyledButtonView>
         </KeyboardAccessoryView>

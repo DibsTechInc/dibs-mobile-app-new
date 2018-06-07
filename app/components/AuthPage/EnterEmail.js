@@ -80,7 +80,7 @@ class EnterEmail extends PureComponent {
     }
 
     await new Promise(res => this.setState({ isLoading: true, validInput: true }, res));
-    const route = await new Promise(res => this.props.validateEmail(email, res));
+    const route = await this.props.validateEmail(email);
     await new Promise(res => this.setState({ isLoading: false, errorText: '' }, res));
 
     if (!route) {

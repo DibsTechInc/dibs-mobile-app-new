@@ -62,7 +62,7 @@ class CalendarStrip extends PureComponent {
     startingDate.add(Math.floor(props.currentDate.diff(startingDate, 'days') / numberOfDays) * numberOfDays, 'days');
 
     this.state = {
-      numberOfDays: CalendarStrip.getNumberOfDaysToDisplay(),
+      numberOfDays,
       startingDate,
     };
 
@@ -73,7 +73,6 @@ class CalendarStrip extends PureComponent {
     this.getDatesForWeek = this.getDatesForWeek.bind(this);
     this.getPreviousDays = this.getPreviousDays.bind(this);
     this.getNextDays = this.getNextDays.bind(this);
-    this.onDateSelected = this.onDateSelected.bind(this);
     this.isDateSelected = this.isDateSelected.bind(this);
     this.formatCalendarHeader = this.formatCalendarHeader.bind(this);
     this.animate = this.animate.bind(this);
