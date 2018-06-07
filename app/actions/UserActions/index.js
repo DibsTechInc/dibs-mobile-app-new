@@ -339,12 +339,13 @@ export function submitPasswordResetCode(code, email) {
 export function submitPasswordReset(uuId, password) {
   return async function innerSubmitPasswordReset(dispatch, getState, dibsFetch) {
     try {
-      const { success, token, message } = await dibsFetch(`/api/user/password/reset/${uuId}`, {
+      const { success, token, message, user } = await dibsFetch(`/api/user/password/reset/${uuId}`, {
         method: 'PUT',
         body: { password },
       });
       if (success) {
         await AsyncStorage.setItem(Config.USER_TOKEN_KEY, token);
+        dispatch(refreshUser(user));
         dispatch(enqueueNotice({ title: 'Success!', message: 'Your password has been reset.' }));
         return success;
       }
