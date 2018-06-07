@@ -54,7 +54,7 @@ class EditPassword extends PureComponent {
    */
   async handleOnPress() {
     if (this.state.newPasswordConfirmation !== this.state.newPassword) {
-      this.setState({ passwordConfirmationError: 'Password confirmation does not match' });
+      this.setState({ error: 'Password confirmation does not match' });
       return;
     }
 
@@ -114,7 +114,7 @@ class EditPassword extends PureComponent {
               placeholder="Current password"
               containerStyle={{ marginBottom: 30, width: 250 }}
             />
-            {this.state.currentPasswordError.length && <StyledText style={{ fontSize: 12, color: RED, position: 'absolute', bottom: -12 }}>{this.state.currentPasswordError}</StyledText>}
+            {this.state.error.length && <StyledText style={{ fontSize: 12, color: RED, position: 'absolute', bottom: -12 }}>{this.state.error}</StyledText>}
           </View>
           <InputField
             autoCapitalize="none"
@@ -131,7 +131,7 @@ class EditPassword extends PureComponent {
             containerStyle={{ marginBottom: 5, width: 250 }}
           />
           <View style={{ width: 250 }}>
-            {this.state.passwordConfirmationError.length && <StyledText style={{ fontSize: 12, color: RED }}>{this.state.error}</StyledText>}
+            {this.state.error.length && <StyledText style={{ fontSize: 12, color: RED }}>{this.state.error}</StyledText>}
             {this.state.successMessage.length && <StyledText style={{ fontSize: 12 }}>{this.state.successMessage}</StyledText>}
           </View>
         </ScrollView>
