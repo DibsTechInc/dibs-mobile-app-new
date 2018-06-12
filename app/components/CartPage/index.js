@@ -16,7 +16,7 @@ import {
   getCCExpMonth,
   getCCIsLoading,
 } from '../../selectors';
-import { submitCartForPurchase } from '../../actions';
+import { submitCartForPurchase, clearPromoCodeData } from '../../actions';
 import {
   LIGHT_GREY,
   WHITE,
@@ -94,6 +94,10 @@ class CartPage extends PureComponent {
    * @returns {undefined}
    */
   componentDidUpdate(props) {
+    if (!this.props.cart.length) {
+      this.props.clearPromoCodeData();
+    }
+
     if (this.props.confirmedPurchases.length) {
       this.props.navigation.navigate(RECEIPT_ROUTE);
     } else if (props.purchasing && !this.props.purchasing) {
@@ -238,6 +242,7 @@ CartPage.propTypes = {
   submitCartForPurchase: PropTypes.func,
   confirmedPurchases: PropTypes.arrayOf(PropTypes.shape()),
   purchasing: PropTypes.bool.isRequired,
+  clearPromoCodeData: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
@@ -253,6 +258,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   submitCartForPurchase,
+  clearPromoCodeData,
 };
 
 export default withNavigation(connect(mapStateToProps, mapDispatchToProps)(CartPage));
