@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
 import { Font, ScreenOrientation, Asset } from 'expo';
+import Sentry from 'sentry-expo';
 import styled from 'styled-components';
 import { AsyncStorage, View } from 'react-native';
 import Promise from 'bluebird';
@@ -44,8 +45,11 @@ import UserGrey from './assets/img/user-grey.png';
 import UserWhite from './assets/img/user-white.png';
 
 // Native apps can only load downloaded fronts stored in assets/fonts folder
-import SourceSansProBold from './assets/fonts/SourceSansPro-Bold.ttf';
-import SourceSansProRegular from './assets/fonts/SourceSansPro-Regular.ttf';
+import StudioFont from './assets/fonts/SourceSansPro-Regular.ttf';
+import StudioFontHeavy from './assets/fonts/SourceSansPro-Bold.ttf';
+
+// load up the gaurdian robot
+Sentry.config(Config.SENTRY_DSN).install();
 
 const StyledLoadingPage = styled.View`
   align-items: center;
@@ -131,8 +135,8 @@ class App extends Component {
    */
   async getFonts() {
     await Font.loadAsync({
-      'studio-font': SourceSansProRegular,
-      'studio-font-heavy': SourceSansProBold,
+      'studio-font': StudioFont,
+      'studio-font-heavy': StudioFontHeavy,
     });
 
     this.setState({ fontLoaded: true });
