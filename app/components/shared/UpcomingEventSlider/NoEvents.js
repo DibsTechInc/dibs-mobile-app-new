@@ -55,7 +55,7 @@ class NoEvents extends React.PureComponent {
     return (
       <Container>
         <NoEventsText>
-          No classes on {this.props.naturalDate}.
+          No upcoming classes on {this.props.naturalDate}.
         </NoEventsText>
         <MaterialButton
           style={{ width: 120, height: 40 }}
