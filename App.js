@@ -43,10 +43,12 @@ import Visa from './assets/img/stp_card_visa.png';
 import TrashGrey from './assets/img/trash-grey.png';
 import UserGrey from './assets/img/user-grey.png';
 import UserWhite from './assets/img/user-white.png';
+import FilterWhite from './assets/img/filter-white.png';
+import CheckWhite from './assets/img/check-white.png';
 
 // Native apps can only load downloaded fronts stored in assets/fonts folder
-import StudioFont from './assets/fonts/SourceSansPro-Regular.ttf';
-import StudioFontHeavy from './assets/fonts/SourceSansPro-Bold.ttf';
+import StudioFont from './assets/fonts/OpenSans-Regular.ttf';
+import StudioFontHeavy from './assets/fonts/OpenSans-Bold.ttf';
 
 // load up the gaurdian robot
 Sentry.config(Config.SENTRY_DSN).install();
@@ -164,6 +166,8 @@ class App extends Component {
       TrashGrey,
       UserGrey,
       UserWhite,
+      FilterWhite,
+      CheckWhite,
     ]);
 
     this.setState({ imageLoaded: true });

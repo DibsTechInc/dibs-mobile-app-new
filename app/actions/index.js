@@ -9,3 +9,4 @@ export * from './StudioActions';
 export * from './UserActions';
 export * from './UpcomingEventsActions';
 export * from './WaitlistActions';
+export * from './FiltersActions';

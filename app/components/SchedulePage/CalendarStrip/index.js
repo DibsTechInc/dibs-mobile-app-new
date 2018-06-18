@@ -4,23 +4,16 @@ import { connect } from 'react-redux';
 import {
   Animated,
   Easing,
-  Dimensions,
 } from 'react-native';
-import styled from 'styled-components';
 import moment from 'moment-timezone';
 
 import { setScheduleCurrentDate, addDaysToScheduleCurrentDate } from '../../../actions';
 import CalendarDay from './CalendarDay';
-import { WHITE } from '../../../constants';
+import { WHITE, WIDTH } from '../../../constants';
 import Config from '../../../../config.json';
 import { FlexRow, FlexCenter, HeavyText } from '../../styled';
+import { FadeInView } from '../../shared';
 import CalendarArrow from './CalendarArrow';
-
-const Container = styled.View`
-  overflow: hidden;
-  top: -20;
-  z-index: 5;
-`;
 
 const CalendarHeader = HeavyText.extend`
   color: ${WHITE};
@@ -46,8 +39,7 @@ class CalendarStrip extends PureComponent {
    * @returns {number} number of days for the calendar to display
    */
   static getNumberOfDaysToDisplay() {
-    const { width } = Dimensions.get('window');
-    return width > 350 ? 7 : 5;
+    return WIDTH > 350 ? 7 : 5;
   }
   /**
    * @constructor
@@ -221,8 +213,12 @@ class CalendarStrip extends PureComponent {
     const lowerBound = this.state.startingDate.clone().subtract(this.state.numberOfDays, 'd').add(1, 'd');
     const canGoBack = lowerBound.isBefore(this.props.lowerBound);
     let opacityAnim = 1;
+    if (this.props.hideStrip) {
+      return <FadeInView pointerEvents="box-none" style={{ height: 80, overflow: 'hidden', top: -20, zIndex: 5, flex: 0 }} />;
+    }
+
     return (
-      <Container pointerEvents="box-none">
+      <FadeInView pointerEvents="box-none" style={{ overflow: 'hidden', top: -20, zIndex: 5, flex: 0 }}>
         <CalendarHeader>
           {this.formatCalendarHeader()}
         </CalendarHeader>
@@ -254,7 +250,7 @@ class CalendarStrip extends PureComponent {
             rightArrow
           />
         </FlexRow>
-      </Container>
+      </FadeInView>
     );
   }
 }
@@ -273,6 +269,7 @@ CalendarStrip.propTypes = {
   currentDate: PropTypes.shape(),
   setScheduleCurrentDate: PropTypes.func,
   addDaysToScheduleCurrentDate: PropTypes.func,
+  hideStrip: PropTypes.bool,
 };
 
 const mapStateToProps = state => ({ currentDate: state.events.currentDate });

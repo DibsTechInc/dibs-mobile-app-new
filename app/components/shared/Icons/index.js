@@ -9,3 +9,6 @@ export { default as PlusIcon } from './PlusIcon';
 export { default as TrashIcon } from './TrashIcon';
 export { default as UserIcon } from './UserIcon';
 export { default as XIcon } from './XIcon';
+export { default as CheckIcon } from './CheckIcon';
+export { default as FiltersIcon } from './FiltersIcon';
+

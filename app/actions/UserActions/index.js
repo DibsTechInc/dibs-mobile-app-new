@@ -122,11 +122,11 @@ export function validateEmail(email) {
       if (res.message === 'No user with that email') {
         return REGISTER_ROUTE;
       }
-      dispatch(enqueueApiError({ title: 'Uh oh!', message: `${res.message}.` }));
+      dispatch(enqueueApiError({ title: 'Error!', message: `${res.message}.` }));
       return null;
     } catch (err) {
       console.log(err);
-      dispatch(enqueueApiError({ title: 'Uh oh!', message: 'Something went wrong validating your email.' }));
+      dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong validating your email.' }));
       return null;
     }
   };
@@ -298,10 +298,10 @@ export function createPasswordReset(email) {
         },
       });
       if (success) return { userHasMobilephone };
-      return dispatch(enqueueApiError({ title: 'Uh oh', message }));
+      return dispatch(enqueueApiError({ title: 'Error!', message }));
     } catch (err) {
       console.log(err);
-      return dispatch(enqueueApiError({ title: 'Uh oh', message: 'Something went wrong resetting your password.' }));
+      return dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong resetting your password.' }));
     }
   };
 }

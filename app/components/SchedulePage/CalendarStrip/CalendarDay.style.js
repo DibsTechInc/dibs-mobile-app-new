@@ -10,12 +10,12 @@ export default StyleSheet.create({
     borderRadius: 43 / 2,
   },
   dateName: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: 'studio-font-heavy',
     textAlign: 'center',
   },
   dateNumber: {
-    fontSize: 18,
+    fontSize: 14,
     fontFamily: 'studio-font',
     textAlign: 'center',
   },
@@ -32,13 +32,13 @@ export default StyleSheet.create({
     textAlign: 'center',
   },
   highlightDateNameStyle: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: 'studio-font-heavy',
     fontWeight: 'bold',
     textAlign: 'center',
   },
   highlightDateNumberStyle: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: 'studio-font',
     fontWeight: 'bold',
     textAlign: 'center',

@@ -10,3 +10,4 @@ export * from './UpcomingEventsSelectors';
 export * from './CreditCardSelectors';
 export * from './ConfirmationSelectors';
 export * from './AlertsSelectors';
+export * from './FiltersSelectors';

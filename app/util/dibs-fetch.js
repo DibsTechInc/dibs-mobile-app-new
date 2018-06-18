@@ -22,7 +22,7 @@ async function checkNetworkConnection() {
   });
   lastCheck = Date.now();
   if (googleCall.status !== 200) {
-    store.dispatch(enqueueConnectionError({ title: 'Uh oh!', message: 'You must be connected to the internet to use this app.' }));
+    store.dispatch(enqueueConnectionError({ title: 'Error!', message: 'You must be connected to the internet to use this app.' }));
     throw new Error('Not connected to the internet');
   }
 }

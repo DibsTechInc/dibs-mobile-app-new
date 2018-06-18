@@ -1,24 +1,42 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { View, AsyncStorage } from 'react-native';
+import { View, Animated } from 'react-native';
 import { connect } from 'react-redux';
 
 import Config from '../../../config.json';
-import { WHITE } from '../../constants';
+import { WHITE, HEIGHT } from '../../constants';
 import { requestEventData } from '../../actions';
 import {
   getEventsAreLoading,
 } from '../../selectors';
 import Header from '../Header';
-import FadeInView from '../shared/FadeInView';
+import { FadeInView } from '../shared/';
 import CalendarStrip from './CalendarStrip';
 import EventList from './EventList';
+import Filters from './Filters';
 
 /**
  * @class SchedulePage
  * @extends Component
  */
 class SchedulePage extends PureComponent {
+  /**
+   * @constructor
+   * @constructs SchedulePage
+   * @param {Object} props for component
+   */
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      slideAnimation: new Animated.Value(-HEIGHT + 70),
+      filterSlideOpened: false,
+      displaySlideDownContents: false,
+    };
+
+    this.showFilter = this.showFilter.bind(this);
+    this.hideFilter = this.hideFilter.bind(this);
+  }
   /**
    * @returns {undefined}
    */
@@ -34,14 +52,49 @@ class SchedulePage extends PureComponent {
       this.props.requestEventData();
     }
   }
+    /**
+   * @return {undefined}
+   */
+  showFilter() {
+    this.setState({ filterSlideOpened: true });
+    Animated.timing(
+      this.state.slideAnimation,
+      { toValue: 0, duration: 300 }
+    ).start(() => {
+      this.setState({ displaySlideDownContents: true });
+    });
+  }
+  /**
+   * @return {undefined}
+   */
+  hideFilter() {
+    this.setState({ displaySlideDownContents: false });
+    Animated.timing(
+      this.state.slideAnimation,
+      { toValue: -HEIGHT + 70, duration: 300 }
+    ).start(() => {
+      this.setState({ filterSlideOpened: false });
+    });
+  }
   /**
    * @returns {JSX} XML
    */
   render() {
     return (
-      <FadeInView style={{ height: '100%', backgroundColor: Config.STUDIO_COLOR }}>
-        <Header />
-        <CalendarStrip />
+      <FadeInView style={{ height: HEIGHT, position: 'relative', backgroundColor: Config.STUDIO_COLOR }}>
+        <Header
+          hasClassFilter
+          title={this.state.filterSlideOpened ? 'Filters' : ''}
+          showFilter={this.showFilter}
+          hideFilter={this.hideFilter}
+          filterSlideOpened={this.state.filterSlideOpened}
+        />
+        <Filters
+          filterSlideOpened={this.state.filterSlideOpened}
+          displaySlideDownContents={this.state.displaySlideDownContents}
+          slideAnimation={this.state.slideAnimation}
+        />
+        <CalendarStrip hideStrip={this.state.filterSlideOpened} />
         <View style={{ height: 1, backgroundColor: WHITE }} />
         <EventList />
       </FadeInView>

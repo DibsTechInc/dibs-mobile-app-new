@@ -16,6 +16,7 @@ import {
   getUsersNextPassValue,
   getUserFixedPrice,
 } from '../UserSelectors/Passes';
+import { getFilterLocationIdsAsArray } from '../FiltersSelectors';
 
 /**
  * getEventsState
@@ -114,9 +115,26 @@ export const getEventsOnCurrentDateAfterNow = createSelector(
   events => events.filter(event => moment.tz(event.start_time, event.mainTZ).isAfter(moment()))
 );
 
-export const getScheduleEvents = createUnboundedSelector(
+export const getFilteredEvents = createSelector(
   [
     getEventsOnCurrentDateAfterNow,
+    getFilterLocationIdsAsArray,
+  ],
+  (
+    events,
+    locationIds
+  ) => {
+    return events.filter((event) => {
+      if (!event.location) return false;
+      if (locationIds.length && !locationIds.includes(event.location.id)) return false;
+      return true;
+    });
+  }
+);
+
+export const getScheduleEvents = createUnboundedSelector(
+  [
+    getFilteredEvents,
     getStudioCurrency,
     getStudioCustomTimeFormat,
     state => ((state.cart && state.cart.data) || []),

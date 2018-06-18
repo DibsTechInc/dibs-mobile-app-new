@@ -1,0 +1,1 @@
+export const FILTERS_SETTINGS = 'FILTERS_SETTINGS';

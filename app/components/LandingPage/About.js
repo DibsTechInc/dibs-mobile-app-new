@@ -1,4 +1,3 @@
-
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Text } from 'react-native';
@@ -31,5 +30,3 @@ class About extends Component {
 About.propTypes = {
   studioName: PropTypes.string,
 };
-
-export default About;
