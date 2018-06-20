@@ -17,7 +17,7 @@ export const getStudioVisibleLocations = createSelector(
 
 export const getStudioHasMultipleLocations = createSelector(
   getStudioLocations,
-  locs => (locs.length > 1)
+  locations => (locations.length > 1)
 );
 
 export const getStudioHasMultipleVisibleLocations = createSelector(

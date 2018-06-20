@@ -9,7 +9,10 @@ import styled from 'styled-components';
 
 import Config from '../../../config.json';
 import { WHITE, FILTERS_SETTINGS } from '../../constants';
-import { getFiltersState } from '../../selectors';
+import {
+  getFiltersState,
+  getStudioHasMultipleLocations,
+} from '../../selectors';
 import {
   setUpcomingEventSliderExpandedFalse,
   setAllFilters,
@@ -129,6 +132,8 @@ class Header extends React.PureComponent {
       />
     );
 
+    const showFilter = this.props.studioHasMultipleLocations && this.props.hasClassFilter && !this.props.filterSlideOpened;
+
     return (
       <View style={{ height: 80 + (isIphoneX() ? 20 : 0), overflow: 'hidden', zIndex: 2 }}>
         <CustomStatusBar backgroundColor={Config.STUDIO_COLOR} barStyle="light-content" />
@@ -140,7 +145,7 @@ class Header extends React.PureComponent {
             {this.props.title}
           </PageTitle>
           <View style={{ flexDirection: 'row' }}>
-            {this.props.hasClassFilter && !this.props.filterSlideOpened && <TouchableOpacity onPress={this.props.showFilter} style={{ width: 90, marginRight: 20 }}>
+            {showFilter && <TouchableOpacity onPress={this.props.showFilter} style={{ width: 90, marginRight: 20 }}>
               <FilterView>
                 <FiltersIcon />
                 <NormalText style={{ color: WHITE, marginLeft: 5, marginRight: 1 }}>Filters</NormalText>
@@ -175,11 +180,13 @@ Header.propTypes = {
   filters: PropTypes.shape(),
   setAllFilters: PropTypes.func,
   clearAllFilters: PropTypes.func,
+  studioHasMultipleLocations: PropTypes.bool,
 };
 
 const mapStateToProps = state => ({
   upcomingEventSliderExpanded: state.animation.upcomingEventSliderExpanded,
   filters: getFiltersState(state),
+  studioHasMultipleLocations: getStudioHasMultipleLocations(state),
 });
 
 const mapDispatchToProps = {
