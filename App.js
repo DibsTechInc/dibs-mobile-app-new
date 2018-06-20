@@ -204,6 +204,7 @@ class App extends Component {
    */
   componentDidCatch(err) {
     console.log(err);
+    Sentry.captureException(new Error(err));
     store.dispatch(logFatalError(err));
     this.setState({ errorOccurred: true });
   }
