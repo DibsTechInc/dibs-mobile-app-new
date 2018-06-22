@@ -14,7 +14,7 @@ import {
   setUpcomingEventSliderExpandedTrue,
   setUpcomingEventSliderExpandedFalse,
 } from '../../../actions';
-import UpcomingEvents from '../UpcomingEvents';
+import PaginatedSlider from '../PaginatedSlider';
 import Header from '../../Header';
 import NoEvents from './NoEvents';
 
@@ -174,7 +174,7 @@ class UpcomingClassSlider extends React.PureComponent {
             {!this.props.events.length && (
               <NoEvents />
             )}
-            <UpcomingEvents
+            <PaginatedSlider
               forReceiptPage={false}
               events={this.props.events}
               expanded={this.props.expanded}

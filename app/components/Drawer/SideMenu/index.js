@@ -11,6 +11,7 @@ import {
   WHITE,
   DARK_TEXT_GREY,
   UPCOMING_CLASS_ROUTE,
+  PACKAGES_ROUTE,
 } from '../../../constants';
 import {
   getUsersFullName,
@@ -25,6 +26,7 @@ import {
   UserIcon,
   ActivityIcon,
   HomeIcon,
+  PackageIcon,
 } from '../../shared';
 import { SpaceBetweenRow, HeavyText } from '../../styled';
 import BalanceDisplay from './BalanceDisplay';
@@ -115,6 +117,11 @@ class SideMenu extends React.PureComponent {
           label="Schedule"
           route={SCHEDULE_ROUTE}
           renderIcon={() => <CalendarIcon fromSideMenu />}
+        />
+        <NavLink
+          label="Packages"
+          route={PACKAGES_ROUTE}
+          renderIcon={() => <PackageIcon fromSideMenu />}
         />
         <NavLink
           label="Upcoming Classes"

@@ -1,12 +1,9 @@
 import React, { PureComponent } from 'react';
-import { View } from 'react-native';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { getConfirmedTransactionsByEvent } from '../../selectors';
-import { GREY } from '../../constants';
+import { getDetailedConfirmationEvents, getDetailedConfirmationPackages } from '../../selectors';
 import { clearConfirmation } from '../../actions';
-import { UpcomingEvents, FadeInView } from '../shared';
-import { NormalText } from '../styled';
+import { PaginatedSlider, FadeInView } from '../shared';
 import Header from '../Header';
 
 /**
@@ -27,19 +24,25 @@ class ReceiptPage extends PureComponent {
     return (
       <FadeInView>
         <Header title="Order Summary" />
-        <UpcomingEvents forReceiptPage events={this.props.items} />
+        <PaginatedSlider
+          forReceiptPage
+          packages={this.props.packages}
+          events={this.props.events}
+        />
       </FadeInView>
     );
   }
 }
 
 ReceiptPage.propTypes = {
-  items: PropTypes.arrayOf(PropTypes.shape()),
+  packages: PropTypes.arrayOf(PropTypes.shape()),
+  events: PropTypes.arrayOf(PropTypes.shape()),
   clearConfirmation: PropTypes.func,
 };
 
 const mapStateToProps = state => ({
-  items: getConfirmedTransactionsByEvent(state),
+  packages: getDetailedConfirmationPackages(state),
+  events: getDetailedConfirmationEvents(state),
 });
 
 const mapDispatchToProps = {

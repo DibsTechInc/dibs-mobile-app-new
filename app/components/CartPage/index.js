@@ -8,15 +8,21 @@ import styled from 'styled-components';
 import FadeInView from '../shared/FadeInView';
 import {
   getFormattedCartValueBack,
-  getConfirmationState,
+  getConfirmationItems,
   getCartValueBack,
   getFormattedCartTotal,
   getCartIsPurchasing,
   getDetailedCartEvents,
+  getSortedCartPackages,
   getCCExpMonth,
   getCCIsLoading,
 } from '../../selectors';
-import { submitCartForPurchase, clearPromoCodeData } from '../../actions';
+import {
+  submitCartForPurchase,
+  enqueueNotice,
+  setCartEventsData,
+  clearPromoCodeData,
+} from '../../actions';
 import {
   LIGHT_GREY,
   WHITE,
@@ -31,11 +37,13 @@ import {
   EventListItem,
   SwipableButton,
 } from '../shared';
+
 import CartTransaction from './CartTransaction';
 import PromoField from './PromoField';
 import Config from '../../../config.json';
 import NoItems from './NoItems';
 import Header from '../Header';
+import Package from '../shared/PackageItem';
 
 import { NormalText, FlexCenter } from '../styled';
 
@@ -87,20 +95,40 @@ class CartPage extends PureComponent {
     this.toPreviousPage = this.toPreviousPage.bind(this);
     this.setEditCC = this.setEditCC.bind(this);
     this.handlePurchase = this.handlePurchase.bind(this);
+    this.clearEvents = this.clearEvents.bind(this);
+  }
+
+  /**
+   * @returns {undefined}
+   */
+  componentDidMount() {
+    if (this.props.events.length && this.props.packages.length) {
+      this.props.enqueueNotice({
+        title: 'Keep classes in your cart?',
+        message: 'Packages will not apply to the classes in the cart.',
+        buttons: [
+          { text: 'REMOVE', onPress: this.clearEvents },
+          { text: 'KEEP', onPress: () => { } },
+        ],
+      });
+    }
   }
   /**
    * @param {Object} props previous props
-   * @param {Object} state previous state
    * @returns {undefined}
    */
-  componentDidUpdate(props) {
-    if (!this.props.cart.length) {
+  componentWillReceiveProps(props) {
+    if (
+      (this.props.events.length || this.props.packages.length)
+      && !props.events.length
+      && !props.packages.length
+    ) {
       this.props.clearPromoCodeData();
     }
 
-    if (this.props.confirmedPurchases.length) {
+    if (props.confirmedPurchases.length) {
       this.props.navigation.navigate(RECEIPT_ROUTE);
-    } else if (props.purchasing && !this.props.purchasing) {
+    } else if (this.props.purchasing && !props.purchasing) {
       this.endPurchase();
     }
   }
@@ -131,6 +159,12 @@ class CartPage extends PureComponent {
    */
   endPurchase() {
     this.setState({ isProcessingPayment: false });
+  }
+/**
+   * @returns {undefined}
+   */
+  clearEvents() {
+    this.props.setCartEventsData([]);
   }
 
   /**
@@ -193,31 +227,48 @@ class CartPage extends PureComponent {
       );
     }
 
-    if (!this.props.cart.length) {
+    if (!this.props.events.length && !this.props.packages.length) {
       return <NoItems />;
     }
-
     return (
       <FadeInView style={{ backgroundColor: WHITE }}>
         <Header title="My Cart" showCart={false} />
         <Container>
-          <View>
+          {this.props.packages.length && <View>
             <View style={{ marginLeft: 20, marginTop: 20 }}>
-              <Text style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy' }}>Items</Text>
+              <Text style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy' }}>Packages</Text>
             </View>
-            {this.props.cart.map(item => (
+            {this.props.packages.map(pkg => (
+              <Package
+                key={pkg.id}
+                {...pkg}
+                isCartPage
+                hasPackages={Boolean(this.props.packages.length)}
+              />
+            ))}
+          </View>}
+          {this.props.events.length && <View>
+            <View style={{ marginLeft: 20, marginTop: 20 }}>
+              <Text style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy' }}>Classes</Text>
+            </View>
+            {this.props.events.map(item => (
               <EventListItem
                 key={item.eventid}
                 isCartEvent
+                cartItem={item}
                 {...item}
               />
             ))}
           </View>
+          }
           <PaymentInfo
             isUpdatingCard={this.state.isUpdatingCard}
             setEditCC={this.setEditCC}
           />
-          <PromoField />
+          <PromoField
+            events={this.props.events}
+            packages={this.props.packages}
+          />
           <CartTransaction />
         </Container>
         <CheckoutView>
@@ -235,22 +286,26 @@ class CartPage extends PureComponent {
 
 CartPage.propTypes = {
   navigation: PropTypes.shape().isRequired,
-  cart: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+  events: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+  packages: PropTypes.arrayOf(PropTypes.shape()).isRequired,
   formattedValueBack: PropTypes.string.isRequired,
   valueBack: PropTypes.number.isRequired,
   formattedCartTotal: PropTypes.string.isRequired,
   submitCartForPurchase: PropTypes.func,
   confirmedPurchases: PropTypes.arrayOf(PropTypes.shape()),
   purchasing: PropTypes.bool.isRequired,
+  enqueueNotice: PropTypes.func.isRequired,
+  setCartEventsData: PropTypes.func.isRequired,
   clearPromoCodeData: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
-  cart: getDetailedCartEvents(state),
+  events: getDetailedCartEvents(state),
+  packages: getSortedCartPackages(state),
   formattedValueBack: getFormattedCartValueBack(state),
   valueBack: getCartValueBack(state),
   formattedCartTotal: getFormattedCartTotal(state),
-  confirmedPurchases: getConfirmationState(state),
+  confirmedPurchases: getConfirmationItems(state),
   purchasing: getCartIsPurchasing(state),
   creditCardExpMonth: getCCExpMonth(state),
   creditCardLoading: getCCIsLoading(state),
@@ -258,6 +313,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   submitCartForPurchase,
+  enqueueNotice,
+  setCartEventsData,
   clearPromoCodeData,
 };
 

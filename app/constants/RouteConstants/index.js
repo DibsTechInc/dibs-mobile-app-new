@@ -32,4 +32,5 @@ export const CART_ROUTE = 'Cart';
 export const DRAWER_OPEN = 'DrawerOpen';
 
 export const RECEIPT_ROUTE = 'Receipt';
+export const PACKAGES_ROUTE = 'Packages';
 

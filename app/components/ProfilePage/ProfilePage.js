@@ -86,15 +86,13 @@ class ProfilePage extends PureComponent {
   }
   /**
    * @param {string} route the route constant
+   * @param {object} state the state
    * @returns {undefined}
    */
   handleOnPress(route, state) {
     this.props.navigation.navigate(route, state);
   }
 
-  // handleTermsAndConditions(urlObj) {
-  //   this.props.navigation.navigate(TERMS_AND_CONDITIONS_ROUTE, urlObj);
-  // }
   /**
    * @returns {undefined}
    */

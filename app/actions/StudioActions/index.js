@@ -40,4 +40,3 @@ export function requestStudioData(showAlert = true) {
     }
   };
 }
-

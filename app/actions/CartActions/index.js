@@ -4,7 +4,7 @@ import moment from 'moment';
 
 import {
   getUsersNextPassId,
-  getSortedCartItems,
+  getSortedCartEvents,
   getUserHasPasses,
   getCanUseCardToPurchase,
 } from '../../selectors';
@@ -23,17 +23,23 @@ import {
 const range = n => [...Array(n)]; // JS implementation of Python's range() fn
 
 export const {
-  addToCart,
+  addEventToCart,
+  addPackageToCart,
+  removePackageFromCart,
   clearCart,
-  setCartData,
+  setCartEventsData,
+  setCartPackagesData,
   setCartVisibleTrue,
   setCartVisibleFalse,
   setCartPurchasingTrue,
   setCartPurchasingFalse,
 } = createActions({
-  ADD_TO_CART: item => item,
-  CLEAR_CART: () => [],
-  SET_CART_DATA: payload => payload,
+  ADD_EVENT_TO_CART: item => item,
+  ADD_PACKAGE_TO_CART: item => item,
+  REMOVE_PACKAGE_FROM_CART: packageid => packageid,
+  CLEAR_CART: () => null,
+  SET_CART_EVENTS_DATA: payload => payload,
+  SET_CART_PACKAGES_DATA: payload => payload,
   SET_CART_VISIBLE_TRUE: () => true,
   SET_CART_VISIBLE_FALSE: () => false,
   SET_CART_PURCHASING_TRUE: () => true,
@@ -47,8 +53,8 @@ export const {
  * and reselects the next eligible pass on each dispatch of
  * addEventToClientCart.
  *
- * @param {number} eventid id of the event being removed
- * @param {object} options optional params
+ * @param {object} cartItem id of the event being removed
+ * @param {string} itemCategory optional params
  * @param {boolean} [options.toggleVisibility=true] whether or not to change visibility state
  * @returns {Object} action on the state
  */
@@ -56,54 +62,29 @@ export function removeOneEventItem(eventid, { toggleVisibility = true } = {}) {
   return function innerRemoveOneEventItem(dispatch, getState) {
     // stores items in cart before removal
     // in the order they are added
-    let { data } = getState().cart;
-    data = cloneDeep(data);
+    let cart = getState().cart;
+    cart = cloneDeep(cart);
 
-    const itemToRemoveFrom = data.find(item => item.eventid === eventid);
+    const itemToRemoveFrom = cart.events.find(item => item.eventid === eventid);
+
     if (!itemToRemoveFrom) return;
-    const indexOfItem = data.indexOf(itemToRemoveFrom);
-    if (toggleVisibility) dispatch(setCartVisibleTrue()); // so the cart view won't close before this is done
-    dispatch(setCartData(data.slice(0, indexOfItem)));
-    data.slice(indexOfItem).forEach(item => (
+    const indexOfItem = cart.events.indexOf(itemToRemoveFrom);
+    if (toggleVisibility) dispatch(setCartVisibleTrue());
+
+    dispatch(setCartEventsData(cart.events.slice(0, indexOfItem)));
+
+    // for events only applying passes
+    cart.events.slice(indexOfItem).forEach((item) => {
       // will iterate over the quantity of each item
       // the item to be removed will be skipped once
-      [...Array(item.quantity - Number((item === itemToRemoveFrom) && 1))].forEach(() => {
+      const array = [...Array(item.quantity - Number((item === itemToRemoveFrom) && 1))];
+      return array.forEach(() => {
         const passid = getUsersNextPassId(getState())(item.eventid);
-        dispatch(addToCart({ ...item, passid }));
-      })
-    ));
+        dispatch(addEventToCart({ ...item, passid }));
+      });
+    });
+
     if (toggleVisibility) dispatch(setCartVisibleFalse());
-  };
-}
-
-/**
- * Saves a previous version of the cart without any
- * items with eventids of the chosen event to remove.
- * It then rebuilds the cart, reselecting the next
- * pass to use for addEventToClientCart
- *
- * @param {type} eventid of the class to update
- * @returns {Object} action on the state
- */
-export function removeEventFromCart(eventid) {
-  return function innerRemoveEventFromCart(dispatch, getState) {
-    // Storing all items in previous cart for every other event
-    // in the order they were added
-    let { data } = getState().cart;
-    data = cloneDeep(data);
-    data = data.filter(item => item.eventid !== eventid);
-
-    dispatch(setCartVisibleTrue()); // so the cart view won't close before this is done
-    dispatch(clearCart());
-    data.forEach(item => (
-      // will iterate over the quantity of each item
-      [...Array(item.quantity)].forEach(() => {
-        const passid = getUsersNextPassId(getState())(item.eventid);
-        dispatch(addToCart({ ...item, passid }));
-      })
-    ));
-    // dispatch(reverifyPromoCode()); TODO for promo codes
-    dispatch(setCartVisibleFalse());
   };
 }
 
@@ -114,19 +95,32 @@ export function removeExpiredEvents() {
   return function innerRemoveExpiredEventsFromCart(dispatch, getState) {
     // Storing all items in previous cart for every other event
     // in the order they were added
-    let { data } = getState().cart;
-    data = cloneDeep(data);
-    data = data.filter(item => moment(item.start_time).isAfter(moment().local().add(10, 'minutes')));
+    let { cart } = getState();
+    cart = cloneDeep(cart);
+
+    if (cart && cart.events) {
+      cart.events = cart.events.filter(item => moment(item.start_time).isAfter(moment().local().add(10, 'minutes')));
+    } else {
+      console.log(cart, 'cart');
+      enqueueApiError({ 'Error!': JSON.stringify(cart) });
+    }
 
     dispatch(setCartVisibleTrue()); // so the cart view won't close before this is done
-    dispatch(clearCart());
-    data.forEach(item => (
-      // will iterate over the quantity of each item
-      range(item.quantity).forEach(() => {
-        const passid = getUsersNextPassId(getState())(item.eventid);
-        dispatch(addToCart({ ...item, passid }));
-      })
-    ));
+    dispatch(setCartEventsData(cart.events));
+
+    if (cart && cart.events) {
+      cart.events.forEach(item => (
+        // will iterate over the quantity of each item
+        range(item.quantity).forEach(() => {
+          const passid = getUsersNextPassId(getState())(item.eventid);
+          dispatch(addEventToCart({ ...item, passid }));
+        })
+      ));
+    } else {
+      console.log(cart, 'cart');
+      enqueueApiError({ 'Error!': JSON.stringify(cart) });
+    }
+
     dispatch(setCartVisibleFalse());
   };
 }
@@ -137,12 +131,12 @@ export function removeExpiredEvents() {
  */
 export function applyFreeClassPromoToCart() {
   return function innerApplyFreeClassPromoToCart(dispatch, getState) {
-    const cartData = getSortedCartItems(getState());
-    const { eventid } = cartData[0];
+    const cartData = getSortedCartEvents(getState());
+    // const cartItem = cartData[0];
     const copiedItem = { ...cartData[0], passid: null };
     dispatch(setCartVisibleTrue());
-    dispatch(removeOneEventItem(eventid, { toggleVisibility: false }));
-    dispatch(addToCart(copiedItem));
+    dispatch(removeOneEventItem(copiedItem, { toggleVisibility: false }));
+    dispatch(addEventToCart(copiedItem));
     dispatch(setCartVisibleFalse());
   };
 }
@@ -151,42 +145,22 @@ export function applyFreeClassPromoToCart() {
  * Refresh cart once user logs in or out to account for passes
  * @returns {function} redux thunk
  */
-export function refreshCart() {
+export function refreshCartEvents() {
   return function innerRefreshCart(dispatch, getState) {
     const { cart, events } = getState();
     dispatch(setCartVisibleTrue());
     dispatch(clearCart());
-    cart.data.forEach(cartEvent => [...Array(cartEvent.quantity)].forEach(() => {
+
+    // refresh classes
+
+    cart.events.forEach(cartEvent => [...Array(cartEvent.quantity)].forEach(() => {
       const nextPassId = getUsersNextPassId(getState())(cartEvent.eventid);
       const selectedEvent = events.data.find(ev => ev.id === cartEvent.eventid) || {};
       cartEvent.passid = nextPassId;
       cartEvent.price = selectedEvent.price;
-      dispatch(addToCart(cartEvent));
+      dispatch(addEventToCart(cartEvent));
     }));
     dispatch(setCartVisibleFalse());
-  };
-}
-
-/**
- * updateQuantity of an item in the cart by adding and removing event items one by one
- * this is the best solution I can come up with to make sure the correct passes are
- * applied - DC
- * @param {Object} value the eventid and quantity of the new cart item
- * @returns {function} redux thunk
- */
-export function updateQuantity({ eventid, quantity }) {
-  return function innerUpdateQuantity(dispatch, getState) {
-    const { data } = getState().cart;
-    const initialQuantityInCart = data.filter(event => event.eventid === eventid)
-                                      .reduce((acc, { quantity: q }) => acc + q, 0);
-    if (!initialQuantityInCart) return;
-    range(Math.abs(quantity - initialQuantityInCart)).forEach(() => {
-      if (quantity < initialQuantityInCart) return dispatch(removeOneEventItem(eventid));
-      const state = getState();
-      const nextPassId = getUsersNextPassId(state)(eventid);
-      const cartItem = state.cart.data.find(event => event.eventid === eventid);
-      return dispatch(addToCart({ ...cartItem, passid: nextPassId }));
-    });
   };
 }
 
@@ -198,7 +172,7 @@ export function updateQuantity({ eventid, quantity }) {
 export function submitCartForPurchase() {
   return async function innerSubmitCartForPurchase(dispatch, getState, dibsFetch) {
     const state = getState();
-    const { promoCode, cart, studio } = state;
+    const { promoCode, cart } = state;
     dispatch(setCartPurchasingTrue());
 
     if (!getCanUseCardToPurchase(state) && !getUserHasPasses(state)) {
@@ -206,20 +180,17 @@ export function submitCartForPurchase() {
       return;
     }
 
-    const cartData = cart.data.map(item => ({
-      ...item,
-      source: studio.data.source,
-      studioid: studio.data.studioid,
-    }));
-
     try {
-      const res = await dibsFetch('/api/buy', {
+      const res = await dibsFetch('/api/user/checkout', {
         method: 'POST',
         requiresAuth: true,
         body: {
-          cart: cartData,
+          cart: {
+            events: cart.events,
+            packages: cart.packages,
+          },
           promoCode,
-          purchasePlace: 'Mobile App',
+          purchasePlace: 'mobile app',
         },
       });
 
@@ -228,7 +199,7 @@ export function submitCartForPurchase() {
         dispatch(setTransactionsConfirmed(res.transactions));
         dispatch(clearCart());
         await dispatch(requestUserEvents());
-        dispatch(refreshCart());
+        dispatch(refreshCartEvents());
         // dispatch(requestUserTransactions()); implement with transaction history
         // dispatch(performTransactionAnalytics(resp.transactions)); not sure works with native
         dispatch(clearPromoCodeData());
@@ -248,7 +219,7 @@ export function submitCartForPurchase() {
       console.log(err);
       dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong checking out your cart.' }));
     }
-    const eventids = uniq(cart.data.map(({ eventid }) => eventid));
+    const eventids = uniq(cart.events.map(({ eventid }) => eventid));
     dispatch(requestEventData({ eventids }));
     dispatch(setCartPurchasingFalse());
   };

@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import Config from '../../../../config.json';
 import { GREY, WHITE, DARK_TEXT_GREY } from '../../../constants/index';
-import { addToCart, addToWaitlist, enqueueNotice } from '../../../actions';
+import { addToWaitlist, enqueueNotice } from '../../../actions';
 import { lightenDarkenColor, Enum } from '../../../helpers';
 import MaterialButton from '../../shared/MaterialButton';
 import { HeavyText } from '../../styled';
@@ -148,16 +148,7 @@ class Button extends React.PureComponent {
    * @returns {undefined}
    */
   addToCart() {
-    return this.props.addToCart({
-      eventid: this.props.eventid,
-      passid: this.props.passid,
-      price: this.props.price,
-      taxRate: this.props.taxRate,
-      name: this.props.name,
-      start_time: this.props.start_time,
-      locationName: this.props.locationName,
-      instructorName: this.props.instructorName,
-    });
+    this.props.addToCart();
   }
   /**
    * @returns {undefined}
@@ -179,7 +170,7 @@ class Button extends React.PureComponent {
           activeOpacity={1}
         >
           <QuantityDisplay>
-            {this.props.quantity}
+            {this.props.quantity || 1}
           </QuantityDisplay>
         </StudioColoredQuantity>
       );
@@ -193,7 +184,7 @@ class Button extends React.PureComponent {
           borderColor: this.getBorderColor(),
         }}
         backgroundColor={this.getBackgroundColor()}
-        text={this.getText()}
+        text={this.props.text || this.getText()}
         textColor={this.getTextColor()}
         fontSize={16} // checkfontz
         onPress={this.onPress}
@@ -206,35 +197,37 @@ class Button extends React.PureComponent {
 
 Button.defaultProps = {
   showOverlay() {},
+  incrementPackageQuantity() {},
   userHasBooked: false,
   waitlisted: false,
+  text: null,
 };
 
 Button.propTypes = {
-  maxSeatsReached: PropTypes.bool.isRequired,
+  hasPackages: PropTypes.bool,
+  maxSeatsReached: PropTypes.bool,
   has_waitlist: PropTypes.bool,
   addToCart: PropTypes.func.isRequired,
-  eventid: PropTypes.number.isRequired,
+  eventid: PropTypes.number,
   passid: PropTypes.number,
-  price: PropTypes.number.isRequired,
-  taxRate: PropTypes.number.isRequired,
-  name: PropTypes.string.isRequired,
-  start_time: PropTypes.string.isRequired,
+  price: PropTypes.number,
+  taxRate: PropTypes.number,
+  name: PropTypes.string,
+  start_time: PropTypes.string,
   waitlisted: PropTypes.bool,
-  soldOut: PropTypes.bool.isRequired,
-  locationName: PropTypes.string.isRequired,
-  instructorName: PropTypes.string.isRequired,
-  quantity: PropTypes.number.isRequired,
+  soldOut: PropTypes.bool,
+  locationName: PropTypes.string,
+  instructorName: PropTypes.string,
+  quantity: PropTypes.number,
   showOverlay: PropTypes.func,
   userHasBooked: PropTypes.bool,
-  enqueueNotice: PropTypes.func.isRequired,
+  enqueueNotice: PropTypes.func,
+  text: PropTypes.string,
 };
 
-const mapStateToProps = null; // state => ({});
 const mapDispatchToProps = {
-  addToCart,
   addToWaitlist,
   enqueueNotice,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Button);
+export default connect(null, mapDispatchToProps)(Button);

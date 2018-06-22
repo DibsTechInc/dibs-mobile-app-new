@@ -20,6 +20,19 @@ export const getStudioHasMultipleLocations = createSelector(
   locations => (locations.length > 1)
 );
 
+export const getPrimaryStudioLocation = createSelector(
+  [
+    getStudioLocations,
+    getStudioData,
+  ],
+  (locations, studio) => locations.find(l => l.source_location_id === studio.primary_location_id)
+);
+
+export const getPrimaryLocationTaxes = createSelector(
+  getPrimaryStudioLocation,
+  location => location.tax_rate
+);
+
 export const getStudioHasMultipleVisibleLocations = createSelector(
   getStudioVisibleLocations,
   locations => (locations.length > 1)

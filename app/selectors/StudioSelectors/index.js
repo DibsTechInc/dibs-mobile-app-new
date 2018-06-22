@@ -110,6 +110,7 @@ export function getStudioName(state) {
   return getStudioData(state).name || 'Dibs';
 }
 
+
 export const getStudioShortDateFormat = createSelector(
   getStudioCountry,
   country => ({ US: 'M/D', UK: 'D/M' })[country]

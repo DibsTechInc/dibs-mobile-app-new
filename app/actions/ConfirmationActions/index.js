@@ -5,5 +5,5 @@ export const {
   clearConfirmation,
 } = createActions({
   SET_TRANSACTIONS_CONFIRMED: payload => payload,
-  CLEAR_CONFIRMATION: () => [],
+  CLEAR_CONFIRMATION: () => ({}),
 });

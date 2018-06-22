@@ -212,7 +212,7 @@ class PaymentInfo extends PureComponent {
       return (
         <MaterialPanel
           height={displayHeight}
-          style={{ shadowOffset: { width: 3, height: 3 } }}
+          style={{ shadowOffset: { width: 3, height: 3 }, width: '100%' }}
           heading="Payment Info"
           headingRight={editLabel}
           headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}
@@ -228,7 +228,7 @@ class PaymentInfo extends PureComponent {
     return (
       <MaterialPanel
         height={displayHeight}
-        style={{ shadowOffset: { width: 3, height: 3 } }}
+        style={{ shadowOffset: { width: 3, height: 3 }, width: '100%' }}
         heading="Payment Info"
         headingRight={editLabel}
         headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}

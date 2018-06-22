@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import Dash from 'react-native-dash';
 
@@ -8,7 +7,8 @@ import { FlexRow, NormalText } from '../../styled';
 
 const StyledView = FlexRow.extend`
   align-items: center;
-  margin-bottom: 5;
+  padding-right: 15;
+  width: 100%;
 `;
 
 

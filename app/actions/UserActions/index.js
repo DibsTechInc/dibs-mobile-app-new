@@ -12,7 +12,7 @@ import {
   requestUserEvents,
   setUpcomingEvents,
   clearCart,
-  refreshCart,
+  refreshCartEvents,
   enqueueApiError,
   enqueueNotice,
 } from '../index';
@@ -26,7 +26,7 @@ export const setUser = createAction('SET_USER', payload => payload);
 export function refreshUser(user) {
   return function innerRefreshUser(dispatch) {
     dispatch(setUser(user));
-    dispatch(refreshCart());
+    dispatch(refreshCartEvents());
   };
 }
 
@@ -144,7 +144,7 @@ export function signUpUser(payload, callback) {
         method: 'POST',
         body: {
           ...payload,
-          signupMethod: 'Mobile App',
+          signupMethod: 'mobile app',
         },
       });
       if (res.success) {

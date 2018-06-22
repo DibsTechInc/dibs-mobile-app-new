@@ -9,6 +9,7 @@ import { getEventsData } from '../EventsSelectors';
 import { getUserPasses } from '../UserSelectors/Passes';
 import { getStudioCustomTimeFormat, getStudioCurrency, getStudioShortDateFormat } from '../StudioSelectors';
 import { getUpcomingEventsData } from '../UpcomingEventsSelectors';
+import { getDetailedStudioPackages } from '../StudioSelectors/Packages';
 
 /**
  * @param {Object} state in store
@@ -33,39 +34,52 @@ export function getCartIsPurchasing(state) {
 export function getCartData(state) {
   return getCart(state).data || [];
 }
+/**
+ * @param {Object} state in store
+ * @returns {Array<Object>} items in cart
+ */
+export function getCartClassEvents(state) {
+  return getCart(state).events || [];
+}
 
-export const getCartLength = createSelector(
-  getCartData,
-  data => data.length
-);
+/**
+ * @param {Object} state in store
+ * @returns {Array<Object>} items in cart
+ */
+export function getCartPackages(state) {
+  return getCart(state).packages || [];
+}
 
 export const getTotalQuantityInCart = createSelector(
-  getCartData,
-  data => data.reduce((a, b) => a + b.quantity, 0)
+  [
+    getCartClassEvents,
+    getCartPackages,
+  ],
+  (events, packages) => events.reduce((a, b) => a + b.quantity, 0) + packages.length
 );
 
-export const getSortedCartItems = createSelector(
-  getCartData,
-  items => items.sort((itemA, itemB) => {
-    if (itemA.price === 0 && itemB.price) return 1;
-    if (itemB.price === 0 && itemA.price) return -1;
-    return itemA.price - itemB.price;
+export const getSortedCartEvents = createSelector(
+  getCartClassEvents,
+  events => events.sort((eventA, eventB) => {
+    if (eventA.price === 0 && eventB.price) return 1;
+    if (eventB.price === 0 && eventA.price) return -1;
+    return eventA.price - eventB.price;
   })
 );
 
 export const getCartEventIds = createSelector(
-  getSortedCartItems,
-  items => uniq(items.map(e => e.eventid))
+  getSortedCartEvents,
+  events => uniq(events.map(e => e.eventid))
 );
 
 export const getCartEventNames = createSelector(
-  getSortedCartItems,
+  getSortedCartEvents,
   items => uniq(items.map(e => e.name))
 );
 
 export const getCartEvents = createSelector(
   [
-    getCartData,
+    getCartClassEvents,
     getEventsData,
   ],
   (cartItems, events) => cartItems.reduce(
@@ -94,40 +108,58 @@ export const getDetailedCartEvents = createSelector(
     getUpcomingEventsData,
     getStudioShortDateFormat,
   ],
-  (events, currency, userPasses, timeFormat, upcomingEvents, shortDateFormat) => events.map(({ instructor, location, ...event }) => {
-    const formatLocalTime = time => moment(time).tz(event.mainTZ).format(timeFormat);
-    const localStartTime = moment.tz(event.start_time, event.mainTZ);
+  (items, currency, userPasses, timeFormat, upcomingEvents, shortDateFormat) => items.map(({ instructor, location, ...item }) => {
+    const formatLocalTime = time => moment(time).tz(item.mainTZ).format(timeFormat);
+    const localStartTime = moment.tz(item.start_time, item.mainTZ);
 
     // Getting the proper subtotal since each item in the cart is eventid/passid combo
-    const displayedPrice = event.passids.reduce((acc, { passid, quantity }) => {
-      if (!passid) return acc.plus(Decimal(event.price).times(quantity));
+    const displayedPrice = item.passids.reduce((acc, { passid, quantity }) => {
+      if (!passid) return acc.plus(Decimal(item.price).times(quantity));
       const pass = userPasses.find(p => p.id === passid);
       const passValue = pass && pass.passValue;
-      let adjustedPrice = Decimal(Math.min(event.price, passValue || 0));
+      let adjustedPrice = Decimal(Math.min(item.price, (passValue || 0)));
       adjustedPrice = adjustedPrice.times(quantity);
       return acc.plus(adjustedPrice);
     }, Decimal(0));
     const maxSeatsReached = Boolean(
-      (event.quantity + event.current_enrollment) === event.maximum_enrollment
-      || event.quantity === (Config.MAXIMUM_CART_QUANTITY || 4)
+      (item.quantity + item.current_enrollment) === item.maximum_enrollment
+      || item.quantity === (Config.MAXIMUM_CART_QUANTITY || 4)
     );
-    const bookedEvent = upcomingEvents.find(userEvent => userEvent.eventid === event.eventid);
+    const bookedEvent = upcomingEvents.find(userEvent => userEvent.eventid === item.eventid);
 
     return {
-      ...event,
+      ...item,
       shortDayOfWeek: localStartTime.format('ddd'),
       shortEventDate: localStartTime.format(shortDateFormat),
-      startTimeInLocalTZ: formatLocalTime(event.start_time),
-      endTimeInLocalTZ: formatLocalTime(event.end_time),
+      startTimeInLocalTZ: formatLocalTime(item.start_time),
+      endTimeInLocalTZ: formatLocalTime(item.end_time),
       instructorName: instructor.name,
       locationName: location.name,
       formattedRoundedPrice: formatCurrency(displayedPrice.toNumber(), { precision: 0, code: currency }),
-      seatsRemaining: event.seats_remaining,
-      soldOut: event.seats_remaining <= 0,
-      seatsSold: event.current_enrollment,
+      seatsRemaining: item.seats_remaining,
+      soldOut: item.seats_remaining <= 0,
+      seatsSold: item.current_enrollment,
       maxSeatsReached,
       taxRate: location.tax_rate,
       userHasBooked: Boolean(bookedEvent),
     };
+  })
+);
+
+export const getDetailedCartPackages = createSelector(
+  getCartPackages,
+  getDetailedStudioPackages,
+  (cartItems, packages) => cartItems.map(item => ({
+    ...item,
+    ...packages.find(pkg => pkg.id === item.packageid),
+  }))
+);
+
+export const getSortedCartPackages = createSelector(
+  getDetailedCartPackages,
+  pkgs => pkgs.sort((pkgA, pkgB) => {
+    if (pkgA.price === 0 && pkgB.price) return 1;
+    if (pkgB.price === 0 && pkgA.price) return -1;
+    return pkgA.price - pkgB.price;
   })
 );

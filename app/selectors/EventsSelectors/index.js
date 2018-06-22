@@ -137,7 +137,7 @@ export const getScheduleEvents = createUnboundedSelector(
     getFilteredEvents,
     getStudioCurrency,
     getStudioCustomTimeFormat,
-    state => ((state.cart && state.cart.data) || []),
+    state => ((state.cart && state.cart.events) || []),
     getUpcomingEventsData,
     getUsersNextPassId,
     getUsersNextPassValue,

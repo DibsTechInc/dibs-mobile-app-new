@@ -2,10 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { View, TouchableOpacity } from 'react-native';
-import { connect } from 'react-redux';
 import { LIGHT_GREY, TEXT_GREY, BLACK, SOFT_GREY, TRANSPARENT } from '../../../constants';
 import { fadeColor } from '../../../helpers';
-import { addToCart, removeOneEventItem } from '../../../actions';
 import { Overlay as StyledOverlay, FlexRow, NormalText } from '../../styled';
 import { TrashIcon, MinusIcon, PlusIcon } from '../../shared';
 
@@ -63,22 +61,13 @@ class Overlay extends React.PureComponent {
    * @returns {undefined}
    */
   addToCart() {
-    this.props.addToCart({
-      eventid: this.props.eventid,
-      passid: this.props.passid,
-      price: this.props.price,
-      taxRate: this.props.taxRate,
-      name: this.props.name,
-      start_time: this.props.start_time,
-      locationName: this.props.locationName,
-      instructorName: this.props.instructorName,
-    });
+    this.props.addToCart();
   }
   /**
    * @returns {undefined}
    */
   removeFromCart() {
-    this.props.removeOneEventItem(this.props.eventid);
+    this.props.removeItem();
   }
   /**
    * render
@@ -106,7 +95,7 @@ class Overlay extends React.PureComponent {
               <Quantity>
                 {this.props.quantity}
               </Quantity>
-              {this.props.maxSeatsReached ? (
+              {(this.props.maxSeatsReached || this.props.fromPackage) ? (
                 <View style={{ width: 50, height: 15 }} />
               ) : (
                 <IconContainer>
@@ -125,28 +114,16 @@ class Overlay extends React.PureComponent {
 
 Overlay.defaultProps = {
   soldOut: false,
+  fromPackage: false,
 };
 
 Overlay.propTypes = {
   soldOut: PropTypes.bool,
-  quantity: PropTypes.number.isRequired,
-  maxSeatsReached: PropTypes.bool.isRequired,
-  addToCart: PropTypes.func.isRequired,
-  eventid: PropTypes.number.isRequired,
-  passid: PropTypes.number,
-  price: PropTypes.number.isRequired,
-  taxRate: PropTypes.number.isRequired,
-  name: PropTypes.string.isRequired,
-  start_time: PropTypes.string.isRequired,
-  removeOneEventItem: PropTypes.func.isRequired,
-  locationName: PropTypes.string.isRequired,
-  instructorName: PropTypes.string.isRequired,
+  quantity: PropTypes.number,
+  maxSeatsReached: PropTypes.bool,
+  addToCart: PropTypes.func,
+  removeItem: PropTypes.func,
+  fromPackage: PropTypes.bool,
 };
 
-const mapStateToProps = null; // state => ({});
-const mapDispatchToProps = {
-  addToCart,
-  removeOneEventItem,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Overlay);
+export default Overlay;

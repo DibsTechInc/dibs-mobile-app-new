@@ -7,7 +7,7 @@ import { getUpcomingEventsData } from '../../UpcomingEventsSelectors';
 import { getStudioSource } from '../../StudioSelectors';
 import Config from '../../../../config.json';
 
-const getCartData = state => ((state.cart && state.cart.data) || []);
+const getCartData = state => ((state.cart && state.cart.events) || []);
 
 /**
  * @param {Object} state in store

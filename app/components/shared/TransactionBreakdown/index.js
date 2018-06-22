@@ -10,6 +10,7 @@ const StyledBreakDownView = styled.View`
   margin: 10px;
   margin-bottom: 0;
   height: auto;
+  width: 100%;
 `;
 
 /**
@@ -24,7 +25,7 @@ class TransactionBreakdown extends PureComponent {
     return (
       <MaterialPanel
         heading="Order Summary"
-        style={{ shadowOffset: { width: 3, height: 3 } }}
+        style={{ shadowOffset: { width: 3, height: 3 }, width: '100%' }}
         headerStyle={{ marginLeft: 10, color: GREY }}
       >
         <StyledBreakDownView>

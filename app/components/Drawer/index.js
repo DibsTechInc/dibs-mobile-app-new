@@ -7,6 +7,7 @@ import {
   CART_ROUTE,
   RECEIPT_ROUTE,
   UPCOMING_CLASS_ROUTE,
+  PACKAGES_ROUTE,
 } from '../../constants/RouteConstants/index';
 import {
   getDrawerConfig,
@@ -18,6 +19,7 @@ import CartPage from '../CartPage';
 import SideMenu from './SideMenu';
 import ReceiptPage from '../ReceiptPage';
 import UpcomingClassesPage from '../UpcomingClassesPage';
+import PackagesPage from '../PackagesPage';
 
 export default DrawerNavigator({
   [MAIN_ROUTE]: { screen: MainPage },
@@ -26,4 +28,5 @@ export default DrawerNavigator({
   [UPCOMING_CLASS_ROUTE]: { screen: UpcomingClassesPage },
   [CART_ROUTE]: { screen: CartPage },
   [RECEIPT_ROUTE]: { screen: ReceiptPage },
+  [PACKAGES_ROUTE]: { screen: PackagesPage },
 }, getDrawerConfig(300, 'left', MAIN_ROUTE, SideMenu));

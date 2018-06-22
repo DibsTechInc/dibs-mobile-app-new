@@ -8,12 +8,13 @@ import Config from '../../../../config.json';
 import { WHITE, HEIGHT } from '../../../constants';
 import { setUpcomingEventSliderExpandedFalse } from '../../../actions';
 import UpcomingEvent from './UpcomingEvent';
+import PackageReceipt from './PackageReceipt';
 
 /**
  * @class UpcomingClasses
  * @extends {Component}
  */
-class UpcomingEvents extends PureComponent {
+class PaginatedSlider extends PureComponent {
   /**
    * @param {Object} props for component
    * @returns {undefined}
@@ -38,6 +39,21 @@ class UpcomingEvents extends PureComponent {
       top: HEIGHT - (isIphoneX() ? 140 : 105),
     };
 
+    const items = this.props.packages.map(pkgItem => (
+      <PackageReceipt
+        key={pkgItem.id}
+        {...pkgItem}
+      />
+    ));
+    items.push(...this.props.events.map(event => (
+      <UpcomingEvent
+        key={event.eventid}
+        forReceiptPage={this.props.forReceiptPage}
+        expanded={this.props.expanded}
+        {...event}
+      />
+    )));
+
     return (
       <Swiper
         loop={false}
@@ -45,26 +61,24 @@ class UpcomingEvents extends PureComponent {
         paginationStyle={paginationStyle}
         activeDotStyle={{ backgroundColor: Config.STUDIO_COLOR }}
       >
-        {this.props.events.map(event => (
-          <UpcomingEvent
-            key={event.eventid}
-            forReceiptPage={this.props.forReceiptPage}
-            expanded={this.props.expanded}
-            {...event}
-          />
-        ))}
+        {items}
       </Swiper>
     );
   }
 }
 
-UpcomingEvents.defaultProps = { expanded: true, forReceiptPage: false };
+PaginatedSlider.defaultProps = {
+  expanded: true,
+  forReceiptPage: false,
+  packages: [],
+};
 
-UpcomingEvents.propTypes = {
+PaginatedSlider.propTypes = {
   forReceiptPage: PropTypes.bool,
   events: PropTypes.arrayOf(PropTypes.shape()),
   expanded: PropTypes.bool.isRequired,
   setUpcomingEventSliderExpandedFalse: PropTypes.func.isRequired,
+  packages: PropTypes.arrayOf(PropTypes.shape()),
 };
 
 const mapStateToProps = state => ({
@@ -74,4 +88,4 @@ const mapDispatchToProps = {
   setUpcomingEventSliderExpandedFalse,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(UpcomingEvents);
+export default connect(mapStateToProps, mapDispatchToProps)(PaginatedSlider);

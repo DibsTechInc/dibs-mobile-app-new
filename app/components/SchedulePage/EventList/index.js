@@ -83,7 +83,11 @@ class EventList extends React.PureComponent {
             </ContainerWithMargin>
           )}
           {this.props.events.map(event => (
-            <EventListItem key={event.eventid} {...event} />
+            <EventListItem
+              key={event.eventid}
+              cartItem={event}
+              {...event}
+            />
           ))}
         </ScrollContainer>
         <IPhoneXPadding />

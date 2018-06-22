@@ -141,5 +141,4 @@ Navigator.propTypes = {
   userToken: PropTypes.string,
 };
 
-
 export default Navigator;

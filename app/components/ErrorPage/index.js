@@ -37,7 +37,7 @@ class ErrorPage extends React.PureComponent {
     try {
       await dibsFetch('/api/error', {
         method: 'POST',
-        body: { err: this.props.err.toString(), app: 'Mobile App' },
+        body: { err: this.props.err.toString(), app: 'mobile app' },
       });
     } catch (err) {
       console.log(err);

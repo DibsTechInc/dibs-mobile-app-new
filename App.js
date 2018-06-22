@@ -16,8 +16,6 @@ import Modal from './app/components/Modal';
 import {
   requestStudioData,
   requestUserData,
-  requestCreditCardInfo,
-  requestUserEvents,
   syncUserEvents,
   removeExpiredEvents,
   requestEventData,

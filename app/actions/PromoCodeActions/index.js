@@ -10,13 +10,13 @@ import {
 } from '../../constants';
 import {
   applyFreeClassPromoToCart,
-  addToCart,
+  addEventToCart,
   removeOneEventItem,
   setCartVisibleTrue,
   setCartVisibleFalse,
 } from '../CartActions';
 import { getStudioCurrency } from '../../selectors/StudioSelectors';
-import { getSortedCartItems, getCartEventIds, getCartEventNames } from '../../selectors';
+import { getSortedCartEvents, getCartEventIds, getCartEventNames } from '../../selectors';
 import { getUsersNextPassId } from '../../selectors/UserSelectors/Passes';
 
 export const {
@@ -54,11 +54,11 @@ export function clearPromoCode() {
   return function innerClearPromoCode(dispatch, getState) {
     const { promoCode } = getState();
     if (promoCode.type === PROMO_TYPE_FREE_CLASS) {
-      const cartItem = getSortedCartItems(getState())[0];
+      const cartItem = getSortedCartEvents(getState())[0];
       dispatch(setCartVisibleTrue());
       dispatch(removeOneEventItem(cartItem.eventid));
       const passid = getUsersNextPassId(getState())(cartItem.eventid);
-      dispatch(addToCart({ ...cartItem, passid }));
+      dispatch(addEventToCart({ ...cartItem, passid }));
       dispatch(setCartVisibleFalse());
     }
 

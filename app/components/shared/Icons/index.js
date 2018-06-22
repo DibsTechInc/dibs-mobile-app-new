@@ -11,4 +11,5 @@ export { default as UserIcon } from './UserIcon';
 export { default as XIcon } from './XIcon';
 export { default as CheckIcon } from './CheckIcon';
 export { default as FiltersIcon } from './FiltersIcon';
+export { default as PackageIcon } from './PackageIcon';
 

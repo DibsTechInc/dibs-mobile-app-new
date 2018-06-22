@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { View, ScrollView } from 'react-native';
 import { connect } from 'react-redux';
-import { isIphoneX } from 'react-native-iphone-x-helper';
 
 import Config from '../../../../../config.json';
 import { WHITE, DARK_TEXT_GREY, GREY } from '../../../../constants';
@@ -112,16 +111,12 @@ class UpcomingEvent extends PureComponent {
     return (
       <FadeInView
         style={{
-          paddingTop: this.props.forReceiptPage ? 10 : 0,
-          paddingBottom: isIphoneX() ? 80 : +(!this.props.forReceiptPage && 60),
+          paddingBottom: 60,
           backgroundColor: WHITE,
         }}
       >
         <ScrollView
           ref={node => this.scrollView = node}
-          style={{
-            paddingTop: this.props.forReceiptPage ? 10 : 0,
-          }}
           onScrollEndDrag={this.onScrollEnd}
         >
 

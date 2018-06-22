@@ -2,11 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { View } from 'react-native';
+import { connect } from 'react-redux';
 
 import { WHITE, LIGHT_GREY, DARK_TEXT_GREY, BLACK, GREY } from '../../../constants';
+import { addEventToCart, removeOneEventItem } from '../../../actions';
 import { FlexRow, FlexCenter, RightAlignedColumn, HeavyText, NormalText } from '../../styled';
-import Button from './Button';
-import Overlay from './Overlay';
+import Button from '../PurchaseItem/Button';
+import Overlay from '../PurchaseItem/Overlay';
 
 const Container = FlexRow.extend`
   background: ${WHITE},
@@ -56,6 +58,8 @@ class EventListItem extends React.PureComponent {
     super(props);
     this.state = { showOverlay: false };
     this.showOverlayAndStartTimer = this.showOverlayAndStartTimer.bind(this);
+    this.addToCart = this.addToCart.bind(this);
+    this.removeFromCart = this.removeFromCart.bind(this);
   }
   /**
    * @param {Object} props component will get
@@ -74,6 +78,22 @@ class EventListItem extends React.PureComponent {
    */
   componentWillUnmount() {
     if (this.overlayTimeout) clearTimeout(this.overlayTimeout);
+  }
+  /**
+   * @returns {undefined}
+   */
+  addToCart() {
+    this.props.addEventToCart({
+      eventid: this.props.eventid,
+      passid: this.props.passid,
+      price: this.props.price,
+    });
+  }
+  /**
+   * @returns {undefined}
+   */
+  removeFromCart() {
+    this.props.removeOneEventItem(this.props.eventid);
   }
   /**
    * @returns {undefined}
@@ -97,7 +117,11 @@ class EventListItem extends React.PureComponent {
           (this.props.soldOut && !this.props.waitlisted && !this.props.has_waitlist)
           || this.state.showOverlay
         ) ? (
-          <Overlay {...this.props} />
+          <Overlay
+            {...this.props}
+            removeItem={this.removeFromCart}
+            addToCart={this.addToCart}
+          />
         ) : null}
         {this.props.isCartEvent ? null : (
           <PriceColumn>
@@ -152,6 +176,7 @@ class EventListItem extends React.PureComponent {
           <Button
             {...this.props}
             showOverlay={this.showOverlayAndStartTimer}
+            addToCart={this.addToCart}
           />
         </ButtonColumn>
       </Container>
@@ -166,6 +191,7 @@ EventListItem.defaultProps = {
 };
 
 EventListItem.propTypes = {
+  eventid: PropTypes.number,
   shortDayOfWeek: PropTypes.string,
   shortEventDate: PropTypes.string,
   formattedRoundedPrice: PropTypes.string.isRequired,
@@ -181,6 +207,15 @@ EventListItem.propTypes = {
   has_waitlist: PropTypes.bool,
   quantity: PropTypes.number.isRequired,
   isCartEvent: PropTypes.bool,
+  addEventToCart: PropTypes.func.isRequired,
+  removeOneEventItem: PropTypes.func,
+  price: PropTypes.number,
 };
 
-export default EventListItem;
+// const mapStateToProps = state => ({});
+const mapDispatchToProps = {
+  addEventToCart,
+  removeOneEventItem,
+};
+
+export default connect(null, mapDispatchToProps)(EventListItem);

@@ -10,6 +10,7 @@ import creditCard from './CreditCardReducer';
 import promoCode from './PromoCodeReducer';
 import confirmation from './ConfirmationReducer';
 import animation from './AnimationReducer';
+import packages from './PackagesReducer';
 import filters from './FiltersReducer';
 
 export default combineReducers({
@@ -23,5 +24,6 @@ export default combineReducers({
   promoCode,
   confirmation,
   animation,
+  packages,
   filters,
 });

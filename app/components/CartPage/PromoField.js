@@ -6,6 +6,7 @@ import Config from '../../../config.json';
 import { RED, DARK_TEXT_GREY, GREY } from '../../constants';
 import { getAppliedPromoCode, getPromoCodeIsSubmitting, getPromoCodeError, getPromoCodeNotice } from '../../selectors';
 import { verifyPromoCode, clearPromoCodeError, clearPromoCodeNotice, clearPromoCode } from '../../actions';
+import { PROMO_PRODUCT_PACKAGE, PROMO_PRODUCT_CLASS } from '../../constants';
 import MaterialPanel from '../shared/MaterialPanel';
 import MaterialButton from '../shared/MaterialButton';
 import LinearLoader from '../shared/LinearLoader';
@@ -89,9 +90,11 @@ class PromoField extends PureComponent {
    * @returns {undefined}
    */
   handlePress() {
+    const promoCodeType = this.props.packages.length ? PROMO_PRODUCT_PACKAGE : PROMO_PRODUCT_CLASS;
+
     return this.props.currentPromoCode ?
       this.setState({ promoCode: '' }, () => this.props.clearPromoCode()) :
-      this.props.verifyPromoCode(this.state.promoCode);
+      this.props.verifyPromoCode(this.state.promoCode, promoCodeType);
   }
   /**
    * @returns {JSX} XML
@@ -100,7 +103,7 @@ class PromoField extends PureComponent {
     // TODO handle scrolling
     return (
       <MaterialPanel
-        style={{ shadowOffset: { width: 3, height: 3 } }}
+        style={{ shadowOffset: { width: 3, height: 3 }, width: '100%' }}
         headerStyle={{ marginLeft: 10, color: GREY }}
         heading="Promo Code"
       >
@@ -156,6 +159,8 @@ PromoField.propTypes = {
   clearPromoCodeError: PropTypes.func.isRequired,
   clearPromoCodeNotice: PropTypes.func.isRequired,
   clearPromoCode: PropTypes.func.isRequired,
+  events: PropTypes.arrayOf(PropTypes.shape()),
+  packages: PropTypes.arrayOf(PropTypes.shape()),
 };
 
 const mapStateToProps = state => ({

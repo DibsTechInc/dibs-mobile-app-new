@@ -14,8 +14,9 @@ import {
 } from '../../PromoCodeSelectors';
 
 import {
-  getSortedCartItems,
-  getCartData,
+  getSortedCartEvents,
+  getSortedCartPackages,
+  getCartClassEvents,
 } from '../';
 
 import {
@@ -28,6 +29,28 @@ import {
 
 import { getUserStudioPassesInCart } from '../../UserSelectors/Passes';
 import { getStudioCurrency } from '../../StudioSelectors';
+import { getStudioLocations } from '../../StudioSelectors/Locations';
+import { PROMO_PRODUCT_CLASS, PROMO_PRODUCT_UNIVERSAL, PROMO_PRODUCT_PACKAGE } from '../../../constants/index';
+
+export const getSortedCartItems = createSelector(
+  [
+    getSortedCartPackages,
+    getSortedCartEvents,
+  ],
+  (cartPackages, cartEvents) => cartPackages.concat(cartEvents)
+);
+
+export const getCartHasPackages = createSelector(
+  getSortedCartItems,
+  items => items.some(item => item.packageid)
+);
+
+export const getCartPromoIsAppliedToPackage = createSelector(
+  getCartHasPackages,
+  getPromoCodeProduct,
+  (cartHasPacks, promoProduct) =>
+    Boolean(cartHasPacks && [PROMO_PRODUCT_PACKAGE, PROMO_PRODUCT_UNIVERSAL].includes(promoProduct))
+);
 
 export const getCartPromoCodeAmount = createSelector(
   [
@@ -36,20 +59,30 @@ export const getCartPromoCodeAmount = createSelector(
     getPromoCodeAmount,
     getPromoCodeProduct,
   ],
-  (cartEvents, promoCodeType, promoCodeAmount) => {
-    if (!cartEvents.length) return 0;
+  (cartItems, promoCodeType, promoCodeAmount, promoProduct) => {
+    if (!cartItems.length) return 0;
+
+    const itemToApplyCode = cartItems.find(item => (
+      {
+        [PROMO_PRODUCT_UNIVERSAL]: true,
+        [PROMO_PRODUCT_CLASS]: Boolean(item.eventid),
+        [PROMO_PRODUCT_PACKAGE]: Boolean(item.packageid),
+      }[promoProduct]
+    ));
+
+    if (!itemToApplyCode) return 0;
 
     switch (promoCodeType) {
       case PROMO_TYPE_FREE_CLASS:
-        return cartEvents[0].price;
+        return itemToApplyCode.price;
       case PROMO_TYPE_PERCENT_OFF_ONE_CLASS:
         return Decimal(promoCodeAmount)
           .dividedBy(100)
-          .times(cartEvents[0].price)
+          .times(itemToApplyCode.price)
           .toDecimalPlaces(2)
           .toNumber();
       case PROMO_TYPE_CASH_OFF:
-        return Math.min(promoCodeAmount, cartEvents[0].price);
+        return Math.min(promoCodeAmount, itemToApplyCode.price);
       default:
         return 0;
     }
@@ -99,14 +132,15 @@ export const getFormattedCartPassesValue = createSelector(
 
 export const getCartEventsAdjustedPrices = createSelector(
   [
-    getCartData,
+    getCartClassEvents,
     getUserStudioPassesInCart,
   ],
-  (cartEvents, passesInCart) => cartEvents.map((cartEvent) => {
-    const pass = passesInCart.find(p => p.id === cartEvent.passid);
+  (cartItems, passesInCart) => cartItems.map((cartItem) => {
+    const pass = passesInCart.find(p => p.id === cartItem.passid);
     if (!pass) return 0; // events paid without passes will be handled separately
-    const eventPassValue = Math.min((pass.studioPackage.unlimited ? cartEvent.price : pass.passValue), cartEvent.price);
-    return Decimal(eventPassValue).times(cartEvent.quantity).toNumber(); // classes priced higher than their pass value earn zero credit
+    const eventPassValue = Math.min((pass.studioPackage.unlimited ? cartItem.price : pass.passValue), cartItem.price);
+    const adjustedPrice = Decimal(eventPassValue).times(cartItem.quantity).toNumber();
+    return adjustedPrice; // classes priced higher than their pass value earn zero credit
   })
 );
 
@@ -123,19 +157,30 @@ export const getCartValueBack = createSelector(
     getUserStudioPassesInCart,
     getCartPassesValue,
     getPromoCodeType,
+    getCartHasPackages,
     getPromoCodeAmount,
+    getCartPromoIsAppliedToPackage,
     getUserFlashCreditAmount,
     getCartEventsAdjustedValue,
   ],
-  (passes, passesValue, promoType, promoAmount, flashCredAmount, adjustedEventsValue) => (
+  (
+    passes,
+    passesValue,
+    promoType,
+    packsInCart,
+    promoAmount,
+    promoAppliedToPack,
+    flashCredAmount,
+    adjustedEventsValue
+  ) => (
     passes.length ? Math.max(
-                      0,
-                      Decimal(passesValue).plus(flashCredAmount)
-                                          .plus(promoType === PROMO_TYPE_FREE_CLASS ? 0 : promoAmount)
-                                          .minus(adjustedEventsValue)
-                                          .toNumber()
-                    )
-                  : 0
+      0,
+      Decimal(passesValue)
+        .plus(flashCredAmount)
+        .plus(promoAppliedToPack ? 0 : promoAmount)
+        .minus(adjustedEventsValue)
+        .toNumber()
+      ) : 0
   )
 );
 
@@ -151,19 +196,29 @@ export const getFormattedCartValueBack = createSelector(
 
 BREAKDOWN FOR WHEN USER DOES NOT HAVE PASSES
 
+TODO: handle when user can toggle autopay on/off
+
 */
 
 export const getCartEventsWithoutPasses = createSelector( // TODO edit
-  getSortedCartItems,
+  getCartClassEvents,
   cartEvents => cartEvents.filter(cartEvent => !cartEvent.passid)
 );
 
+export const getCartPackagesWithEvents = createSelector(
+  [
+    getSortedCartPackages,
+    getCartEventsWithoutPasses,
+  ],
+  (cartPackages, cartEvents) => cartPackages.concat(cartEvents)
+);
+
 export const getCartSubtotal = createSelector(
-  getCartEventsWithoutPasses,
-  events => events.reduce(
-    (acc, event) => acc.plus(Decimal(event.price).times(event.quantity)),
-  Decimal(0)
-).toNumber()
+  getCartPackagesWithEvents,
+  items => +items.reduce(
+    (acc, item) =>
+      acc.plus(Decimal(item.price).times(item.quantity)),
+    Decimal(0))
 );
 
 export const getFormattedCartSubtotal = createSelector(
@@ -176,18 +231,30 @@ export const getFormattedCartSubtotal = createSelector(
 
 export const getCartTaxAmount = createSelector(
   [
-    getCartEventsWithoutPasses,
+    getCartPackagesWithEvents,
     getUserStudioPassesInCart,
     getCartDiscountAmount,
+    state => ((state.events || {}).data || []),
+    getStudioLocations,
+    getCartHasPackages,
   ],
-  (events, passes, discount) => events.reduce(
-    (acc, event, i) => {
-      let price = Decimal(event.price).times(event.quantity);
-      const taxRate = Decimal(event.taxRate).dividedBy(100);
-      if (!i && !passes.length) {
-        price = price.minus(Math.min(discount, event.price));
+  (items, passes, discount, events, locations) => items.reduce(
+    (acc, item, i) => {
+      if (item.eventid) {
+        const event = events.find(e => e.id === item.eventid);
+        const loc = locations.find(l => l.id === event.location.id);
+        const taxRate = Decimal(loc.tax_rate).dividedBy(100);
+        let price = Decimal(item.price).times(item.quantity);
+        price = Decimal(item.price).times(item.quantity);
+        if (!i && !passes.length) {
+          price = price.minus(Math.min(discount, item.price));
+        }
+        return acc.plus(price.times(taxRate).toDecimalPlaces(2));
       }
-      return acc.plus(price.times(taxRate).toDecimalPlaces(2));
+      if (item.packageid) {
+        return acc.plus(item.packageTaxes);
+      }
+      return acc;
     },
     new Decimal(0)
   ).toNumber()

@@ -4,6 +4,7 @@ export * from './EventsSelectors';
 export * from './PromoCodeSelectors';
 export * from './StudioSelectors';
 export * from './StudioSelectors/Locations';
+export * from './StudioSelectors/Packages';
 export * from './UserSelectors';
 export * from './UserSelectors/Passes';
 export * from './UpcomingEventsSelectors';
