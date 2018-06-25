@@ -10,14 +10,6 @@ import {
  } from '../../PromoCodeSelectors';
 import { getStudioCurrency, getStudioData } from '../../StudioSelectors';
 import { getPrimaryLocationTaxes } from '../../StudioSelectors/Locations';
-
-import {
-  PROMO_TYPE_FREE_CLASS,
-  PROMO_TYPE_PERCENT_OFF_ONE_CLASS,
-  PROMO_TYPE_CASH_OFF,
-  PROMO_TYPE_FIXED,
-} from '../../../constants';
-
 import { getModifiedCharge, formatAutopayTimeText } from '../../../helpers';
 
 /**
@@ -44,38 +36,15 @@ export const getSingleStudioPackage = createSelector(
   (studioPackages, confirmId) => studioPackages.find(studioPackage => studioPackage.id === confirmId) || {}
 );
 
-// export const getPackagePromoCodeAmount = createSelector(
-//   [
-//     getSingleStudioPackage,
-//     getPromoCodeType,
-//     getPromoCodeAmount,
-//   ],
-//   (studioPackage, promoCodeType, promoCodeAmount) => {
-//     if (!studioPackage) return 0;
-
-//     switch (promoCodeType) {
-//       case PROMO_TYPE_FREE_CLASS:
-//         return studioPackage.price;
-//       case PROMO_TYPE_PERCENT_OFF_ONE_CLASS:
-//         return Decimal(promoCodeAmount).dividedBy(100)
-//                                        .times(studioPackage.price)
-//                                        .toDecimalPlaces(2)
-//                                        .toNumber();
-//       case PROMO_TYPE_CASH_OFF:
-//         return Math.min(promoCodeAmount, studioPackage.price);
-//       default:
-//         return 0;
-//     }
-//   }
-// );
+const expiresOrRenews = autopayStr => (autopayStr === 'FORCE' ? 'Renews' : 'Expires');
 
 /**
  *
  * @param {Object} pkg studio package object
  * @returns {String} text to display
  */
-function expirationText({ passesValidFor, validForInterval, expires_after_first_booking: expiresAfterBooking }) {
-  return `Expires ${passesValidFor} ${validForInterval}${passesValidFor > 1 ? 's' : ''} ${expiresAfterBooking ? 'after first visit' : 'from purchase date'}`;
+function cartExpirationText({ passesValidFor, validForInterval, expires_after_first_booking: expiresAfterBooking, autopay }) {
+  return `${expiresOrRenews(autopay)} ${passesValidFor} ${validForInterval}${passesValidFor > 1 ? 's' : ''} ${expiresAfterBooking ? 'after first visit' : 'from purchase date'}`;
 }
 
 /**
@@ -83,8 +52,8 @@ function expirationText({ passesValidFor, validForInterval, expires_after_first_
  * @param {Object} pkg studio package object
  * @returns {String} text to display
  */
-function initialExpirationText({ passesValidFor, validForInterval }) {
-  return `Expires in ${passesValidFor} ${validForInterval}${passesValidFor > 1 ? 's' : ''}`;
+function expirationText({ passesValidFor, validForInterval, autopay }) {
+  return `${expiresOrRenews(autopay)} in ${passesValidFor} ${validForInterval}${passesValidFor > 1 ? 's' : ''}`;
 }
 
 /**
@@ -177,8 +146,8 @@ export const getDetailedStudioPackages = createSelector(
       formattedPriceAutopayPerClass: formatCurrency(price / pkg.classAmount, { code: currency, precision: ((price / pkg.classAmount) % 1) && 2 }),
       shortenedIncrement: formatShortenedIncrement(pkg),
       autoPayText,
+      cartExpirationText: cartExpirationText(pkg),
       expirationText: expirationText(pkg),
-      initialExpirationText: initialExpirationText(pkg),
       formattedModifiedPrice: formatCurrency(modifiedPrice, { code: currency }),
       formattedCreditsSpent: formatCurrency(creditsSpent, { code: currency }),
       packageTaxes,
@@ -188,6 +157,7 @@ export const getDetailedStudioPackages = createSelector(
       promoCodeAmount,
       formattedPromoAmount: formatCurrency(promoCodeAmount, { code: currency }),
       appliedPromoCode,
+      autopay: pkg.autopay === 'FORCE',
     };
   }).sort((a, b) => {
     const a1 = a.sortIndex;

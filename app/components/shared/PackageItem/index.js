@@ -135,7 +135,7 @@ class Package extends React.PureComponent {
         )}
         <DescriptionView>
           <PackageName>
-            {this.props.formattedRoundedPrice}
+            {this.props.formattedRoundedPrice} + {String(this.props.commitment_period)}
           </PackageName>
           <HeavyText>
             {this.props.name}
@@ -148,14 +148,13 @@ class Package extends React.PureComponent {
             <NormalText>
               {this.props.formattedPricePerClass} / class
             </NormalText>}
-          {this.props.unlimited && this.props.commitment_period &&
+          {this.props.autopay && this.props.commitment_period &&
             <GreyText>
               {this.props.commitment_period} month commitment
             </GreyText>}
-          {!this.props.unlimited &&
-            <GreyText>
-              {this.props.isCartPage ? this.props.expirationText : this.props.initialExpirationText}
-            </GreyText>}
+          <GreyText>
+            {this.props.isCartPage ? this.props.cartExpirationText : this.props.expirationText}
+          </GreyText>
         </DescriptionView>
         <MarginedView>
           <Button
@@ -186,10 +185,11 @@ Package.propTypes = {
   unlimited: PropTypes.bool,
   formattedPricePerClass: PropTypes.string,
   commitment_period: PropTypes.number,
+  cartExpirationText: PropTypes.string,
   expirationText: PropTypes.string,
-  initialExpirationText: PropTypes.string,
   removePackageFromCart: PropTypes.func.isRequired,
   addPackageToCart: PropTypes.func.isRequired,
+  autopay: PropTypes.bool.isRequired,
 };
 
 // const mapStateToProps = state => ({});
