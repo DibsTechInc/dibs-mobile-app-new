@@ -114,9 +114,22 @@ for every little change or feature. There are however a few things that cannot b
 
 Please make sure to publish to the development release channel and test before publishing to production.
 
+You can use the following list as a checklist for over the air updates to make sure everything is in order:
+
+- Replace/update the `config.json` and `app.json` to use the studio's JSONs stored in the database.
+- Update the studios' JSONs in the database with any changes that were made to the structure of the files
+- Replace `assets/img/main-page.jpg`
+- Place the studio fonts in `assets/fonts/`
+- Update `App.js` to use the correct font files in the initial load.
+- Confirm Sentry credentials are correct.
+- Build the app in your development environment and test any features you are adding/changing.
+
+Once you have checked each item in the list, run the following command:
 ```bash
 $ exp publish --release-channel [name of release channel]
 ```
+
+and the updates will be automatically pushed to the app on that release channel.
 
 In the case that you want to revert the publish, simply remove the code that was published and run the command again.
 Once an updates has been pushed OTA, the app will automatically check for and download the updates the next time it opens.
