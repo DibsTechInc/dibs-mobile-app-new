@@ -135,7 +135,7 @@ class Package extends React.PureComponent {
         )}
         <DescriptionView>
           <PackageName>
-            {this.props.formattedRoundedPrice} + {String(this.props.commitment_period)}
+            {this.props.formattedRoundedPrice}
           </PackageName>
           <HeavyText>
             {this.props.name}
