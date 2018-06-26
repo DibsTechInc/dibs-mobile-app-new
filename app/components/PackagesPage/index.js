@@ -13,6 +13,7 @@ import { getDetailedStudioPackages } from '../../selectors';
 
 const ScrollContainer = styled.ScrollView`
   background: ${WHITE};
+  margin-top: 1px;
 `;
 
 const IPhoneXPadding = styled.View`
