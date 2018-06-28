@@ -4,6 +4,7 @@ npm-debug.*
 config.json
 app.json
 assets/splash.png
+assets/icon.png
 assets/img/main-page.png
 assets/fonts/*
-
+.vscode/
