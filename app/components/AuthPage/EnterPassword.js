@@ -75,14 +75,14 @@ class EnterPassword extends PureComponent {
 
     await new Promise(res => this.setState({ isLoading: true, validInput: true }, res));
     const response = await new Promise(res => this.props.submitLogin(email, this.state.password, res));
-    await new Promise(res => this.setState({ isLoading: false, errorText: '' }, res));
+    await new Promise(res => this.setState({ errorText: '' }, res));
 
     if (response.code !== 200) {
       this.setState({ isLoading: false, errorText: 'Invalid password' });
       return;
     }
 
-    await Promise.delay(Config.LOADING_QUOTES.length && 3000);
+    await Promise.delay(Config.LOADING_QUOTES.length && 2000);
     this.props.navigation.navigate(MAIN_ROUTE);
   }
 

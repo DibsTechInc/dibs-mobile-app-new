@@ -86,7 +86,7 @@ class App extends Component {
    */
   async componentDidMount() {
     await this.getFonts();
-    await Promise.delay(Config.LOADING_QUOTES.length && 3000);
+    await Promise.delay(Config.LOADING_QUOTES.length && 2000);
     await this.getImages();
     await this.getAssets();
     this.eventRefreshInterval = setInterval(async () => {
