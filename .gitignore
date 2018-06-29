@@ -6,5 +6,5 @@ app.json
 assets/splash.png
 assets/icon.png
 assets/img/main-page.png
-assets/fonts/*
+assets/fonts/*.ttf
 .vscode/
