@@ -1,5 +1,6 @@
 import { createActions } from 'redux-actions';
 import { enqueueApiError } from '../';
+import Sentry from 'sentry-expo';
 
 export const {
   setCreditCard,
@@ -35,6 +36,7 @@ export function requestCreditCardInfo(showAlert = true) {
       }
     } catch (err) {
       console.log(err);
+      Sentry.captureException(new Error(err));
       if (showAlert) dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong getting your billing information.' }));
       else throw err;
     }
@@ -65,6 +67,7 @@ export function updateCreditCard({ ccNum, ccCVC, expiration }, callback = () => 
       else enqueueApiError({ title: 'Error!', message: `${res.message}.` });
     } catch (err) {
       console.log(err);
+      Sentry.captureException(new Error(err));
       enqueueApiError({ title: 'Error!', message: 'Something went wrong updating your credit card.' });
     }
     dispatch(setCreditCardLoadingFalse());

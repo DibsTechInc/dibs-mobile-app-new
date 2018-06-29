@@ -1,5 +1,6 @@
 import { createActions } from 'redux-actions';
 import moment from 'moment-timezone';
+import Sentry from 'sentry-expo';
 
 import Config from '../../../config.json';
 import { refreshUser, enqueueApiError } from '../';
@@ -58,6 +59,7 @@ export function requestUserEvents(showAlert = true) {
       }
     } catch (err) {
       console.log(err);
+      Sentry.captureException(new Error(err));
       if (showAlert) dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong getting your upcoming classes.' }));
       else throw err;
     }
@@ -81,6 +83,7 @@ export function syncUserEvents() {
       });
     } catch (err) {
       console.log(err);
+      Sentry.captureException(new Error(err));
     }
     dispatch(setSyncingEventsFalse());
     return dispatch(requestUserEvents(false));
@@ -150,6 +153,7 @@ export function dropUserFromEvent(eventid) {
       }
     } catch (err) {
       console.log(err);
+      Sentry.captureException(new Error(err));
       dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong dropping your class.' }));
     }
     dispatch(setDroppingEventFalse());

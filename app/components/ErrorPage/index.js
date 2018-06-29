@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import Sentry from 'sentry-expo';
 
 import Config from '../../../config.json';
 import { WHITE, DARK_TEXT_GREY } from '../../constants';
@@ -41,6 +42,7 @@ class ErrorPage extends React.PureComponent {
       });
     } catch (err) {
       console.log(err);
+      Sentry.captureException(new Error(err));
     }
   }
   /**

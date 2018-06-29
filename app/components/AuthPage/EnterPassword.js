@@ -32,7 +32,6 @@ const StyledButtonView = styled.View`
 
 const ErrorText = NormalText.extend`
   fontSize: 12px;
-  left: 26%;
   color: red;
   position: absolute;
   top: 50%;

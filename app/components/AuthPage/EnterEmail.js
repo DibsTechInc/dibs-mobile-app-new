@@ -33,7 +33,6 @@ const ErrorText = NormalText.extend`
   fontSize: 12px;
   color: red;
   position: absolute;
-  left: 26%;
   top: 52%;
 `;
 

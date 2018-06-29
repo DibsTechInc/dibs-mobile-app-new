@@ -1,6 +1,7 @@
 import { stringify } from 'qs';
 import { format as formatCurrency } from 'currency-formatter';
 import { createActions } from 'redux-actions';
+import Sentry from 'sentry-expo';
 import {
   PROMO_TYPE_FREE_CLASS,
   PROMO_PRODUCT_PACKAGE,
@@ -122,10 +123,12 @@ export function verifyPromoCode(promoCodeAttempt, product = PROMO_PRODUCT_CLASS)
         dispatch(setPromoCodeNotice(text));
       } else {
         console.log(res);
+        Sentry.captureException(new Error(res.message));
         dispatch(setPromoCodeError(`${res.message}.`));
       }
     } catch (err) {
       console.log(err);
+      Sentry.captureException(new Error(err));
       dispatch(setPromoCodeError('Something went wrong applying that promo code to your cart.'));
     }
     dispatch(setPromoCodeSubmittingFalse());

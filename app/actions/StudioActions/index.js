@@ -1,5 +1,6 @@
 import { createActions } from 'redux-actions';
 import { AsyncStorage } from 'react-native';
+import Sentry from 'sentry-expo';
 import Config from '../../../config.json';
 import { enqueueApiError } from '../';
 
@@ -35,6 +36,7 @@ export function requestStudioData(showAlert = true) {
       return;
     } catch (err) {
       console.log(err);
+      Sentry.captureException(new Error(err));
       if (showAlert) dispatch(enqueueApiError({ title: 'Something went wrong loading your app.' }));
       else throw err;
     }

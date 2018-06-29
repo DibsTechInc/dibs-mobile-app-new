@@ -52,7 +52,7 @@ class SchedulePage extends PureComponent {
       this.props.requestEventData();
     }
   }
-    /**
+  /**
    * @return {undefined}
    */
   showFilter() {

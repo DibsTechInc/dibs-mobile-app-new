@@ -1,6 +1,7 @@
 import { createActions } from 'redux-actions';
 import { cloneDeep, uniq } from 'lodash';
 import moment from 'moment';
+import Sentry from 'sentry-expo';
 
 import {
   getUsersNextPassId,
@@ -117,7 +118,7 @@ export function removeExpiredEvents() {
         })
       ));
     } else {
-      console.log(cart, 'cart');
+      Sentry.captureException(new Error(JSON.stringify(cart)));
       enqueueApiError({ 'Error!': JSON.stringify(cart) });
     }
 
@@ -132,7 +133,6 @@ export function removeExpiredEvents() {
 export function applyFreeClassPromoToCart() {
   return function innerApplyFreeClassPromoToCart(dispatch, getState) {
     const cartData = getSortedCartEvents(getState());
-    // const cartItem = cartData[0];
     const copiedItem = { ...cartData[0], passid: null };
     dispatch(setCartVisibleTrue());
     dispatch(removeOneEventItem(copiedItem, { toggleVisibility: false }));
@@ -213,10 +213,13 @@ export function submitCartForPurchase() {
         if (res.removedEvents.every(r => r.reason === 'PRICE_CHANGE')) {
           message = 'Oh no! The classes you chose had their price increase more than 5 minutes ago. Please refresh and try again';
         }
+        console.log(message);
+        Sentry.captureException(new Error(message));
         dispatch(enqueueApiError({ title: 'Error!', message }));
       }
     } catch (err) {
       console.log(err);
+      Sentry.captureException(new Error(err));
       dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong checking out your cart.' }));
     }
     const eventids = uniq(cart.events.map(({ eventid }) => eventid));

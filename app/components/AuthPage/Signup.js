@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import Sentry from 'sentry-expo';
 import {
   View,
   ScrollView,
@@ -20,7 +21,6 @@ import {
   MAIN_ROUTE,
   LOGIN_ROUTE,
   DEFAULT_BG,
-  GREY,
   HEIGHT,
   WIDTH,
   RED,
@@ -119,29 +119,6 @@ class Signup extends PureComponent {
       phoneError: isValidPhoneNumber ? '' : 'Invalid phone number',
       tAndCError: tAndC ? '' : 'Please agree to terms and conditions',
     });
-
-    // if (!isValidFullName) {
-    //   this.setState({ nameError: 'Please enter a first and last name.' });
-    // }
-
-    // if (!isValidPassword) {
-    //   this.setState({ passwordError: 'Password must be 6 characters' });
-    // }
-
-    // switch (true) {
-    //   case isFormEmpty:
-    //     return this.setState({ formEmptyError: 'Please enter all required fields.' });
-    //   case !isValidFullName:
-    //     return this.setState({ nameError: 'Please enter a first and last name.' });
-    //   case !isValidPassword:
-    //     return this.setState({ passwordError: 'Password must be 6 characters' });
-    //   case !isValidPhoneNumber:
-    //     return this.setState({ phoneError: 'Please make sure your password is at least 6 characters.' });
-    //   case !tAndC:
-    //     return this.setState({ tAndCError: 'Please make sure your password is at least 6 characters.' });
-    //   default:
-    //     return this.setState({ formEmptyError: '', nameError: '', passwordError: '', phoneError: '', tAndCError: '' });
-    // }
   }
 
   /**
@@ -150,29 +127,6 @@ class Signup extends PureComponent {
   async handleOnPress() {
     const { isValid } = this.checkForm();
     this.setErrorMessages();
-    // let errorMsg;
-
-    // const {
-    //   isValidFullName,
-    //   isValidPassword,
-    //   tAndC,
-    //   isValidPhoneNumber,
-    // } = formInfo;
-
-    // switch (true) {
-    //   case isFormEmpty:
-    //     errorMsg = 
-    // }
-
-    // if (!isValidFullName) {
-    //   errorMsg = 'Please enter a first and last name.';
-    // } else if (!isValidPassword) {
-    //   errorMsg = 'Please make sure your password is at least 6 characters.';
-    // } else if (!tAndC) {
-    //   errorMsg = 'Please agree to the terms and conditions.';
-    // } else if (!isValidPhoneNumber) {
-    //   errorMsg = 'Please check that your phone number is correct.';
-    // }
 
     if (isValid) {
       const phone = this.phone.getValue();
@@ -195,6 +149,7 @@ class Signup extends PureComponent {
         return this.props.navigation.navigate(MAIN_ROUTE);
       } catch (err) {
         console.log(err);
+        Sentry.captureException(new Error(err));
         this.setState({ isLoading: false });
         if (err.message === 'Account disabled') {
           return this.props.navigation.navigate(LOGIN_ROUTE, { accountDisabled: true, email: this.props.navigation.state.params.email });

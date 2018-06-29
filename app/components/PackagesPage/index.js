@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { View, TouchableOpacity } from 'react-native';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { isIphoneX } from 'react-native-iphone-x-helper';
@@ -8,8 +9,25 @@ import Header from '../Header';
 import Package from '../shared/PackageItem';
 
 import { FadeInView } from '../shared';
-import { WHITE } from '../../constants';
+import { NormalText, HeavyText } from '../styled';
+import { WHITE, LIGHT_GREY } from '../../constants';
 import { getDetailedStudioPackages } from '../../selectors';
+
+import Config from '../../../config.json';
+
+const NoticeContainer = styled.View`
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  background: ${WHITE},
+  border-bottom-width: 1;
+  border-bottom-color: ${LIGHT_GREY};
+  overflow: hidden;
+  padding-top: 40;
+  padding-left: 25;
+  padding-right: 25;
+  position: relative;
+`;
 
 const ScrollContainer = styled.ScrollView`
   background: ${WHITE};
@@ -28,13 +46,49 @@ const IPhoneXPadding = styled.View`
  */
 class PackagesPage extends React.PureComponent {
   /**
+   * @constructor
+   * @constructs PackagesPage
+   * @param {Object} props for component
+   */
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showPackageNotice: true,
+    };
+
+    this.handleOnPressCloseNotice = this.handleOnPressCloseNotice.bind(this);
+  }
+  /**
+   * @returns {undefined}
+   */
+  handleOnPressCloseNotice() {
+    this.setState({
+      showPackageNotice: false,
+    });
+  }
+  /**
    * render
    * @returns {JSX.Element} HTML
    */
   render() {
+    const showNoticeContainer = this.state.showPackageNotice && (<NoticeContainer>
+      <NormalText>
+        If you book a class on the schedule that is lower than your class package price, you will earn the difference back in credit to your account.
+      </NormalText>
+      <View style={{ height: 50, width: '100%' }}>
+        <TouchableOpacity onPress={this.handleOnPressCloseNotice}>
+          <HeavyText style={{ textAlign: 'right', marginTop: 10, color: Config.STUDIO_COLOR }}>
+            Dismiss
+          </HeavyText>
+        </TouchableOpacity>
+      </View>
+    </NoticeContainer>);
+
     return (
       <FadeInView>
         <Header title="Packages" />
+        {showNoticeContainer}
         <ScrollContainer>
           {this.props.packages.map(pkg => (
             <Package
