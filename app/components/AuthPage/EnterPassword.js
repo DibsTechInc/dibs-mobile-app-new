@@ -83,6 +83,7 @@ class EnterPassword extends PureComponent {
       return;
     }
 
+    await Promise.delay(Config.LOADING_QUOTES.length && 3000);
     this.props.navigation.navigate(MAIN_ROUTE);
   }
 

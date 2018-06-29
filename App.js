@@ -84,31 +84,11 @@ class App extends Component {
   /**
    * @returns {undefined}
    */
-  async componentWillMount() {
-    await this.getImages();
+  async componentDidMount() {
     await this.getFonts();
+    await Promise.delay(Config.LOADING_QUOTES.length && 3000);
+    await this.getImages();
     await this.getAssets();
-  }
-  /**
-   * @returns {undefined}
-   */
-  componentDidMount() {
-    // this.userPollInterval = setInterval(async () => {
-    //   try {
-    //     if (
-    //       !(await AsyncStorage.getItem(Config.USER_TOKEN_KEY))
-    //       || !store.getState().user.id
-    //       || !store.getState().studio.data
-    //     ) return;
-    //     await Promise.all([
-    //       store.dispatch(requestUserData(false)),
-    //       store.dispatch(requestCreditCardInfo(false)),
-    //       store.dispatch(requestUserEvents(false)),
-    //     ]);
-    //   } catch (err) {
-    //     console.error(err);
-    //   }
-    // }, USER_POLL_INTERVAL);
     this.eventRefreshInterval = setInterval(async () => {
       try {
         if (
