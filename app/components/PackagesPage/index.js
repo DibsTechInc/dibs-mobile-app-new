@@ -79,7 +79,7 @@ class PackagesPage extends React.PureComponent {
       <View style={{ height: 50, width: '100%' }}>
         <TouchableOpacity onPress={this.handleOnPressCloseNotice}>
           <HeavyText style={{ textAlign: 'right', marginTop: 10, color: Config.STUDIO_COLOR }}>
-            Dismiss
+            DISMISS
           </HeavyText>
         </TouchableOpacity>
       </View>
