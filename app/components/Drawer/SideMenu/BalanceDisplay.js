@@ -21,7 +21,6 @@ const StyledLabelText = NormalText.extend`
 const StyledValueText = NormalText.extend`
   color: ${Config.STUDIO_COLOR};
   font-size: 16;
-  margin-bottom: 10;
 `;
 
 /**
@@ -35,7 +34,7 @@ class BalanceDisplay extends React.PureComponent {
    */
   render() {
     return (
-      <View>
+      <View style={{ marginBottom: 10 }}>
         <LabelContainer>
           <StyledLabelText>
             {this.props.label}
@@ -50,9 +49,17 @@ class BalanceDisplay extends React.PureComponent {
             />
           )}
         </LabelContainer>
-        <StyledValueText>
-          {this.props.value}
-        </StyledValueText>
+        {Array.isArray(this.props.value) ? (
+          this.props.value.map(value => (
+            <StyledValueText key={value} numberOfLines={1}>
+              {value}
+            </StyledValueText>
+          ))
+        ) : (
+          <StyledValueText numberOfLines={1}>
+            {this.props.value}
+          </StyledValueText>
+        )}
       </View>
     );
   }
@@ -64,7 +71,10 @@ BalanceDisplay.defaultProps = {
 
 BalanceDisplay.propTypes = {
   label: PropTypes.string.isRequired,
-  value: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.arrayOf(PropTypes.string),
+  ]).isRequired,
   hasFlashCredit: PropTypes.bool,
 };
 

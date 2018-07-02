@@ -1,10 +1,11 @@
 import { createSelector } from 'reselect';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import Decimal from 'decimal.js';
+
 import { getUser } from '../index';
 import { getEventsData } from '../../EventsSelectors';
 import { getUpcomingEventsData } from '../../UpcomingEventsSelectors';
-import { getStudioSource } from '../../StudioSelectors';
+import { getStudioSource, getStudioShortDateFormat } from '../../StudioSelectors';
 import Config from '../../../../config.json';
 
 const getCartData = state => ((state.cart && state.cart.events) || []);
@@ -176,4 +177,20 @@ export const getUsersFirstActivePassId = createSelector(
 export const getUsersFirstPassName = createSelector(
   getUsersFirstActivePass,
   pass => (pass.name || '')
+);
+
+export const getUsersFirstPassIsUnlimited = createSelector(
+  getUsersFirstActivePass,
+  pass => pass.unlimited
+);
+
+export const getUsersFirstPassUsesLeft = createSelector(
+  getUsersFirstActivePass,
+  pass => pass.usesLeft
+);
+
+export const getUsersFirstPassShortExpiresAt = createSelector(
+  getUsersFirstActivePass,
+  getStudioShortDateFormat,
+  (pass, shortDateFormat) => moment(pass.expiresAt).tz(Config.STUDIO_TZ).format(`${shortDateFormat}/YY`)
 );

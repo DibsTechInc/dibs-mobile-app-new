@@ -18,6 +18,9 @@ import {
   getFormattedTotalCreditsWithFlashCredits,
   getUsersFirstPassName,
   getUserHasFlashCredit,
+  getUsersFirstPassIsUnlimited,
+  getUsersFirstPassUsesLeft,
+  getUsersFirstPassShortExpiresAt,
 } from '../../../selectors';
 import {
   CartIcon,
@@ -102,10 +105,15 @@ class SideMenu extends React.PureComponent {
           value={this.props.creditBalance}
           hasFlashCredit={this.props.hasFlashCredit}
         />
-        {Boolean(this.props.nextPassName) && (
+        {Boolean(this.props.firstPassName) && (
           <BalanceDisplay
             label="Current Package"
-            value={this.props.nextPassName}
+            value={[
+              (this.props.firstPassIsUnlimited ?
+                '' : `${this.props.firstPassUsesLeft} Left - `)
+              + this.props.firstPassName,
+              `(Exp. ${this.props.firstPassExp})`,
+            ]}
           />
         )}
         <NavLink
@@ -142,14 +150,20 @@ SideMenu.propTypes = {
   userFullName: PropTypes.string,
   creditBalance: PropTypes.string,
   hasFlashCredit: PropTypes.bool,
-  nextPassName: PropTypes.string,
+  firstPassName: PropTypes.string,
+  firstPassIsUnlimited: PropTypes.bool,
+  firstPassUsesLeft: PropTypes.number,
+  firstPassExp: PropTypes.string,
   navigation: PropTypes.shape(),
 };
 
 const mapStateToProps = state => ({
   userFullName: getUsersFullName(state),
   creditBalance: getFormattedTotalCreditsWithFlashCredits(state),
-  nextPassName: getUsersFirstPassName(state),
+  firstPassName: getUsersFirstPassName(state),
+  firstPassIsUnlimited: getUsersFirstPassIsUnlimited(state),
+  firstPassUsesLeft: getUsersFirstPassUsesLeft(state),
+  firstPassExp: getUsersFirstPassShortExpiresAt(state),
   hasFlashCredit: getUserHasFlashCredit(state),
 });
 
