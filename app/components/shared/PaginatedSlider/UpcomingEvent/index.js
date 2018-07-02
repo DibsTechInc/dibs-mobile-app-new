@@ -185,7 +185,7 @@ class UpcomingEvent extends PureComponent {
                 Class Description
               </HeaderText>
             </View>
-            <View>
+            <View style={{ paddingRight: WIDTH / 20 }}>
               <HTML html={this.props.formattedDescription} imagesMaxWidth={WIDTH} />
             </View>
             <View style={{ paddingBottom: 60 }}>
