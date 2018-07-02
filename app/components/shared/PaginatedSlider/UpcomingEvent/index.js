@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { View, ScrollView } from 'react-native';
 import { connect } from 'react-redux';
+import HTML from 'react-native-render-html';
 
 import Config from '../../../../../config.json';
-import { WHITE, DARK_TEXT_GREY, GREY } from '../../../../constants';
+import { WHITE, DARK_TEXT_GREY, GREY, WIDTH } from '../../../../constants';
 import { getDroppingUpcomingEvent } from '../../../../selectors';
 import {
   dropUserFromEvent,
@@ -183,9 +184,9 @@ class UpcomingEvent extends PureComponent {
               <HeaderText>
                 Class Description
               </HeaderText>
-              <DesciptionText>
-                {this.props.formattedDescription}
-              </DesciptionText>
+            </View>
+            <View>
+              <HTML html={this.props.formattedDescription} imagesMaxWidth={WIDTH} />
             </View>
             <View style={{ paddingBottom: 60 }}>
               <HeaderText>

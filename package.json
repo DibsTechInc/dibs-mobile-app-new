@@ -26,6 +26,7 @@
     "react-native-maps": "^0.21.0",
     "react-native-modalbox": "^1.4.2",
     "react-native-phone-input": "^0.2.1",
+    "react-native-render-html": "^3.10.0",
     "react-native-settings-list": "^1.8.0",
     "react-native-svg": "^6.3.1",
     "react-native-swipeable": "^0.6.0",
@@ -40,8 +41,7 @@
     "reselect": "^3.0.1",
     "rn-sliding-up-panel": "^1.2.0",
     "sentry-expo": "^1.9.0",
-    "styled-components": "^3.2.6",
-    "textversionjs": "^1.1.1"
+    "styled-components": "^3.2.6"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",

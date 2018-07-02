@@ -2,7 +2,6 @@ import { createSelector } from 'reselect';
 import Decimal from 'decimal.js';
 import { format as formatCurrency } from 'currency-formatter';
 import moment from 'moment-timezone';
-import createTextVersion from 'textversionjs';
 
 import {
   getEventsData,
@@ -92,16 +91,13 @@ export const getDetailedConfirmationEvents = createSelector(
       const { latitude, longitude } = eventLocation;
       const { id } = transaction;
 
-      let formattedDescription = createTextVersion(confirmedEvent.description);
+      let formattedDescription = confirmedEvent.description;
 
       if (!formattedDescription || formattedDescription.length <= 1) {
         formattedDescription = 'No class description.';
       }
 
-      const sanitizedDescription = formattedDescription
-      .replace(/&.*;/, '')
-      .replace(/[`~!@#$%^&_|+\=?;:"<>\{\}\[\]\\\/]/g, '')
-      .replace(/Theyrsquore\b/g, "They're").trim();
+      const sanitizedDescription = formattedDescription;
 
       const amount = new Decimal(transaction.amount).minus(transaction.studio_credits_spent)
                                                     .minus(transaction.raf_credits_spent)

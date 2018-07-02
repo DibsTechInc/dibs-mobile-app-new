@@ -3,7 +3,6 @@ import { createSelector } from 'reselect';
 import { groupBy } from 'lodash';
 import { format as formatCurrency } from 'currency-formatter';
 import Decimal from 'decimal.js';
-import createTextVersion from 'textversionjs';
 
 import Config from '../../../config.json';
 import { WHITE } from '../../constants';
@@ -120,16 +119,22 @@ function generateDetailedUpcomingEvents(items, currency, timeFormat, shortDateFo
         time.format(timeFormat) : time.format('hA')
     );
 
-    let formattedDescription = createTextVersion(item.description);
+    console.log(item.description, 'prerender')
+
+    // let formattedDescription = createTextVersion(item.description);
+
+    let formattedDescription = item.description;
 
     if (!formattedDescription || formattedDescription.length <= 1) {
       formattedDescription = 'No class description.';
     }
 
-    const sanitizedDescription = formattedDescription
-      .replace(/&.*;/, '')
-      .replace(/[`~!@#$%^&_|+\=?;:"<>\{\}\[\]\\\/]/g, '')
-      .replace(/Theyrsquore\b/g, "They're").trim();
+    const sanitizedDescription = formattedDescription;
+
+    // const sanitizedDescription = formattedDescription
+    //   .replace(/&.*;/, '')
+    //   .replace(/[`~!@#$%^&_|+\=?;:"<>\{\}\[\]\\\/]/g, '')
+    //   .replace(/Theyrsquore\b/g, "They're").trim();
 
     return {
       ...item,
