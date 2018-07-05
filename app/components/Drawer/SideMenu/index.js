@@ -122,7 +122,7 @@ class SideMenu extends React.PureComponent {
           renderIcon={() => <HomeIcon />}
         />
         <NavLink
-          label="Schedule"
+          label="Book"
           route={SCHEDULE_ROUTE}
           renderIcon={() => <CalendarIcon fromSideMenu />}
         />
@@ -132,7 +132,7 @@ class SideMenu extends React.PureComponent {
           renderIcon={() => <PackageIcon fromSideMenu />}
         />
         <NavLink
-          label="Upcoming Classes"
+          label="Upcoming"
           route={UPCOMING_CLASS_ROUTE}
           renderIcon={() => <ActivityIcon fromSideMenu />}
         />
