@@ -99,12 +99,7 @@ export function removeExpiredEvents() {
     let { cart } = getState();
     cart = cloneDeep(cart);
 
-    if (cart && cart.events) {
-      cart.events = cart.events.filter(item => moment(item.start_time).isAfter(moment().local().add(10, 'minutes')));
-    } else {
-      console.log(cart, 'cart');
-      enqueueApiError({ 'Error!': JSON.stringify(cart) });
-    }
+    cart.events = cart.events.filter(item => moment(item.start_time).isAfter(moment().local().add(10, 'minutes')));
 
     dispatch(setCartVisibleTrue()); // so the cart view won't close before this is done
     dispatch(setCartEventsData(cart.events));
