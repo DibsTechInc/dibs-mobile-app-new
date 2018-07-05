@@ -119,10 +119,6 @@ function generateDetailedUpcomingEvents(items, currency, timeFormat, shortDateFo
         time.format(timeFormat) : time.format('hA')
     );
 
-    console.log(item.description, 'prerender')
-
-    // let formattedDescription = createTextVersion(item.description);
-
     let formattedDescription = item.description;
 
     if (!formattedDescription || formattedDescription.length <= 1) {

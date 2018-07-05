@@ -85,7 +85,7 @@ export const getUserStudioCredits = createSelector(
 
 export const getUserStudioCreditsAmount = createSelector(
   getUserStudioCredits,
-  credit => (credit ? credit.credit : 0)
+  credit => ((credit && credit.credit) ? credit.credit : 0)
 );
 
 export const getUserHasStudioCredits = createSelector(
@@ -195,10 +195,3 @@ export const getFormattedTotalCreditsWithFlashCredits = createSelector(
   (total, code) => formatCurrency(total, { code })
 );
 
-// export const getUserFormattedFlashCreditExpiration = createSelector(
-//   [
-//     getUserFlashCreditAtStudio,
-//     getStudioCountry,
-//   ],
-//   (flashCredit, country) => moment(flashCredit.expiration).format(getDateFormatFromCountry(country)).toString()
-// );
