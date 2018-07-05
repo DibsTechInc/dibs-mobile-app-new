@@ -94,10 +94,10 @@ async function updateStudioApp({ appJson, configJson }) {
   try {
     program
       .option('-a, --all', 'Update all studios')
-      .option('-s, --studios <dibs_studio_ids>', 'Studio ID to update', parseInt)
+      .option('-s, --studio <dibs_studio_ids>', 'Studio ID to update', parseInt)
       .option('-p, --prod', 'Publishes app build to production release channels')
       .parse(process.argv);
-    if (!program.all && !program.studios) {
+    if (!program.all && !program.studio) {
       console.log('You must provide either the --all or --studios option');
       process.exit(1);
     }
@@ -109,7 +109,7 @@ async function updateStudioApp({ appJson, configJson }) {
           type: sequelize.QueryTypes.SELECT },
       ] : [
         STUDIO_QUERY,
-        { bind: { id: program.studios },
+        { bind: { id: program.studio },
           type: sequelize.QueryTypes.SELECT },
       ])
     );
