@@ -9,3 +9,4 @@ assets/img/main-page.png
 assets/fonts/*.ttf
 .vscode/
 .env
+.tmp
