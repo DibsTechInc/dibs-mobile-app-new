@@ -5,8 +5,10 @@ import Sentry from 'sentry-expo';
 
 import Config from '../../../config.json';
 import { WHITE, DARK_TEXT_GREY } from '../../constants';
+import { logOutUser } from '../../actions';
 import { FlexCenter, HeavyText, NormalText } from '../styled';
 import dibsFetch from '../../util/dibs-fetch';
+
 
 const Container = FlexCenter.extend`
   background: ${WHITE};
@@ -44,6 +46,7 @@ class ErrorPage extends React.PureComponent {
       console.log(err);
       Sentry.captureException(new Error(err));
     }
+    await this.props.logOutUser();
   }
   /**
    * render
@@ -66,11 +69,15 @@ class ErrorPage extends React.PureComponent {
 
 ErrorPage.propTypes = {
   err: PropTypes.shape(),
+  logOutUser: PropTypes.func,
 };
 
 const mapStateToProps = state => ({
   err: state.alerts.fatalError,
 });
-const mapDispatchToProps = {};
+
+const mapDispatchToProps = {
+  logOutUser,
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(ErrorPage);
