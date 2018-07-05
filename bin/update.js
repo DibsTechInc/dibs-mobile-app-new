@@ -106,7 +106,7 @@ async function updateStudioApp({ appJson, configJson }) {
 
     const results = await Promise.map(
       configs,
-      updateStudioApp.bind(null, program),
+      updateStudioApp,
       { concurrency: 1 }
     );
 
