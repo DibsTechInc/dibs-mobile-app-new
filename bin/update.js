@@ -9,7 +9,7 @@ const AWS = require('aws-sdk');
 const { spawn } = require('child_process');
 
 const ALL_STUDIOS_QUERY =
-  'SELECT app_json AS "appJson", app_config_json AS "configJson" FROM dibs_studios WHERE app_json, app_config_json IS NOT NULL AND (NOT $prod OR "liveMobileApp");';
+  'SELECT app_json AS "appJson", app_config_json AS "configJson" FROM dibs_studios WHERE app_json IS NOT NULL AND (NOT $prod OR "liveMobileApp");';
 const STUDIO_QUERY =
   'SELECT app_json AS "appJson", app_config_json AS "configJson" FROM dibs_studios WHERE id = $id;';
 
@@ -30,6 +30,7 @@ const getObjectAsync = Promise.promisify(s3.getObject, { context: s3 });
  * @returns {Object} result of the publish for a particular studio
  */
 async function updateStudioApp({ appJson, configJson }) {
+  const dibsStudioId = configJson.DIBS_STUDIO_ID;
   try {
     const getS3Object = key => getObjectAsync({
       Bucket: S3_BUCKET,
@@ -41,42 +42,51 @@ async function updateStudioApp({ appJson, configJson }) {
     );
 
     // Overwriting config files
+    console.log(`Overwriting config JSONs for studio ${dibsStudioId}...`);
     fs.writeFileSync(
       path.join(APP_ROOT, '/app.json'),
       new Buffer(JSON.stringify(appJson)));
     fs.writeFileSync(
       path.join(APP_ROOT, '/config.json'),
       new Buffer(JSON.stringify(configJson)));
+    console.log(`Finished overwriting config JSONs for studio ${dibsStudioId}.\n`);
 
     // Overwriting fonts
+    console.log(`Overwriting font files for studio ${dibsStudioId}...`);
     const regularFont = await getS3Object(`${configJson.STUDIO_FONT}-Regular.ttf`);
     const boldFont = await getS3Object(`${configJson.STUDIO_FONT}-Bold.ttf`);
     writeFile('/assets/fonts/Regular.ttf', regularFont.Body);
     writeFile('/assets/fonts/Bold.ttf', boldFont.Body);
+    console.log(`Finished overwriting font files for studio ${dibsStudioId}.\n`);
 
     // Overwriting assets
+    console.log(`Overwriting image files for studio ${dibsStudioId}...`);
     const iconImg = await getS3Object('icon.png');
     const splashImg = await getS3Object('splash.png');
     const mainPageImg = await getS3Object('main-page.png');
     writeFile('/assets/icon.png', iconImg.Body);
     writeFile('/assets/splash.png', splashImg.Body);
     writeFile('/assets/img/main-page.png', mainPageImg.Body);
+    console.log(`Finished overwriting image files for studio ${dibsStudioId}.\n`);
 
     // Publish update
+    console.log(`Starting publish process for studio ${dibsStudioId}...`);
     const releaseChannel = configJson[`RELEASE_CHANNEL_${program.prod ? 'PROD' : 'DEV'}`];
     await new Promise((resolve, reject) => {
       const publish = spawn('exp', ['publish', '--release-channel', releaseChannel]);
       publish.stdout.on('data', data => console.log(data.toString()));
+      publish.stderr.on('data', data => console.log(data.toString()));
       publish.on('exit', code => (code ?
-        reject(new Error(`Failed to publish the app for studio ${configJson.DIBS_STUDIO_ID}`))
+        reject(new Error(`Failed to publish the app for studio ${dibsStudioId}`))
         : resolve()));
     });
+    console.log(`Finished publish for studio ${dibsStudioId}.\n`);
     return { success: true };
   } catch (err) {
     console.log('\nERROR PUBLISHING UPDATE:');
-    console.log(`Failed to update app for studio ${configJson.DIBS_STUDIO_ID}:\n`);
+    console.log(`Failed to update app for studio ${dibsStudioId}:\n`);
     console.log(err);
-    return { success: false, dibs_studio_id: configJson.DIBS_STUDIO_ID };
+    return { success: false, dibs_studio_id: dibsStudioId };
   }
 }
 
