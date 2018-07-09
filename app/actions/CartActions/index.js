@@ -206,7 +206,7 @@ export function submitCartForPurchase() {
       }
     } catch (err) {
       console.log(err);
-      Sentry.captureException(new Error(err));
+      Sentry.captureException(new Error(err.stack));
       dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong checking out your cart.' }));
     }
     const eventids = uniq(cart.events.map(({ eventid }) => eventid));

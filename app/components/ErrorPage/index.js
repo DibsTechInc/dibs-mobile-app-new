@@ -44,7 +44,7 @@ class ErrorPage extends React.PureComponent {
       });
     } catch (err) {
       console.log(err);
-      Sentry.captureException(new Error(err));
+      Sentry.captureException(new Error(err.stack));
     }
     await this.props.logOutUser();
   }

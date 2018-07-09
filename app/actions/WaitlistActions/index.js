@@ -33,7 +33,7 @@ export function addToWaitlist(eventid) {
       return dispatch(enqueueApiError({ title: 'Error!', message: `${res.message}.` }));
     } catch (err) {
       console.log(err); // todo real error handling
-      Sentry.captureException(new Error(err));
+      Sentry.captureException(new Error(err.stack));
       return dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong adding you to the waitlist.' }));
     }
   };
@@ -63,7 +63,7 @@ export function removeFromWaitlist(eventid) {
       dispatch(enqueueApiError({ title: 'Error!', message: `${res.message}.` }));
     } catch (err) {
       console.log(err); // todo real error handling
-      Sentry.captureException(new Error(err));
+      Sentry.captureException(new Error(err.stack));
       dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong removing you from the waitlist.' }));
     }
     dispatch(setDroppingEventFalse());
