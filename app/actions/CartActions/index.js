@@ -13,7 +13,6 @@ import {
 import {
   clearPromoCodeData,
   clearPackagePromoCode,
-  setEventSoldOut,
   requestEventData,
   refreshUser,
   setTransactionsConfirmed,
