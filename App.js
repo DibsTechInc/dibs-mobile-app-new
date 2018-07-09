@@ -48,7 +48,7 @@ import CheckWhite from './assets/img/check-white.png';
 import StudioFont from './assets/fonts/Regular.ttf';
 import StudioFontHeavy from './assets/fonts/Bold.ttf';
 
-// load up the gaurdian robot
+// load up the guardian robot
 Sentry.config(Config.SENTRY_DSN).install();
 
 const StyledLoadingPage = styled.View`
@@ -107,7 +107,6 @@ class App extends Component {
    * @returns {undefined}
    */
   componentWillUnmount() {
-    // clearInterval(this.userPollInterval);
     clearInterval(this.eventRefreshInterval);
   }
   /**
@@ -208,7 +207,7 @@ class App extends Component {
             <Navigator userToken={this.state.userToken} />
           ) : (
             <StyledLoadingPage>
-              {(!this.state.fontLoaded) ? <LinearLoader /> : <LinearLoader showQuote />}
+              <LinearLoader showQuote={this.state.fontLoaded} />
             </StyledLoadingPage>
           )}
           <Modal />
