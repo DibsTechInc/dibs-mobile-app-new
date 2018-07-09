@@ -158,7 +158,7 @@ class App extends Component {
       const token = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
       let studioData = await AsyncStorage.getItem(Config.STUDIO_DATA_KEY);
 
-      if (studioData) {
+      if (studioData && studioData.length) {
         studioData = JSON.parse(studioData);
         store.dispatch(setStudio(studioData));
       } else await store.dispatch(requestStudioData(false));

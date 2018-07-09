@@ -76,7 +76,7 @@ class Header extends React.PureComponent {
    */
   async handleSavedFilters() {
     let filterSettings = await AsyncStorage.getItem(FILTERS_SETTINGS);
-    if (filterSettings) {
+    if (filterSettings && filterSettings.length) {
       filterSettings = JSON.parse(filterSettings);
       this.props.setAllFilters(filterSettings);
     }
