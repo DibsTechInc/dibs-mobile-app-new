@@ -200,14 +200,7 @@ export function submitCartForPurchase() {
         dispatch(clearPromoCodeData());
         dispatch(clearPackagePromoCode());
       } else {
-        let message = `${res.message}.`;
-        if (res.removedEvents.every(r => r.reason === 'SOLD_OUT')) {
-          message = 'Oh no! The classes you chose were just recently sold out…. please pick another option.';
-          res.removedEvents.map(event => dispatch(setEventSoldOut({ eventid: event.eventid })));
-        }
-        if (res.removedEvents.every(r => r.reason === 'PRICE_CHANGE')) {
-          message = 'Oh no! The classes you chose had their price increase more than 5 minutes ago. Please refresh and try again';
-        }
+        const message = `${res.message}.`;
         console.log(message);
         Sentry.captureException(new Error(message));
         dispatch(enqueueApiError({ title: 'Error!', message }));
