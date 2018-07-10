@@ -105,7 +105,7 @@ export function removeExpiredEvents() {
     cart.events = cart.events.filter(item => moment(item.start_time).isAfter(moment().local().add(10, 'minutes')));
 
     dispatch(setCartVisibleTrue()); // so the cart view won't close before this is done
-    dispatch(setCartEventsData(cart.events));
+    dispatch(setCartEventsData([]));
 
     if (cart && cart.events) {
       cart.events.forEach(item => (
