@@ -8,7 +8,7 @@ import { getUpcomingEventsData } from '../../UpcomingEventsSelectors';
 import { getStudioSource, getStudioShortDateFormat } from '../../StudioSelectors';
 import Config from '../../../../config.json';
 
-const getCartData = state => ((state.cart && state.cart.events) || []);
+const getCartEvents = state => ((state.cart && state.cart.events) || []);
 
 /**
  * @param {Object} state in store
@@ -31,7 +31,7 @@ export const getAllUserStudioPasses = createSelector(
 export const getUserStudioPassesLeft = createSelector(
   [
     getUserStudioPasses,
-    getCartData,
+    getCartEvents,
   ],
   (passes, cartEvents) => passes.filter((pass) => {
     const cartEventsWithPass = cartEvents.filter(event => event.passid === pass.id);
@@ -46,7 +46,7 @@ export const getUserStudioPassesLeft = createSelector(
 export const getUserStudioPassesInCart = createSelector(
   [
     getUserStudioPasses,
-    getCartData,
+    getCartEvents,
   ],
   (passes, cartEvents) => (
     passes.filter(
@@ -89,7 +89,7 @@ PASS FOR APPLYING TO CART
 export const getUsersNextPass = createSelector(
   [
     getDetailedUserPasses,
-    getCartData,
+    getCartEvents,
     getStudioSource,
     getEventsData,
     getUpcomingEventsData,

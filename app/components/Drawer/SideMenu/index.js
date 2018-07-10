@@ -11,13 +11,14 @@ import {
   WHITE,
   DARK_TEXT_GREY,
   UPCOMING_CLASS_ROUTE,
-  PACKAGES_ROUTE,
+  BUY_ROUTE,
 } from '../../../constants';
 import {
   getUsersFullName,
   getFormattedTotalCreditsWithFlashCredits,
   getUsersFirstPassName,
   getUserHasFlashCredit,
+  getStudioShowsCredits,
   getUsersFirstPassIsUnlimited,
   getUsersFirstPassUsesLeft,
   getUsersFirstPassShortExpiresAt,
@@ -127,8 +128,8 @@ class SideMenu extends React.PureComponent {
           renderIcon={() => <CalendarIcon fromSideMenu />}
         />
         <NavLink
-          label="Packages"
-          route={PACKAGES_ROUTE}
+          label={this.props.showsCreditTiers ? 'Credits & Packages' : 'Credits'}
+          route={BUY_ROUTE}
           renderIcon={() => <PackageIcon fromSideMenu />}
         />
         <NavLink
@@ -155,6 +156,7 @@ SideMenu.propTypes = {
   firstPassUsesLeft: PropTypes.number,
   firstPassExp: PropTypes.string,
   navigation: PropTypes.shape(),
+  showsCreditTiers: PropTypes.bool,
 };
 
 const mapStateToProps = state => ({
@@ -165,6 +167,7 @@ const mapStateToProps = state => ({
   firstPassUsesLeft: getUsersFirstPassUsesLeft(state),
   firstPassExp: getUsersFirstPassShortExpiresAt(state),
   hasFlashCredit: getUserHasFlashCredit(state),
+  showsCreditTiers: getStudioShowsCredits(state),
 });
 
 export default connect(mapStateToProps)(SideMenu);

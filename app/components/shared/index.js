@@ -13,5 +13,7 @@ export { default as PaymentInfo } from './PaymentInfo';
 export { default as CustomWebView } from './CustomWebView';
 export { default as EventListItem } from './EventListItem';
 export { default as SwipableButton } from './SwipableButton';
+export { default as PackageItem } from './PackageItem';
+export { default as CreditLoadItem } from './CreditLoadItem';
 
 export * from './Icons';

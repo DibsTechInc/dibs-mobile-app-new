@@ -88,6 +88,11 @@ export const getUserStudioCreditsAmount = createSelector(
   credit => ((credit && credit.credit) ? credit.credit : 0)
 );
 
+export const getUserStudioCreditLoadBonusAmount = createSelector(
+  getUserStudioCredits,
+  credit => ((credit && credit.load_bonus) ? credit.load_bonus : 0)
+);
+
 export const getUserHasStudioCredits = createSelector(
   getUserStudioCreditsAmount,
   credit => credit > 0

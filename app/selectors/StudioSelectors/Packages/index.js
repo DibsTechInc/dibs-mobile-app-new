@@ -3,11 +3,6 @@ import { format as formatCurrency } from 'currency-formatter';
 import Decimal from 'decimal.js';
 
 import { getUserStudioCreditsAmount } from '../../UserSelectors';
-import {
-  getPromoCodeType,
-  getPromoCodeAmount,
-  getAppliedPromoCode,
- } from '../../PromoCodeSelectors';
 import { getStudioCurrency, getStudioData } from '../../StudioSelectors';
 import { getPrimaryLocationTaxes } from '../../StudioSelectors/Locations';
 import { getModifiedCharge, formatAutopayTimeText } from '../../../helpers';
@@ -100,9 +95,6 @@ export const getDetailedStudioPackages = createSelector(
     getStudioCurrency,
     getUserStudioCreditsAmount,
     getPrimaryLocationTaxes,
-    getPromoCodeAmount,
-    getAppliedPromoCode,
-    getPromoCodeType,
     state => ((state.cart || {}).packages || []),
   ],
   (
@@ -110,9 +102,6 @@ export const getDetailedStudioPackages = createSelector(
     currency,
     userCredits,
     primaryTaxes,
-    promoCodeAmount,
-    appliedPromoCode,
-    promoType,
     packageCartItems
   ) => packages.map((pkg) => {
     const autoPayText = formatAutopayTimeText(pkg);
@@ -120,8 +109,8 @@ export const getDetailedStudioPackages = createSelector(
 
     const price = pkg.discount_price || pkg.price;
 
-    const packageTaxes = new Decimal(price).times(taxRate).toNumber();
-    const packageAutopayTaxes = new Decimal(price).times(taxRate).toNumber();
+    const packageTaxes = new Decimal(price).times(taxRate).toDP(2).toNumber();
+    const packageAutopayTaxes = new Decimal(price).times(taxRate).toDP(2).toNumber();
 
     const modifiedPrice = getModifiedCharge(Decimal(price).plus(packageTaxes), userCredits).toNumber();
     const creditsSpent = new Decimal(price).plus(packageTaxes).minus(modifiedPrice).toNumber();
@@ -132,6 +121,7 @@ export const getDetailedStudioPackages = createSelector(
       ...pkg,
       quantity: cartItem ? cartItem.quantity : 0,
       price,
+      taxRate: +taxRate,
       hasPromotion: Boolean(pkg.discount_price),
       hasAutopayPromotion: Boolean(pkg.discount_price_autopay),
       formattedClassAmount: formatClassAmount(pkg),
@@ -154,9 +144,6 @@ export const getDetailedStudioPackages = createSelector(
       packageAutopayTaxes,
       packageFormattedTaxes: formatCurrency(packageTaxes, { code: currency }),
       packageFormattedAutopayTaxes: formatCurrency(packageAutopayTaxes, { code: currency }),
-      promoCodeAmount,
-      formattedPromoAmount: formatCurrency(promoCodeAmount, { code: currency }),
-      appliedPromoCode,
       autopay: pkg.autopay === 'FORCE',
     };
   }).sort((a, b) => {

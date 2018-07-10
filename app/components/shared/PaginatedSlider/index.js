@@ -9,6 +9,7 @@ import { WHITE, HEIGHT } from '../../../constants';
 import { setUpcomingEventSliderExpandedFalse } from '../../../actions';
 import UpcomingEvent from './UpcomingEvent';
 import PackageReceipt from './PackageReceipt';
+import CreditReceipt from './CreditReceipt';
 
 /**
  * @class UpcomingClasses
@@ -39,12 +40,18 @@ class PaginatedSlider extends PureComponent {
       top: HEIGHT - (isIphoneX() ? 140 : 105),
     };
 
-    const items = this.props.packages.map(pkgItem => (
+    const items = this.props.credits.map(creditItem => (
+      <CreditReceipt
+        key={creditItem.id}
+        {...creditItem}
+      />
+    ));
+    items.push(...this.props.packages.map(pkgItem => (
       <PackageReceipt
         key={pkgItem.id}
         {...pkgItem}
       />
-    ));
+    )));
     items.push(...this.props.events.map(event => (
       <UpcomingEvent
         key={event.eventid}
@@ -71,6 +78,7 @@ PaginatedSlider.defaultProps = {
   expanded: true,
   forReceiptPage: false,
   packages: [],
+  credits: [],
 };
 
 PaginatedSlider.propTypes = {
@@ -79,6 +87,7 @@ PaginatedSlider.propTypes = {
   expanded: PropTypes.bool.isRequired,
   setUpcomingEventSliderExpandedFalse: PropTypes.func.isRequired,
   packages: PropTypes.arrayOf(PropTypes.shape()),
+  credits: PropTypes.arrayOf(PropTypes.shape()),
 };
 
 const mapStateToProps = state => ({

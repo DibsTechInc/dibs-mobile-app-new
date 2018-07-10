@@ -11,11 +11,9 @@ import {
   getFormattedCartStudioCreditsApplied,
   getCartRAFCreditApplied,
   getFormattedCartRAFCreditApplied,
-  getCartGlobalCreditApplied,
-  getFormattedCartGlobalCreditApplied,
   getFormattedCartTotal,
-  getUserFlashCreditAmount,
-  getFormattedUserFlashCreditAmount,
+  getCartFlashCreditAmount,
+  getFormattedCartFlashCreditAmount,
 } from '../../selectors';
 import { TransactionBreakdown } from '../shared';
 
@@ -23,8 +21,8 @@ const mapStateToProps = state => ({
   formattedSubtotal: getFormattedCartSubtotalWithPackageClasses(state),
   promoCodeAmount: getCartPromoCodeAmount(state),
   formattedPromoCodeAmount: getFormattedPromoCodeAmount(state),
-  flashCreditAmount: getUserFlashCreditAmount(state),
-  formattedFlashCreditAmount: getFormattedUserFlashCreditAmount(state),
+  flashCreditAmount: getCartFlashCreditAmount(state),
+  formattedFlashCreditAmount: getFormattedCartFlashCreditAmount(state),
   passValueAmount: getCartPassesValue(state),
   formattedPassValueAmount: getFormattedCartPassesValue(state),
   taxAmount: getCartTaxAmount(state),
@@ -33,8 +31,6 @@ const mapStateToProps = state => ({
   formattedStudioCreditAmount: getFormattedCartStudioCreditsApplied(state),
   rafCreditAmount: getCartRAFCreditApplied(state),
   formattedRAFCreditAmount: getFormattedCartRAFCreditApplied(state),
-  globalCreditAmount: getCartGlobalCreditApplied(state),
-  formattedGlobalCreditAmount: getFormattedCartGlobalCreditApplied(state),
   formattedTotal: getFormattedCartTotal(state),
 });
 

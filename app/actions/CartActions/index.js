@@ -26,6 +26,8 @@ export const {
   addEventToCart,
   addPackageToCart,
   removePackageFromCart,
+  addCreditLoadToCart,
+  removeCreditLoadFromCart,
   clearCart,
   setCartEventsData,
   setCartPackagesData,
@@ -37,6 +39,8 @@ export const {
   ADD_EVENT_TO_CART: item => item,
   ADD_PACKAGE_TO_CART: item => item,
   REMOVE_PACKAGE_FROM_CART: packageid => packageid,
+  ADD_CREDIT_LOAD_TO_CART: creditTierId => creditTierId,
+  REMOVE_CREDIT_LOAD_FROM_CART: creditTierId => creditTierId,
   CLEAR_CART: () => null,
   SET_CART_EVENTS_DATA: payload => payload,
   SET_CART_PACKAGES_DATA: payload => payload,
@@ -180,6 +184,7 @@ export function submitCartForPurchase() {
         requiresAuth: true,
         body: {
           cart: {
+            credits: cart.credits,
             events: cart.events,
             packages: cart.packages,
           },

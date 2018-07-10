@@ -6,12 +6,13 @@ import styled from 'styled-components';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 
 import Header from '../Header';
-import Package from '../shared/PackageItem';
+import PackageItem from '../shared/PackageItem';
+import CreditLoadItem from '../shared/CreditLoadItem';
 
 import { FadeInView } from '../shared';
-import { NormalText, HeavyText } from '../styled';
 import { WHITE, LIGHT_GREY } from '../../constants';
-import { getDetailedStudioPackages } from '../../selectors';
+import { getDetailedStudioPackages, getDetailedStudioCreditTiers, getStudioShowsCredits } from '../../selectors';
+import { NormalText, HeavyText } from '../styled';
 
 import Config from '../../../config.json';
 
@@ -44,7 +45,7 @@ const IPhoneXPadding = styled.View`
  * @class PackagesPage
  * @extends {React.PureComponent}
  */
-class PackagesPage extends React.PureComponent {
+class BuyItemsPage extends React.PureComponent {
   /**
    * @constructor
    * @constructs PackagesPage
@@ -87,11 +88,18 @@ class PackagesPage extends React.PureComponent {
 
     return (
       <FadeInView>
-        <Header title="Packages" />
+        <Header title={this.props.showCreditTiers ? 'Credits & Packages' : 'Packages'} />
         {showNoticeContainer}
         <ScrollContainer>
+          {this.props.showCreditTiers &&
+            this.props.creditTiers.map(creditTier => (
+              <CreditLoadItem
+                key={creditTier.id}
+                {...creditTier}
+              />
+            ))}
           {this.props.packages.map(pkg => (
-            <Package
+            <PackageItem
               key={pkg.id}
               {...pkg}
             />
@@ -103,12 +111,16 @@ class PackagesPage extends React.PureComponent {
   }
 }
 
-PackagesPage.propTypes = {
+BuyItemsPage.propTypes = {
   packages: PropTypes.arrayOf(PropTypes.shape()),
+  creditTiers: PropTypes.arrayOf(PropTypes.shape()),
+  showCreditTiers: PropTypes.bool.isRequired,
 };
 
 const mapStateToProps = state => ({
   packages: getDetailedStudioPackages(state),
+  creditTiers: getDetailedStudioCreditTiers(state),
+  showCreditTiers: getStudioShowsCredits(state),
 });
 
-export default connect(mapStateToProps)(PackagesPage);
+export default connect(mapStateToProps)(BuyItemsPage);

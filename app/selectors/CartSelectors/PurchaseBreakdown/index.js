@@ -16,15 +16,17 @@ import {
 import {
   getSortedCartEvents,
   getSortedCartPackages,
-  getCartClassEvents,
+  getCartEvents,
+  getCartCreditsWithPrice,
+  getCreditAmountInCart,
+  getCreditLoadBonusInCart,
 } from '../';
 
 import {
   getUserFlashCreditAmount,
   getUserStudioCreditsAmount,
   getUserRAFCreditAmount,
-  getUserGlobalCreditAmount,
-  getUserGlobalCreditCurrency,
+  getUserStudioCreditLoadBonusAmount,
 } from '../../UserSelectors';
 
 import { getUserStudioPassesInCart } from '../../UserSelectors/Passes';
@@ -32,17 +34,14 @@ import { getStudioCurrency } from '../../StudioSelectors';
 import { getStudioLocations } from '../../StudioSelectors/Locations';
 import { PROMO_PRODUCT_CLASS, PROMO_PRODUCT_UNIVERSAL, PROMO_PRODUCT_PACKAGE } from '../../../constants/index';
 
-export const getSortedCartItems = createSelector(
-  [
-    getSortedCartPackages,
-    getSortedCartEvents,
-  ],
-  (cartPackages, cartEvents) => cartPackages.concat(cartEvents)
+export const getCartHasPackages = createSelector(
+  getSortedCartPackages,
+  items => Boolean(items.length)
 );
 
-export const getCartHasPackages = createSelector(
-  getSortedCartItems,
-  items => items.some(item => item.packageid)
+export const getCartHasEvents = createSelector(
+  getSortedCartEvents,
+  items => Boolean(items.length)
 );
 
 export const getCartPromoIsAppliedToPackage = createSelector(
@@ -52,37 +51,44 @@ export const getCartPromoIsAppliedToPackage = createSelector(
     Boolean(cartHasPacks && [PROMO_PRODUCT_PACKAGE, PROMO_PRODUCT_UNIVERSAL].includes(promoProduct))
 );
 
+export const getCartPromoIsAppliedToEvent = createSelector(
+  getCartPromoIsAppliedToPackage,
+  getPromoCodeProduct,
+  (promoIsAppliedToPack, promoProduct) =>
+    Boolean(!promoIsAppliedToPack && [PROMO_PRODUCT_CLASS, PROMO_PRODUCT_UNIVERSAL].includes(promoProduct))
+);
+
 export const getCartPromoCodeAmount = createSelector(
   [
-    getSortedCartItems,
+    getSortedCartPackages,
+    getCartEvents,
+    getCartPromoIsAppliedToPackage,
+    getCartPromoIsAppliedToEvent,
     getPromoCodeType,
     getPromoCodeAmount,
-    getPromoCodeProduct,
   ],
-  (cartItems, promoCodeType, promoCodeAmount, promoProduct) => {
-    if (!cartItems.length) return 0;
-
-    const itemToApplyCode = cartItems.find(item => (
-      {
-        [PROMO_PRODUCT_UNIVERSAL]: true,
-        [PROMO_PRODUCT_CLASS]: Boolean(item.eventid),
-        [PROMO_PRODUCT_PACKAGE]: Boolean(item.packageid),
-      }[promoProduct]
-    ));
-
+  (
+    packItems,
+    eventItems,
+    promoIsAppliedToPack,
+    promoIsAppliedToEvent,
+    promoType,
+    promoAmount
+  ) => {
+    if (!promoIsAppliedToEvent && !promoIsAppliedToPack) return 0;
+    const itemToApplyCode = (promoIsAppliedToPack ? packItems : eventItems)[0];
     if (!itemToApplyCode) return 0;
-
-    switch (promoCodeType) {
+    switch (promoType) {
       case PROMO_TYPE_FREE_CLASS:
         return itemToApplyCode.price;
       case PROMO_TYPE_PERCENT_OFF_ONE_CLASS:
-        return Decimal(promoCodeAmount)
+        return Decimal(promoAmount)
           .dividedBy(100)
           .times(itemToApplyCode.price)
           .toDecimalPlaces(2)
           .toNumber();
       case PROMO_TYPE_CASH_OFF:
-        return Math.min(promoCodeAmount, itemToApplyCode.price);
+        return Math.min(promoAmount, itemToApplyCode.price);
       default:
         return 0;
     }
@@ -97,12 +103,18 @@ export const getFormattedPromoCodeAmount = createSelector(
   (promoCodeAmount, code) => formatCurrency(promoCodeAmount, { code })
 );
 
-export const getCartDiscountAmount = createSelector(
+export const getCartFlashCreditAmount = createSelector(
+  getUserFlashCreditAmount,
+  getSortedCartEvents,
+  (fcAmount, events) => (events.length && fcAmount)
+);
+
+export const getFormattedCartFlashCreditAmount = createSelector(
   [
-    getCartPromoCodeAmount,
-    getUserFlashCreditAmount,
+    getCartFlashCreditAmount,
+    getStudioCurrency,
   ],
-  (promoCodeAmount, flashCreditAmount) => +Decimal(promoCodeAmount).plus(flashCreditAmount)
+  (fcAmount, code) => formatCurrency(fcAmount, { code })
 );
 
 /*
@@ -130,14 +142,18 @@ export const getFormattedCartPassesValue = createSelector(
   (passValues, code) => formatCurrency(passValues, { code })
 );
 
+export const getCartEventsWithPasses = createSelector(
+  getSortedCartEvents,
+  items => items.filter(item => item.passid)
+);
+
 export const getCartEventsAdjustedPrices = createSelector(
   [
-    getCartClassEvents,
+    getCartEventsWithPasses,
     getUserStudioPassesInCart,
   ],
   (cartItems, passesInCart) => cartItems.map((cartItem) => {
     const pass = passesInCart.find(p => p.id === cartItem.passid);
-    if (!pass) return 0; // events paid without passes will be handled separately
     const eventPassValue = Math.min((pass.studioPackage.unlimited ? cartItem.price : pass.passValue), cartItem.price);
     const adjustedPrice = Decimal(eventPassValue).times(cartItem.quantity).toNumber();
     return adjustedPrice; // classes priced higher than their pass value earn zero credit
@@ -146,10 +162,7 @@ export const getCartEventsAdjustedPrices = createSelector(
 
 export const getCartEventsAdjustedValue = createSelector(
   getCartEventsAdjustedPrices,
-  prices => prices.reduce(
-    (acc, price) => acc.plus(price),
-    Decimal(0)
-  ).toNumber()
+  prices => +prices.reduce((acc, price) => acc.plus(price), Decimal(0))
 );
 
 export const getCartValueBack = createSelector(
@@ -159,8 +172,8 @@ export const getCartValueBack = createSelector(
     getPromoCodeType,
     getCartHasPackages,
     getPromoCodeAmount,
-    getCartPromoIsAppliedToPackage,
-    getUserFlashCreditAmount,
+    getCartPromoIsAppliedToEvent,
+    getCartFlashCreditAmount,
     getCartEventsAdjustedValue,
   ],
   (
@@ -169,7 +182,7 @@ export const getCartValueBack = createSelector(
     promoType,
     packsInCart,
     promoAmount,
-    promoAppliedToPack,
+    promoAppliedToEvent,
     flashCredAmount,
     adjustedEventsValue
   ) => (
@@ -177,7 +190,7 @@ export const getCartValueBack = createSelector(
       0,
       Decimal(passesValue)
         .plus(flashCredAmount)
-        .plus(promoAppliedToPack ? 0 : promoAmount)
+        .plus(+(promoAppliedToEvent && promoAmount))
         .minus(adjustedEventsValue)
         .toNumber()
       ) : 0
@@ -201,24 +214,51 @@ TODO: handle when user can toggle autopay on/off
 */
 
 export const getCartEventsWithoutPasses = createSelector( // TODO edit
-  getCartClassEvents,
+  getCartEvents,
   cartEvents => cartEvents.filter(cartEvent => !cartEvent.passid)
 );
 
-export const getCartPackagesWithEvents = createSelector(
-  [
-    getSortedCartPackages,
-    getCartEventsWithoutPasses,
-  ],
-  (cartPackages, cartEvents) => cartPackages.concat(cartEvents)
+export const getCartEventSubtotal = createSelector(
+  getCartEventsWithoutPasses,
+  items => +items.reduce((acc, item) => acc.plus(item.price), Decimal(0))
 );
 
-export const getCartSubtotal = createSelector(
-  getCartPackagesWithEvents,
+export const getCartEventDiscountAmount = createSelector(
+  [
+    getCartPromoIsAppliedToEvent,
+    getCartEventsWithPasses,
+    getCartPromoCodeAmount,
+    getCartFlashCreditAmount,
+  ],
+  (promoIsAppliedToEvent, eventItemsWithPasses, promoAmount, fcAmount) =>
+    (eventItemsWithPasses.length ?
+      0 : +Decimal(promoIsAppliedToEvent ? promoAmount : 0).plus(fcAmount))
+);
+
+export const getCartPackSubtotal = createSelector(
+  getSortedCartPackages,
+  items => +items.reduce((acc, item) => acc.plus(item.price), Decimal(0))
+);
+
+export const getCartPackDiscountAmount = createSelector(
+  getCartPromoIsAppliedToPackage,
+  getCartPromoCodeAmount,
+  (promoIsAppliedToPack, promoAmount) => +(promoIsAppliedToPack && promoAmount)
+);
+
+export const getCartCreditTotal = createSelector(
+  getCartCreditsWithPrice,
   items => +items.reduce(
     (acc, item) =>
       acc.plus(Decimal(item.price).times(item.quantity)),
     Decimal(0))
+);
+
+export const getCartSubtotal = createSelector(
+  getCartEventSubtotal,
+  getCartPackSubtotal,
+  getCartCreditTotal,
+  (eventSubtotal, packSubtotal, creditSubtotal) => +Decimal(eventSubtotal).plus(packSubtotal).plus(creditSubtotal)
 );
 
 export const getFormattedCartSubtotal = createSelector(
@@ -229,35 +269,68 @@ export const getFormattedCartSubtotal = createSelector(
   (subtotal, code) => formatCurrency(subtotal, { code })
 );
 
+export const getCartSubtotalWithPackageClasses = createSelector(
+  [
+    getCartEventsAdjustedValue,
+    getCartSubtotal,
+  ],
+  (adjustedEventPrices, subtotal) => +Decimal(adjustedEventPrices).plus(subtotal)
+);
+
+export const getFormattedCartSubtotalWithPackageClasses = createSelector(
+  [
+    getCartSubtotalWithPackageClasses,
+    getStudioCurrency,
+  ],
+  (subtotal, code) => formatCurrency(subtotal, { code })
+);
+
+export const getCartDiscountAmount = createSelector(
+  getCartEventDiscountAmount,
+  getCartPackDiscountAmount,
+  (eventDiscount, packDiscount) => +Decimal(eventDiscount).plus(packDiscount)
+);
+
 export const getCartTaxAmount = createSelector(
   [
-    getCartPackagesWithEvents,
-    getUserStudioPassesInCart,
+    getCartEventsWithoutPasses,
+    getSortedCartPackages,
     getCartDiscountAmount,
+    getCartPromoIsAppliedToEvent,
+    getCartPromoIsAppliedToPackage,
     state => ((state.events || {}).data || []),
     getStudioLocations,
     getCartHasPackages,
   ],
-  (items, passes, discount, events, locations) => items.reduce(
-    (acc, item, i) => {
-      if (item.eventid) {
-        const event = events.find(e => e.id === item.eventid);
-        const loc = locations.find(l => l.id === event.location.id);
-        const taxRate = Decimal(loc.tax_rate).dividedBy(100);
-        let price = Decimal(item.price).times(item.quantity);
-        price = Decimal(item.price).times(item.quantity);
-        if (!i && !passes.length) {
-          price = price.minus(Math.min(discount, item.price));
+  (eventItems, packItems, discount, promoAppliedToEvent, promoAppliedToPack, events, locations) => {
+    let discountRemoved = false;
+    return +[...eventItems, ...packItems].reduce(
+      (acc, item) => {
+        if (item.eventid) {
+          const event = events.find(e => e.id === item.eventid);
+          const loc = locations.find(l => l.id === event.location.id);
+          const taxRate = Decimal(loc.tax_rate).dividedBy(100);
+          let price = Decimal(item.price).times(item.quantity);
+          if (promoAppliedToEvent && !discountRemoved) {
+            price = price.minus(discount);
+            discountRemoved = true;
+          }
+          price = price.times(taxRate).toDP(2);
+          return acc.plus(price);
         }
-        return acc.plus(price.times(taxRate).toDecimalPlaces(2));
-      }
-      if (item.packageid) {
-        return acc.plus(item.packageTaxes);
-      }
-      return acc;
-    },
-    new Decimal(0)
-  ).toNumber()
+        if (item.packageid) {
+          let taxes = Decimal(item.packageTaxes);
+          if (promoAppliedToPack && !discountRemoved) {
+            taxes = taxes.minus(Decimal(discount).times(item.taxRate).toDP(2));
+            discountRemoved = true;
+          }
+          return acc.plus(taxes);
+        }
+        return acc;
+      },
+      Decimal(0)
+    );
+  }
 );
 
 export const getFormattedCartTaxAmount = createSelector(
@@ -277,33 +350,59 @@ export const getCartSubtotalAfterTax = createSelector(
   (subtotal, discount, taxAmount) => +Decimal(subtotal).minus(discount).plus(taxAmount)
 );
 
+export const getCartStudioCreditAppliedToPacks = createSelector(
+  [
+    getCartPackSubtotal,
+    getCartPackDiscountAmount,
+    getUserStudioCreditsAmount,
+    getUserStudioCreditLoadBonusAmount,
+    getCreditAmountInCart,
+    getCreditLoadBonusInCart,
+  ],
+  (
+    packSubtotal,
+    packDiscount,
+    userCreditAmount,
+    userCreditBonus,
+    cartCreditAmount,
+    cartCreditBonus
+  ) => Math.min(
+    Decimal(packSubtotal).minus(packDiscount),
+    Decimal(userCreditAmount).minus(userCreditBonus).plus(cartCreditAmount).minus(cartCreditBonus)
+  )
+);
+
+export const getCartStudioCreditAppliedToEvents = createSelector(
+  [
+    getCartEventSubtotal,
+    getCartEventDiscountAmount,
+    getUserStudioCreditsAmount,
+    getCreditAmountInCart,
+    getCartStudioCreditAppliedToPacks,
+  ],
+  (
+    eventSubtotal,
+    eventDiscount,
+    userCreditAmount,
+    cartCreditAmount,
+    creditAppliedToPacks
+  ) => Math.min(
+    Decimal(eventSubtotal).minus(eventDiscount),
+    Decimal(userCreditAmount).plus(cartCreditAmount).minus(creditAppliedToPacks)
+  )
+);
+
 export const getCartStudioCreditsApplied = createSelector(
   [
-    getCartSubtotalAfterTax,
-    getUserStudioCreditsAmount,
+    getCartStudioCreditAppliedToPacks,
+    getCartStudioCreditAppliedToEvents,
   ],
-  (currentAmount, studioCredits) => Math.min(currentAmount, studioCredits)
+  (creditForPacks, creditForEvents) => +Decimal(creditForPacks).plus(creditForEvents)
 );
 
 export const getFormattedCartStudioCreditsApplied = createSelector(
   [
     getCartStudioCreditsApplied,
-    getStudioCurrency,
-  ],
-  (credits, code) => formatCurrency(credits, { code })
-);
-
-export const getCartStudioCreditsRemaining = createSelector(
-  [
-    getUserStudioCreditsAmount,
-    getCartStudioCreditsApplied,
-  ],
-  (totalCredits, creditsApplied) => +Decimal(totalCredits).minus(creditsApplied)
-);
-
-export const getFormattedStudioCreditsRemaining = createSelector(
-  [
-    getCartStudioCreditsRemaining,
     getStudioCurrency,
   ],
   (credits, code) => formatCurrency(credits, { code })
@@ -333,66 +432,10 @@ export const getFormattedCartRAFCreditApplied = createSelector(
   (credits, code) => formatCurrency(credits, { code })
 );
 
-export const getCartAmountAfterRAFCredits = createSelector(
+export const getCartTotal = createSelector(
   [
     getCartAmountAfterStudioCredits,
     getCartRAFCreditApplied,
-  ],
-  (currentAmount, creditsApplied) => +Decimal(currentAmount).minus(creditsApplied)
-);
-
-export const getCartGlobalCreditApplied = createSelector(
-  [
-    getCartAmountAfterRAFCredits,
-    getUserGlobalCreditAmount,
-    getUserGlobalCreditCurrency,
-    getStudioCurrency,
-    state => state.exchangeRates,
-  ],
-  (currentAmount, globalCredits, globalCreditCurrency, studioCurrency, exchangeRates) => {
-    if (globalCreditCurrency && studioCurrency !== globalCreditCurrency) {
-      const exchangeRate = exchangeRates.find(rate => (rate.to === studioCurrency && rate.from === globalCreditCurrency));
-      const convertedGlobalCreditAmount = Decimal(globalCredits).times(exchangeRate.rate).toNumber();
-      return Math.min(currentAmount, convertedGlobalCreditAmount);
-    }
-    return Math.min(currentAmount, globalCredits);
-  }
-);
-
-export const getFormattedCartGlobalCreditApplied = createSelector(
-  [
-    getCartGlobalCreditApplied,
-    getStudioCurrency,
-  ],
-  (credits, code) => formatCurrency(credits, { code })
-);
-
-/*
-
-PURCHASE BREAKDOWN TOTAL
-
-*/
-
-export const getCartSubtotalWithPackageClasses = createSelector(
-  [
-    getCartEventsAdjustedValue,
-    getCartSubtotal,
-  ],
-  (adjustedEventPrices, subtotal) => +Decimal(adjustedEventPrices).plus(subtotal)
-);
-
-export const getFormattedCartSubtotalWithPackageClasses = createSelector(
-  [
-    getCartSubtotalWithPackageClasses,
-    getStudioCurrency,
-  ],
-  (subtotal, code) => formatCurrency(subtotal, { code })
-);
-
-export const getCartTotal = createSelector(
-  [
-    getCartAmountAfterRAFCredits,
-    getCartGlobalCreditApplied,
   ],
   (currentAmount, creditsApplied) => +Decimal(currentAmount).minus(creditsApplied)
 );

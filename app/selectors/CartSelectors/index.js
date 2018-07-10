@@ -10,6 +10,7 @@ import { getUserPasses } from '../UserSelectors/Passes';
 import { getStudioCustomTimeFormat, getStudioCurrency, getStudioShortDateFormat } from '../StudioSelectors';
 import { getUpcomingEventsData } from '../UpcomingEventsSelectors';
 import { getDetailedStudioPackages } from '../StudioSelectors/Packages';
+import { getDetailedStudioCreditTiers, getStudioCreditTiers } from '../StudioSelectors/CreditTiers';
 
 /**
  * @param {Object} state in store
@@ -31,14 +32,7 @@ export function getCartIsPurchasing(state) {
  * @param {Object} state in store
  * @returns {Array<Object>} items in cart
  */
-export function getCartData(state) {
-  return getCart(state).data || [];
-}
-/**
- * @param {Object} state in store
- * @returns {Array<Object>} items in cart
- */
-export function getCartClassEvents(state) {
+export function getCartEventItems(state) {
   return getCart(state).events || [];
 }
 
@@ -50,16 +44,25 @@ export function getCartPackages(state) {
   return getCart(state).packages || [];
 }
 
+/**
+ * @param {Object} state in store
+ * @returns {Array<Object>} items in cart
+ */
+export function getCartCredits(state) {
+  return getCart(state).credits || [];
+}
+
 export const getTotalQuantityInCart = createSelector(
   [
-    getCartClassEvents,
+    getCartEventItems,
     getCartPackages,
+    getCartCredits,
   ],
-  (events, packages) => events.reduce((a, b) => a + b.quantity, 0) + packages.length
+  (events, packages, credits) => events.reduce((a, b) => a + b.quantity, 0) + packages.length + credits.length
 );
 
 export const getSortedCartEvents = createSelector(
-  getCartClassEvents,
+  getCartEventItems,
   events => events.sort((eventA, eventB) => {
     if (eventA.price === 0 && eventB.price) return 1;
     if (eventB.price === 0 && eventA.price) return -1;
@@ -79,7 +82,7 @@ export const getCartEventNames = createSelector(
 
 export const getCartEvents = createSelector(
   [
-    getCartClassEvents,
+    getSortedCartEvents,
     getEventsData,
   ],
   (cartItems, events) => cartItems.reduce(
@@ -162,4 +165,32 @@ export const getSortedCartPackages = createSelector(
     if (pkgB.price === 0 && pkgA.price) return -1;
     return pkgA.price - pkgB.price;
   })
+);
+
+export const getCartCreditsWithPrice = createSelector(
+  getCartCredits,
+  getStudioCreditTiers,
+  (cartItems, creditTiers) => cartItems.map(item => ({
+    ...item,
+    price: creditTiers.find(creditTier => creditTier.id === item.creditTierId).payAmount,
+  }))
+);
+
+export const getDetailedCartCredits = createSelector(
+  getCartCredits,
+  getDetailedStudioCreditTiers,
+  (cartItems, creditTiers) => cartItems.map(item => ({
+    ...item,
+    ...creditTiers.find(creditTier => creditTier.id === item.creditTierId),
+  }))
+);
+
+export const getCreditAmountInCart = createSelector(
+  getDetailedCartCredits,
+  items => +items.reduce((acc, item) => acc.plus(item.receiveAmount), Decimal(0))
+);
+
+export const getCreditLoadBonusInCart = createSelector(
+  getDetailedCartCredits,
+  items => +items.reduce((acc, item) => acc.plus(item.loadBonus), Decimal(0))
 );
