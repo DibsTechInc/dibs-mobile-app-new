@@ -22,6 +22,14 @@ export function getConfirmationState(state) {
 
 /**
  * @param {Object} state in redux store
+ * @returns {Array<Object>} confirmed credit transactions
+ */
+export function getConfirmationCredits(state) {
+  return getConfirmationState(state).credits || [];
+}
+
+/**
+ * @param {Object} state in redux store
  * @returns {Array<Object>} confirmed pack transactions
  */
 export function getConfirmationPackages(state) {
@@ -36,18 +44,47 @@ export function getConfirmationEvents(state) {
   return getConfirmationState(state).events || [];
 }
 
+export const getDetailedConfirmationCredits = createSelector(
+  getConfirmationCredits,
+  getStudioCurrency,
+  (credits, currency) => credits.reduce((acc, transaction) => {
+    const creditTransaction = acc.find(({ creditTierId }) => creditTierId === transaction.credit_tier_id);
+    if (!creditTransaction) {
+      const { creditTier, ...rest } = transaction;
+      acc.push({
+        ...rest,
+        ...creditTier,
+        creditTierId: transaction.credit_tier_id,
+        quantity: 1,
+      });
+      return acc;
+    }
+    // TODO handle multiple of same credit tier in same cart
+    return acc;
+  }, []).map(item => ({
+    ...item,
+    formattedSubtotal: formatCurrency(item.original_price, { code: currency, precision: (item.original_price % 1 && 2) }),
+    formattedTaxAmount: formatCurrency(item.tax_amount, { code: currency, precision: (item.tax_amount % 1 && 2) }),
+    formattedDiscountAmount: formatCurrency(item.discount_amount, { code: currency, precision: (item.discount_amount % 1 && 2) }),
+    formattedStudioCreditAmount: formatCurrency(item.studio_credits_spent, { code: currency, precision: (item.studio_credits_spent % 1 && 2) }),
+    formattedRAFCreditAmount: formatCurrency(item.raf_credits_spent, { code: currency, precision: (item.studio_credits_spent % 1 && 2) }),
+    formattedTotal: formatCurrency(item.chargeAmount, { code: currency, precision: (item.chargeAmount % 1 && 2) }),
+    formattedPayAmount: formatCurrency(item.payAmount, { code: currency }),
+    formattedReceiveAmount: formatCurrency(item.receiveAmount, { code: currency }),
+  }))
+);
+
 export const getDetailedConfirmationPackages = createSelector(
   getConfirmationPackages,
   getStudioCurrency,
   (packages, currency) => packages.reduce((acc, transaction) => {
     const packTransaction = acc.find(({ packageid }) => packageid === transaction.studioPackage.id);
-
     if (!packTransaction) {
       const { studioPackage, ...rest } = transaction;
-      const amount = new Decimal(transaction.amount).minus(transaction.studio_credits_spent)
+      const amount = Decimal(transaction.amount)
+        .minus(transaction.studio_credits_spent)
         .minus(transaction.raf_credits_spent)
         .toNumber();
-
       acc.push({
         ...rest,
         ...studioPackage,
@@ -57,10 +94,9 @@ export const getDetailedConfirmationPackages = createSelector(
         additionalPackageDescription: studioPackage.customDescription,
         name: studioPackage.name,
       });
+      return acc;
     }
-
     // TODO handle multiple packs
-
     return acc;
   }, []).map(item => ({
     ...item,
@@ -83,22 +119,15 @@ export const getDetailedConfirmationEvents = createSelector(
   getStudioShortDateFormat,
   (transactions, events, currency, locations, timeFormat, shortDateFormat) => transactions.reduce((acc, transaction) => {
     const eventTransaction = acc.find(({ eventid }) => transaction.eventid === eventid);
-
     if (!eventTransaction) {
       const confirmedEvent = events.find(e => transaction.eventid === e.id);
       const eventLocation = locations.length && locations.find(l => l.id === confirmedEvent.location.id);
-
       const { latitude, longitude } = eventLocation;
       const { id } = transaction;
-
       let formattedDescription = confirmedEvent.description;
-
       if (!formattedDescription || formattedDescription.length <= 1) {
         formattedDescription = 'No class description.';
       }
-
-      const sanitizedDescription = formattedDescription;
-
       const amount = new Decimal(transaction.amount).minus(transaction.studio_credits_spent)
                                                     .minus(transaction.raf_credits_spent)
                                                     .toNumber();
@@ -107,7 +136,6 @@ export const getDetailedConfirmationEvents = createSelector(
                                                     .minus(transaction.original_price)
                                                     .toNumber()
       ) : 0;
-
       const formatTime = time => (
         time.get('minute') || timeFormat !== 'LT' ?
           time.format(timeFormat) : time.format('hA')
@@ -119,7 +147,7 @@ export const getDetailedConfirmationEvents = createSelector(
         quantity: 1,
         valueBack,
         amount,
-        formattedDescription: sanitizedDescription,
+        formattedDescription,
         name: confirmedEvent.name,
         address: confirmedEvent.address,
         latitude,
@@ -130,11 +158,9 @@ export const getDetailedConfirmationEvents = createSelector(
         shortDayOfWeek: localStartTime.format('ddd'),
         shortEventDate: localStartTime.format(shortDateFormat),
       };
-
       acc.push(payload);
       return acc;
     }
-
     eventTransaction.transactionids.push(transaction.id);
     eventTransaction.quantity += 1;
     eventTransaction.amount = new Decimal(eventTransaction.amount).plus(transaction.amount)
@@ -168,6 +194,7 @@ export const getDetailedConfirmationEvents = createSelector(
 export const getConfirmationItems = createSelector(
   getConfirmationPackages,
   getConfirmationEvents,
-  (packs, events) => [...packs, ...events]
+  getConfirmationCredits,
+  (packs, events, credits) => [...packs, ...events, ...credits]
 );
 

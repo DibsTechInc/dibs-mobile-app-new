@@ -11,10 +11,12 @@ import {
   setCartPurchasingTrue,
   setCartPurchasingFalse,
   removePackageFromCart,
+  addCreditLoadToCart,
+  removeCreditLoadFromCart,
 } from '../../actions/CartActions';
 
 const initialState = {
-  data: [],
+  credits: [],
   events: [],
   packages: [],
   visible: false,
@@ -50,14 +52,34 @@ function handleAddPackageToCart(state, { payload }) {
   return cart;
 }
 
+/**
+ * @param {Object} state in store before action
+ * @param {Object} action on the state
+ * @returns {Object} new state
+ */
+function handleAddCreditLoadToCart(state, { payload }) {
+  const cart = cloneDeep(state);
+  if (cart.credits.find(item => item.creditTierId)) return cart;
+  cart.credits.push({ creditTierId: payload, quantity: 1 });
+  return cart;
+}
+
 export default handleActions({
   [addEventToCart]: handleAddEventToCart,
+
   [addPackageToCart]: handleAddPackageToCart,
   [removePackageFromCart]: (state, { payload }) =>
     ({ ...state, packages: state.packages.filter(item => item.packageid !== payload) }), // TODO add ability to add multiple packs
+
   [setCartEventsData]: (state, { payload }) => ({ ...state, events: payload }),
   [setCartPackagesData]: (state, { payload }) => ({ ...state, packages: payload }),
-  [clearCart]: state => ({ ...state, events: [], packages: [] }),
+
+  [addCreditLoadToCart]: handleAddCreditLoadToCart,
+  [removeCreditLoadFromCart]: (state, { payload }) =>
+    ({ ...state, credits: state.credits.filter(item => item.creditTierId !== payload) }),
+
+  [clearCart]: state => ({ ...state, credits: [], events: [], packages: [] }),
+
   [combineActions(
     setCartVisibleTrue,
     setCartVisibleFalse)]: (state, { payload }) => ({ ...state, visible: payload }),

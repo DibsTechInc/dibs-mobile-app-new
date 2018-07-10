@@ -3,12 +3,12 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { TEXT_GREY, LIGHT_GREY, WHITE } from '../../../constants';
-import { addPackageToCart, removePackageFromCart } from '../../../actions';
+import { TEXT_GREY, LIGHT_GREY, WHITE } from '../../constants';
+import { addPackageToCart, removePackageFromCart } from '../../actions';
 
-import { NormalText, HeavyText } from '../../styled';
-import Overlay from '../../shared/PurchaseItem/Overlay';
-import Button from '../../shared/PurchaseItem/Button';
+import { NormalText, HeavyText } from '../styled';
+import Overlay from './PurchaseItem/Overlay';
+import Button from './PurchaseItem/Button';
 
 const Container = styled.View`
   flex-direction: row;
@@ -51,11 +51,7 @@ class Package extends React.PureComponent {
    */
   constructor(props) {
     super(props);
-
-    this.state = {
-      showOverlay: false,
-    };
-
+    this.state = { showOverlay: false };
     this.addToCart = this.addToCart.bind(this);
     this.removeFromCart = this.removeFromCart.bind(this);
     this.showOverlayAndStartTimer = this.showOverlayAndStartTimer.bind(this);

@@ -16,6 +16,7 @@ import {
   getSortedCartPackages,
   getCCExpMonth,
   getCCIsLoading,
+  getDetailedCartCredits,
 } from '../../selectors';
 import {
   submitCartForPurchase,
@@ -36,6 +37,8 @@ import {
   PaymentInfo,
   EventListItem,
   SwipableButton,
+  PackageItem,
+  CreditLoadItem,
 } from '../shared';
 
 import CartTransaction from './CartTransaction';
@@ -43,7 +46,6 @@ import PromoField from './PromoField';
 import Config from '../../../config.json';
 import NoItems from './NoItems';
 import Header from '../Header';
-import Package from '../shared/PackageItem';
 
 import { NormalText, FlexCenter } from '../styled';
 
@@ -105,7 +107,7 @@ class CartPage extends PureComponent {
     if (this.props.events.length && this.props.packages.length) {
       this.props.enqueueNotice({
         title: 'Keep classes in your cart?',
-        message: 'Packages will not apply to the classes in the cart.',
+        message: 'Packages in your cart will not apply to the classes.',
         buttons: [
           { text: 'REMOVE', onPress: this.clearEvents },
           { text: 'KEEP', onPress: () => { } },
@@ -205,7 +207,7 @@ class CartPage extends PureComponent {
   render() {
     const renderValueBackMessage = this.props.valueBack > 0 ?
       `Book now to earn ${this.props.formattedValueBack} in credit back`
-      : `Book now for ${this.props.formattedCartTotal}`;
+      : `${this.props.events.length ? 'Book' : 'Buy'} now for ${this.props.formattedCartTotal}`;
 
     const notReadyForPurchase = !CartPage.getIsReadyForPurchase(this.props, this.state);
 
@@ -227,48 +229,73 @@ class CartPage extends PureComponent {
       );
     }
 
-    if (!this.props.events.length && !this.props.packages.length) {
+    if (
+      !this.props.events.length
+      && !this.props.packages.length
+      && !this.props.credits.length
+    ) {
       return <NoItems />;
     }
     return (
       <FadeInView style={{ backgroundColor: WHITE }}>
         <Header title="My Cart" showCart={false} />
         <Container>
-          {this.props.packages.length && <View>
-            <View style={{ marginLeft: 20, marginTop: 20 }}>
-              <Text style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy' }}>Packages</Text>
-            </View>
-            {this.props.packages.map(pkg => (
-              <Package
-                key={pkg.id}
-                {...pkg}
-                isCartPage
-                hasPackages={Boolean(this.props.packages.length)}
-              />
-            ))}
-          </View>}
-          {this.props.events.length && <View>
-            <View style={{ marginLeft: 20, marginTop: 20 }}>
-              <Text style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy' }}>Classes</Text>
-            </View>
-            {this.props.events.map(item => (
-              <EventListItem
-                key={item.eventid}
-                isCartEvent
-                cartItem={item}
-                {...item}
-              />
-            ))}
-          </View>
-          }
+          {this.props.credits.length &&
+            <View>
+              <View style={{ marginLeft: 20, marginTop: 20 }}>
+                <Text style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy' }}>
+                  Credits
+                </Text>
+              </View>
+              {this.props.credits.map(creditTier => (
+                <CreditLoadItem
+                  key={creditTier.id}
+                  {...creditTier}
+                  isCartPage
+                />
+              ))}
+            </View>}
+          {this.props.packages.length &&
+            <View>
+              <View style={{ marginLeft: 20, marginTop: 20 }}>
+                <Text style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy' }}>
+                  Packages
+                </Text>
+              </View>
+              {this.props.packages.map(pkg => (
+                <PackageItem
+                  key={pkg.id}
+                  {...pkg}
+                  isCartPage
+                  hasPackages={Boolean(this.props.packages.length)}
+                />
+              ))}
+            </View>}
+          {this.props.events.length &&
+            <View>
+              <View style={{ marginLeft: 20, marginTop: 20 }}>
+                <Text style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy' }}>
+                  Classes
+                </Text>
+              </View>
+              {this.props.events.map(item => (
+                <EventListItem
+                  key={item.eventid}
+                  isCartEvent
+                  cartItem={item}
+                  {...item}
+                />
+              ))}
+            </View>}
           <PaymentInfo
             isUpdatingCard={this.state.isUpdatingCard}
             setEditCC={this.setEditCC}
           />
-          <PromoField
-            events={this.props.events}
-            packages={this.props.packages}
-          />
+          {Boolean(this.props.events.length || this.props.packages.length) && (
+            <PromoField
+              events={this.props.events}
+              packages={this.props.packages}
+            />)}
           <CartTransaction />
         </Container>
         <CheckoutView>
@@ -288,6 +315,7 @@ CartPage.propTypes = {
   navigation: PropTypes.shape().isRequired,
   events: PropTypes.arrayOf(PropTypes.shape()).isRequired,
   packages: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+  credits: PropTypes.arrayOf(PropTypes.shape()).isRequired,
   formattedValueBack: PropTypes.string.isRequired,
   valueBack: PropTypes.number.isRequired,
   formattedCartTotal: PropTypes.string.isRequired,
@@ -302,6 +330,7 @@ CartPage.propTypes = {
 const mapStateToProps = state => ({
   events: getDetailedCartEvents(state),
   packages: getSortedCartPackages(state),
+  credits: getDetailedCartCredits(state),
   formattedValueBack: getFormattedCartValueBack(state),
   valueBack: getCartValueBack(state),
   formattedCartTotal: getFormattedCartTotal(state),

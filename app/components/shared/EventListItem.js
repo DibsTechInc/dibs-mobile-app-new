@@ -4,11 +4,11 @@ import styled from 'styled-components';
 import { View } from 'react-native';
 import { connect } from 'react-redux';
 
-import { WHITE, LIGHT_GREY, DARK_TEXT_GREY, BLACK, GREY } from '../../../constants';
-import { addEventToCart, removeOneEventItem } from '../../../actions';
-import { FlexRow, FlexCenter, RightAlignedColumn, HeavyText, NormalText } from '../../styled';
-import Button from '../PurchaseItem/Button';
-import Overlay from '../PurchaseItem/Overlay';
+import { WHITE, LIGHT_GREY, DARK_TEXT_GREY, BLACK, GREY } from '../../constants';
+import { addEventToCart, removeOneEventItem } from '../../actions';
+import { FlexRow, FlexCenter, RightAlignedColumn, HeavyText, NormalText } from '../styled';
+import Button from './PurchaseItem/Button';
+import Overlay from './PurchaseItem/Overlay';
 
 const Container = FlexRow.extend`
   background: ${WHITE},

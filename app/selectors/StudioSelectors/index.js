@@ -48,10 +48,13 @@ export function getStudioCurrency(state) {
   return getStudioData(state).currency || 'USD';
 }
 
-export const getStudioCustomTimeFormat = createSelector(
-  getStudioDibsConfig,
-  dibsConfig => (dibsConfig.customTimeFormat || 'LT')
-);
+/**
+ * @param {Object} state in store
+ * @returns {string} custom date format
+ */
+export function getStudioCustomTimeFormat(state) {
+  return getStudioDibsConfig(state).customTimeFormat || 'LT';
+}
 
 /**
  * @param {Object} state in store
@@ -115,3 +118,11 @@ export const getStudioShortDateFormat = createSelector(
   getStudioCountry,
   country => ({ US: 'M/D', UK: 'D/M' })[country]
 );
+
+/**
+ * @param {Object} state in store
+ * @returns {boolean} if the studio has credit tiers
+ */
+export function getStudioShowsCredits(state) {
+  return Boolean(getStudioDibsConfig(state).show_credit_load);
+}
