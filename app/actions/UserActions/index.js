@@ -88,7 +88,7 @@ export function requestUserData(showAlert = true) {
         await AsyncStorage.removeItem(Config.USER_TOKEN_KEY);
         dispatch(logOutUser());
       } else {
-        Sentry.captureException(new Error(JSON.stringify(err)));'Failed to get user data'));
+        Sentry.captureException(new Error(JSON.stringify(err)));
         throw new Error('Failed to get user data');
       }
     } catch (err) {
