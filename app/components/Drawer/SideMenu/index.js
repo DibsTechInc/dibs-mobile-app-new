@@ -128,7 +128,7 @@ class SideMenu extends React.PureComponent {
           renderIcon={() => <CalendarIcon fromSideMenu />}
         />
         <NavLink
-          label={this.props.showsCreditTiers ? 'Credits & Packages' : 'Credits'}
+          label={this.props.showsCreditTiers ? 'Credits & Packages' : 'Packages'}
           route={BUY_ROUTE}
           renderIcon={() => <PackageIcon fromSideMenu />}
         />
