@@ -296,46 +296,50 @@ export const getCartDiscountAmount = createSelector(
   (eventDiscount, packDiscount) => +Decimal(eventDiscount).plus(packDiscount)
 );
 
-export const getCartTaxAmount = createSelector(
+export const getCartEventTaxAmount = createSelector(
   [
     getCartEventsWithoutPasses,
-    getSortedCartPackages,
-    getCartDiscountAmount,
-    getCartPromoIsAppliedToEvent,
-    getCartPromoIsAppliedToPackage,
+    getCartEventDiscountAmount,
     state => ((state.events || {}).data || []),
     getStudioLocations,
-    getCartHasPackages,
   ],
-  (eventItems, packItems, discount, promoAppliedToEvent, promoAppliedToPack, events, locations) => {
-    let discountRemoved = false;
-    return +[...eventItems, ...packItems].reduce(
-      (acc, item) => {
-        if (item.eventid) {
-          const event = events.find(e => e.id === item.eventid);
-          const loc = locations.find(l => l.id === event.location.id);
-          const taxRate = Decimal(loc.tax_rate).dividedBy(100);
-          let price = Decimal(item.price).times(item.quantity);
-          if (promoAppliedToEvent && !discountRemoved) {
-            price = price.minus(discount);
-            discountRemoved = true;
-          }
-          price = price.times(taxRate).toDP(2);
-          return acc.plus(price);
-        }
-        if (item.packageid) {
-          let taxes = Decimal(item.packageTaxes);
-          if (promoAppliedToPack && !discountRemoved) {
-            taxes = taxes.minus(Decimal(discount).times(item.taxRate).toDP(2));
-            discountRemoved = true;
-          }
-          return acc.plus(taxes);
-        }
-        return acc;
+  (eventItems, eventDiscount, events, locations) =>
+    eventItems.reduce(
+      (acc, item, i) => {
+        const event = events.find(e => e.id === item.eventid);
+        const loc = locations.find(l => l.id === event.location.id);
+        const taxRate = Decimal(loc.tax_rate).dividedBy(100);
+        let price = Decimal(item.price).times(item.quantity);
+        if (!i) price = price.minus(eventDiscount);
+        price = price.times(taxRate).toDP(2);
+        return acc.plus(price);
       },
-      Decimal(0)
-    );
-  }
+      Decimal(0))
+);
+
+export const getCartPackTaxAmount = createSelector(
+  [
+    getSortedCartPackages,
+    getCartPackDiscountAmount,
+  ],
+  (packItems, packDiscount) =>
+    packItems.reduce(
+      (acc, item, i) => {
+        let taxes = Decimal(item.packageTaxes).times(item.quantity);
+        if (!i) {
+          taxes = taxes.minus(Decimal(packDiscount).times(item.taxRate).toDP(2));
+        }
+        return acc.plus(taxes);
+      },
+      Decimal(0))
+);
+
+export const getCartTaxAmount = createSelector(
+  [
+    getCartEventTaxAmount,
+    getCartPackTaxAmount,
+  ],
+  (eventTaxes, packTaxes) => +Decimal(eventTaxes).plus(packTaxes)
 );
 
 export const getFormattedCartTaxAmount = createSelector(
@@ -358,6 +362,7 @@ export const getCartSubtotalAfterTax = createSelector(
 export const getCartStudioCreditAppliedToPacks = createSelector(
   [
     getCartPackSubtotal,
+    getCartPackTaxAmount,
     getCartPackDiscountAmount,
     getUserStudioCreditsAmount,
     getUserStudioCreditLoadBonusAmount,
@@ -366,13 +371,14 @@ export const getCartStudioCreditAppliedToPacks = createSelector(
   ],
   (
     packSubtotal,
+    packTaxes,
     packDiscount,
     userCreditAmount,
     userCreditBonus,
     cartCreditAmount,
     cartCreditBonus
   ) => Math.min(
-    Decimal(packSubtotal).minus(packDiscount),
+    Decimal(packSubtotal).minus(packDiscount).plus(packTaxes),
     Decimal(userCreditAmount).minus(userCreditBonus).plus(cartCreditAmount).minus(cartCreditBonus)
   )
 );
@@ -380,6 +386,7 @@ export const getCartStudioCreditAppliedToPacks = createSelector(
 export const getCartStudioCreditAppliedToEvents = createSelector(
   [
     getCartEventSubtotal,
+    getCartEventTaxAmount,
     getCartEventDiscountAmount,
     getUserStudioCreditsAmount,
     getCreditAmountInCart,
@@ -387,12 +394,13 @@ export const getCartStudioCreditAppliedToEvents = createSelector(
   ],
   (
     eventSubtotal,
+    eventTaxes,
     eventDiscount,
     userCreditAmount,
     cartCreditAmount,
     creditAppliedToPacks
   ) => Math.min(
-    Decimal(eventSubtotal).minus(eventDiscount),
+    Decimal(eventSubtotal).minus(eventDiscount).plus(eventTaxes),
     Decimal(userCreditAmount).plus(cartCreditAmount).minus(creditAppliedToPacks)
   )
 );

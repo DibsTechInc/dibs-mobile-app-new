@@ -3,6 +3,8 @@ import { cloneDeep, uniq } from 'lodash';
 import moment from 'moment';
 import Sentry from 'sentry-expo';
 
+import { Alert } from 'react-native';
+
 import {
   getUsersNextPassId,
   getSortedCartEvents,
@@ -51,13 +53,33 @@ export const {
 });
 
 /**
+ * Refresh cart once user logs in or out to account for passes
+ * @returns {function} redux thunk
+ */
+export function refreshCartEvents({ toggleVisibility = true } = {}) {
+  return function innerRefreshCart(dispatch, getState) {
+    const { cart, events } = getState();
+    if (toggleVisibility) dispatch(setCartVisibleTrue());
+    dispatch(clearCart());
+    cart.events.forEach(cartEvent => [...Array(cartEvent.quantity)].forEach(() => {
+      const nextPassId = getUsersNextPassId(getState())(cartEvent.eventid);
+      const selectedEvent = events.data.find(ev => ev.id === cartEvent.eventid) || {};
+      cartEvent.passid = nextPassId;
+      cartEvent.price = selectedEvent.price;
+      dispatch(addEventToCart(cartEvent));
+    }));
+    if (toggleVisibility) dispatch(setCartVisibleFalse());
+  };
+}
+
+/**
  * Remove a single item from the cart. In order to ensure that
  * users get all their eligible passes applied to their classes,
  * when a user removes a single event item, the cart is rebuilt
  * and reselects the next eligible pass on each dispatch of
  * addEventToClientCart.
  *
- * @param {object} cartItem id of the event being removed
+ * @param {object} eventid id of the event being removed
  * @param {string} itemCategory optional params
  * @param {boolean} [options.toggleVisibility=true] whether or not to change visibility state
  * @returns {Object} action on the state
@@ -68,27 +90,11 @@ export function removeOneEventItem(eventid, { toggleVisibility = true } = {}) {
     // in the order they are added
     let cart = getState().cart;
     cart = cloneDeep(cart);
-
     const itemToRemoveFrom = cart.events.find(item => item.eventid === eventid);
-
     if (!itemToRemoveFrom) return;
-    const indexOfItem = cart.events.indexOf(itemToRemoveFrom);
-    if (toggleVisibility) dispatch(setCartVisibleTrue());
-
-    dispatch(setCartEventsData(cart.events.slice(0, indexOfItem)));
-
-    // for events only applying passes
-    cart.events.slice(indexOfItem).forEach((item) => {
-      // will iterate over the quantity of each item
-      // the item to be removed will be skipped once
-      const array = [...Array(item.quantity - Number((item === itemToRemoveFrom) && 1))];
-      return array.forEach(() => {
-        const passid = getUsersNextPassId(getState())(item.eventid);
-        dispatch(addEventToCart({ ...item, passid }));
-      });
-    });
-
-    if (toggleVisibility) dispatch(setCartVisibleFalse());
+    itemToRemoveFrom.quantity -= 1; // if quantity is 1, it will become 0 and refreshCartEvents will filter it out
+    dispatch(setCartEventsData(cart.events));
+    dispatch(refreshCartEvents({ toggleVisibility }));
   };
 }
 
@@ -101,26 +107,9 @@ export function removeExpiredEvents() {
     // in the order they were added
     let { cart } = getState();
     cart = cloneDeep(cart);
-
     cart.events = cart.events.filter(item => moment(item.start_time).isAfter(moment().local().add(10, 'minutes')));
-
-    dispatch(setCartVisibleTrue()); // so the cart view won't close before this is done
-    dispatch(setCartEventsData([]));
-
-    if (cart && cart.events) {
-      cart.events.forEach(item => (
-        // will iterate over the quantity of each item
-        range(item.quantity).forEach(() => {
-          const passid = getUsersNextPassId(getState())(item.eventid);
-          dispatch(addEventToCart({ ...item, passid }));
-        })
-      ));
-    } else {
-      Sentry.captureException(new Error(JSON.stringify(cart)));
-      enqueueApiError({ 'Error!': JSON.stringify(cart) });
-    }
-
-    dispatch(setCartVisibleFalse());
+    dispatch(setCartEventsData(cart.events));
+    dispatch(refreshCartEvents());
   };
 }
 
@@ -135,29 +124,6 @@ export function applyFreeClassPromoToCart() {
     dispatch(setCartVisibleTrue());
     dispatch(removeOneEventItem(copiedItem, { toggleVisibility: false }));
     dispatch(addEventToCart(copiedItem));
-    dispatch(setCartVisibleFalse());
-  };
-}
-
-/**
- * Refresh cart once user logs in or out to account for passes
- * @returns {function} redux thunk
- */
-export function refreshCartEvents() {
-  return function innerRefreshCart(dispatch, getState) {
-    const { cart, events } = getState();
-    dispatch(setCartVisibleTrue());
-    dispatch(clearCart());
-
-    // refresh classes
-
-    cart.events.forEach(cartEvent => [...Array(cartEvent.quantity)].forEach(() => {
-      const nextPassId = getUsersNextPassId(getState())(cartEvent.eventid);
-      const selectedEvent = events.data.find(ev => ev.id === cartEvent.eventid) || {};
-      cartEvent.passid = nextPassId;
-      cartEvent.price = selectedEvent.price;
-      dispatch(addEventToCart(cartEvent));
-    }));
     dispatch(setCartVisibleFalse());
   };
 }
