@@ -36,7 +36,7 @@ export function requestStudioData(showAlert = true) {
       return;
     } catch (err) {
       console.log(err);
-      Sentry.captureException(new Error(err.stack));
+      Sentry.captureException(new Error(JSON.stringify(err)));
       if (showAlert) dispatch(enqueueApiError({ title: 'Something went wrong loading your app.' }));
       else throw err;
     }
