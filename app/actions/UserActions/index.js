@@ -88,7 +88,6 @@ export function requestUserData(showAlert = true) {
         await AsyncStorage.removeItem(Config.USER_TOKEN_KEY);
         dispatch(logOutUser());
       } else {
-        Sentry.captureException(new Error(JSON.stringify(err)));
         throw new Error('Failed to get user data');
       }
     } catch (err) {
@@ -127,7 +126,7 @@ export function validateEmail(email) {
       if (res.message === 'No user with that email') {
         return REGISTER_ROUTE;
       }
-      Sentry.captureException(new Error(JSON.stringify(err)));res.message));
+      Sentry.captureException(new Error(JSON.stringify(res.message)));
       dispatch(enqueueApiError({ title: 'Error!', message: `${res.message}.` }));
       return null;
     } catch (err) {
