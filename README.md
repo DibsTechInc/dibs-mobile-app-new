@@ -1,10 +1,13 @@
 Table of Contents
 =================
+
+   * [Table of Contents](#table-of-contents)
    * [Installation](#installation)
-   * [Starting Expo](#starting-expo)
+   * [Setting Up Initial Project Files](#setting-up-initial-project-files)
    * [Running Expo](#running-expo)
    * [Building the App](#building-the-app)
-   * [Publishing the App](#publishing-the-app)
+   * [Submitting to the App Store](#submitting-to-the-app-store)
+   * [Over The Air Updates](#over-the-air-updates)
    * [Common Problems](#common-problems)
    * [Debugging](#debugging)
    * [Troubleshooting](#troubleshooting)
@@ -38,7 +41,7 @@ If you are using the CLI and would like to use the simulator:
 $ exp start -i --dev
 ```
 
-Starting Expo
+Setting Up Initial Project Files
 =============
 
 Clone the ```dibs-mobile-app``` repo, then navigate to the root directory of the repo.
@@ -48,6 +51,44 @@ Run the following:
 ```bash
 $ npm i
 ```
+
+Before you run the app, there are a few configuration files you need in your repo.
+
+Run the following:
+
+Create the ```env``` file used for API keys used during the building and publishing phases of the app
+
+```bash
+$ touch .env
+```
+
+The ```app.json``` file is normally created when initializing a new Expo project. However in our case, we generated different
+config files based on the studio, so this file is git ignored.
+
+```bash
+$ touch app.json
+```
+
+The ```config.json``` file is used by the app for studio specific information.
+
+```bash
+$ touch config.json
+```
+
+Once you have done this, go to the Dibs database and look up the studio you want to load in the app.
+This information is located in the ```dibs_studios``` table under the ```app_json``` and ```app_config_json``` columns.
+
+Copy the json file from ```app_json``` and paste it into your ```app.json``` file.
+Copy the json file from ```app_config_json``` and pase it into your ```config.json``` file.
+
+In your ```env``` file, create key entries named ```DATABASE_URL```, ```AWS_ACCESS_KEY_ID```, and ```AWS_SECRET_ACCESS_KEY```.
+You should have the values for those keys already. If not, ask another dev.
+
+Once these three files are setup, you should be ready to start expo! Woot!
+
+Running Expo
+============
+
 If you are using the XDE - do the following:
 
 - Open your Expo XDE and register/login.
@@ -61,9 +102,6 @@ $ exp start --dev
 ```
 
 NOTE: This is assuming that you are using an actual phone, if you need to use the simulator - add an ```-i``` to the command.
-
-Running Expo
-============
 
 Once you see this message: ```Project opened! You can now use the "Share" or "Device" buttons to view your project.```, Expo has successfully loaded your project!
 
@@ -96,6 +134,19 @@ The formatting we use is ```[STUDIONAME]_[MOBILE]``` for development and ```[STU
 
 Please make sure to never use ```RELEASE_CHANNEL_PROD``` until features are ready to be in the App Store.
 
+We have an update script that automatically replaces all the necessary files for us.
+When creating a production app build for the first time (new studio), run the following command:
+
+This will replace all the necessary files for you and publish the production version of the build to our production release channel.
+After this step, you will be able to move on to actually building the app.
+
+Don't forget it's the ```dibs_studio_id``` and not the ```studioid```.
+
+```bash
+$ node ./bin/update.js -s [dibs_studio_id] -p
+```
+After checking to make sure everything working correctly, run the command below to create the build.
+
 ```bash
 $ exp build:ios --release-channel [name of release channel]
 ```
@@ -106,7 +157,15 @@ More information on publishing in the next section.
 Once the process has begun, Expo will ask if you want to provide the certifictes or have Expo generate them for you. Choose to have expo handle everything.
 When the bundle has finished building, you will be ready to submit to Testflight and eventually the App Store.
 
-Publishing the App
+NOTE: When pushing new builds to the app store, do not forget to tick the version number in the ```app.json```. If not, your app build file will
+be rejected by Apple's Application Loader.
+
+Submitting to the App Store
+===========================
+
+IN PROGRESS...Stay tuned.
+
+Over The Air Updates
 ==================
 
 Once you have a build in Testflight or the App Store, Expo provides the ability to publish Over The Air updates. This means that there is no need to resubmit to the App Store
@@ -123,6 +182,15 @@ You can use the following list as a checklist for over the air updates to make s
 - Update `App.js` to use the correct font files in the initial load.
 - Confirm Sentry credentials are correct.
 - Build the app in your development environment and test any features you are adding/changing.
+
+We use an automated script to help us perform those boring manual file replacements.
+Simply run the following command:
+
+Don't forget it's the ```dibs_studio_id``` and not the ```studioid```.
+
+```bash
+$ node ./bin/update.js -s [dibs_studio_id] -p
+```
 
 Once you have checked each item in the list, run the following command:
 ```bash
