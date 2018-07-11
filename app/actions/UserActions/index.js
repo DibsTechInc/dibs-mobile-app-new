@@ -170,7 +170,7 @@ export function signUpUser(payload, callback) {
       if (err.message !== 'Account disabled') {
         dispatch(enqueueApiError({
           title: 'Error!',
-          message: 'Something went wrong during registration.',
+          message: err.message,
         }));
       }
       return callback(err);
