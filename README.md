@@ -1,7 +1,6 @@
 Table of Contents
 =================
 
-   * [Table of Contents](#table-of-contents)
    * [Installation](#installation)
    * [Setting Up Initial Project Files](#setting-up-initial-project-files)
    * [Running Expo](#running-expo)
@@ -56,13 +55,13 @@ Before you run the app, there are a few configuration files you need in your rep
 
 Run the following:
 
-Create the ```env``` file used for API keys used during the building and publishing phases of the app
+Create the ```env``` file for API keys used during the building and publishing phases of the app
 
 ```bash
 $ touch .env
 ```
 
-The ```app.json``` file is normally created when initializing a new Expo project. However in our case, we generated different
+The ```app.json``` file is normally created when initializing a new Expo project. However in our case, we generate different
 config files based on the studio, so this file is git ignored.
 
 ```bash
