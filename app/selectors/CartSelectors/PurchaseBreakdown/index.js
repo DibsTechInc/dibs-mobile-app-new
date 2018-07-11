@@ -16,7 +16,6 @@ import {
 import {
   getSortedCartEvents,
   getSortedCartPackages,
-  getCartEvents,
   getCartCreditsWithPrice,
   getCreditAmountInCart,
   getCreditLoadBonusInCart,
@@ -61,7 +60,7 @@ export const getCartPromoIsAppliedToEvent = createSelector(
 export const getCartPromoCodeAmount = createSelector(
   [
     getSortedCartPackages,
-    getCartEvents,
+    getSortedCartEvents,
     getCartPromoIsAppliedToPackage,
     getCartPromoIsAppliedToEvent,
     getPromoCodeType,
@@ -153,7 +152,7 @@ export const getCartEventsAdjustedPrices = createSelector(
     getUserStudioPassesInCart,
   ],
   (cartItems, passesInCart) => cartItems.map((cartItem) => {
-    const pass = passesInCart.find(p => p.id === cartItem.passid);
+    const pass = passesInCart.find(p => +p.id === +cartItem.passid);
     const eventPassValue = Math.min((pass.studioPackage.unlimited ? cartItem.price : pass.passValue), cartItem.price);
     const adjustedPrice = Decimal(eventPassValue).times(cartItem.quantity).toNumber();
     return adjustedPrice; // classes priced higher than their pass value earn zero credit
@@ -213,14 +212,17 @@ TODO: handle when user can toggle autopay on/off
 
 */
 
-export const getCartEventsWithoutPasses = createSelector( // TODO edit
-  getCartEvents,
+export const getCartEventsWithoutPasses = createSelector(
+  getSortedCartEvents,
   cartEvents => cartEvents.filter(cartEvent => !cartEvent.passid)
 );
 
 export const getCartEventSubtotal = createSelector(
   getCartEventsWithoutPasses,
-  items => +items.reduce((acc, item) => acc.plus(item.price), Decimal(0))
+  items => +items.reduce(
+    (acc, item) =>
+      acc.plus(Decimal(item.price).times(item.quantity)),
+    Decimal(0))
 );
 
 export const getCartEventDiscountAmount = createSelector(
@@ -237,7 +239,10 @@ export const getCartEventDiscountAmount = createSelector(
 
 export const getCartPackSubtotal = createSelector(
   getSortedCartPackages,
-  items => +items.reduce((acc, item) => acc.plus(item.price), Decimal(0))
+  items => +items.reduce(
+    (acc, item) =>
+      acc.plus(Decimal(item.price).times(item.quantity)),
+    Decimal(0))
 );
 
 export const getCartPackDiscountAmount = createSelector(
