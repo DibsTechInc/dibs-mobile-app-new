@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import HTML from 'react-native-render-html';
 
 import Config from '../../../../../config.json';
-import { WHITE, DARK_TEXT_GREY, GREY, WIDTH } from '../../../../constants';
+import { WHITE, DARK_TEXT_GREY, GREY, WIDTH, BLACK } from '../../../../constants';
 import { getDroppingUpcomingEvent } from '../../../../selectors';
 import {
   dropUserFromEvent,
@@ -180,13 +180,21 @@ class UpcomingEvent extends PureComponent {
             formattedTotal={this.props.formattedTotal}
           />
           <View style={{ margin: 10, marginLeft: 20 }}>
-            <View>
+            <View style={{ marginBottom: 20 }}>
               <HeaderText>
                 Class Description
               </HeaderText>
             </View>
             <View style={{ paddingRight: WIDTH / 20 }}>
-              <HTML html={this.props.formattedDescription} imagesMaxWidth={WIDTH} />
+              <HTML
+                html={this.props.formattedDescription}
+                imagesMaxWidth={WIDTH}
+                baseFontStyle={{
+                  color: BLACK,
+                  fontFamily: 'studio-font',
+                  fontSize: 16,
+                }}
+              />
             </View>
             <View style={{ paddingBottom: 60 }}>
               <HeaderText>

@@ -37,15 +37,7 @@ class ErrorPage extends React.PureComponent {
    */
   async componentDidMount() {
     if (this.props.err.message === 'Not connected to the internet') return;
-    try {
-      await dibsFetch('/api/error', {
-        method: 'POST',
-        body: { err: this.props.err.toString(), app: 'mobile app' },
-      });
-    } catch (err) {
-      console.log(err);
-      Sentry.captureException(new Error(JSON.stringify(err)));
-    }
+    Sentry.captureException(new Error(JSON.stringify(this.props.err)));
     await this.props.logOutUser();
   }
   /**
