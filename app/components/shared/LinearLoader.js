@@ -100,7 +100,7 @@ class LinearLoader extends React.PureComponent {
           html={this.state.quote}
           imagesMaxWidth={this.props.width}
           baseFontStyle={{
-            color: WHITE,
+            color: this.props.color,
             fontFamily: 'studio-font',
             fontSize: 16,
             textAlign: 'center',
