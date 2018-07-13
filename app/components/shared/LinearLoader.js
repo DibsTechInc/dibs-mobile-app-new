@@ -33,7 +33,7 @@ const QuoteView = styled.View`
 `;
 
 const NormalQuoteText = NormalText.extend`
-  color: ${WHITE};
+  color: ${props => props.color};
   text-align: center;
 `;
 
@@ -112,7 +112,7 @@ class LinearLoader extends React.PureComponent {
             quoter: { fontFamily: 'studio-font-heavy', fontSize: 14, marginTop: 5 },
           }}
         />
-      ) : <NormalQuoteText>{this.state.quote}</NormalQuoteText>;
+      ) : <NormalQuoteText color={this.props.color}>{this.state.quote}</NormalQuoteText>;
 
     return (
       <LoaderContainer>
