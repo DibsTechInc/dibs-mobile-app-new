@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Animated, View } from 'react-native';
+import HTML from 'react-native-render-html';
 
 import { WHITE } from '../../constants';
 import { fadeColor, generateQuote } from '../../helpers';
@@ -24,11 +25,11 @@ const LoaderBackground = styled.View`
   width: ${props => props.width};
 `;
 
-const QuoteText = NormalText.extend`
-  color: ${props => props.color};
+const QuoteView = styled.View`
+  width: 60%;
   margin-bottom: 50px;
   padding-horizontal: 15;
-  text-align: center;
+  align-items: center;
 `;
 
 /**
@@ -85,12 +86,34 @@ class LinearLoader extends React.PureComponent {
    * @returns {JSX.Element} HTML
    */
   render() {
+    // check if studio has custom html quote styling
+    const renderTypeOfQuote =
+      this.state.quote.includes('<') ?
+      (
+        <HTML
+          html={this.state.quote}
+          imagesMaxWidth={this.props.width}
+          baseFontStyle={{
+            color: WHITE,
+            fontFamily: 'studio-font',
+            fontSize: 16,
+            textAlign: 'center',
+          }}
+          tagsStyles={{
+            p: { borderWidth: 1, borderColor: 'transparent' },
+          }}
+          classesStyles={{
+            quoter: { fontFamily: 'studio-font-heavy', fontSize: 14, marginTop: 5 },
+          }}
+        />
+      ) : this.state.quote;
+
     return (
       <LoaderContainer>
         {this.props.showQuote &&
-          <QuoteText color={this.props.color}>
-            {this.state.quote}
-          </QuoteText>
+          <QuoteView>
+            {renderTypeOfQuote}
+          </QuoteView>
         }
         <View style={{ width: this.props.width, position: 'relative', overflow: 'hidden', height: 5 }}>
           <LoaderBackground
