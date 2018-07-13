@@ -147,7 +147,7 @@ class App extends Component {
       CheckWhite,
     ]);
 
-    // this.setState({ imageLoaded: true });
+    this.setState({ imageLoaded: true });
   }
   /**
    * @returns {undefined}
