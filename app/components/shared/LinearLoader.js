@@ -32,6 +32,11 @@ const QuoteView = styled.View`
   align-items: center;
 `;
 
+const NormalQuoteText = NormalText.extend`
+  color: ${WHITE};
+  text-align: center;
+`;
+
 /**
  * @class LinearLoader
  * @extends {React.PureComponent}
@@ -87,6 +92,7 @@ class LinearLoader extends React.PureComponent {
    */
   render() {
     // check if studio has custom html quote styling
+    console.log(this.state.quote, 'quote?')
     const renderTypeOfQuote =
       this.state.quote.includes('<') ?
       (
@@ -106,7 +112,7 @@ class LinearLoader extends React.PureComponent {
             quoter: { fontFamily: 'studio-font-heavy', fontSize: 14, marginTop: 5 },
           }}
         />
-      ) : this.state.quote;
+      ) : <NormalQuoteText>{this.state.quote}</NormalQuoteText>;
 
     return (
       <LoaderContainer>
