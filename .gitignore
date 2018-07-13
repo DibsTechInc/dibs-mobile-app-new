@@ -10,3 +10,4 @@ assets/fonts/*.ttf
 .vscode/
 .env
 .tmp
+.DS_Store

@@ -125,13 +125,6 @@ function generateDetailedUpcomingEvents(items, currency, timeFormat, shortDateFo
       formattedDescription = 'No class description.';
     }
 
-    const sanitizedDescription = formattedDescription;
-
-    // const sanitizedDescription = formattedDescription
-    //   .replace(/&.*;/, '')
-    //   .replace(/[`~!@#$%^&_|+\=?;:"<>\{\}\[\]\\\/]/g, '')
-    //   .replace(/Theyrsquore\b/g, "They're").trim();
-
     return {
       ...item,
       shortDayOfWeek: localStartTime.format('ddd'),
@@ -141,14 +134,14 @@ function generateDetailedUpcomingEvents(items, currency, timeFormat, shortDateFo
       formattedDiscountAmount: formatCurrency(item.discount_amount, { code: currency, precision: (item.discount_amount % 1 && 2) }),
       formattedStudioCreditAmount: formatCurrency(item.studio_credits_spent, { code: currency, precision: (item.studio_credits_spent % 1 && 2) }),
       formattedRAFCreditAmount: formatCurrency(item.raf_credits_spent, { code: currency, precision: (item.studio_credits_spent % 1 && 2) }),
-      formattedTotal: formatCurrency(chargeAmount, { code: currency, precision: (item.chargeAmount % 1 && 2) }),
-      formattedValueBack: formatCurrency(item.valueBack, { code: currency, precision: (item.chargeAmount % 1 && 2) }),
+      formattedTotal: formatCurrency(chargeAmount, { code: currency, precision: (chargeAmount % 1 && 2) }),
+      formattedValueBack: formatCurrency(item.valueBack, { code: currency, precision: (chargeAmount % 1 && 2) }),
       formattedStartTime: formatTime(localStartTime),
       longitude,
       latitude,
       locationName: location.name,
       instructorName: instructor.name,
-      formattedDescription: sanitizedDescription,
+      formattedDescription,
     };
   });
 }
