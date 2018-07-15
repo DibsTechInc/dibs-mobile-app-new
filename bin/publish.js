@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-const config = require('./config');
+const config = require('./config/sequelize');
 const program = require('commander');
 const Sequelize = require('sequelize');
 const Promise = require('bluebird');
@@ -29,7 +29,7 @@ const getObjectAsync = Promise.promisify(s3.getObject, { context: s3 });
  * @param {Object} SQL query result which contains app.json and config.json
  * @returns {Object} result of the publish for a particular studio
  */
-async function updateStudioApp({ appJson, configJson }) {
+async function publishStudioAppUpdate({ appJson, configJson }) {
   const dibsStudioId = configJson.DIBS_STUDIO_ID;
   try {
     const getS3Object = key => getObjectAsync({
@@ -90,7 +90,7 @@ async function updateStudioApp({ appJson, configJson }) {
   }
 }
 
-(async function updateApp() {
+(async function updateApps() {
   try {
     program
       .option('-a, --all', 'Update all studios')
@@ -116,7 +116,7 @@ async function updateStudioApp({ appJson, configJson }) {
 
     const results = await Promise.map(
       configs,
-      updateStudioApp,
+      publishStudioAppUpdate,
       { concurrency: 1 }
     );
 

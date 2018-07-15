@@ -174,7 +174,7 @@ We use an automated script to help us perform over the air updates.
 Simply run the following command:
 
 ```bash
-$ node ./bin/publish.js --studios [dibs_studio_id] --prod
+$ node ./bin/publish --studios [dibs_studio_id] --prod
 ```
 
 The `--studios` (or `-s`) option determines which studios you are publishing for. Don't forget it's the ```dibs_studio_id``` and not the ```studioid```.
@@ -191,6 +191,8 @@ staging (Test Flight) environments.
 
 In the case that you want to revert the publish, simply remove the code that was published and run the command again.
 Once an updates has been pushed OTA, the app will automatically check for and download the updates the next time it opens.
+
+Run `node ./bin/publish --help` for more information.
 
 Common Problems
 ===============
