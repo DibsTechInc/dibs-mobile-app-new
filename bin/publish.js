@@ -94,7 +94,7 @@ async function updateStudioApp({ appJson, configJson }) {
   try {
     program
       .option('-a, --all', 'Update all studios')
-      .option('-s, --studio <dibs_studio_ids>', 'Studio ID to update', parseInt)
+      .option('-s, --studio <dibs_studio_id>', 'Studio ID to update', parseInt)
       .option('-p, --prod', 'Publishes app build to production release channels')
       .parse(process.argv);
     if (!program.all && !program.studio) {
