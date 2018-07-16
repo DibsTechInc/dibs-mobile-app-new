@@ -170,36 +170,29 @@ Over The Air Updates
 Once you have a build in Testflight or the App Store, Expo provides the ability to publish Over The Air updates. This means that there is no need to resubmit to the App Store
 for every little change or feature. There are however a few things that cannot be pushed via OTA, including the splash screen and the app icon.
 
-Please make sure to publish to the development release channel and test before publishing to production.
-
-You can use the following list as a checklist for over the air updates to make sure everything is in order:
-
-- Replace/update the `config.json` and `app.json` to use the studio's JSONs stored in the database.
-- Update the studios' JSONs in the database with any changes that were made to the structure of the files
-- Replace `assets/img/main-page.jpg`
-- Place the studio fonts in `assets/fonts/`
-- Update `App.js` to use the correct font files in the initial load.
-- Confirm Sentry credentials are correct.
-- Build the app in your development environment and test any features you are adding/changing.
-
-We use an automated script to help us perform those boring manual file replacements.
+We use an automated script to help us perform over the air updates.
 Simply run the following command:
 
-Don't forget it's the ```dibs_studio_id``` and not the ```studioid```.
-
 ```bash
-$ node ./bin/update.js -s [dibs_studio_id] -p
+$ node ./bin/publish --studios [dibs_studio_id] --prod
 ```
 
-Once you have checked each item in the list, run the following command:
-```bash
-$ exp publish --release-channel [name of release channel]
-```
+The `--studios` (or `-s`) option determines which studios you are publishing for. Don't forget it's the ```dibs_studio_id``` and not the ```studioid```.
+You can also run the script with the `--all` option to publish
+over the air updates to all studios in series (this takes a long to run).
 
-and the updates will be automatically pushed to the app on that release channel.
+_You must use either `--studios` or `--all` to run the publish._
+
+TODO: multi-studio updates by `dibs_studio_id`s and have updates be in parallel.
+
+and the updates will be automatically pushed to that studio's **production** app.
+Run the script without the `--prod` option (which can also) to publish to the
+staging (Test Flight) environments.
 
 In the case that you want to revert the publish, simply remove the code that was published and run the command again.
 Once an updates has been pushed OTA, the app will automatically check for and download the updates the next time it opens.
+
+Run `node ./bin/publish --help` for more information.
 
 Common Problems
 ===============
