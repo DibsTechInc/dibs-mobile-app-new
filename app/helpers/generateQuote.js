@@ -26,7 +26,7 @@ function getRandomIntInclusive(n, m) {
  */
 export default function generateQuote() {
   if (!Config.LOADING_QUOTES.length) return '';
-  const randomIndex = getRandomIntInclusive(0, Config.LOADING_QUOTES.length - 1);
+  const randomIndex = getRandomIntInclusive(0, Config.LOADING_QUOTES.length + 1);
   return Config.LOADING_QUOTES[randomIndex];
 }
 
