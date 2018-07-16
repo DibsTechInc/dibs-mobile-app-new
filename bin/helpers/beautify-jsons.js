@@ -4,7 +4,7 @@ const beautify = require('json-beautify');
 const path = require('path');
 const { compose } = require('redux');
 
-const APP_ROOT = path.resolve(__dirname, '..');
+const APP_ROOT = path.resolve(__dirname, '../..');
 
 const toString = buff => buff.toString();
 const toBuffer = str => new Buffer(str);
@@ -24,6 +24,4 @@ function beautifyJson(jsonPath) {
   )(APP_ROOT + jsonPath);
 }
 
-(function beautifyJsons() {
-  return ['/config.json', '/app.json'].forEach(beautifyJson);
-}());
+module.exports = () => ['/config.json', '/app.json'].map(beautifyJson);

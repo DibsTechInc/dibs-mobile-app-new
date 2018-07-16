@@ -1,12 +1,13 @@
 /* eslint-disable import/no-extraneous-dependencies */
-const config = require('./config/sequelize');
 const program = require('commander');
 const Sequelize = require('sequelize');
+const config = require('./config/sequelize');
 const Promise = require('bluebird');
 const fs = require('fs');
 const path = require('path');
 const AWS = require('aws-sdk');
 const { spawn } = require('child_process');
+const beautifyJsons = require('./helpers/beautify-jsons');
 
 const ALL_STUDIOS_QUERY =
   'SELECT app_json AS "appJson", app_config_json AS "configJson" FROM dibs_studios WHERE app_json IS NOT NULL AND (NOT $prod OR "liveMobileApp");';
@@ -43,12 +44,8 @@ async function publishStudioAppUpdate({ appJson, configJson }) {
 
     // Overwriting config files
     console.log(`Overwriting config JSONs for studio ${dibsStudioId}...`);
-    fs.writeFileSync(
-      path.join(APP_ROOT, '/app.json'),
-      new Buffer(JSON.stringify(appJson)));
-    fs.writeFileSync(
-      path.join(APP_ROOT, '/config.json'),
-      new Buffer(JSON.stringify(configJson)));
+    writeFile('/app.json', new Buffer(JSON.stringify(appJson)));
+    writeFile('/config.json', new Buffer(JSON.stringify(configJson)));
     console.log(`Finished overwriting config JSONs for studio ${dibsStudioId}.\n`);
 
     // Overwriting fonts
@@ -98,7 +95,7 @@ async function publishStudioAppUpdate({ appJson, configJson }) {
       .option('-p, --prod', 'Publishes app build to production release channels')
       .parse(process.argv);
     if (!program.all && !program.studio) {
-      console.log('You must provide either the --all or --studios option');
+      console.log('You must provide either the --all or --studio option. Run node bin/publish --help for more info.');
       process.exit(1);
     }
 
@@ -132,6 +129,7 @@ async function publishStudioAppUpdate({ appJson, configJson }) {
       console.log('\nFailed to publish the update to each app. See error(s) above for details.');
     }
 
+    beautifyJsons();
     process.exit(0);
   } catch (err) {
     console.log('\nERROR PUBLISHING UPDATE:\n');
