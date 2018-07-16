@@ -61,7 +61,7 @@ export function requestEventData({ eventids } = {}, showAlert = true) {
       // else if (showAlert) dispatch(enqueueApiError({ title: 'Error!', message: `${res.message}.` }));
     } catch (err) {
       console.log(err);
-      Sentry.captureException(new Error(err.message));
+      Sentry.captureException(new Error(err.message), { logger: 'my.module' });
       if (showAlert) dispatch(enqueueApiError({ title: 'Error!', message: `Something went wrong getting classes for ${getStudioName(getState())}` }));
     }
     dispatch(removeKeyFromFetchingEvents(currentDate));

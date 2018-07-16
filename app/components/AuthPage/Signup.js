@@ -149,7 +149,7 @@ class Signup extends PureComponent {
         return this.props.navigation.navigate(MAIN_ROUTE);
       } catch (err) {
         console.log(err);
-        Sentry.captureException(new Error(err.message));
+        Sentry.captureException(new Error(err.message), { logger: 'my.module' });
         this.setState({ isLoading: false });
         if (err.message === 'Account disabled') {
           return this.props.navigation.navigate(LOGIN_ROUTE, { accountDisabled: true, email: this.props.navigation.state.params.email });

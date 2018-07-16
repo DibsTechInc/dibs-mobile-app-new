@@ -35,7 +35,7 @@ class ErrorPage extends React.PureComponent {
    */
   async componentDidMount() {
     if (this.props.err.message === 'Not connected to the internet') return;
-    Sentry.captureException(new Error(this.props.err.message));
+    Sentry.captureException(new Error(this.props.err.message), { logger: 'my.module' });
     await this.props.logOutUser();
   }
   /**

@@ -100,7 +100,7 @@ class App extends Component {
         store.dispatch(requestEventData({}, false));
       } catch (err) {
         console.error(err);
-        Sentry.captureException(new Error(err.message));
+        Sentry.captureException(new Error(err.message), { logger: 'my.module' });
       }
     }, EVENT_POLL_INTERVAL);
   }
@@ -173,7 +173,7 @@ class App extends Component {
     } catch (err) {
       AsyncStorage.clear();
       store.dispatch(logFatalError(err));
-      Sentry.captureException(new Error(err.message));
+      Sentry.captureException(new Error(err.message), { logger: 'my.module' });
       this.setState({ fetchedAssets: false, errorOccurred: true });
     }
   }
@@ -183,7 +183,7 @@ class App extends Component {
    */
   componentDidCatch(err) {
     console.log(err);
-    Sentry.captureException(new Error(err.message));
+    Sentry.captureException(new Error(err.message), { logger: 'my.module' });
     store.dispatch(logFatalError(err));
     this.setState({ errorOccurred: true });
   }

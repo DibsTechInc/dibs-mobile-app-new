@@ -123,12 +123,12 @@ export function verifyPromoCode(promoCodeAttempt, product = PROMO_PRODUCT_CLASS)
         dispatch(setPromoCodeNotice(text));
       } else {
         console.log(res);
-        Sentry.captureException(new Error(res.message));
+        Sentry.captureException(new Error(res.message), { logger: 'my.module' });
         dispatch(setPromoCodeError(`${res.message}.`));
       }
     } catch (err) {
       console.log(err);
-      Sentry.captureException(new Error(err.message));
+      Sentry.captureException(new Error(err.message), { logger: 'my.module' });
       dispatch(setPromoCodeError('Something went wrong applying that promo code to your cart.'));
     }
     dispatch(setPromoCodeSubmittingFalse());

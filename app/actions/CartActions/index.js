@@ -172,12 +172,12 @@ export function submitCartForPurchase() {
       } else {
         const message = `${res.message}.`;
         console.log(message);
-        Sentry.captureException(new Error(message));
+        Sentry.captureException(new Error(message), { logger: 'my.module' });
         dispatch(enqueueApiError({ title: 'Error!', message }));
       }
     } catch (err) {
       console.log(err);
-      Sentry.captureException(new Error(err.message));
+      Sentry.captureException(new Error(err.message), { logger: 'my.module' });
       dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong checking out your cart.' }));
     }
     const eventids = uniq(cart.events.map(({ eventid }) => eventid));
