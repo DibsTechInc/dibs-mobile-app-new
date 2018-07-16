@@ -45,7 +45,7 @@ export function logOutUser() {
       dispatch(clearCart());
     } catch (err) {
       console.log(err);
-      Sentry.captureException(new Error(JSON.stringify(err)));
+      Sentry.captureException(new Error(err.message));
     }
   };
 }
@@ -63,7 +63,7 @@ export function recordStudioVisit() {
       });
     } catch (err) {
       console.log(err);
-      Sentry.captureException(new Error(JSON.stringify(err)));
+      Sentry.captureException(new Error(err.message));
     }
   };
 }
@@ -92,7 +92,7 @@ export function requestUserData(showAlert = true) {
       }
     } catch (err) {
       console.log(err);
-      Sentry.captureException(new Error(JSON.stringify(err)));
+      Sentry.captureException(new Error(err.message));
       if (showAlert) dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong loading your account.' }));
       else throw err;
     }
@@ -126,12 +126,12 @@ export function validateEmail(email) {
       if (res.message === 'No user with that email') {
         return REGISTER_ROUTE;
       }
-      Sentry.captureException(new Error(JSON.stringify(res.message)));
+      Sentry.captureException(new Error(res.message));
       dispatch(enqueueApiError({ title: 'Error!', message: `${res.message}.` }));
       return null;
     } catch (err) {
       console.log(err);
-      Sentry.captureException(new Error(JSON.stringify(err)));
+      Sentry.captureException(new Error(err.message));
       dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong validating your email.' }));
       return null;
     }
@@ -166,7 +166,7 @@ export function signUpUser(payload, callback) {
       return callback(res);
     } catch (err) {
       console.log(err);
-      Sentry.captureException(new Error(JSON.stringify(err)));
+      Sentry.captureException(new Error(err.message));
       if (err.message !== 'Account disabled') {
         dispatch(enqueueApiError({
           title: 'Error!',
@@ -204,7 +204,7 @@ export function submitLogin(email, password, callback) {
         callback(res);
       }
     } catch (err) {
-      Sentry.captureException(new Error(JSON.stringify(err)));
+      Sentry.captureException(new Error(err.message));
       dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong logging you in.' }));
       console.log(err);
     }
@@ -232,7 +232,7 @@ export function updateUser(payload, callback) {
       callback(res);
     } catch (err) {
       console.log(err);
-      Sentry.captureException(new Error(JSON.stringify(err)));
+      Sentry.captureException(new Error(err.message));
       callback({ message: 'Something went wrong updating your account.' });
     }
   };
@@ -259,7 +259,7 @@ export function updateUserPassword(payload) {
       return res;
     } catch (err) {
       console.log(err);
-      Sentry.captureException(new Error(JSON.stringify(err)));
+      Sentry.captureException(new Error(err.message));
       return {};
     }
   };
@@ -284,7 +284,7 @@ export function updateUserEmailPreferences(list) {
       }
     } catch (err) {
       console.log(err);
-      Sentry.captureException(new Error(JSON.stringify(err)));
+      Sentry.captureException(new Error(err.message));
     }
   };
 }
@@ -312,7 +312,7 @@ export function createPasswordReset(email) {
       return dispatch(enqueueApiError({ title: 'Error!', message }));
     } catch (err) {
       console.log(err);
-      Sentry.captureException(new Error(JSON.stringify(err)));
+      Sentry.captureException(new Error(err.message));
       return dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong resetting your password.' }));
     }
   };
@@ -337,7 +337,7 @@ export function submitPasswordResetCode(code, email) {
       return null;
     } catch (err) {
       console.log(err);
-      Sentry.captureException(new Error(JSON.stringify(err)));
+      Sentry.captureException(new Error(err.message));
       dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong verifying your code.' }));
       return null;
     }
@@ -373,7 +373,7 @@ export function submitPasswordReset(uuId, password) {
       return false;
     } catch (err) {
       console.log(err);
-      Sentry.captureException(new Error(JSON.stringify(err)));
+      Sentry.captureException(new Error(err.message));
       dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong resetting your password.' }));
       return false;
     }
@@ -396,7 +396,7 @@ export function disableUserAccount() {
       return res;
     } catch (err) {
       console.log(err);
-      Sentry.captureException(new Error(JSON.stringify(err)));
+      Sentry.captureException(new Error(err.message));
       dispatch(enqueueApiError({ title: 'Error!', message: 'There was a problem deactivating your account.' }));
       return { success: false };
     }
@@ -423,7 +423,7 @@ export function reactivateUserAccount(email, password, callback) {
       callback(res);
     } catch (err) {
       console.log(err);
-      Sentry.captureException(new Error(JSON.stringify(err)));
+      Sentry.captureException(new Error(err.message));
       callback(err);
     }
   };

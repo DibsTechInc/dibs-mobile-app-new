@@ -29,11 +29,11 @@ export function addToWaitlist(eventid) {
         return dispatch(enqueueApiError({ title: 'Success', message: `You were added to the waitlist for ${eventName}.` }));
       }
       if (res.refreshEvent) dispatch(requestEventData({ eventids: [eventid] }));
-      Sentry.captureException(new Error(JSON.stringify(res.message)));
+      Sentry.captureException(new Error(res.message));
       return dispatch(enqueueApiError({ title: 'Error!', message: `${res.message}.` }));
     } catch (err) {
       console.log(err); // todo real error handling
-      Sentry.captureException(new Error(JSON.stringify(err)));
+      Sentry.captureException(new Error(err.message));
       return dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong adding you to the waitlist.' }));
     }
   };
@@ -59,11 +59,11 @@ export function removeFromWaitlist(eventid) {
         dispatch(enqueueApiError({ title: 'Success', message: 'You were removed from the waitlist.' }));
         return;
       }
-      Sentry.captureException(new Error(JSON.stringify(res.message)));
+      Sentry.captureException(new Error(res.message));
       dispatch(enqueueApiError({ title: 'Error!', message: `${res.message}.` }));
     } catch (err) {
-      console.log(err); // todo real error handling
-      Sentry.captureException(new Error(JSON.stringify(err)));
+      console.log(err);
+      Sentry.captureException(new Error(err.message));
       dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong removing you from the waitlist.' }));
     }
     dispatch(setDroppingEventFalse());

@@ -100,6 +100,7 @@ class App extends Component {
         store.dispatch(requestEventData({}, false));
       } catch (err) {
         console.error(err);
+        Sentry.captureException(new Error(err.message));
       }
     }, EVENT_POLL_INTERVAL);
   }
@@ -162,9 +163,9 @@ class App extends Component {
         store.dispatch(setStudio(studioData));
       } else await store.dispatch(requestStudioData(false));
 
-      await Promise.all([
-        token && store.dispatch(requestUserData(false)),
-      ]);
+      if (token) {
+        await store.dispatch(requestUserData(false));
+      }
 
       this.setState({ fetchedAssets: true, userToken: token });
       if (await AsyncStorage.getItem(Config.STUDIO_DATA_KEY)) await store.dispatch(requestStudioData(false));
@@ -172,6 +173,7 @@ class App extends Component {
     } catch (err) {
       AsyncStorage.clear();
       store.dispatch(logFatalError(err));
+      Sentry.captureException(new Error(err.message));
       this.setState({ fetchedAssets: false, errorOccurred: true });
     }
   }
@@ -181,7 +183,7 @@ class App extends Component {
    */
   componentDidCatch(err) {
     console.log(err);
-    Sentry.captureException(new Error(JSON.stringify(err)));
+    Sentry.captureException(new Error(err.message));
     store.dispatch(logFatalError(err));
     this.setState({ errorOccurred: true });
   }

@@ -7,8 +7,6 @@ import Config from '../../../config.json';
 import { WHITE, DARK_TEXT_GREY } from '../../constants';
 import { logOutUser } from '../../actions';
 import { FlexCenter, HeavyText, NormalText } from '../styled';
-import dibsFetch from '../../util/dibs-fetch';
-
 
 const Container = FlexCenter.extend`
   background: ${WHITE};

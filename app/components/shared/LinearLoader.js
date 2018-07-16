@@ -92,7 +92,6 @@ class LinearLoader extends React.PureComponent {
    */
   render() {
     // check if studio has custom html quote styling
-    console.log(this.state.quote, 'quote?')
     const renderTypeOfQuote =
       this.state.quote.includes('<') ?
       (

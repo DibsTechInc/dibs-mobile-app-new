@@ -59,7 +59,7 @@ export function requestUserEvents(showAlert = true) {
       }
     } catch (err) {
       console.log(err);
-      Sentry.captureException(new Error(JSON.stringify(err)));
+      Sentry.captureException(new Error(err.message));
       if (showAlert) dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong getting your upcoming classes.' }));
       else throw err;
     }
@@ -83,7 +83,7 @@ export function syncUserEvents() {
       });
     } catch (err) {
       console.log(err);
-      Sentry.captureException(new Error(JSON.stringify(err)));
+      Sentry.captureException(new Error(err.message));
     }
     dispatch(setSyncingEventsFalse());
     return dispatch(requestUserEvents(false));
@@ -153,7 +153,7 @@ export function dropUserFromEvent(eventid) {
       }
     } catch (err) {
       console.log(err);
-      Sentry.captureException(new Error(JSON.stringify(err)));
+      Sentry.captureException(new Error(err.message));
       dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong dropping your class.' }));
     }
     dispatch(setDroppingEventFalse());
