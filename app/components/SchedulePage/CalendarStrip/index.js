@@ -212,13 +212,15 @@ class CalendarStrip extends PureComponent {
   render() {
     const lowerBound = this.state.startingDate.clone().subtract(this.state.numberOfDays, 'd').add(1, 'd');
     const canGoBack = lowerBound.isBefore(this.props.lowerBound);
+
     let opacityAnim = 1;
+
     if (this.props.hideStrip) {
-      return <FadeInView pointerEvents="box-none" style={{ height: 80, overflow: 'hidden', top: -20, zIndex: 5, flex: 0 }} />;
+      return <FadeInView pointerEvents="box-none" style={{ height: 80, overflow: 'hidden', top: -20, zIndex: 1, flex: 0 }} />;
     }
 
     return (
-      <FadeInView pointerEvents="box-none" style={{ overflow: 'hidden', top: -20, zIndex: 5, flex: 0 }}>
+      <FadeInView pointerEvents="box-none" style={{ overflow: 'hidden', top: -10, zIndex: 1, flex: 0 }}>
         <CalendarHeader>
           {this.formatCalendarHeader()}
         </CalendarHeader>

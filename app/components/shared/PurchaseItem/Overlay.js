@@ -1,9 +1,15 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { View, TouchableOpacity } from 'react-native';
 import { LIGHT_GREY, TEXT_GREY, BLACK, SOFT_GREY, TRANSPARENT } from '../../../constants';
 import { fadeColor } from '../../../helpers';
+import {
+  setCurrentSpotBookingEventId,
+  setCartEventsData,
+} from '../../../actions';
+import { getStudioHasSpotBooking } from '../../../selectors';
 import { Overlay as StyledOverlay, FlexRow, NormalText } from '../../styled';
 import { TrashIcon, MinusIcon, PlusIcon } from '../../shared';
 
@@ -62,12 +68,20 @@ class Overlay extends React.PureComponent {
    */
   addToCart() {
     this.props.addToCart();
+    if (this.props.studioHasSpotBooking) {
+      this.props.setCurrentSpotBookingEventId(this.props.eventid);
+    }
   }
   /**
    * @returns {undefined}
    */
   removeFromCart() {
     this.props.removeItem();
+    if (this.props.studioHasSpotBooking) {
+      return this.props.setCartEventsData([]);
+    }
+
+    return null;
   }
   /**
    * render
@@ -85,7 +99,7 @@ class Overlay extends React.PureComponent {
             <CartControls>
               <IconContainer>
                 <TouchableOpacity activeOpacity={1} onPress={this.removeFromCart}>
-                  {this.props.quantity > 1 ? (
+                  {(this.props.quantity > 1) ? (
                     <MinusIcon />
                   ) : (
                     <TrashIcon />
@@ -95,7 +109,7 @@ class Overlay extends React.PureComponent {
               <Quantity>
                 {this.props.quantity}
               </Quantity>
-              {(this.props.maxSeatsReached || this.props.fromPackage) ? (
+              {(this.props.maxSeatsReached || this.props.fromPackage || this.props.studioHasSpotBooking) ? (
                 <View style={{ width: 50, height: 15 }} />
               ) : (
                 <IconContainer>
@@ -119,11 +133,26 @@ Overlay.defaultProps = {
 
 Overlay.propTypes = {
   soldOut: PropTypes.bool,
-  quantity: PropTypes.number,
+  quantity: PropTypes.number.isRequired,
   maxSeatsReached: PropTypes.bool,
-  addToCart: PropTypes.func,
+  addToCart: PropTypes.func.isRequired,
+  eventid: PropTypes.number,
+  setCurrentSpotBookingEventId: PropTypes.func,
+  studioHasSpotBooking: PropTypes.bool,
+  setCartEventsData: PropTypes.func,
   removeItem: PropTypes.func,
   fromPackage: PropTypes.bool,
 };
 
-export default Overlay;
+const mapStateToProps = state => ({
+  studioHasSpotBooking: getStudioHasSpotBooking(state),
+  currentSpotBookingEventId: state.events.currentSpotBookingEventId,
+});
+
+const mapDispatchToProps = {
+  setCurrentSpotBookingEventId,
+  setCartEventsData,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Overlay);
+

@@ -4,8 +4,10 @@ import { View, Text } from 'react-native';
 import { withNavigation, NavigationActions } from 'react-navigation';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import Modal from 'react-native-modalbox';
 
 import FadeInView from '../shared/FadeInView';
+
 import {
   getFormattedCartValueBack,
   getConfirmationItems,
@@ -16,20 +18,27 @@ import {
   getSortedCartPackages,
   getCCExpMonth,
   getCCIsLoading,
+  getEventsCurrentSpotBookingEventId,
+  getStudioHasSpotBooking,
+  getLastRoomSpot,
   getDetailedCartCredits,
 } from '../../selectors';
+
 import {
-  submitCartForPurchase,
   enqueueNotice,
   setCartEventsData,
   clearPromoCodeData,
+  submitCartForPurchase,
+  setCurrentSpotBookingEventId,
 } from '../../actions';
+
 import {
   LIGHT_GREY,
   WHITE,
   BLACK,
   RECEIPT_ROUTE,
   GREY,
+  HEIGHT,
 } from '../../constants';
 
 import {
@@ -41,13 +50,14 @@ import {
   CreditLoadItem,
 } from '../shared';
 
+import { NormalText, FlexCenter } from '../styled';
+
 import CartTransaction from './CartTransaction';
 import PromoField from './PromoField';
 import Config from '../../../config.json';
 import NoItems from './NoItems';
 import Header from '../Header';
-
-import { NormalText, FlexCenter } from '../styled';
+import SpotBookingPage from '../SpotBookingPage';
 
 const Container = styled.ScrollView`
   flex: 1;
@@ -94,9 +104,11 @@ class CartPage extends PureComponent {
       isUpdatingCard: false,
       isProcessingPayment: false,
     };
+
     this.toPreviousPage = this.toPreviousPage.bind(this);
     this.setEditCC = this.setEditCC.bind(this);
     this.handlePurchase = this.handlePurchase.bind(this);
+    this.closePickingSpotsModal = this.closePickingSpotsModal.bind(this);
     this.clearEvents = this.clearEvents.bind(this);
   }
 
@@ -161,6 +173,12 @@ class CartPage extends PureComponent {
    */
   endPurchase() {
     this.setState({ isProcessingPayment: false });
+  }
+  /**
+   * @returns {undefined}
+   */
+  closePickingSpotsModal() {
+    this.props.setCurrentSpotBookingEventId(null);
   }
 /**
    * @returns {undefined}
@@ -283,6 +301,8 @@ class CartPage extends PureComponent {
                   key={item.eventid}
                   isCartEvent
                   cartItem={item}
+                  studioHasSpotBooking={this.props.studioHasSpotBooking}
+                  lastRoomSpot={this.props.lastRoomSpot}
                   {...item}
                 />
               ))}
@@ -306,6 +326,18 @@ class CartPage extends PureComponent {
           </View>
           {renderPurchaseButton}
         </CheckoutView>
+        <Modal
+          isOpen={Boolean(this.props.currentSpotBookingEventId)}
+          onClosed={this.closePickingSpotsModal}
+          coverScreen
+          style={{ height: HEIGHT, justifyContent: 'space-around', alignItems: 'center' }}
+          swipeToClose={false}
+        >
+          <SpotBookingPage
+            spotBookingOpened={Boolean(this.props.currentSpotBookingEventId)}
+            closePickingSpotsModal={this.closePickingSpotsModal}
+          />
+        </Modal>
       </FadeInView>
     );
   }
@@ -325,6 +357,10 @@ CartPage.propTypes = {
   enqueueNotice: PropTypes.func.isRequired,
   setCartEventsData: PropTypes.func.isRequired,
   clearPromoCodeData: PropTypes.func.isRequired,
+  currentSpotBookingEventId: PropTypes.number,
+  setCurrentSpotBookingEventId: PropTypes.func,
+  studioHasSpotBooking: PropTypes.bool,
+  lastRoomSpot: PropTypes.shape(),
 };
 
 const mapStateToProps = state => ({
@@ -338,6 +374,9 @@ const mapStateToProps = state => ({
   purchasing: getCartIsPurchasing(state),
   creditCardExpMonth: getCCExpMonth(state),
   creditCardLoading: getCCIsLoading(state),
+  currentSpotBookingEventId: getEventsCurrentSpotBookingEventId(state),
+  studioHasSpotBooking: getStudioHasSpotBooking(state),
+  lastRoomSpot: getLastRoomSpot(state),
 });
 
 const mapDispatchToProps = {
@@ -345,6 +384,7 @@ const mapDispatchToProps = {
   enqueueNotice,
   setCartEventsData,
   clearPromoCodeData,
+  setCurrentSpotBookingEventId,
 };
 
 export default withNavigation(connect(mapStateToProps, mapDispatchToProps)(CartPage));

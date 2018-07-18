@@ -1,3 +1,4 @@
+import Sentry from 'sentry-expo';
 import {
   requestUserEvents,
   removeUpcomingEvent,
@@ -7,7 +8,6 @@ import {
 import { refreshUser } from '../UserActions';
 import { requestEventData } from '../EventActions';
 import { enqueueApiError } from '../AlertsActions';
-import Sentry from 'sentry-expo';
 
 /**
  * @param {number} eventid to add to waitlist

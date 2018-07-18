@@ -1,7 +1,8 @@
 import { stringify } from 'qs';
+import Sentry from 'sentry-expo';
 import { format as formatCurrency } from 'currency-formatter';
 import { createActions } from 'redux-actions';
-import Sentry from 'sentry-expo';
+
 import {
   PROMO_TYPE_FREE_CLASS,
   PROMO_PRODUCT_PACKAGE,

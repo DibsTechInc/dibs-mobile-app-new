@@ -31,6 +31,7 @@ class CartIcon extends React.PureComponent {
    */
   openCart() {
     if (this.props.navigation.state.key === CART_ROUTE) return;
+
     this.props.navigation.navigate(CART_ROUTE, {
       previousRoute: this.props.fromSideMenu ? MAIN_ROUTE : this.props.navigation.state.key,
     });

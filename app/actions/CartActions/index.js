@@ -1,9 +1,7 @@
 import { createActions } from 'redux-actions';
 import { cloneDeep, uniq } from 'lodash';
-import moment from 'moment';
 import Sentry from 'sentry-expo';
-
-import { Alert } from 'react-native';
+import moment from 'moment';
 
 import {
   getUsersNextPassId,
@@ -20,9 +18,8 @@ import {
   setTransactionsConfirmed,
   requestUserEvents,
   enqueueApiError,
+  setUserForSpot,
 } from '../';
-
-const range = n => [...Array(n)]; // JS implementation of Python's range() fn
 
 export const {
   addEventToCart,
@@ -37,6 +34,9 @@ export const {
   setCartVisibleFalse,
   setCartPurchasingTrue,
   setCartPurchasingFalse,
+  setAllSpotBookingSpotsPickedTrue,
+  setAllSpotBookingSpotsPickedFalse,
+  setLastRoomSpot,
 } = createActions({
   ADD_EVENT_TO_CART: item => item,
   ADD_PACKAGE_TO_CART: item => item,
@@ -50,12 +50,71 @@ export const {
   SET_CART_VISIBLE_FALSE: () => false,
   SET_CART_PURCHASING_TRUE: () => true,
   SET_CART_PURCHASING_FALSE: () => false,
+  SET_ALL_SPOT_BOOKING_SPOTS_PICKED_TRUE: () => true,
+  SET_ALL_SPOT_BOOKING_SPOTS_PICKED_FALSE: () => false,
+  SET_LAST_ROOM_SPOT: payload => payload,
 });
 
 /**
- * Refresh cart once user logs in or out to account for passes
- * @returns {function} redux thunk
+ * setSpotsInCart
+ * @param {number} eventid to set event in spot
+ * @param {Object} spot spot data
+ * @returns {Object} action on the state
  */
+export function setSpotInCart(eventid, spot) {
+  return async function innerSetSpotsInCart(dispatch, getState) {
+    const state = getState();
+    const { cart, user } = state;
+    const cartItems = cart.events;
+
+    const clonedCart = cloneDeep(cartItems);
+    const i = clonedCart.findIndex(event => event.eventid === eventid);
+
+    if (clonedCart[i].spotIds.length === clonedCart[i].quantity) return null;
+    clonedCart[i].spotIds.push(spot.id);
+
+    if ((clonedCart[i].spotIds.length + 1) > clonedCart[i].quantity) {
+      dispatch(setAllSpotBookingSpotsPickedTrue());
+    }
+
+    dispatch(setLastRoomSpot(spot));
+    dispatch(setCartEventsData(clonedCart));
+    return dispatch(setUserForSpot({ eventid, userid: user.id, x: spot.x, y: spot.y }));
+  };
+}
+
+/**
+ * removeSpotFromCart
+ * @param {number} eventid to set event in spot
+ * @param {Object} spot spot data
+ * @returns {Object} action on the state
+ */
+export function removeSpotFromCart(eventid, spot = null) {
+  return function innerRemoveSpotFromCart(dispatch, getState) {
+    const state = getState();
+    const { cart } = state;
+
+    const cartItems = cart.events;
+    const lastRoomSpot = cart.lastRoomSpot;
+
+    if (!spot) spot = lastRoomSpot;
+
+    const clonedCartItems = cloneDeep(cartItems);
+
+    const i = clonedCartItems.findIndex(event => event.eventid === eventid);
+    const j = clonedCartItems[i].spotIds.findIndex(spotId => spotId === spot.id);
+
+    clonedCartItems[i].spotIds.splice(j, 1);
+
+    dispatch(setAllSpotBookingSpotsPickedFalse());
+    dispatch(setCartEventsData(clonedCartItems));
+    dispatch(setUserForSpot({ eventid, userid: null, x: spot.x, y: spot.y }));
+  }
+}
+
+ /** Refresh cart once user logs in or out to account for passes
+  * @returns {function} redux thunk
+  */
 export function refreshCartEvents({ toggleVisibility = true } = {}) {
   return function innerRefreshCart(dispatch, getState) {
     const { cart, events } = getState();
@@ -93,6 +152,7 @@ export function removeOneEventItem(eventid, { toggleVisibility = true } = {}) {
     const itemToRemoveFrom = cart.events.find(item => item.eventid === eventid);
     if (!itemToRemoveFrom) return;
     itemToRemoveFrom.quantity -= 1; // if quantity is 1, it will become 0 and refreshCartEvents will filter it out
+    dispatch(setAllSpotBookingSpotsPickedFalse());
     dispatch(setCartEventsData(cart.events));
     dispatch(refreshCartEvents({ toggleVisibility }));
   };
@@ -108,6 +168,7 @@ export function removeExpiredEvents() {
     let { cart } = getState();
     cart = cloneDeep(cart);
     cart.events = cart.events.filter(item => moment(item.start_time).isAfter(moment().local().add(10, 'minutes')));
+    dispatch(setAllSpotBookingSpotsPickedFalse());
     dispatch(setCartEventsData(cart.events));
     dispatch(refreshCartEvents());
   };
@@ -162,6 +223,7 @@ export function submitCartForPurchase() {
       if (res.success) {
         dispatch(refreshUser(res.user));
         dispatch(setTransactionsConfirmed(res.transactions));
+        dispatch(setAllSpotBookingSpotsPickedFalse());
         dispatch(clearCart());
         await dispatch(requestUserEvents());
         dispatch(refreshCartEvents());
@@ -185,3 +247,4 @@ export function submitCartForPurchase() {
     dispatch(setCartPurchasingFalse());
   };
 }
+

@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
+import Sentry from 'sentry-expo';
 import PropTypes from 'prop-types';
 import { View } from 'react-native';
 import SettingsList from 'react-native-settings-list';
@@ -103,7 +104,11 @@ class ProfilePage extends PureComponent {
       bcc: '', // string or array of email addresses
       subject: `User ID ${this.props.userId} Feedback`,
       body: '',
-    }).catch(() => this.props.enqueueUserError({ title: 'Error!', message: 'Something went wrong opening your mail client' }));
+    }).catch((err) => {
+      console.log(err);
+      Sentry.captureException(new Error(err));
+      this.props.enqueueUserError({ title: 'Error!', message: 'Something went wrong opening your mail client' })
+    });
   }
   /**
    * @returns {JSX} XML

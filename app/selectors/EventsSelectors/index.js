@@ -17,6 +17,8 @@ import {
   getUserFixedPrice,
 } from '../UserSelectors/Passes';
 import { getFilterLocationIdsAsArray } from '../FiltersSelectors';
+import { getUserId } from '../UserSelectors';
+import { setSpotInCart } from '../../actions';
 
 /**
  * getEventsState
@@ -34,6 +36,15 @@ export function getEvents(state) {
  */
 export function getEventsFetching(state) {
   return getEvents(state).fetching || {};
+}
+
+/**
+ * getEventsCurrentSpotBookingEventId
+ * @param {Object} state in store
+ * @returns {Object} map to what events are being loaded
+ */
+export function getEventsCurrentSpotBookingEventId(state) {
+  return getEvents(state).currentSpotBookingEventId || null;
 }
 
 /**
@@ -123,13 +134,11 @@ export const getFilteredEvents = createSelector(
   (
     events,
     locationIds
-  ) => {
-    return events.filter((event) => {
-      if (!event.location) return false;
-      if (locationIds.length && !locationIds.includes(event.location.id)) return false;
-      return true;
-    });
-  }
+  ) => events.filter((event) => {
+    if (!event.location) return false;
+    if (locationIds.length && !locationIds.includes(event.location.id)) return false;
+    return true;
+  })
 );
 
 export const getScheduleEvents = createUnboundedSelector(
@@ -174,6 +183,7 @@ export const getScheduleEvents = createUnboundedSelector(
       price,
       formattedRoundedPrice: formatCurrency(price, { precision: 0, code: currency }),
       instructorName: instructor.name,
+      instructorImageURL: instructor.image_url,
       locationName: location.name,
       soldOut: event.seats_remaining <= 0,
       seatsSold: event.current_enrollment,
@@ -187,4 +197,66 @@ export const getScheduleEvents = createUnboundedSelector(
       formattedValueBack: formatCurrency(valueBack, { code: currency }),
     };
   })
+);
+
+export const getCurrentSpotBookingEvent = createSelector(
+  [
+    getScheduleEvents,
+    getEventsCurrentSpotBookingEventId,
+  ],
+  (events, eventid) => events.filter(event => event.eventid === eventid)[0]
+);
+
+export const getCurrentSpotBookingEventFormattedTimes = createSelector(
+  getCurrentSpotBookingEvent,
+  (event) => {
+    if (!event) return { startTimeDate: null, startTimeHourMinute: null };
+
+    const timeDisplay = event.mainTZ === 'Europe/London' ? 'HH:mm' : 'h:mm A';
+    const startTimeDate = moment(event.start_time).tz(event.mainTZ).format('ddd MM/DD');
+    const startTimeHourMinute = moment(event.start_time).tz(event.mainTZ).format(timeDisplay);
+
+    return {
+      startTimeDate,
+      startTimeHourMinute,
+    };
+  }
+);
+
+export const getRoomForEvent = createSelector(
+  getEventsData,
+  events => eventid => (events.find(event => eventid === event.id) || {}).room || {}
+);
+
+export const getSpotGridForEvent = createSelector(
+  getRoomForEvent,
+  getRoom => eventid => getRoom(eventid).spotGrid || []
+);
+
+export const getSpotGridForEventWithSelectedSpots = createSelector(
+  [
+    getSpotGridForEvent,
+    getUserId,
+  ],
+  (getSpotGrid, userid) => eventid => getSpotGrid(eventid).map(spotRow =>
+    spotRow.map(spot => (spot ? {
+      ...spot,
+      userSelected: spot.userid === userid,
+    } : null)))
+);
+
+export const getSpotGridForEventWithSetter = createSelector(
+  [
+    getSpotGridForEventWithSelectedSpots,
+    getUserId,
+  ],
+  (getGridWithSelections, userid) => (eventid) => {
+    const spotGrid = getGridWithSelections(eventid).map(spotRow =>
+      spotRow.map(spot => (spot ? {
+        ...spot,
+        addUserToSpot: setSpotInCart(eventid, spot.id, userid),
+      } : null))
+    );
+    return spotGrid;
+  }
 );
