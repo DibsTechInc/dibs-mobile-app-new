@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import Sentry from 'sentry-expo';
+import { connect } from 'react-redux';
 
 import Config from '../../../config.json';
 import { WHITE, DARK_TEXT_GREY } from '../../constants';

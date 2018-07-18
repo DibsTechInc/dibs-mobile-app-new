@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 import Sentry from 'sentry-expo';
+import PropTypes from 'prop-types';
+
 import {
   View,
   ScrollView,

@@ -10,6 +10,9 @@ import {
   setCartVisibleFalse,
   setCartPurchasingTrue,
   setCartPurchasingFalse,
+  setAllSpotBookingSpotsPickedTrue,
+  setAllSpotBookingSpotsPickedFalse,
+  setLastRoomSpot,
   removePackageFromCart,
   addCreditLoadToCart,
   removeCreditLoadFromCart,
@@ -21,6 +24,8 @@ const initialState = {
   packages: [],
   visible: false,
   purchasing: false,
+  allSpotBookingSpotsPicked: false,
+  lastRoomSpot: {},
 };
 
 /**
@@ -36,7 +41,7 @@ function handleAddEventToCart(state, { payload }) {
     arrayElem.quantity += 1;
     return cart;
   }
-  cart.events.push({ ...payload, quantity: 1 });
+  cart.events.push({ ...payload, spotIds: payload.spotIds || [], quantity: 1 });
   return cart;
 }
 
@@ -83,7 +88,14 @@ export default handleActions({
   [combineActions(
     setCartVisibleTrue,
     setCartVisibleFalse)]: (state, { payload }) => ({ ...state, visible: payload }),
+  
   [combineActions(
     setCartPurchasingTrue,
     setCartPurchasingFalse)]: (state, { payload }) => ({ ...state, purchasing: payload }),
+  
+  [combineActions(
+    setAllSpotBookingSpotsPickedTrue,
+    setAllSpotBookingSpotsPickedFalse)]: (state, { payload }) => ({ ...state, allSpotBookingSpotsPicked: payload }),
+  
+  [setLastRoomSpot]: (state, { payload }) => ({ ...state, lastRoomSpot: payload }),
 }, initialState);

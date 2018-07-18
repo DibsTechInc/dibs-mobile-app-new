@@ -1,6 +1,6 @@
 import { createActions } from 'redux-actions';
-import { enqueueApiError } from '../';
 import Sentry from 'sentry-expo';
+import { enqueueApiError } from '../';
 
 export const {
   setCreditCard,

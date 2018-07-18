@@ -93,8 +93,8 @@ class UpcomingEvent extends PureComponent {
       title: `${titleMesage}`,
       message: `Click 'yes' to drop ${this.props.name}.`,
       buttons: [
-        { text: 'CANCEL', onPress: () => { } },
         { text: 'YES', onPress: this.removeFromClass },
+        { text: 'CANCEL', onPress: () => { } },
       ],
     });
   }

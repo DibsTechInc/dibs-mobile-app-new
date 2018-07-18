@@ -2,15 +2,26 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { View, Animated } from 'react-native';
 import { connect } from 'react-redux';
+import Modal from 'react-native-modalbox';
 
 import Config from '../../../config.json';
 import { WHITE, HEIGHT } from '../../constants';
-import { requestEventData } from '../../actions';
+
+import {
+  requestEventData,
+  setCurrentSpotBookingEventId,
+  setCartEventsData,
+} from '../../actions';
+
 import {
   getEventsAreLoading,
+  getEventsCurrentSpotBookingEventId,
 } from '../../selectors';
+
 import Header from '../Header';
 import { FadeInView } from '../shared/';
+import SpotBookingPage from '../SpotBookingPage';
+
 import CalendarStrip from './CalendarStrip';
 import EventList from './EventList';
 import Filters from './Filters';
@@ -36,11 +47,13 @@ class SchedulePage extends PureComponent {
 
     this.showFilter = this.showFilter.bind(this);
     this.hideFilter = this.hideFilter.bind(this);
+    this.closePickingSpotsModal = this.closePickingSpotsModal.bind(this);
   }
   /**
    * @returns {undefined}
    */
   componentDidMount() {
+    this.props.setCurrentSpotBookingEventId(null);
     this.props.requestEventData();
   }
   /**
@@ -77,6 +90,13 @@ class SchedulePage extends PureComponent {
     });
   }
   /**
+   * @return {undefined}
+   */
+  closePickingSpotsModal() {
+    this.props.setCurrentSpotBookingEventId(null);
+    this.props.setCartEventsData([]);
+  }
+  /**
    * @returns {JSX} XML
    */
   render() {
@@ -97,6 +117,17 @@ class SchedulePage extends PureComponent {
         <CalendarStrip hideStrip={this.state.filterSlideOpened} />
         <View style={{ height: 1, backgroundColor: WHITE }} />
         <EventList />
+        <Modal
+          isOpen={Boolean(this.props.currentSpotBookingEventId)}
+          onClosed={this.closePickingSpotsModal}
+          style={{ height: HEIGHT, justifyContent: 'space-around', alignItems: 'center' }}
+          swipeToClose={false}
+        >
+          <SpotBookingPage
+            spotBookingOpened={Boolean(this.props.currentSpotBookingEventId)}
+            closePickingSpotsModal={this.closePickingSpotsModal}
+          />
+        </Modal>
       </FadeInView>
     );
   }
@@ -105,15 +136,21 @@ class SchedulePage extends PureComponent {
 SchedulePage.propTypes = {
   requestEventData: PropTypes.func,
   currentDate: PropTypes.shape(),
+  currentSpotBookingEventId: PropTypes.number,
+  setCurrentSpotBookingEventId: PropTypes.func,
+  setCartEventsData: PropTypes.func,
 };
 
 const mapStateToProps = state => ({
   isLoading: getEventsAreLoading(state),
   currentDate: state.events.currentDate,
+  currentSpotBookingEventId: getEventsCurrentSpotBookingEventId(state),
 });
 
 const mapDispatchToProps = {
   requestEventData,
+  setCurrentSpotBookingEventId,
+  setCartEventsData,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SchedulePage);

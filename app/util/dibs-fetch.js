@@ -1,5 +1,5 @@
 import { AsyncStorage } from 'react-native';
-
+import Sentry from 'sentry-expo';
 import Config from '../../config.json';
 import store from '../store';
 import { enqueueConnectionError } from '../actions';
@@ -58,6 +58,7 @@ async function dibsFetch(refreshToken, path, {
     try {
       res = await res.json();
     } catch (err) {
+      Sentry.captureException(new Error(err));
       throw err;
     }
   }
@@ -83,6 +84,7 @@ async function refreshUserToken(path, res) {
     });
     if (response.success) await AsyncStorage.setItem(Config.USER_TOKEN_KEY, response.token);
   } catch (err) {
+    Sentry.captureException(new Error(err));
     console.error(err);
   }
 }

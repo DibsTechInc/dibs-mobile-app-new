@@ -119,6 +119,11 @@ export const getStudioShortDateFormat = createSelector(
   country => ({ US: 'M/D', UK: 'D/M' })[country]
 );
 
+export const getStudioHasSpotBooking = createSelector(
+  getStudioDibsConfig,
+  dibsConfig => Boolean(dibsConfig.use_spot_booking)
+);
+
 /**
  * @param {Object} state in store
  * @returns {boolean} if the studio has credit tiers

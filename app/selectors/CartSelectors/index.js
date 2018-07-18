@@ -38,6 +38,21 @@ export function getCartEventItems(state) {
 
 /**
  * @param {Object} state in store
+ * @returns {boolean} whether user has selected all spots if spot booking
+ */
+export function getAllSpotBookingSpotsPicked(state) {
+  return getCart(state).allSpotBookingSpotsPicked || false;
+}
+/**
+ * @param {Object} state in store
+ * @returns {object} the last room picked
+ */
+export function getLastRoomSpot(state) {
+  return getCart(state).lastRoomSpot || {};
+}
+
+/**
+ * @param {Object} state in store
  * @returns {Array<Object>} items in cart
  */
 export function getCartPackages(state) {

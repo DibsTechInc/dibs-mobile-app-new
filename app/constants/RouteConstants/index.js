@@ -24,13 +24,13 @@ export const EDIT_CC_ROUTE = 'EditCC';
 /** Drawer Navigator Routes */
 export const MAIN_ROUTE = 'Main';
 export const SCHEDULE_ROUTE = 'Schedule';
-export const UPCOMING_CLASS_ROUTE = 'UpcomingClasses';
 
+export const UPCOMING_CLASS_ROUTE = 'UpcomingClasses';
 export const PROFILE_ROUTE = 'Profile';
 
 export const CART_ROUTE = 'Cart';
-export const DRAWER_OPEN = 'DrawerOpen';
 
+export const DRAWER_OPEN = 'DrawerOpen';
 export const RECEIPT_ROUTE = 'Receipt';
 export const BUY_ROUTE = 'Buy';
 

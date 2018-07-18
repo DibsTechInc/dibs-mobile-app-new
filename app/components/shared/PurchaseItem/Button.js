@@ -5,8 +5,14 @@ import { promisify } from 'bluebird';
 import styled from 'styled-components';
 
 import Config from '../../../../config.json';
-import { GREY, WHITE, DARK_TEXT_GREY } from '../../../constants/index';
-import { addToWaitlist, enqueueNotice } from '../../../actions';
+import { GREY, WHITE, DARK_TEXT_GREY } from '../../../constants';
+import {
+  addToWaitlist,
+  enqueueNotice,
+  setCurrentSpotBookingEventId,
+} from '../../../actions';
+import { getStudioHasSpotBooking } from '../../../selectors';
+
 import { lightenDarkenColor, Enum } from '../../../helpers';
 import MaterialButton from '../../shared/MaterialButton';
 import { HeavyText } from '../../styled';
@@ -135,6 +141,9 @@ class Button extends React.PureComponent {
         ],
       });
     }
+    if (this.props.studioHasSpotBooking) {
+      this.props.setCurrentSpotBookingEventId(this.props.eventid);
+    }
     return this.addToCart();
   }
   /**
@@ -211,7 +220,6 @@ Button.propTypes = {
   eventid: PropTypes.number,
   passid: PropTypes.number,
   price: PropTypes.number,
-  taxRate: PropTypes.number,
   name: PropTypes.string,
   start_time: PropTypes.string,
   waitlisted: PropTypes.bool,
@@ -221,13 +229,20 @@ Button.propTypes = {
   quantity: PropTypes.number,
   showOverlay: PropTypes.func,
   userHasBooked: PropTypes.bool,
-  enqueueNotice: PropTypes.func,
+  enqueueNotice: PropTypes.func.isRequired,
+  studioHasSpotBooking: PropTypes.bool.isRequired,
+  setCurrentSpotBookingEventId: PropTypes.func.isRequired,
   text: PropTypes.string,
 };
+
+const mapStateToProps = state => ({
+  studioHasSpotBooking: getStudioHasSpotBooking(state),
+});
 
 const mapDispatchToProps = {
   addToWaitlist,
   enqueueNotice,
+  setCurrentSpotBookingEventId,
 };
 
-export default connect(null, mapDispatchToProps)(Button);
+export default connect(mapStateToProps, mapDispatchToProps)(Button);

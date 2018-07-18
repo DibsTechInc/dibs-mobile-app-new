@@ -1,6 +1,7 @@
 import { AsyncStorage } from 'react-native';
-import { createAction } from 'redux-actions';
 import Sentry from 'sentry-expo';
+import { createAction } from 'redux-actions';
+
 import {
   LOGIN_ROUTE,
   REGISTER_ROUTE,

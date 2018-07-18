@@ -111,6 +111,11 @@ class EventListItem extends React.PureComponent {
    * @returns {JSX.Element} HTML
    */
   render() {
+    let lastRoomSpot;
+    if (this.props.studioHasSpotBooking && this.props.spotIds.length) {
+      lastRoomSpot = `Bike ${this.props.lastRoomSpot.source_id}`;
+    }
+
     return (
       <Container showOverlay={this.state.showOverlay}>
         {(
@@ -170,6 +175,9 @@ class EventListItem extends React.PureComponent {
                 {this.props.formattedRoundedPrice}
               </ScheduleText>
             ) : null}
+            {this.props.isCartEvent && this.props.studioHasSpotBooking && <ScheduleText numberOfLines={1} style={{ color: GREY }}>
+              {this.props.spotIds.length ? lastRoomSpot : 'No Bike Selected'}
+            </ScheduleText>}
           </View>
         </CenterColumn>
         <ButtonColumn>
@@ -207,6 +215,9 @@ EventListItem.propTypes = {
   has_waitlist: PropTypes.bool,
   quantity: PropTypes.number.isRequired,
   isCartEvent: PropTypes.bool,
+  studioHasSpotBooking: PropTypes.bool,
+  spotIds: PropTypes.arrayOf(PropTypes.number),
+  lastRoomSpot: PropTypes.shape(),
   addEventToCart: PropTypes.func.isRequired,
   removeOneEventItem: PropTypes.func,
   price: PropTypes.number,

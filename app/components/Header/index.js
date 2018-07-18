@@ -8,15 +8,18 @@ import { isIphoneX } from 'react-native-iphone-x-helper';
 import styled from 'styled-components';
 
 import Config from '../../../config.json';
-import { WHITE, FILTERS_SETTINGS } from '../../constants';
+import { WHITE, FILTERS_SETTINGS, SCHEDULE_ROUTE } from '../../constants';
 import {
   getFiltersState,
   getStudioHasMultipleLocations,
+  getStudioHasSpotBooking,
+  getCartEvents,
 } from '../../selectors';
 import {
   setUpcomingEventSliderExpandedFalse,
   setAllFilters,
   clearAllFilters,
+  setCartEventsData,
 } from '../../actions';
 import { FlexRow, HeavyText, NormalText } from '../styled';
 import { BackArrow, CustomStatusBar, CartIcon, XIcon, FiltersIcon, CheckIcon } from '../shared';
@@ -64,12 +67,59 @@ class Header extends React.PureComponent {
     this.handleOnCloseSaveFilter = this.handleOnCloseSaveFilter.bind(this);
     this.handleOnCloseExitFilter = this.handleOnCloseExitFilter.bind(this);
     this.handleSavedFilters = this.handleSavedFilters.bind(this);
+    this.getXIconOnPressFunction = this.getXIconOnPressFunction.bind(this);
   }
   /**
    * @returns {undefined}
    */
   async componentDidMount() {
     this.handleSavedFilters();
+  }
+  /**
+   * @returns {undefined}
+   */
+  getXIconOnPressFunction() {
+    switch (true) {
+      case this.props.filterSlideOpened:
+        return this.handleOnCloseExitFilter();
+      case this.props.spotBookingOpened:
+        return this.props.closePickingSpotsModal();
+      default:
+        return this.props.setUpcomingEventSliderExpandedFalse();
+
+    }
+  }
+    /**
+   * @returns {undefined}
+   */
+  async handleOnCloseSaveFilter() {
+    this.props.hideFilter();
+    await AsyncStorage.setItem(FILTERS_SETTINGS, JSON.stringify(this.props.filters));
+  }
+    /**
+   * @returns {undefined}
+   */
+  async handleOnCloseExitFilter() {
+    this.props.hideFilter();
+    const savedFilters = this.handleSavedFilters();
+    if (!savedFilters) {
+      this.props.clearAllFilters();
+    }
+  }
+  /**
+   * @returns {undefined}
+   */
+  goBack() {
+    if (this.props.studioHasSpotBooking && this.props.cart.length) {
+      this.props.setCartEventsData([]);
+      return this.props.navigation.navigate(SCHEDULE_ROUTE);
+    }
+
+    if (
+      this.props.navigation.state.params
+      && this.props.navigation.state.params.previousRoute
+    ) return this.props.navigation.navigate(this.props.navigation.state.params.previousRoute);
+    return this.props.navigation.goBack();
   }
   /**
    * @returns {object} filterSettings the saved filters settings
@@ -84,40 +134,15 @@ class Header extends React.PureComponent {
     return filterSettings;
   }
   /**
-   * @returns {undefined}
-   */
-  goBack() {
-    if (
-      this.props.navigation.state.params
-      && this.props.navigation.state.params.previousRoute
-    ) return this.props.navigation.navigate(this.props.navigation.state.params.previousRoute);
-    return this.props.navigation.goBack();
-  }
-  /**
-   * @returns {undefined}
-   */
-  async handleOnCloseSaveFilter() {
-    this.props.hideFilter();
-    await AsyncStorage.setItem(FILTERS_SETTINGS, JSON.stringify(this.props.filters));
-  }
-  /**
-   * @returns {undefined}
-   */
-  async handleOnCloseExitFilter() {
-    this.props.hideFilter();
-    const savedFilters = this.handleSavedFilters();
-    if (!savedFilters) {
-      this.props.clearAllFilters();
-    }
-  }
-  /**
    * @returns {JSX.Element} XML
    */
   render() {
-    const leftButton = (this.props.upcomingEventSliderExpanded || this.props.isSliderHeader || this.props.filterSlideOpened) ? (
+    const renderXIcon = this.props.upcomingEventSliderExpanded || this.props.isSliderHeader || this.props.filterSlideOpened || this.props.spotBookingOpened;
+
+    const leftButton = (renderXIcon) ? (
       <View style={{ width: 30, marginLeft: 15 }}>
         <XIcon
-          onPress={this.props.filterSlideOpened ? this.handleOnCloseExitFilter : this.props.setUpcomingEventSliderExpandedFalse}
+          onPress={this.getXIconOnPressFunction}
           stroke={WHITE}
           strokeWidth={2.5}
           size={18}
@@ -132,10 +157,14 @@ class Header extends React.PureComponent {
       />
     );
 
-    const showFilter = this.props.studioHasMultipleLocations && this.props.hasClassFilter && !this.props.filterSlideOpened;
+    const renderCartIcon = this.props.showCart && (
+      <CartIcon
+        iconColor={WHITE}
+      />);
 
+    const showFilter = this.props.studioHasMultipleLocations && this.props.hasClassFilter && !this.props.filterSlideOpened;
     return (
-      <View style={{ height: 80 + (isIphoneX() ? 20 : 0), overflow: 'hidden', zIndex: 2 }}>
+      <View style={{ height: 80 + (isIphoneX() ? 20 : 0), overflow: 'hidden', zIndex: 2, ...this.props.headerStyle }}>
         <CustomStatusBar backgroundColor={Config.STUDIO_COLOR} barStyle="light-content" />
         <StudioColoredTop>
           <View style={{ width: 60 }}>
@@ -152,7 +181,7 @@ class Header extends React.PureComponent {
               </FilterView>
             </TouchableOpacity>}
             <View style={{ width: 60 }}>
-              {this.props.filterSlideOpened ? <CheckIcon handleOnPress={this.handleOnCloseSaveFilter} /> : <CartIcon iconColor={WHITE} />}
+              {this.props.filterSlideOpened ? <CheckIcon handleOnPress={this.handleOnCloseSaveFilter} /> : renderCartIcon}
             </View>
           </View>
         </StudioColoredTop>
@@ -165,6 +194,7 @@ Header.defaultProps = {
   title: '',
   isSliderHeader: false,
   hasClassFilter: false,
+  showCart: true,
 };
 
 Header.propTypes = {
@@ -181,18 +211,28 @@ Header.propTypes = {
   setAllFilters: PropTypes.func,
   clearAllFilters: PropTypes.func,
   studioHasMultipleLocations: PropTypes.bool,
+  headerStyle: PropTypes.shape(),
+  closePickingSpotsModal: PropTypes.func,
+  spotBookingOpened: PropTypes.bool,
+  showCart: PropTypes.bool,
+  studioHasSpotBooking: PropTypes.bool,
+  cart: PropTypes.arrayOf(PropTypes.shape()),
+  setCartEventsData: PropTypes.func,
 };
 
 const mapStateToProps = state => ({
   upcomingEventSliderExpanded: state.animation.upcomingEventSliderExpanded,
   filters: getFiltersState(state),
   studioHasMultipleLocations: getStudioHasMultipleLocations(state),
+  studioHasSpotBooking: getStudioHasSpotBooking(state),
+  cart: getCartEvents(state),
 });
 
 const mapDispatchToProps = {
   setUpcomingEventSliderExpandedFalse,
   setAllFilters,
   clearAllFilters,
+  setCartEventsData,
 };
 
 export default compose(

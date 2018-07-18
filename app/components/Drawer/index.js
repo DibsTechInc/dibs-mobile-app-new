@@ -8,10 +8,12 @@ import {
   RECEIPT_ROUTE,
   UPCOMING_CLASS_ROUTE,
   BUY_ROUTE,
-} from '../../constants/RouteConstants/index';
+} from '../../constants';
+
 import {
   getDrawerConfig,
 } from '../../util/navigation';
+
 import MainPage from '../MainPage';
 import { ProfilePage } from '../ProfilePage';
 import SchedulePage from '../SchedulePage';
