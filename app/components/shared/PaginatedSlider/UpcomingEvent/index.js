@@ -197,7 +197,7 @@ class UpcomingEvent extends PureComponent {
                 ignoredStyles={['color']}
               />
             </View>
-            <View style={{ paddingBottom: 60 }}>
+            <View style={{ paddingBottom: 60, paddingTop: 20 }}>
               <HeaderText>
                 Drop Policy
               </HeaderText>
