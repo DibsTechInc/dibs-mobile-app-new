@@ -194,6 +194,7 @@ class UpcomingEvent extends PureComponent {
                   fontFamily: 'studio-font',
                   fontSize: 16,
                 }}
+                ignoredStyles={['color']}
               />
             </View>
             <View style={{ paddingBottom: 60 }}>
