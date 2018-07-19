@@ -58,7 +58,7 @@ async function dibsFetch(refreshToken, path, {
     try {
       res = await res.json();
     } catch (err) {
-      Sentry.captureException(new Error(err));
+      Sentry.captureException(new Error(err.message), { logger: 'my.module' });
       throw err;
     }
   }
@@ -84,7 +84,7 @@ async function refreshUserToken(path, res) {
     });
     if (response.success) await AsyncStorage.setItem(Config.USER_TOKEN_KEY, response.token);
   } catch (err) {
-    Sentry.captureException(new Error(err));
+    Sentry.captureException(new Error(err.message), { logger: 'my.module' });
     console.error(err);
   }
 }

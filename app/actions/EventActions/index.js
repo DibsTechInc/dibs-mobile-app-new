@@ -95,7 +95,7 @@ export function getRoomForEvent(eventid) {
       Sentry.captureException(new Error('Something went wrong getting the spot list for your event'));
     } catch (err) {
       console.log(err);
-      Sentry.captureException(new Error('Something went wrong getting the spot list for your event'));
+      Sentry.captureException(new Error(err.message), { logger: 'my.module' });
     }
   };
 }

@@ -102,7 +102,6 @@ class App extends Component {
         store.dispatch(removeExpiredEvents());
         store.dispatch(requestEventData({}, false));
       } catch (err) {
-        Sentry.captureException(new Error(err));
         console.error(err);
         Sentry.captureException(new Error(err.message), { logger: 'my.module' });
       }
@@ -174,7 +173,6 @@ class App extends Component {
       if (await AsyncStorage.getItem(Config.STUDIO_DATA_KEY)) await store.dispatch(requestStudioData(false));
       if (token) await store.dispatch(syncUserEvents());
     } catch (err) {
-      Sentry.captureException(new Error(err));
       AsyncStorage.clear();
       store.dispatch(logFatalError(err));
       Sentry.captureException(new Error(err.message), { logger: 'my.module' });

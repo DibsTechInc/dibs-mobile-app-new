@@ -221,10 +221,10 @@ export function submitCartForPurchase() {
       });
 
       if (res.success) {
+        dispatch(clearCart());
         dispatch(refreshUser(res.user));
         dispatch(setTransactionsConfirmed(res.transactions));
         dispatch(setAllSpotBookingSpotsPickedFalse());
-        dispatch(clearCart());
         await dispatch(requestUserEvents());
         dispatch(refreshCartEvents());
         // dispatch(requestUserTransactions()); implement with transaction history

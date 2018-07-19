@@ -32,7 +32,7 @@ export function addToWaitlist(eventid) {
       Sentry.captureException(new Error(res.message), { logger: 'my.module' });
       return dispatch(enqueueApiError({ title: 'Error!', message: `${res.message}.` }));
     } catch (err) {
-      console.log(err); // todo real error handling
+      console.log(err);
       Sentry.captureException(new Error(err.message), { logger: 'my.module' });
       return dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong adding you to the waitlist.' }));
     }

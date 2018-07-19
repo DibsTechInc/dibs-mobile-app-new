@@ -120,7 +120,6 @@ class UpcomingEvent extends PureComponent {
           ref={node => this.scrollView = node}
           onScrollEndDrag={this.onScrollEnd}
         >
-
           {this.props.expanded &&
             <View style={{ margin: 10 }}>
               <NormalText style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy', marginLeft: 5 }}>
