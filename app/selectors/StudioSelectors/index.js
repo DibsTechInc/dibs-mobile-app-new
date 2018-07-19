@@ -131,3 +131,11 @@ export const getStudioHasSpotBooking = createSelector(
 export function getStudioShowsCredits(state) {
   return Boolean(getStudioDibsConfig(state).show_credit_load);
 }
+
+/**
+ * @param {Object} state in store
+ * @returns {number} fixed price for a studio's first class
+ */
+export function getStudioFirstClassFixedPrice(state) {
+  return getStudioDibsConfig(state).first_class_fixed_price;
+}
