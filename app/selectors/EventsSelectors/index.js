@@ -9,6 +9,7 @@ import {
   getStudioCurrency,
   getStudioCustomTimeFormat,
   getStudioInterval,
+  getStudioFirstClassFixedPrice,
 } from '../StudioSelectors';
 import { getUpcomingEventsData } from '../UpcomingEventsSelectors';
 import {
@@ -17,7 +18,10 @@ import {
   getUserFixedPrice,
 } from '../UserSelectors/Passes';
 import { getFilterLocationIdsAsArray } from '../FiltersSelectors';
-import { getUserId } from '../UserSelectors';
+import {
+  getUserId,
+  getUserHasMadePurchaseAtStudio,
+} from '../UserSelectors';
 import { setSpotInCart } from '../../actions';
 
 /**
@@ -140,7 +144,6 @@ export const getFilteredEvents = createSelector(
     return true;
   })
 );
-
 export const getScheduleEvents = createUnboundedSelector(
   [
     getFilteredEvents,
@@ -151,6 +154,13 @@ export const getScheduleEvents = createUnboundedSelector(
     getUsersNextPassId,
     getUsersNextPassValue,
     getUserFixedPrice,
+    getUserHasMadePurchaseAtStudio,
+    state => [
+      ...((state.cart && state.cart.credits) || []),
+      ...((state.cart && state.cart.events) || []),
+      ...((state.cart && state.cart.packages) || []),
+    ].length,
+    getStudioFirstClassFixedPrice,
   ],
   (
     events,
@@ -160,7 +170,10 @@ export const getScheduleEvents = createUnboundedSelector(
     upcomingEvents,
     getPassId,
     getPassValue,
-    fixedPrice
+    memberFixedPrice,
+    hasMadePurchaseAtStudio,
+    totalCartQuantity,
+    firstClassFixedPrice
   ) => events.map(({ instructor, location, ...event }) => {
     const formatLocalTime = time => moment(time).tz(event.mainTZ).format(timeFormat);
     const eventItemsInCart = cartItems.filter(cartEvent => cartEvent.eventid === event.id);
@@ -174,7 +187,15 @@ export const getScheduleEvents = createUnboundedSelector(
     const passid = getPassId(event.id);
     const passValue = getPassValue(event.id);
     const valueBack = passValue ? Math.max(0, Decimal(passValue || 0).minus(event.price).toDecimalPlaces(2).toNumber()) : 0;
-    const price = (!passid && fixedPrice && event.can_apply_pass) ? Math.min(event.price, fixedPrice) : event.price;
+    let price = event.price;
+    if (
+      !passid
+      && memberFixedPrice
+      && event.can_apply_pass) price = Math.min(event.price, memberFixedPrice);
+    if (
+      !totalCartQuantity
+      && !hasMadePurchaseAtStudio
+      && firstClassFixedPrice) price = firstClassFixedPrice;
     return {
       ...event,
       eventid: event.id,

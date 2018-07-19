@@ -67,6 +67,14 @@ export function getUserCredits(state) {
   return getUser(state).credits || [];
 }
 
+/**
+ * @param {Object} state in store
+ * @returns {boolean} true if user has made purchase at studio
+ */
+export function getUserHasMadePurchaseAtStudio(state) {
+  return Boolean(getUser(state).hasMadePurchaseAtStudio);
+}
+
 export const getUsersFullName = createSelector(
   [
     getUserFirstName,
