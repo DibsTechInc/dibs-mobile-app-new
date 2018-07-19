@@ -193,6 +193,7 @@ export function submitLogin(email, password, callback) {
         body: {
           email,
           password,
+          dibs_studio_id: getState().studio.data.id,
         },
       });
       if (res.success) {
