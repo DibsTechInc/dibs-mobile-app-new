@@ -18,6 +18,7 @@ import {
   enqueueApiError,
   enqueueNotice,
 } from '../index';
+import { getDibsStudioId } from '../../selectors/StudioSelectors';
 
 export const setUser = createAction('SET_USER', payload => payload);
 
@@ -76,7 +77,7 @@ export function recordStudioVisit() {
 export function requestUserData(showAlert = true) {
   return async function innerRequestUserData(dispatch, getState, dibsFetch) {
     try {
-      const res = await dibsFetch('/api/user', {
+      const res = await dibsFetch(`/api/user?dibs_studio_id=${getDibsStudioId(getState())}`, {
         method: 'GET',
         requiresAuth: true,
       });
