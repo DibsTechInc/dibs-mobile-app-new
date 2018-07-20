@@ -73,7 +73,7 @@ class EditEmail extends PureComponent {
       isLoading: false,
       email: '',
       successMessage: response.success ? 'Email successfully updated!' : '',
-      errorMessage: !response.success ? response.mesage : '',
+      errorMessage: !response.success ? response.message : '',
     });
   }
   /**
