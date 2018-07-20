@@ -219,106 +219,99 @@ class Signup extends PureComponent {
     return (
       <FadeInView>
         <CustomStatusBar backgroundColor={'transparent'} barStyle="dark-content" />
-        <ScrollView contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', height: HEIGHT * 0.50, marginTop: 30 }}>
-          <StyledText>
-            Just a few details before we get started
-          </StyledText>
-          <View style={{ position: 'relative' }}>
-            <InputField
-              value={this.state.fullName}
-              onChangeText={fullName => this.setState({ fullName })}
-              placeholder="First and last name"
-              containerStyle={{ marginBottom: 30, width: 250 }}
-            />
-            {this.state.nameError.length && <NormalText style={{ color: RED, position: 'absolute', bottom: 10, fontSize: 12 }}>{this.state.nameError}</NormalText>}
-          </View>
-          <View style={{ position: 'relative' }}>
-            <InputField
-              value={this.state.password}
-              secureTextEntry
-              onChangeText={password => this.setState({ password })}
-              placeholder="Password (6 char min)"
-              containerStyle={{ marginBottom: 30, width: 250 }}
-            />
-            {this.state.passwordError.length && <NormalText style={{ color: RED, position: 'absolute', bottom: 10, fontSize: 12 }}>{this.state.passwordError}</NormalText>}
-          </View>
-          <View style={{ position: 'relative' }}>
-            <PhoneInput
-              ref={(ref) => {
-                this.phone = ref;
-              }}
-              onPressFlag={this.onPressFlag}
-              textStyle={{ fontFamily: 'studio-font' }}
-              textProps={{ placeholder: 'Mobile number' }}
-              style={{ width: 250, borderBottomWidth: 1, paddingBottom: 5, marginTop: 10, marginBottom: 30, borderBottomColor: Config.STUDIO_COLOR }}
-            />
-            <CountryPicker
-              ref={(ref) => {
-                this.countryPicker = ref;
-              }}
-              onChange={value => this.selectCountry(value)}
-              translation="eng"
-              cca2={this.state.cca2}
-              closeable
-              filterable
-              styles={{
-                countryName: { fontFamily: 'studio-font' },
-                input: { fontFamily: 'studio-font' },
-                letterText: { fontFamily: 'studio-font' },
-              }}
-            >
-              <View />
-            </CountryPicker>
-            {this.state.phoneError.length && <NormalText style={{ color: RED, position: 'absolute', bottom: 10, fontSize: 12 }}>{this.state.phoneError}</NormalText>}
-          </View>
-          <View style={{ width: 250, height: 30, position: 'relative', marginTop: 5, flexDirection: 'row' }}>
-            <CheckBox
-              title=""
-              iconType="material-community"
-              checkedIcon="checkbox-marked"
-              uncheckedIcon="checkbox-blank-outline"
-              checkedColor={Config.STUDIO_COLOR}
-              checked={this.state.tAndC}
-              containerStyle={{ backgroundColor: DEFAULT_BG, position: 'absolute', top: -10, left: -22 }}
-              textStyle={{ fontFamily: 'studio-font', fontSize: 16 }}
-              onPress={this.handleOnCheck}
-              size={20}
-            />
-            <View style={{ position: 'absolute', width: '90%', left: 22, top: 5 }}>
-              <NormalText style={{ flex: 1, flexWrap: 'wrap' }}>
-                I have read & agreed to the <LinkedText onPress={this.handleOnPressNavStudioTerms}>
-                  {this.props.studioName}
-                </LinkedText> and <LinkedText onPress={this.handleOnPressNavDibsTerms}>
-                Dibs
-              </LinkedText> Terms and Conditions.
-              </NormalText>
+        <ScrollView contentContainerStyle={{ height: HEIGHT, marginTop: 30 }}>
+          <View style={{ justifyContent: 'center', alignItems: 'center', paddingTop: 30 }}>
+            <StyledText>
+              Just a few details before we get started
+            </StyledText>
+            <View style={{ position: 'relative' }}>
+              <InputField
+                value={this.state.fullName}
+                onChangeText={fullName => this.setState({ fullName })}
+                placeholder="First and last name"
+                containerStyle={{ marginBottom: 30, width: 250 }}
+                customFocus
+              />
+              {this.state.nameError.length && <NormalText style={{ color: RED, position: 'absolute', bottom: 10, fontSize: 12 }}>{this.state.nameError}</NormalText>}
             </View>
-            {this.state.tAndCError.length && <NormalText style={{ color: RED, position: 'absolute', bottom: -55, fontSize: 12 }}>{this.state.tAndCError}</NormalText>}
+            <View style={{ position: 'relative' }}>
+              <InputField
+                value={this.state.password}
+                secureTextEntry
+                onChangeText={password => this.setState({ password })}
+                placeholder="Password (6 char min)"
+                containerStyle={{ marginBottom: 30, width: 250 }}
+              />
+              {this.state.passwordError.length && <NormalText style={{ color: RED, position: 'absolute', bottom: 10, fontSize: 12 }}>{this.state.passwordError}</NormalText>}
+            </View>
+            <View style={{ position: 'relative' }}>
+              <PhoneInput
+                ref={(ref) => {
+                  this.phone = ref;
+                }}
+                onPressFlag={this.onPressFlag}
+                textStyle={{ fontFamily: 'studio-font' }}
+                textProps={{ placeholder: 'Mobile number' }}
+                style={{ width: 250, borderBottomWidth: 1, paddingBottom: 5, marginTop: 10, marginBottom: 30, borderBottomColor: Config.STUDIO_COLOR }}
+              />
+              <CountryPicker
+                ref={(ref) => {
+                  this.countryPicker = ref;
+                }}
+                onChange={value => this.selectCountry(value)}
+                translation="eng"
+                cca2={this.state.cca2}
+                closeable
+                filterable
+                styles={{
+                  countryName: { fontFamily: 'studio-font' },
+                  input: { fontFamily: 'studio-font' },
+                  letterText: { fontFamily: 'studio-font' },
+                }}
+              >
+                <View />
+              </CountryPicker>
+              {this.state.phoneError.length && <NormalText style={{ color: RED, position: 'absolute', bottom: 10, fontSize: 12 }}>{this.state.phoneError}</NormalText>}
+            </View>
+            <View style={{ width: 250, height: 30, position: 'relative', marginTop: 5, flexDirection: 'row' }}>
+              <CheckBox
+                title=""
+                iconType="material-community"
+                checkedIcon="checkbox-marked"
+                uncheckedIcon="checkbox-blank-outline"
+                checkedColor={Config.STUDIO_COLOR}
+                checked={this.state.tAndC}
+                containerStyle={{ backgroundColor: DEFAULT_BG, position: 'absolute', top: -10, left: -22 }}
+                textStyle={{ fontFamily: 'studio-font', fontSize: 16 }}
+                onPress={this.handleOnCheck}
+                size={20}
+              />
+              <View style={{ position: 'absolute', width: '90%', left: 22, top: 5 }}>
+                <NormalText style={{ flex: 1, flexWrap: 'wrap' }}>
+                  I have read & agreed to the <LinkedText onPress={this.handleOnPressNavStudioTerms}>
+                    {this.props.studioName}
+                  </LinkedText> and <LinkedText onPress={this.handleOnPressNavDibsTerms}>
+                  Dibs
+                </LinkedText> Terms and Conditions.
+                </NormalText>
+              </View>
+              {this.state.tAndCError.length && <NormalText style={{ color: RED, position: 'absolute', bottom: -55, fontSize: 12 }}>{this.state.tAndCError}</NormalText>}
+            </View>
           </View>
         </ScrollView>
-        {WIDTH >= 400 ? (
-          <KeyboardAccessoryView
-            alwaysVisible
-            hideBorder
-            style={{ backgroundColor: DEFAULT_BG, marginBottom: 25 }}
-          >
-            <StyledButtonView>
-              <MaterialButton
-                onPress={this.handleOnPress}
-                text="Register"
-                style={{ width: '75%', height: 40 }}
-              />
-            </StyledButtonView>
-          </KeyboardAccessoryView>
-        ) : (
-          <StyledButtonView style={{ paddingBottom: 20 }}>
+        <KeyboardAccessoryView
+          alwaysVisible
+          hideBorder
+          style={{ backgroundColor: DEFAULT_BG, marginBottom: 25 }}
+        >
+          <StyledButtonView>
             <MaterialButton
               onPress={this.handleOnPress}
               text="Register"
               style={{ width: '75%', height: 40 }}
             />
           </StyledButtonView>
-        )}
+        </KeyboardAccessoryView>
       </FadeInView>
     );
   }
