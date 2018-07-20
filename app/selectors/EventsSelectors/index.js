@@ -191,11 +191,12 @@ export const getScheduleEvents = createUnboundedSelector(
     if (
       !passid
       && memberFixedPrice
-      && event.can_apply_pass) price = Math.min(event.price, memberFixedPrice);
+      && event.can_apply_pass) price = memberFixedPrice;
     if (
       !totalCartQuantity
       && !hasMadePurchaseAtStudio
       && firstClassFixedPrice) price = firstClassFixedPrice;
+    price = Math.min(price, event.price);
     return {
       ...event,
       eventid: event.id,
