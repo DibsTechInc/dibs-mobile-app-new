@@ -219,7 +219,7 @@ class Signup extends PureComponent {
     return (
       <FadeInView>
         <CustomStatusBar backgroundColor={'transparent'} barStyle="dark-content" />
-        <ScrollView contentContainerStyle={{ height: HEIGHT, marginTop: 30 }}>
+        <ScrollView contentContainerStyle={{ height: HEIGHT, marginTop: 30 }} keyboardShouldPersistTaps="always">
           <View style={{ justifyContent: 'center', alignItems: 'center', paddingTop: 30 }}>
             <StyledText>
               Just a few details before we get started

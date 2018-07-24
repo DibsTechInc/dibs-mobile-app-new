@@ -22,7 +22,11 @@ class MaterialPanel extends React.PureComponent {
    */
   render() {
     return (
-      <MaterialPanelView height={this.props.height} style={this.props.style}>
+      <MaterialPanelView
+        height={this.props.height}
+        style={this.props.style}
+        isCartPage={this.props.isCartPage}
+      >
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           {this.props.heading && (
             <Heading style={this.props.headerStyle}>
@@ -55,6 +59,7 @@ MaterialPanel.propTypes = {
     PropTypes.node,
     PropTypes.arrayOf(PropTypes.node),
   ]),
+  isCartPage: PropTypes.bool,
 };
 
 export default MaterialPanel;

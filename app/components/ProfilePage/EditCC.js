@@ -42,7 +42,7 @@ class EditCC extends PureComponent {
     return (
       <FadeInView>
         <Header title="My Account" />
-        <ScrollView>
+        <ScrollView keyboardShouldPersistTaps="always">
           <PaymentInfo
             isUpdatingCard={this.state.isUpdatingCard}
             setEditCC={this.setEditCC}

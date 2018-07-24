@@ -54,7 +54,9 @@ class EnterEmail extends PureComponent {
       errorText: '',
       validInput: false,
     };
+
     this.handleOnPress = this.handleOnPress.bind(this);
+    this.onChangeText = this.onChangeText.bind(this);
   }
 
    /**
@@ -63,14 +65,21 @@ class EnterEmail extends PureComponent {
   componentWillUnmount() {
     Keyboard.dismiss();
   }
+  /**
+   * @param {string} email - user email
+   * @returns {undefined}
+   */
+  onChangeText(email) {
+    this.setState({ email });
+  }
     /**
    * @returns {undefined}
    */
   async handleOnPress() {
     const { email } = this.state;
 
+    // Heavy duty regex catches most email formatting errors
     const validEmail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
     const isValidEmail = validEmail.test(email);
 
     if (!isValidEmail) {
@@ -110,7 +119,7 @@ class EnterEmail extends PureComponent {
             customFocus
             label="What's your email?"
             autoCapitalize="none"
-            onChangeText={email => this.setState({ email })}
+            onChangeText={this.onChangeText}
             onSubmitEditing={this.handleOnPress}
             value={this.state.email}
             containerStyle={{

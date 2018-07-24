@@ -124,6 +124,11 @@ export const getStudioHasSpotBooking = createSelector(
   dibsConfig => Boolean(dibsConfig.use_spot_booking)
 );
 
+export const getStudioRafAwardAmount = createSelector(
+  getStudioDibsConfig,
+  dibsConfig => dibsConfig.raf_award || 5
+);
+
 /**
  * @param {Object} state in store
  * @returns {boolean} if the studio has credit tiers

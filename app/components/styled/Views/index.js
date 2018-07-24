@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { Dimensions } from 'react-native';
-import { WHITE, LIGHT_GREY } from '../../../constants';
+import { WHITE, LIGHT_GREY, BLACK } from '../../../constants';
 import Config from '../../../../config.json';
 
 export const FlexCenter = styled.View`
@@ -33,9 +33,10 @@ export const MaterialPanelView = styled.View`
   border-left-width: 0;
   border-top-width: 0;
   border-bottom-width: 1;
+  border-bottom-color: ${props => props.isCartPage ? LIGHT_GREY : 'transparent'};
   elevation: 3;
   height: ${props => (props.height ? props.height : 'auto')};
-  padding-horizontal: 10px;
+  padding-horizontal: ${props => props.isCartPage ? '10px' : 0};
   padding-top: 15px;
   padding-bottom: 20px;
   shadow-color: ${LIGHT_GREY};
@@ -50,5 +51,19 @@ export const Overlay = styled.View`
   position: absolute;
   right: 0;
   top: 0;
+`;
+
+export const ElevatedView = styled.View`
+  justify-content: space-between;
+  align-items: flex-start;
+  border-top-width: 1;
+  border-left-width: 1;
+  border-color: ${LIGHT_GREY};
+  elevation: 3;
+  background-color: ${WHITE};
+  shadow-color: ${BLACK};
+  shadow-opacity: 0.02;
+  margin: 10px;
+  padding: ${props => props.noPadding ? '0px' : '20px'};
 `;
 

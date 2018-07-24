@@ -37,7 +37,7 @@ class PackageReceipt extends React.PureComponent {
           backgroundColor: WHITE,
         }}
       >
-        <ScrollView>
+        <ScrollView keyboardShouldPersistTaps="always">
           <PackageRow>
             <View style={{ marginBottom: 10 }}>
               <HeavyText>

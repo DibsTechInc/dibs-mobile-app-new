@@ -36,7 +36,7 @@ class CreditReceipt extends React.PureComponent {
           backgroundColor: WHITE,
         }}
       >
-        <ScrollView>
+        <ScrollView keyboardShouldPersistTaps="always">
           <CreditRow>
             <View style={{ marginBottom: 20 }}>
               <PayAmount>

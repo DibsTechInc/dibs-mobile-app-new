@@ -5,6 +5,7 @@ import { withNavigation, NavigationActions } from 'react-navigation';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Modal from 'react-native-modalbox';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import FadeInView from '../shared/FadeInView';
 
@@ -58,10 +59,6 @@ import Config from '../../../config.json';
 import NoItems from './NoItems';
 import Header from '../Header';
 import SpotBookingPage from '../SpotBookingPage';
-
-const Container = styled.ScrollView`
-  flex: 1;
-`;
 
 const CheckoutView = styled.View`
   justify-content: space-between;
@@ -186,7 +183,6 @@ class CartPage extends PureComponent {
   clearEvents() {
     this.props.setCartEventsData([]);
   }
-
   /**
    * @returns {undefined}
    */
@@ -237,6 +233,64 @@ class CartPage extends PureComponent {
       />
     );
 
+    const renderCreditTiers = this.props.credits.length &&
+      (<View>
+        <View style={{ marginLeft: 20, marginTop: 20 }}>
+          <Text style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy' }}>
+            Credits
+          </Text>
+        </View>
+        {this.props.credits.map(creditTier => (
+          <CreditLoadItem
+            key={creditTier.id}
+            {...creditTier}
+            isCartPage
+          />
+        ))}
+      </View>);
+
+    const renderCartPackages = this.props.packages.length &&
+    (<View>
+      <View style={{ marginLeft: 20, marginTop: 20 }}>
+        <Text style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy' }}>
+          Packages
+        </Text>
+      </View>
+      {this.props.packages.map(pkg => (
+        <PackageItem
+          key={pkg.id}
+          {...pkg}
+          isCartPage
+          hasPackages={Boolean(this.props.packages.length)}
+        />
+      ))}
+    </View>);
+
+    const renderCartEvents = this.props.events.length &&
+    (<View>
+      <View style={{ marginLeft: 20, marginTop: 20 }}>
+        <Text style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy' }}>
+          Classes
+        </Text>
+      </View>
+      {this.props.events.map(item => (
+        <EventListItem
+          key={item.eventid}
+          isCartEvent
+          cartItem={item}
+          studioHasSpotBooking={this.props.studioHasSpotBooking}
+          lastRoomSpot={this.props.lastRoomSpot}
+          {...item}
+        />
+      ))}
+    </View>);
+
+    const renderPromoCodeField = Boolean(this.props.events.length || this.props.packages.length) && (
+      <PromoField
+        events={this.props.events}
+        packages={this.props.packages}
+      />);
+
     if (this.state.isProcessingPayment) {
       return (
         <FadeInView style={{ backgroundColor: Config.STUDIO_COLOR }}>
@@ -257,67 +311,21 @@ class CartPage extends PureComponent {
     return (
       <FadeInView style={{ backgroundColor: WHITE }}>
         <Header title="My Cart" showCart={false} />
-        <Container>
-          {this.props.credits.length &&
-            <View>
-              <View style={{ marginLeft: 20, marginTop: 20 }}>
-                <Text style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy' }}>
-                  Credits
-                </Text>
-              </View>
-              {this.props.credits.map(creditTier => (
-                <CreditLoadItem
-                  key={creditTier.id}
-                  {...creditTier}
-                  isCartPage
-                />
-              ))}
-            </View>}
-          {this.props.packages.length &&
-            <View>
-              <View style={{ marginLeft: 20, marginTop: 20 }}>
-                <Text style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy' }}>
-                  Packages
-                </Text>
-              </View>
-              {this.props.packages.map(pkg => (
-                <PackageItem
-                  key={pkg.id}
-                  {...pkg}
-                  isCartPage
-                  hasPackages={Boolean(this.props.packages.length)}
-                />
-              ))}
-            </View>}
-          {this.props.events.length &&
-            <View>
-              <View style={{ marginLeft: 20, marginTop: 20 }}>
-                <Text style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy' }}>
-                  Classes
-                </Text>
-              </View>
-              {this.props.events.map(item => (
-                <EventListItem
-                  key={item.eventid}
-                  isCartEvent
-                  cartItem={item}
-                  studioHasSpotBooking={this.props.studioHasSpotBooking}
-                  lastRoomSpot={this.props.lastRoomSpot}
-                  {...item}
-                />
-              ))}
-            </View>}
+        <KeyboardAwareScrollView
+          keyboardShouldPersistTaps="always"
+          contentContainerStyle={{ flex: 1 }}
+          resetScrollToCoords={{ x: 0, y: 0 }}
+        >
+          {renderCreditTiers}
+          {renderCartPackages}
+          {renderCartEvents}
           <PaymentInfo
             isUpdatingCard={this.state.isUpdatingCard}
             setEditCC={this.setEditCC}
           />
-          {Boolean(this.props.events.length || this.props.packages.length) && (
-            <PromoField
-              events={this.props.events}
-              packages={this.props.packages}
-            />)}
+          {renderPromoCodeField}
           <CartTransaction />
-        </Container>
+        </KeyboardAwareScrollView>
         <CheckoutView>
           <View style={{ justifyContent: 'center', alignItems: 'center', width: '100%', paddingVertical: 15 }}>
             <SavingsText>

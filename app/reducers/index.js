@@ -12,6 +12,7 @@ import confirmation from './ConfirmationReducer';
 import animation from './AnimationReducer';
 import packages from './PackagesReducer';
 import filters from './FiltersReducer';
+import friendReferrals from './FriendReferralsReducer';
 
 export default combineReducers({
   alerts,
@@ -26,4 +27,5 @@ export default combineReducers({
   animation,
   packages,
   filters,
+  friendReferrals,
 });

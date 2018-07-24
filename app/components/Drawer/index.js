@@ -8,6 +8,7 @@ import {
   RECEIPT_ROUTE,
   UPCOMING_CLASS_ROUTE,
   BUY_ROUTE,
+  REFER_A_FRIEND_ROUTE,
 } from '../../constants';
 
 import {
@@ -22,6 +23,7 @@ import SideMenu from './SideMenu';
 import ReceiptPage from '../ReceiptPage';
 import UpcomingClassesPage from '../UpcomingClassesPage';
 import BuyItemsPage from '../BuyItemsPage';
+import ReferAFriendPage from '../ReferAFriendPage';
 
 export default DrawerNavigator({
   [MAIN_ROUTE]: { screen: MainPage },
@@ -31,4 +33,5 @@ export default DrawerNavigator({
   [CART_ROUTE]: { screen: CartPage },
   [RECEIPT_ROUTE]: { screen: ReceiptPage },
   [BUY_ROUTE]: { screen: BuyItemsPage },
+  [REFER_A_FRIEND_ROUTE]: { screen: ReferAFriendPage },
 }, getDrawerConfig(300, 'left', MAIN_ROUTE, SideMenu));

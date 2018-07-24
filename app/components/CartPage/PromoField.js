@@ -1,47 +1,15 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import styled from 'styled-components';
-import Config from '../../../config.json';
-import { RED, DARK_TEXT_GREY, GREY } from '../../constants';
+
 import { getAppliedPromoCode, getPromoCodeIsSubmitting, getPromoCodeError, getPromoCodeNotice } from '../../selectors';
 import { verifyPromoCode, clearPromoCodeError, clearPromoCodeNotice, clearPromoCode } from '../../actions';
-import { PROMO_PRODUCT_PACKAGE, PROMO_PRODUCT_CLASS } from '../../constants';
-import MaterialPanel from '../shared/MaterialPanel';
-import MaterialButton from '../shared/MaterialButton';
-import LinearLoader from '../shared/LinearLoader';
-import { FlexRow, NormalText } from '../styled';
+import {
+  PROMO_PRODUCT_PACKAGE,
+  PROMO_PRODUCT_CLASS,
+} from '../../constants';
 
-const PromoCodeText = NormalText.extend`
-  flex: 2;
-  margin-right: 10px;
-`;
-
-const PromoCodeInput = styled.TextInput`
-  border-bottom-width: 1px;
-  flex: 2;
-  font-size: 16;
-  font-family: studio-font;
-  height: 40px;
-  margin-right: 20px;
-  margin-left: 10px;
-  padding: 3px;
-`;
-
-const LoaderContainer = styled.View`
-  align-items: center;
-  padding-vertical: 10;
-`;
-
-const ErrorMessage = NormalText.extend`
-  color: ${RED};
-  margin-top: 10;
-`;
-
-const NoticeMessage = NormalText.extend`
-  color: ${DARK_TEXT_GREY};
-  margin-top: 10;
-`;
+import { SpecialField } from '../shared';
 
 /**
  * @class TransactionBreakdown
@@ -100,58 +68,20 @@ class PromoField extends PureComponent {
    * @returns {JSX} XML
    */
   render() {
-    // TODO handle scrolling
     return (
-      <MaterialPanel
-        style={{ shadowOffset: { width: 3, height: 3 }, width: '100%' }}
-        headerStyle={{ marginLeft: 10, color: GREY }}
+      <SpecialField
+        inputStateItem={this.state.promoCode}
+        handlePress={this.handlePress}
+        handleChange={this.handlePromoCodeChange}
         heading="Promo Code"
-      >
-        {this.props.submitting ? (
-          <LoaderContainer>
-            <LinearLoader
-              color={Config.STUDIO_COLOR}
-              width={150}
-            />
-          </LoaderContainer>
-        ) : (
-          <FlexRow style={{ alignItems: 'center' }}>
-            {this.props.currentPromoCode ? (
-              <PromoCodeText>
-                {this.props.currentPromoCode}
-              </PromoCodeText>
-            ) : (
-              <PromoCodeInput
-                onChangeText={this.handlePromoCodeChange}
-                value={this.state.promoCode}
-              />
-            )}
-            <MaterialButton
-              text={this.props.currentPromoCode ? 'Clear' : 'Apply'}
-              fontSize="16"
-              style={{ width: 80, height: 40 }}
-              onPress={this.handlePress}
-              disabled={!this.state.promoCode}
-            />
-          </FlexRow>
-        )}
-        {this.props.errorMessage ? (
-          <ErrorMessage>
-            {this.props.errorMessage}
-          </ErrorMessage>
-        ) : null}
-        {this.props.noticeMessage ? (
-          <NoticeMessage>
-            {this.props.noticeMessage}
-          </NoticeMessage>
-        ) : null}
-      </MaterialPanel>
+        buttonText="Apply"
+        {...this.props}
+      />
     );
   }
 }
 
 PromoField.propTypes = {
-  submitting: PropTypes.bool.isRequired,
   currentPromoCode: PropTypes.string.isRequired,
   errorMessage: PropTypes.string.isRequired,
   noticeMessage: PropTypes.string.isRequired,
@@ -159,7 +89,6 @@ PromoField.propTypes = {
   clearPromoCodeError: PropTypes.func.isRequired,
   clearPromoCodeNotice: PropTypes.func.isRequired,
   clearPromoCode: PropTypes.func.isRequired,
-  events: PropTypes.arrayOf(PropTypes.shape()),
   packages: PropTypes.arrayOf(PropTypes.shape()),
 };
 

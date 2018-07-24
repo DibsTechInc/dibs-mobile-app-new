@@ -13,3 +13,4 @@ export * from './CreditCardSelectors';
 export * from './ConfirmationSelectors';
 export * from './AlertsSelectors';
 export * from './FiltersSelectors';
+export * from './FriendReferralsSelectors';

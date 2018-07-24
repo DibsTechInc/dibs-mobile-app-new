@@ -29,8 +29,10 @@ export const UPCOMING_CLASS_ROUTE = 'UpcomingClasses';
 export const PROFILE_ROUTE = 'Profile';
 
 export const CART_ROUTE = 'Cart';
-
 export const DRAWER_OPEN = 'DrawerOpen';
+
 export const RECEIPT_ROUTE = 'Receipt';
 export const BUY_ROUTE = 'Buy';
+
+export const REFER_A_FRIEND_ROUTE = 'ReferAFriend';
 

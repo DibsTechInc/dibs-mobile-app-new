@@ -12,6 +12,7 @@ import {
   DARK_TEXT_GREY,
   UPCOMING_CLASS_ROUTE,
   BUY_ROUTE,
+  REFER_A_FRIEND_ROUTE,
 } from '../../../constants';
 import {
   getUsersFullName,
@@ -31,6 +32,7 @@ import {
   ActivityIcon,
   HomeIcon,
   PackageIcon,
+  RafIcon,
 } from '../../shared';
 import { SpaceBetweenRow, HeavyText } from '../../styled';
 import BalanceDisplay from './BalanceDisplay';
@@ -141,6 +143,11 @@ class SideMenu extends React.PureComponent {
           label="Account"
           route={PROFILE_ROUTE}
           renderIcon={() => <UserIcon fromSideMenu />}
+        />
+        <NavLink
+          label="Refer a Friend"
+          route={REFER_A_FRIEND_ROUTE}
+          renderIcon={() => <RafIcon />}
         />
       </StyledContainer>
     );
