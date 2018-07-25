@@ -60,6 +60,7 @@ export function sendFriendReferral(email) {
           email,
           dibsStudioId: id,
           firstName: email,
+          raf_source: 'mobile-app',
         },
         requiresAuth: true,
       });
