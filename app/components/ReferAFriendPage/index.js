@@ -109,6 +109,7 @@ class ReferAFriendPage extends React.PureComponent {
             referredFriends={this.props.referredFriends}
             currency={currency}
             toggleShouldFocus={this.toggleShouldFocus}
+            earnedAmount={this.props.referralAmountEarned}
           />
         </KeyboardAwareScrollView>
       </FadeInView>

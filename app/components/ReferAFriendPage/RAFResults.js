@@ -46,7 +46,7 @@ class RAFResults extends React.PureComponent {
         <RAFResultsRow
           hasLink
           leftText="Invite a friend"
-          rightText={`Earn ${this.props.earnedAmount}`}
+          rightText={`Earn ${this.props.currency}${this.props.earnedAmount}`}
           leftTextColor={Config.STUDIO_COLOR}
           rightTextColor={SOLD_OUT_GREY}
           toggleShouldFocus={this.props.toggleShouldFocus}
@@ -57,7 +57,7 @@ class RAFResults extends React.PureComponent {
 }
 
 RAFResults.propTypes = {
-  earnedAmount: PropTypes.string,
+  earnedAmount: PropTypes.number,
   referredFriends: PropTypes.arrayOf(PropTypes.shape()),
   currency: PropTypes.string,
   toggleShouldFocus: PropTypes.func,
