@@ -235,7 +235,7 @@ class CartPage extends PureComponent {
 
     const renderCreditTiers = this.props.credits.length &&
       (<View>
-        <View style={{ marginLeft: 20, marginTop: 20 }}>
+        <View style={{ marginLeft: 10, marginTop: 20 }}>
           <Text style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy' }}>
             Credits
           </Text>
@@ -251,7 +251,7 @@ class CartPage extends PureComponent {
 
     const renderCartPackages = this.props.packages.length &&
     (<View>
-      <View style={{ marginLeft: 20, marginTop: 20 }}>
+      <View style={{ marginLeft: 10, marginTop: 20 }}>
         <Text style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy' }}>
           Packages
         </Text>
@@ -268,7 +268,7 @@ class CartPage extends PureComponent {
 
     const renderCartEvents = this.props.events.length &&
     (<View>
-      <View style={{ marginLeft: 20, marginTop: 20 }}>
+      <View style={{ marginLeft: 10, marginTop: 20 }}>
         <Text style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy' }}>
           Classes
         </Text>
@@ -312,7 +312,6 @@ class CartPage extends PureComponent {
       <FadeInView style={{ backgroundColor: WHITE }}>
         <Header title="My Cart" showCart={false} />
         <KeyboardAwareScrollView
-          keyboardShouldPersistTaps="always"
           contentContainerStyle={{ flex: 1 }}
           resetScrollToCoords={{ x: 0, y: 0 }}
         >

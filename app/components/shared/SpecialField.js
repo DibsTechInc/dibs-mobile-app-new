@@ -90,7 +90,7 @@ class SpecialField extends React.PureComponent {
     return (
       <MaterialPanel
         style={{ shadowOffset: { width: 3, height: 3 }, width: '100%', ...this.props.style }}
-        headerStyle={{ marginLeft: 10, color: GREY }}
+        headerStyle={{ color: GREY }}
         heading={this.props.heading ? this.props.heading : ''}
         isCartPage={this.props.isCartPage}
       >
@@ -111,13 +111,15 @@ class SpecialField extends React.PureComponent {
               <SpecialFieldInput
                 onChangeText={this.handleOnChangeText}
                 value={this.props.inputStateItem}
-                returnKeyType="done"
+                returnKeyType="go"
+                returnKeyLabel="go"
                 isCartPage={this.props.isCartPage}
                 innerRef={ref => this.textInput = ref}
                 autoCorrect={this.props.hasAutoCorrect}
                 autoCapitalize={this.props.autoCapitalize}
                 onFocus={this.props.onFocusFunc}
                 placeholder={this.props.placeholderText}
+                onSubmitEditing={this.props.handlePress}
               />
             )}
             <MaterialButton
