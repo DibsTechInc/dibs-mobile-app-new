@@ -46,7 +46,7 @@ class NewPassword extends React.PureComponent {
    * @returns {undefined}
    */
   onSubmit() {
-    if (!this.state.password.length || this.state.password.length < 6) {
+    if (this.state.password.length < 6) {
       this.props.enqueueUserError({ title: 'Error!', message: 'Your password must be at least 6 characters' });
       return;
     }
