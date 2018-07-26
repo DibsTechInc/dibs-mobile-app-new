@@ -50,6 +50,14 @@ export function getStudioCurrency(state) {
 
 /**
  * @param {Object} state in store
+ * @returns {string} studio class cancel time
+ */
+export function getStudioCancelTime(state) {
+  return getStudioData(state).cancel_time || 12;
+}
+
+/**
+ * @param {Object} state in store
  * @returns {string} custom date format
  */
 export function getStudioCustomTimeFormat(state) {
@@ -122,6 +130,11 @@ export const getStudioShortDateFormat = createSelector(
 export const getStudioHasSpotBooking = createSelector(
   getStudioDibsConfig,
   dibsConfig => Boolean(dibsConfig.use_spot_booking)
+);
+
+export const getStudioLateDropText = createSelector(
+  getStudioDibsConfig,
+  dibsConfig => dibsConfig.late_drop_text || ''
 );
 
 export const getStudioRafAwardAmount = createSelector(

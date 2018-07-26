@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { promisify } from 'bluebird';
 import styled from 'styled-components';
+import { isEqual } from 'lodash';
 
 import Config from '../../../../config.json';
 import { GREY, WHITE, DARK_TEXT_GREY } from '../../../constants';
@@ -98,6 +99,7 @@ class Button extends React.PureComponent {
         return ButtonStates.Available;
     }
   }
+
   /**
    * @constructor
    * @constructs Button
@@ -116,6 +118,17 @@ class Button extends React.PureComponent {
     this.getBorderColor = this.getStyleFromObject.bind(this, BORDER_COLOR);
     this.getText = this.getStyleFromObject.bind(this, TEXT);
     this.getTextColor = this.getStyleFromObject.bind(this, TEXT_COLOR);
+  }
+  /**
+   * @param {object} prevProps - the previous prop
+   * @returns {undefined}
+   */
+  componentDidUpdate(prevProps) {
+    if (!isEqual(prevProps, this.props)) {
+      this.setState({
+        buttonState: Button.getButtonState(this.props),
+      });
+    }
   }
   /**
    * @returns {undefined}
@@ -172,6 +185,7 @@ class Button extends React.PureComponent {
    * @returns {JSX.Element} HTML
    */
   render() {
+    // console.log(this.props.waitlisted);
     if (this.props.quantity) {
       return (
         <StudioColoredQuantity

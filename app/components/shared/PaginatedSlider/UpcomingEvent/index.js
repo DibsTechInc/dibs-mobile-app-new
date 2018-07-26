@@ -7,7 +7,14 @@ import HTML from 'react-native-render-html';
 
 import Config from '../../../../../config.json';
 import { WHITE, DARK_TEXT_GREY, GREY, WIDTH, BLACK } from '../../../../constants';
-import { getDroppingUpcomingEvent } from '../../../../selectors';
+import {
+  getDroppingUpcomingEvent,
+  getStudioLateDropText,
+  getStudioDibsConfig,
+  getUpcomingEventDropIsEarlyCancel,
+  getUserUsedPass,
+  getStudioName,
+} from '../../../../selectors';
 import {
   dropUserFromEvent,
   removeFromWaitlist,
@@ -65,6 +72,7 @@ class UpcomingEvent extends PureComponent {
     this.onScrollEnd = this.onScrollEnd.bind(this);
     this.startCancel = this.startCancel.bind(this);
     this.removeFromClass = this.removeFromClass.bind(this);
+    this.displayAdditionalNotice = this.displayAdditionalNotice.bind(this);
   }
   /**
    * @param {Object} props component is about to get
@@ -84,14 +92,40 @@ class UpcomingEvent extends PureComponent {
       this.props.setUpcomingEventSliderExpandedFalse();
     }
   }
+/**
+   * @returns {string} extra notice
+   */
+  displayAdditionalNotice() {
+    let extraNotice = 'Please note! This is a late drop, meaning you will not get any credit back to your account for dropping this class.';
+    const { passes } = this.props;
+    const hasUnlimitedPass = (passes && passes.length && passes[0].studioPackage) && passes[0].studioPackage.unlimited;
+    const isDibsEarlyCancel = !this.props.isOffsite && this.props.isEarlyCancel;
+
+    if (isDibsEarlyCancel && this.props.userUsedPass) {
+      extraNotice = `You will get back your ${this.props.studioName} package uses you used to purchase this class.`;
+    }
+
+    if (isDibsEarlyCancel) {
+      extraNotice = `You will receive credit back to your account with ${this.props.studioName}. This credit will be for the full amount you paid for this class.`;
+    }
+
+    if (hasUnlimitedPass) {
+      extraNotice = `${extraNotice} ${this.props.lateDropText}`;
+    }
+
+    return this.props.isWaitlist ? '' : extraNotice;
+  }
   /**
    * @returns {undefined}
    */
   startCancel() {
     const titleMesage = this.props.isWaitlist ? 'Remove from waitlist?' : 'Drop this class?';
+    const baseNotice = `Click 'yes' to drop ${this.props.name}.`;
+    const extraNotice = this.displayAdditionalNotice();
+
     this.props.enqueueNotice({
       title: `${titleMesage}`,
-      message: `Click 'yes' to drop ${this.props.name}.`,
+      message: `${baseNotice} ${extraNotice}`,
       buttons: [
         { text: 'YES', onPress: this.removeFromClass },
         { text: 'CANCEL', onPress: () => { } },
@@ -240,12 +274,24 @@ UpcomingEvent.propTypes = {
   eventid: PropTypes.number.isRequired,
   setUpcomingEventSliderExpandedFalse: PropTypes.func.isRequired,
   enqueueNotice: PropTypes.func.isRequired,
+  lateDropText: PropTypes.string,
+  userUsedPass: PropTypes.bool,
+  isEarlyCancel: PropTypes.bool,
+  isOffsite: PropTypes.bool,
+  studioName: PropTypes.string,
+  passes: PropTypes.arrayOf(PropTypes.shape()),
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state, props) => ({
   dropping: getDroppingUpcomingEvent(state),
   expanded: state.animation.upcomingEventSliderExpanded,
+  lateDropText: getStudioLateDropText(state),
+  config: getStudioDibsConfig(state),
+  userUsedPass: getUserUsedPass(state, props.eventid),
+  isEarlyCancel: getUpcomingEventDropIsEarlyCancel(state, props.eventid),
+  studioName: getStudioName(state),
 });
+
 const mapDispatchToProps = {
   dropUserFromEvent,
   removeFromWaitlist,

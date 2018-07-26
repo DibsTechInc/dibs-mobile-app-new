@@ -6,7 +6,13 @@ import Decimal from 'decimal.js';
 
 import Config from '../../../config.json';
 import { WHITE } from '../../constants';
-import { getStudioShortDateFormat, getStudioCustomTimeFormat, getStudioCurrency } from '../StudioSelectors';
+import {
+  getStudioShortDateFormat,
+  getStudioCustomTimeFormat,
+  getStudioCurrency,
+  getStudioCancelTime,
+} from '../StudioSelectors';
+
 import { getStudioLocations } from '../StudioSelectors/Locations';
 
 /**
@@ -153,6 +159,31 @@ export const getDetailedMostRecentUpcomingEvents = createSelector(
   getStudioShortDateFormat,
   getStudioLocations,
   generateDetailedUpcomingEvents
+);
+
+export const getUpcomingEventFromRouteParam = createSelector(
+  [
+    getDetailedMostRecentUpcomingEvents,
+    (_, eventid) => eventid,
+  ],
+  (events, eventid) => events.find(event => event.eventid === eventid)
+);
+
+export const getUpcomingEventDropIsEarlyCancel = createSelector(
+  [
+    getUpcomingEventFromRouteParam,
+    getStudioCancelTime,
+  ],
+  (event, studioCancelTime) => {
+    if (!event) return false;
+    const eventStart = moment.tz(moment.utc(event.start_time), event.MainTZ);
+    return eventStart > moment().clone().add(studioCancelTime, 'h');
+  }
+);
+
+export const getUserUsedPass = createSelector(
+  getUpcomingEventFromRouteParam,
+  event => (event ? Boolean(event.passes.find(id => id !== null)) : false)
 );
 
 export const getDetailedUpcomingEventsOnCurrentDay = createSelector(

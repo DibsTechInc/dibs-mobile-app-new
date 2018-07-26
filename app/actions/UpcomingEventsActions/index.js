@@ -139,6 +139,7 @@ export function dropUserFromEvent(eventid) {
       const { dropping, data } = getState().upcomingEvents;
       if (dropping) return;
       const { name: eventName } = data.find(ev => eventid === ev.eventid);
+
       dispatch(setDroppingEventTrue());
       const res = await dibsFetch(`/api/studio/unsubscribe/${eventid}`, {
         requiresAuth: true,
