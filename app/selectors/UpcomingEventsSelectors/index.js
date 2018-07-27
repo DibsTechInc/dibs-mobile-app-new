@@ -177,7 +177,7 @@ export const getUpcomingEventDropIsEarlyCancel = createSelector(
   (event, studioCancelTime) => {
     if (!event) return false;
     const eventStart = moment.tz(moment.utc(event.start_time), event.MainTZ);
-    return eventStart < moment().clone().add(studioCancelTime, 'h');
+    return eventStart > moment().clone().add(studioCancelTime, 'h');
   }
 );
 
