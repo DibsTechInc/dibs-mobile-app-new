@@ -12,7 +12,11 @@ import {
   enqueueNotice,
   setCurrentSpotBookingEventId,
 } from '../../../actions';
-import { getStudioHasSpotBooking } from '../../../selectors';
+
+import {
+  getStudioHasSpotBooking,
+  getShouldDisplayPaymentWarning,
+} from '../../../selectors';
 
 import { lightenDarkenColor, Enum } from '../../../helpers';
 import MaterialButton from '../../shared/MaterialButton';
@@ -80,7 +84,7 @@ class Button extends React.PureComponent {
    */
   static getButtonState(props) {
     switch (true) {
-      case Boolean(props.soldOut && props.userHasBooked):
+      case Boolean(props.soldOut && props.userHasBooked && !props.waitlisted):
         return ButtonStates.BookedDisabled;
 
       case Boolean(props.waitlisted):
@@ -111,6 +115,7 @@ class Button extends React.PureComponent {
       waitlisting: false,
       buttonState: Button.getButtonState(props),
     };
+
     this.onPress = this.onPress.bind(this);
     this.addToWaitlist = this.addToWaitlist.bind(this);
     this.addToCart = this.addToCart.bind(this);
@@ -134,6 +139,17 @@ class Button extends React.PureComponent {
    * @returns {undefined}
    */
   onPress() {
+    if (this.props.shouldDisplayPaymentWarning) {
+      return this.props.enqueueNotice({
+        title: 'Add to cart?',
+        message: `Looks like you’ve already applied your unlimited pass to a class that day, so your card will be charged ${this.props.formattedRoundedPrice} for this class.`,
+        buttons: [
+          { text: 'CANCEL', onPress: () => {} },
+          { text: 'YES', onPress: this.addToCart },
+        ],
+      });
+    }
+
     if (this.props.maxSeatsReached) {
       return this.props.enqueueNotice({
         title: 'Add to waitlist?',
@@ -185,7 +201,6 @@ class Button extends React.PureComponent {
    * @returns {JSX.Element} HTML
    */
   render() {
-    // console.log(this.props.waitlisted);
     if (this.props.quantity) {
       return (
         <StudioColoredQuantity
@@ -247,10 +262,13 @@ Button.propTypes = {
   studioHasSpotBooking: PropTypes.bool.isRequired,
   setCurrentSpotBookingEventId: PropTypes.func.isRequired,
   text: PropTypes.string,
+  shouldDisplayPaymentWarning: PropTypes.bool,
+  formattedRoundedPrice: PropTypes.string,
 };
 
 const mapStateToProps = state => ({
   studioHasSpotBooking: getStudioHasSpotBooking(state),
+  shouldDisplayPaymentWarning: getShouldDisplayPaymentWarning(state),
 });
 
 const mapDispatchToProps = {

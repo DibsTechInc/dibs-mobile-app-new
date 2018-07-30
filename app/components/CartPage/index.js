@@ -312,7 +312,6 @@ class CartPage extends PureComponent {
       <FadeInView style={{ backgroundColor: WHITE }}>
         <Header title="My Cart" showCart={false} />
         <KeyboardAwareScrollView
-          contentContainerStyle={{ flex: 1 }}
           resetScrollToCoords={{ x: 0, y: 0 }}
         >
           {renderCreditTiers}
@@ -333,6 +332,7 @@ class CartPage extends PureComponent {
           </View>
           {renderPurchaseButton}
         </CheckoutView>
+
         <Modal
           isOpen={Boolean(this.props.currentSpotBookingEventId)}
           onClosed={this.closePickingSpotsModal}

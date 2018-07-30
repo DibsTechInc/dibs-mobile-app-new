@@ -88,14 +88,14 @@ export default handleActions({
   [combineActions(
     setCartVisibleTrue,
     setCartVisibleFalse)]: (state, { payload }) => ({ ...state, visible: payload }),
-  
+
   [combineActions(
     setCartPurchasingTrue,
     setCartPurchasingFalse)]: (state, { payload }) => ({ ...state, purchasing: payload }),
-  
+
   [combineActions(
     setAllSpotBookingSpotsPickedTrue,
     setAllSpotBookingSpotsPickedFalse)]: (state, { payload }) => ({ ...state, allSpotBookingSpotsPicked: payload }),
-  
+
   [setLastRoomSpot]: (state, { payload }) => ({ ...state, lastRoomSpot: payload }),
 }, initialState);

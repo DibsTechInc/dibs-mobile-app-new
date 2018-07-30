@@ -14,6 +14,7 @@ import {
 } from '../StudioSelectors';
 
 import { getStudioLocations } from '../StudioSelectors/Locations';
+import { getScheduleCurrentDate } from '../EventsSelectors';
 
 /**
  * @param {Object} state in store
@@ -71,6 +72,19 @@ export function getUserHasUpcomingEvents(state) {
 export const getUpcomingEventsByDay = createSelector(
   getUpcomingEventsData,
   events => groupBy(events, event => Number(moment.tz(event.start_time, event.mainTZ).startOf('day')))
+);
+
+export const getUpcomingEventsBySchedule = createSelector(
+  [
+    getUpcomingEventsData,
+    getScheduleCurrentDate,
+  ],
+  (events, currDate) => events.filter((event) => {
+    const m1 = moment(event.start_time);
+    const m2 = moment(currDate);
+
+    return m1.isSame(m2, 'day');
+  })
 );
 
 export const getMostRecentUpcomingEvents = createSelector(

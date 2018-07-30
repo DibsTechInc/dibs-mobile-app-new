@@ -76,8 +76,14 @@ export const getDetailedUserPasses = createSelector(
     unlimited: p.studioPackage.unlimited,
     dailyUsageLimit: p.studioPackage.dailyUsageLimit,
     packageFixedPrice: p.studioPackage.member_class_fixed_price,
+    seriesTypeId: p.studioPackage.zf_series_type_id,
     packageIsAutopay: p.studioPackage.autopay === 'FORCE',
   })).sort((a, b) => (moment(a.expiresAt) - moment(b.expiresAt)))
+);
+
+export const getUserHasUnlmitedMembershipWithDailyUsageLimit = createSelector(
+  getDetailedUserPasses,
+  passes => passes.some(pass => pass.unlimited && pass.dailyUsageLimit)
 );
 
 /*
@@ -99,6 +105,11 @@ export const getUsersNextPass = createSelector(
       if (passAcc) return passAcc;
 
       const currentEvent = events.find(e => e.id === eventid);
+
+      // This is for the case where an autorenew pass user with 10 uses has used all 10
+      // and is trying to book this month not the next month
+      if (moment(currentEvent.start_time) < moment(pass.expiresAt) && pass.autopay && pass.usesLeft === 0 && !pass.unlimited) return null;
+
       if (!currentEvent.can_apply_pass) return null;
       if (!pass) return null;
       if (source === 'zf' && moment.tz(currentEvent.start_time, currentEvent.mainTZ) > moment(pass.expiresAt)) return null;

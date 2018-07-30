@@ -21,7 +21,7 @@ export function addToWaitlist(eventid) {
       const res = await dibsFetch('/api/user/waitlist', {
         method: 'POST',
         requiresAuth: true,
-        body: { eventid },
+        body: { eventid, purchasePlace: 'mobile app' },
       });
       if (res.success) {
         dispatch(refreshUser(res.user));

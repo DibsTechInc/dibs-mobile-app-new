@@ -28,7 +28,9 @@ import {
   getUserStudioCreditLoadBonusAmount,
 } from '../../UserSelectors';
 
-import { getUserStudioPassesInCart } from '../../UserSelectors/Passes';
+import { getUpcomingEventsBySchedule } from '../../UpcomingEventsSelectors';
+
+import { getUserStudioPassesInCart, getUserHasUnlmitedMembershipWithDailyUsageLimit } from '../../UserSelectors/Passes';
 import { getStudioCurrency } from '../../StudioSelectors';
 import { getStudioLocations } from '../../StudioSelectors/Locations';
 import { PROMO_PRODUCT_CLASS, PROMO_PRODUCT_UNIVERSAL, PROMO_PRODUCT_PACKAGE } from '../../../constants/index';
@@ -460,3 +462,12 @@ export const getFormattedCartTotal = createSelector(
   ],
   (total, code) => formatCurrency(total, { code })
 );
+
+export const getShouldDisplayPaymentWarning = createSelector(
+  [
+    getUpcomingEventsBySchedule,
+    getUserHasUnlmitedMembershipWithDailyUsageLimit,
+  ],
+  (events, limitedUnlimitedPass) => Boolean(events.length) && limitedUnlimitedPass
+);
+
