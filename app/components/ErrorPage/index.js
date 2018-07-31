@@ -2,11 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Sentry from 'sentry-expo';
 import { connect } from 'react-redux';
+import { Updates } from 'expo';
 
 import Config from '../../../config.json';
+
 import { WHITE, DARK_TEXT_GREY } from '../../constants';
-import { logOutUser } from '../../actions';
 import { FlexCenter, HeavyText, NormalText } from '../styled';
+import { MaterialButton } from '../shared';
 
 const Container = FlexCenter.extend`
   background: ${WHITE};
@@ -22,7 +24,7 @@ const Body = NormalText.extend`
   color: ${DARK_TEXT_GREY};
   font-size: 16;
   padding-horizontal: 20;
-  text-align: center;
+  text-align: left;
 `;
 
 /**
@@ -31,12 +33,27 @@ const Body = NormalText.extend`
  */
 class ErrorPage extends React.PureComponent {
   /**
+   * @constructor
+   * @constructs ErrorPage
+   * @param {Object} props for component
+   */
+  constructor(props) {
+    super(props);
+
+    this.handleOnPress = this.handleOnPress.bind(this);
+  }
+  /**
    * @returns {undefined}
    */
   async componentDidMount() {
     if (this.props.err.message === 'Not connected to the internet') return;
     Sentry.captureException(new Error(this.props.err.message), { logger: 'my.module' });
-    if (!__DEV__) await this.props.logOutUser();
+  }
+  /**
+   * @returns {undefined}
+   */
+  handleOnPress() {
+    Updates.reload();
   }
   /**
    * render
@@ -50,8 +67,13 @@ class ErrorPage extends React.PureComponent {
         </Heading>
         <Body>
           An error occurred, but don&apos;t worry, our support team has been notified.
-          Please close the app and reopen it. If the error persists, please reach out.
+          Please close the app and reopen it. If the error persists, please reach out to {Config.STUDIO_EMAIL}.
         </Body>
+        <MaterialButton
+          onPress={this.handleOnPress}
+          text="Reload Application"
+          style={{ width: '75%', height: 40, marginTop: 20 }}
+        />
       </Container>
     );
   }
@@ -59,15 +81,11 @@ class ErrorPage extends React.PureComponent {
 
 ErrorPage.propTypes = {
   err: PropTypes.shape(),
-  logOutUser: PropTypes.func,
 };
 
 const mapStateToProps = state => ({
   err: state.alerts.fatalError,
 });
 
-const mapDispatchToProps = {
-  logOutUser,
-};
 
-export default connect(mapStateToProps, mapDispatchToProps)(ErrorPage);
+export default connect(mapStateToProps)(ErrorPage);
