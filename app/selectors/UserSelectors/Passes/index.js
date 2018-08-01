@@ -105,12 +105,12 @@ export const getUsersNextPass = createSelector(
       if (passAcc) return passAcc;
 
       const currentEvent = events.find(e => e.id === eventid);
+      if (!currentEvent.can_apply_pass || !currentEvent.price) return null;
 
       // This is for the case where an autorenew pass user with 10 uses has used all 10
       // and is trying to book this month not the next month
       if (moment(currentEvent.start_time) < moment(pass.expiresAt) && pass.autopay && pass.usesLeft === 0 && !pass.unlimited) return null;
 
-      if (!currentEvent.can_apply_pass) return null;
       if (!pass) return null;
       if (source === 'zf' && moment.tz(currentEvent.start_time, currentEvent.mainTZ) > moment(pass.expiresAt)) return null;
       if (source === 'zf') {
