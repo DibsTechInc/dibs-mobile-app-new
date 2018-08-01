@@ -126,7 +126,7 @@ export const getDetailedConfirmationEvents = createSelector(
       const { id } = transaction;
       let formattedDescription = confirmedEvent.description;
       if (!formattedDescription || formattedDescription.length <= 1) {
-        formattedDescription = 'No class description.';
+        formattedDescription = '';
       }
       const amount = new Decimal(transaction.amount).minus(transaction.studio_credits_spent)
                                                     .minus(transaction.raf_credits_spent)

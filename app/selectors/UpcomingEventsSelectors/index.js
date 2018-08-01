@@ -142,7 +142,7 @@ function generateDetailedUpcomingEvents(items, currency, timeFormat, shortDateFo
     let formattedDescription = item.description;
 
     if (!formattedDescription || formattedDescription.length <= 1) {
-      formattedDescription = 'No class description.';
+      formattedDescription = '';
     }
 
     return {

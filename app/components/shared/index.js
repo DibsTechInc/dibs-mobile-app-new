@@ -17,5 +17,6 @@ export { default as PackageItem } from './PackageItem';
 export { default as CreditLoadItem } from './CreditLoadItem';
 export { default as Emoji } from './Emoji';
 export { default as SpecialField } from './SpecialField';
+export { default as AddToCalendarButton } from './AddToCalendarButton';
 
 export * from './Icons';

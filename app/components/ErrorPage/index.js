@@ -24,7 +24,7 @@ const Body = NormalText.extend`
   color: ${DARK_TEXT_GREY};
   font-size: 16;
   padding-horizontal: 20;
-  text-align: left;
+  text-align: center;
 `;
 
 /**
@@ -67,12 +67,11 @@ class ErrorPage extends React.PureComponent {
         </Heading>
         <Body>
           An error occurred, but don&apos;t worry, our support team has been notified.
-          Please close the app and reopen it. If the error persists, please reach out to {Config.STUDIO_EMAIL}.
         </Body>
         <MaterialButton
           onPress={this.handleOnPress}
           text="Reload Application"
-          style={{ width: '75%', height: 40, marginTop: 20 }}
+          style={{ width: '50%', height: 40, marginTop: 20 }}
         />
       </Container>
     );

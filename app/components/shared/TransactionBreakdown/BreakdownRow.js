@@ -7,8 +7,8 @@ import { FlexRow, NormalText } from '../../styled';
 
 const StyledView = FlexRow.extend`
   align-items: center;
-  padding-right: 15;
-  width: 100%;
+  margin-left: 10;
+  width: 90%;
 `;
 
 

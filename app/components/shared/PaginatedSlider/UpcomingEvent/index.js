@@ -25,6 +25,7 @@ import FadeInView from '../../FadeInView';
 import TransactionBreakdown from '../../TransactionBreakdown';
 import MaterialButton from '../../MaterialButton';
 import { NormalText, HeavyText, SpaceBetweenRow } from '../../../styled';
+import { AddToCalendarButton } from '../../../shared';
 import Map from './Map';
 
 const EventRow = SpaceBetweenRow.extend`
@@ -32,10 +33,12 @@ const EventRow = SpaceBetweenRow.extend`
   padding-horizontal: 10;
   padding-vertical: 10;
   margin-bottom: 10;
+  margin-right: 5;
 `;
 
 const EventInfo = styled.View`
   flex-basis: 75%;
+  margin-left: 5px;
 `;
 
 const HeavyEventText = HeavyText.extend`
@@ -46,6 +49,7 @@ const HeavyEventText = HeavyText.extend`
 const EventText = NormalText.extend`
   color: ${DARK_TEXT_GREY};
   font-size: 16;
+  margin-top: 5;
 `;
 
 const DesciptionText = NormalText.extend`
@@ -109,7 +113,7 @@ class UpcomingEvent extends PureComponent {
       extraNotice = `You will receive credit back to your account with ${this.props.studioName}. This credit will be for the full amount you paid for this class.`;
     }
 
-    if (hasUnlimitedPass) {
+    if (hasUnlimitedPass && !isDibsEarlyCancel) {
       extraNotice = `${extraNotice} ${this.props.lateDropText}`;
     }
 
@@ -143,6 +147,30 @@ class UpcomingEvent extends PureComponent {
    * @returns {JSX} XML
    */
   render() {
+    const parsedHTMLDescription = (
+      <HTML
+        html={this.props.formattedDescription}
+        imagesMaxWidth={WIDTH}
+        baseFontStyle={{
+          color: BLACK,
+          fontFamily: 'studio-font',
+          fontSize: 16,
+        }}
+        ignoredStyles={['color']}
+      />
+    );
+
+    const descriptionContainer = (<View style={{ margin: 10, marginLeft: 20 }}>
+      <View style={{ marginBottom: 20 }}>
+        <HeaderText>
+          Class Description
+        </HeaderText>
+      </View>
+      <View style={{ paddingRight: WIDTH / 20 }}>
+        {parsedHTMLDescription}
+      </View>
+    </View>);
+
     return (
       <FadeInView
         style={{
@@ -163,10 +191,19 @@ class UpcomingEvent extends PureComponent {
           }
           <EventRow>
             <EventInfo>
-              <View style={{ marginBottom: 10 }}>
-                <HeavyEventText>
-                  {this.props.shortDayOfWeek} {this.props.shortEventDate}
-                </HeavyEventText>
+              <View style={{ marginBottom: 15 }}>
+                <View style={{ flexDirection: 'row' }}>
+                  <HeavyEventText>
+                    {this.props.shortDayOfWeek} {this.props.shortEventDate}
+                  </HeavyEventText>
+                  <AddToCalendarButton
+                    title={`${this.props.name} w/ ${this.props.instructorName}`}
+                    startDate={this.props.start_time}
+                    endDate={this.props.end_time}
+                    location={this.props.locationName}
+                    timeZone={this.props.mainTZ}
+                  />
+                </View>
                 <EventText numberOfLines={1}>
                   {this.props.formattedStartTime} @ {this.props.locationName}
                 </EventText>
@@ -192,7 +229,7 @@ class UpcomingEvent extends PureComponent {
                 onPress={this.startCancel}
                 loading={this.props.dropping}
               />
-            )}
+          )}
           </EventRow>
           <Map
             latitude={this.props.latitude}
@@ -212,32 +249,14 @@ class UpcomingEvent extends PureComponent {
             formattedRAFCreditAmount={this.props.formattedRAFCreditAmount}
             formattedTotal={this.props.formattedTotal}
           />
-          <View style={{ margin: 10, marginLeft: 20 }}>
-            <View style={{ marginBottom: 20 }}>
-              <HeaderText>
-                Class Description
-              </HeaderText>
-            </View>
-            <View style={{ paddingRight: WIDTH / 20 }}>
-              <HTML
-                html={this.props.formattedDescription}
-                imagesMaxWidth={WIDTH}
-                baseFontStyle={{
-                  color: BLACK,
-                  fontFamily: 'studio-font',
-                  fontSize: 16,
-                }}
-                ignoredStyles={['color']}
-              />
-            </View>
-            <View style={{ paddingBottom: 60, paddingTop: 20 }}>
-              <HeaderText>
-                Drop Policy
-              </HeaderText>
-              <DesciptionText>
-                {Config.STUDIO_DROP_POLICY}
-              </DesciptionText>
-            </View>
+          {this.props.formattedDescription && descriptionContainer}
+          <View style={{ paddingBottom: 60, paddingTop: 20, marginLeft: 20, marginRight: 20 }}>
+            <HeaderText>
+              Drop Policy
+            </HeaderText>
+            <DesciptionText>
+              {Config.STUDIO_DROP_POLICY}
+            </DesciptionText>
           </View>
         </ScrollView>
       </FadeInView>
