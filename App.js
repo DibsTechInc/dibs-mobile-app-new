@@ -43,6 +43,7 @@ import UserGrey from './assets/img/user-grey.png';
 import UserWhite from './assets/img/user-white.png';
 import FilterWhite from './assets/img/filter-white.png';
 import CheckWhite from './assets/img/check-white.png';
+import AddToCalendar from './assets/img/add-to-calendar.png';
 
 // Native apps can only load downloaded fronts stored in assets/fonts folder
 import StudioFont from './assets/fonts/Regular.ttf';
@@ -148,6 +149,7 @@ class App extends Component {
       UserWhite,
       FilterWhite,
       CheckWhite,
+      AddToCalendar,
     ]);
 
     this.setState({ imageLoaded: true });
