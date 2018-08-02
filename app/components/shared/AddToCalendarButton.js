@@ -56,7 +56,13 @@ class AddToCalendarButton extends React.PureComponent {
    */
   async removeCalendarEvent(eventid) {
     await Calendar.deleteEventAsync(eventid);
-    this.props.enqueueNotice({ title: 'Success!', message: `${this.props.title} has been removed from your calendar.` });
+    this.props.enqueueNotice({
+      title: 'Success!',
+      message: `${this.props.title} has been removed from your calendar.`,
+      buttons: [
+        { text: 'Ok', onPress: () => {} },
+      ],
+    });
   }
   /**
    * @returns {undefined}
@@ -96,7 +102,13 @@ class AddToCalendarButton extends React.PureComponent {
       }
 
       await Calendar.createEventAsync(Calendar.DEFAULT, details);
-      this.props.enqueueNotice({ title: 'Success!', message: `${this.props.title} has been added to your calendar.` });
+      this.props.enqueueNotice({
+        title: 'Success!',
+        message: `${this.props.title} has been added to your calendar.`,
+        buttons: [
+          { text: 'Ok', onPress: () => {} },
+        ],
+      });
     }
 
     return null;
