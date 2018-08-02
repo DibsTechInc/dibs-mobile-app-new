@@ -299,6 +299,9 @@ UpcomingEvent.propTypes = {
   isOffsite: PropTypes.bool,
   studioName: PropTypes.string,
   passes: PropTypes.arrayOf(PropTypes.shape()),
+  start_time: PropTypes.string,
+  end_time: PropTypes.string,
+  mainTZ: PropTypes.string,
 };
 
 const mapStateToProps = (state, props) => ({
