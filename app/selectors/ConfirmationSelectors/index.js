@@ -157,6 +157,9 @@ export const getDetailedConfirmationEvents = createSelector(
         formattedStartTime: formatTime(localStartTime),
         shortDayOfWeek: localStartTime.format('ddd'),
         shortEventDate: localStartTime.format(shortDateFormat),
+        start_time: confirmedEvent.start_time,
+        end_time: confirmedEvent.end_time,
+        mainTZ: confirmedEvent.mainTZ,
       };
       acc.push(payload);
       return acc;
