@@ -23,6 +23,7 @@ import {
   getStudioHasSpotBooking,
   getLastRoomSpot,
   getDetailedCartCredits,
+  getUserHasPasses,
 } from '../../selectors';
 
 import {
@@ -228,7 +229,7 @@ class CartPage extends PureComponent {
     const renderPurchaseButton = (
       <SwipableButton
         swipeText="Swipe to pay"
-        notReadyForPurchase={notReadyForPurchase}
+        notReadyForPurchase={!this.props.userHasPasses && notReadyForPurchase}
         onLeftButtonsActivate={this.handlePurchase}
       />
     );
@@ -332,7 +333,6 @@ class CartPage extends PureComponent {
           </View>
           {renderPurchaseButton}
         </CheckoutView>
-
         <Modal
           isOpen={Boolean(this.props.currentSpotBookingEventId)}
           onClosed={this.closePickingSpotsModal}
@@ -368,6 +368,7 @@ CartPage.propTypes = {
   setCurrentSpotBookingEventId: PropTypes.func,
   studioHasSpotBooking: PropTypes.bool,
   lastRoomSpot: PropTypes.shape(),
+  userHasPasses: PropTypes.bool,
 };
 
 const mapStateToProps = state => ({
@@ -384,6 +385,7 @@ const mapStateToProps = state => ({
   currentSpotBookingEventId: getEventsCurrentSpotBookingEventId(state),
   studioHasSpotBooking: getStudioHasSpotBooking(state),
   lastRoomSpot: getLastRoomSpot(state),
+  userHasPasses: getUserHasPasses(state),
 });
 
 const mapDispatchToProps = {
