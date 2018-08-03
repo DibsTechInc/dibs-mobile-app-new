@@ -68,11 +68,13 @@ export function sendFriendReferral(email) {
       if (res.success) {
         dispatch(addFriendReferral(res.referral));
         dispatch(requestFriendReferrals());
+      } else {
+        Sentry.captureException(new Error(res.message), { logger: 'my.module' });
       }
 
       console.log(res.message);
       dispatch(setFriendReferralLoading(false));
-      Sentry.captureException(new Error(res.message), { logger: 'my.module' });
+
       return res;
     } catch (err) {
       console.log(err);
