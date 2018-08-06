@@ -38,16 +38,20 @@ export function refreshUser(user) {
  */
 export  function syncUserPasses() {
   return async function innerSyncUserPasses(dispatch, getState, dibsFetch) {
-    const { source, studioid } = getState().studio;
-    const res = await dibsFetch(`/api/user/passes/sync/${source}/${studioid}`, {
-      method: 'PUT',
-      requiresAuth: true,
-    });
-    if (res.success) {
-      dispatch(refreshUser(res.user));
-      return;
+    try {
+      const { source, studioid } = getState().studio;
+      const res = await dibsFetch(`/api/user/passes/sync/${source}/${studioid}`, {
+        method: 'PUT',
+        requiresAuth: true,
+      });
+      if (res.success) {
+        dispatch(refreshUser(res.user));
+        return;
+      }
+      if (res.err) Sentry.captureException(new Error(res.err.message), { logger: 'my.module' });
+    } catch (err) {
+      Sentry.captureException(new Error(err.message), { logger: 'my.module' });
     }
-    if (res.err) console.log(res.err);
   };
 }
 
