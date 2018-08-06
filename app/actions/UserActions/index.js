@@ -381,6 +381,7 @@ export function submitPasswordReset(uuId, password) {
       if (success) {
         await AsyncStorage.setItem(Config.USER_TOKEN_KEY, token);
         dispatch(refreshUser(user));
+        dispatch(syncUserPasses(user));
         dispatch(requestCreditCardInfo());
         dispatch(requestUserEvents());
         dispatch(recordStudioVisit());
