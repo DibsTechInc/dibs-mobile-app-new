@@ -36,8 +36,8 @@ export function refreshUser(user) {
 /**
  * @returns {function} redux thunk
  */
-export function syncUserPasses() {
-  return function innerSyncUserPasses(dispatch, getState) {
+export  function syncUserPasses() {
+  return async function innerSyncUserPasses(dispatch, getState, dibsFetch) {
     const { source, studioid } = getState().studio;
     const res = await dibsFetch(`/api/user/passes/sync/${source}/${studioid}`, {
       method: 'PUT',
