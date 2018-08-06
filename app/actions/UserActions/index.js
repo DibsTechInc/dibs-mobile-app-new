@@ -34,6 +34,28 @@ export function refreshUser(user) {
 }
 
 /**
+ * @returns {function} redux thunk
+ */
+export function syncUserPasses() {
+  return async function innerSyncUserPasses(dispatch, getState, dibsFetch) {
+    try {
+      const { source, studioid } = getState().studio;
+      const res = await dibsFetch(`/api/user/passes/sync/${source}/${studioid}`, {
+        method: 'PUT',
+        requiresAuth: true,
+      });
+      if (res.success) {
+        dispatch(refreshUser(res.user));
+        return;
+      }
+      if (res.err) Sentry.captureException(new Error(res.err.message), { logger: 'my.module' });
+    } catch (err) {
+      Sentry.captureException(new Error(err.message), { logger: 'my.module' });
+    }
+  };
+}
+
+/**
  * @param {function} callback on complete
  * @returns {function} thunk
  */
@@ -200,6 +222,7 @@ export function submitLogin(email, password, callback) {
       if (res.success) {
         dispatch(setUser(res.user));
         dispatch(recordStudioVisit());
+        dispatch(syncUserPasses());
         dispatch(requestCreditCardInfo());
         dispatch(requestUserEvents());
         callback(res);
@@ -362,6 +385,7 @@ export function submitPasswordReset(uuId, password) {
       if (success) {
         await AsyncStorage.setItem(Config.USER_TOKEN_KEY, token);
         dispatch(refreshUser(user));
+        dispatch(syncUserPasses());
         dispatch(requestCreditCardInfo());
         dispatch(requestUserEvents());
         dispatch(recordStudioVisit());
