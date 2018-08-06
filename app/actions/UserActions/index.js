@@ -34,6 +34,29 @@ export function refreshUser(user) {
 }
 
 /**
+ * @returns {function} redux thunk
+ */
+export function syncUserPasses() {
+  return function innerSyncUserPasses(dispatch, getState) {
+    const { source, studioid } = getState().studio;
+    $.ajax({
+      method: 'PUT',
+      url: `/api/user/passes/sync/${source}/${studioid}`,
+      success(data) {
+        if (data.success) {
+          dispatch(refreshUser(data.user));
+          return;
+        }
+        if (data.err) console.log(data.err);
+      },
+      error(err) {
+        console.log(err);
+      },
+    });
+  };
+}
+
+/**
  * @param {function} callback on complete
  * @returns {function} thunk
  */
@@ -200,6 +223,7 @@ export function submitLogin(email, password, callback) {
       if (res.success) {
         dispatch(setUser(res.user));
         dispatch(recordStudioVisit());
+        dispatch(syncUserPasses());
         dispatch(requestCreditCardInfo());
         dispatch(requestUserEvents());
         callback(res);
