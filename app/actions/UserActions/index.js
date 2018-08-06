@@ -39,20 +39,15 @@ export function refreshUser(user) {
 export function syncUserPasses() {
   return function innerSyncUserPasses(dispatch, getState) {
     const { source, studioid } = getState().studio;
-    $.ajax({
+    const res = await dibsFetch(`/api/user/passes/sync/${source}/${studioid}`, {
       method: 'PUT',
-      url: `/api/user/passes/sync/${source}/${studioid}`,
-      success(data) {
-        if (data.success) {
-          dispatch(refreshUser(data.user));
-          return;
-        }
-        if (data.err) console.log(data.err);
-      },
-      error(err) {
-        console.log(err);
-      },
+      requiresAuth: true,
     });
+    if (res.success) {
+      dispatch(refreshUser(res.user));
+      return;
+    }
+    if (res.err) console.log(res.err);
   };
 }
 
