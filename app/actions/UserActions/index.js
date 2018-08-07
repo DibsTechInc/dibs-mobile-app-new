@@ -39,7 +39,7 @@ export function refreshUser(user) {
 export function syncUserPasses() {
   return async function innerSyncUserPasses(dispatch, getState, dibsFetch) {
     try {
-      const { source, studioid } = getState().studio;
+      const { source, studioid } = getState().studio.data;
       const res = await dibsFetch(`/api/user/passes/sync/${source}/${studioid}`, {
         method: 'PUT',
         requiresAuth: true,
