@@ -21,6 +21,7 @@ import {
   requestEventData,
   setStudio,
   logFatalError,
+  syncUserPasses,
 } from './app/actions';
 
 import MainPage from './assets/img/main-page.png';
@@ -173,7 +174,10 @@ class App extends Component {
 
       this.setState({ fetchedAssets: true, userToken: token });
       if (await AsyncStorage.getItem(Config.STUDIO_DATA_KEY)) await store.dispatch(requestStudioData(false));
-      if (token) await store.dispatch(syncUserEvents());
+      if (token) {
+        await store.dispatch(syncUserEvents());
+        await store.dispatch(syncUserPasses());
+      }
     } catch (err) {
       AsyncStorage.clear();
       store.dispatch(logFatalError(err));
