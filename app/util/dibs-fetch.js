@@ -6,7 +6,7 @@ import { enqueueConnectionError } from '../actions';
 
 let lastCheck;
 
-const HOST = __DEV__ ? Config.DIBS_HOST : 'https://api.ondibs.com';
+const HOST = __DEV__ ? Config.DIBS_HOST : 'https://ondibs.herokuapp.com';
 
 /**
  * @returns {undefined}
