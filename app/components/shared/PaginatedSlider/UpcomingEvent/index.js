@@ -105,9 +105,14 @@ class UpcomingEvent extends PureComponent {
     const hasUnlimitedPass = (passes && passes.length && passes[0].studioPackage) && passes[0].studioPackage.unlimited;
     const isDibsEarlyCancel = !this.props.isOffsite && this.props.isEarlyCancel;
 
-    if (isDibsEarlyCancel && this.props.userUsedPass) {
-      extraNotice = `You will get back your ${this.props.studioName} package uses you used to purchase this class.`;
+    if (isDibsEarlyCancel) {
+      extraNotice = '';
     }
+
+    // TODO: fix tmr selector broken
+    // if (isDibsEarlyCancel && this.props.userUsedPass) {
+    //   extraNotice = `You will get back your ${this.props.studioName} package uses you used to purchase this class.`;
+    // }
 
     if (isDibsEarlyCancel && !this.props.userUsedPass) {
       extraNotice = `You will receive credit back to your account with ${this.props.studioName}. This credit will be for the full amount you paid for this class.`;
