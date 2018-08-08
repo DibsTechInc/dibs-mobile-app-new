@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { View, ScrollView } from 'react-native';
 import { connect } from 'react-redux';
 import HTML from 'react-native-render-html';
-
 import Config from '../../../../../config.json';
 import { WHITE, DARK_TEXT_GREY, GREY, WIDTH, BLACK } from '../../../../constants';
 import {
@@ -27,6 +26,7 @@ import MaterialButton from '../../MaterialButton';
 import { NormalText, HeavyText, SpaceBetweenRow } from '../../../styled';
 import { AddToCalendarButton } from '../../../shared';
 import Map from './Map';
+import Header from '../../../Header';
 
 const EventRow = SpaceBetweenRow.extend`
   align-items: center;
@@ -177,6 +177,26 @@ class UpcomingEvent extends PureComponent {
       </View>
     </View>);
 
+    const showButton = this.props.isTransactionHistory ?
+      (
+        <View style={{ marginRight: 10, width: 80 }}>
+          <NormalText>
+            {this.props.status}
+          </NormalText>
+        </View>
+      ) :
+      (
+        <MaterialButton
+          text={this.props.isWaitlist ? 'Cancel' : 'Drop'}
+          style={{ width: 80, height: 40 }}
+          onPress={this.startCancel}
+          loading={this.props.dropping}
+        />
+      );
+
+    const renderRightSideContent = this.props.forReceiptPage ? null : showButton;
+
+
     return (
       <FadeInView
         style={{
@@ -184,6 +204,7 @@ class UpcomingEvent extends PureComponent {
           backgroundColor: WHITE,
         }}
       >
+        {this.props.hasHeader && <Header title="Class Detail" />}
         <ScrollView
           ref={node => this.scrollView = node}
           onScrollEndDrag={this.onScrollEnd}
@@ -202,13 +223,13 @@ class UpcomingEvent extends PureComponent {
                   <HeavyEventText>
                     {this.props.shortDayOfWeek} {this.props.shortEventDate}
                   </HeavyEventText>
-                  <AddToCalendarButton
+                  {!this.props.isTransactionHistory && <AddToCalendarButton
                     title={`${this.props.name} w/ ${this.props.instructorName}`}
                     startDate={this.props.start_time}
                     endDate={this.props.end_time}
                     location={this.props.locationName}
                     timeZone={this.props.mainTZ}
-                  />
+                  />}
                 </View>
                 <EventText numberOfLines={1}>
                   {this.props.formattedStartTime} @ {this.props.locationName}
@@ -228,21 +249,14 @@ class UpcomingEvent extends PureComponent {
                 )}
               </View>
             </EventInfo>
-            {this.props.forReceiptPage ? null : (
-              <MaterialButton
-                text={this.props.isWaitlist ? 'Cancel' : 'Drop'}
-                style={{ width: 80, height: 40 }}
-                onPress={this.startCancel}
-                loading={this.props.dropping}
-              />
-          )}
+            {renderRightSideContent}
           </EventRow>
-          <Map
+          {!this.props.isTransactionHistory && <Map
             latitude={this.props.latitude}
             longitude={this.props.longitude}
             locationName={this.props.locationName}
             allowInteraction={this.props.expanded}
-          />
+          />}
           <TransactionBreakdown
             formattedSubtotal={this.props.formattedSubtotal}
             taxAmount={this.props.tax_amount}
@@ -255,8 +269,8 @@ class UpcomingEvent extends PureComponent {
             formattedRAFCreditAmount={this.props.formattedRAFCreditAmount}
             formattedTotal={this.props.formattedTotal}
           />
-          {this.props.formattedDescription && descriptionContainer}
-          <View style={{ paddingBottom: 60, paddingTop: 20, marginLeft: 20, marginRight: 20 }}>
+          {!this.props.isTransactionHistory && this.props.formattedDescription && descriptionContainer}
+          {!this.props.isTransactionHistory && <View style={{ paddingBottom: 60, paddingTop: 20, marginLeft: 20, marginRight: 20 }}>
             <HeaderText>
               Drop Policy
             </HeaderText>
@@ -266,15 +280,21 @@ class UpcomingEvent extends PureComponent {
             <DesciptionText>
               {this.props.lateDropText}
             </DesciptionText>
-          </View>
+          </View>}
         </ScrollView>
       </FadeInView>
     );
   }
 }
 
+UpcomingEvent.defaultProps = {
+  hasHeader: false,
+  forReceiptPage: false,
+  isTransactionHistory: false,
+};
+
 UpcomingEvent.propTypes = {
-  forReceiptPage: PropTypes.bool.isRequired,
+  forReceiptPage: PropTypes.bool,
   formattedSubtotal: PropTypes.string,
   name: PropTypes.string,
   tax_amount: PropTypes.number,
@@ -311,6 +331,9 @@ UpcomingEvent.propTypes = {
   start_time: PropTypes.string,
   end_time: PropTypes.string,
   mainTZ: PropTypes.string,
+  isTransactionHistory: PropTypes.bool,
+  hasHeader: PropTypes.bool,
+  status: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 const mapStateToProps = (state, props) => ({

@@ -8,7 +8,7 @@ import { withNavigation } from 'react-navigation';
 import { getUpcomingEventsNaturalCurrrentDate } from '../../../selectors';
 import { setScheduleCurrentDate } from '../../../actions';
 import { DARK_TEXT_GREY, SCHEDULE_ROUTE } from '../../../constants';
-import { MaterialButton } from '../../shared';
+import { MaterialButton, FadeInView } from '../../shared';
 import { NormalText } from '../../styled';
 
 const Container = styled.View`
@@ -53,7 +53,7 @@ class NoEvents extends React.PureComponent {
    */
   render() {
     return (
-      <Container>
+      <FadeInView style={{ alignItems: 'center' }}>
         <NoEventsText>
           No upcoming classes on {this.props.naturalDate}.
         </NoEventsText>
@@ -62,7 +62,7 @@ class NoEvents extends React.PureComponent {
           text="Book Now"
           onPress={this.onPress}
         />
-      </Container>
+      </FadeInView>
     );
   }
 }

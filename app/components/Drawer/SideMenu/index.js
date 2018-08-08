@@ -13,6 +13,7 @@ import {
   UPCOMING_CLASS_ROUTE,
   BUY_ROUTE,
   REFER_A_FRIEND_ROUTE,
+  MY_CLASSES_ROUTE,
 } from '../../../constants';
 import {
   getUsersFullName,
@@ -33,6 +34,7 @@ import {
   HomeIcon,
   PackageIcon,
   RafIcon,
+  MyClassesIcon,
 } from '../../shared';
 import { SpaceBetweenRow, HeavyText } from '../../styled';
 import BalanceDisplay from './BalanceDisplay';
@@ -127,7 +129,17 @@ class SideMenu extends React.PureComponent {
         <NavLink
           label="Book"
           route={SCHEDULE_ROUTE}
+          renderIcon={() => <ActivityIcon fromSideMenu />}
+        />
+        <NavLink
+          label="Calendar"
+          route={UPCOMING_CLASS_ROUTE}
           renderIcon={() => <CalendarIcon fromSideMenu />}
+        />
+        <NavLink
+          label="Account"
+          route={PROFILE_ROUTE}
+          renderIcon={() => <UserIcon fromSideMenu />}
         />
         <NavLink
           label={this.props.showsCreditTiers ? 'Credits & Packages' : 'Packages'}
@@ -135,14 +147,9 @@ class SideMenu extends React.PureComponent {
           renderIcon={() => <PackageIcon fromSideMenu />}
         />
         <NavLink
-          label="Upcoming"
-          route={UPCOMING_CLASS_ROUTE}
-          renderIcon={() => <ActivityIcon fromSideMenu />}
-        />
-        <NavLink
-          label="Account"
-          route={PROFILE_ROUTE}
-          renderIcon={() => <UserIcon fromSideMenu />}
+          label={'My Classes'}
+          route={MY_CLASSES_ROUTE}
+          renderIcon={() => <MyClassesIcon fromSideMenu />}
         />
         <NavLink
           label="Refer a Friend"

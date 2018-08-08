@@ -11,3 +11,4 @@ export * from './UpcomingEventsActions';
 export * from './WaitlistActions';
 export * from './FiltersActions';
 export * from './FriendReferralsActions';
+export * from './PastEventsActions';

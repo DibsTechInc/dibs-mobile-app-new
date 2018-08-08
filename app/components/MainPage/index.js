@@ -7,6 +7,7 @@ import { Svg, Path, LinearGradient, Stop, Defs } from 'react-native-svg';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 import { Updates } from 'expo';
 import Sentry from 'sentry-expo';
+import { generateDetailedEvents } from '../../helpers';
 
 import backgroundImg from '../../../assets/img/main-page.png';
 import {
@@ -179,14 +180,14 @@ class MainPage extends React.PureComponent {
               text="BOOK"
               route={SCHEDULE_ROUTE}
               alignItems="flex-start"
-              renderIcon={() => <CalendarIcon />}
+              renderIcon={() => <ActivityIcon />}
             />
             <IconBorder />
             <IconLink
-              text={'UPCOMING'}
+              text={'CALENDAR'}
               route={UPCOMING_CLASS_ROUTE}
               alignItems="center"
-              renderIcon={() => <ActivityIcon />}
+              renderIcon={() => <CalendarIcon />}
             />
             <IconBorder />
             <IconLink

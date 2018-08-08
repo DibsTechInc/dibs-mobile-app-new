@@ -45,6 +45,7 @@ import UserWhite from './assets/img/user-white.png';
 import FilterWhite from './assets/img/filter-white.png';
 import CheckWhite from './assets/img/check-white.png';
 import AddToCalendar from './assets/img/add-to-calendar.png';
+import MyClassesIcon from './assets/img/my-classes.png';
 
 // Native apps can only load downloaded fronts stored in assets/fonts folder
 import StudioFont from './assets/fonts/Regular.ttf';
@@ -151,6 +152,7 @@ class App extends Component {
       FilterWhite,
       CheckWhite,
       AddToCalendar,
+      MyClassesIcon,
     ]);
 
     this.setState({ imageLoaded: true });

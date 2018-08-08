@@ -77,7 +77,6 @@ class AddToCalendarButton extends React.PureComponent {
    * @returns {undefined}
    */
   async handleOnPress() {
-    console.log(this.props, 'in add to cal button')
     const status = await this.alertIfRemoteNotificationsDisabledAsync();
 
     const details = {

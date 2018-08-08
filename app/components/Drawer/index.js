@@ -9,6 +9,7 @@ import {
   UPCOMING_CLASS_ROUTE,
   BUY_ROUTE,
   REFER_A_FRIEND_ROUTE,
+  MY_CLASSES_ROUTE,
 } from '../../constants';
 
 import {
@@ -24,6 +25,7 @@ import ReceiptPage from '../ReceiptPage';
 import UpcomingClassesPage from '../UpcomingClassesPage';
 import BuyItemsPage from '../BuyItemsPage';
 import ReferAFriendPage from '../ReferAFriendPage';
+import MyClasses from '../MyClasses';
 
 export default DrawerNavigator({
   [MAIN_ROUTE]: { screen: MainPage },
@@ -34,4 +36,5 @@ export default DrawerNavigator({
   [RECEIPT_ROUTE]: { screen: ReceiptPage },
   [BUY_ROUTE]: { screen: BuyItemsPage },
   [REFER_A_FRIEND_ROUTE]: { screen: ReferAFriendPage },
+  [MY_CLASSES_ROUTE]: { screen: MyClasses },
 }, getDrawerConfig(300, 'left', MAIN_ROUTE, SideMenu));

@@ -4,6 +4,7 @@ import moment from 'moment-timezone';
 
 import Config from '../../../config.json';
 import { refreshUser, enqueueApiError } from '../';
+import { setPastEvents } from '../PastEventsActions';
 
 export const {
   setUpcomingEvents,
@@ -44,8 +45,8 @@ export function requestUserEvents(showAlert = true) {
         method: 'GET',
         requiresAuth: true,
       });
-
       if (res.success) {
+        dispatch(setPastEvents(res.events.past));
         dispatch(setUpcomingEvents(res.events.upcoming));
         const eventDates = res.events.upcoming.map(event => +moment.tz(event.start_time, event.mainTZ));
         if (res.events.upcoming.length) {

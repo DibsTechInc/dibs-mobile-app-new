@@ -17,6 +17,7 @@ import {
   EDIT_PASSWORD_ROUTE,
   EDIT_EMAIL_ROUTE,
   EDIT_CC_ROUTE,
+  CLASS_INFO_ROUTE,
 } from '../constants/RouteConstants';
 
 import {
@@ -37,6 +38,8 @@ import {
   EditEmail,
   EditCC,
 } from '../components/ProfilePage';
+
+import ClassDetail from '../components/MyClasses/ClassDetail';
 
 const createStackNavigator = token => StackNavigator(
   {
@@ -81,6 +84,9 @@ const createStackNavigator = token => StackNavigator(
     },
     [EDIT_CC_ROUTE]: {
       screen: EditCC,
+    },
+    [CLASS_INFO_ROUTE]: {
+      screen: ClassDetail,
     },
   },
   {

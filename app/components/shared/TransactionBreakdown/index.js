@@ -26,7 +26,7 @@ class TransactionBreakdown extends PureComponent {
       <MaterialPanel
         heading="Order Summary"
         style={{ shadowOffset: { width: 3, height: 3 }, width: '100%' }}
-        headerStyle={{ marginLeft: 20, color: GREY }}
+        headerStyle={{ marginLeft: 10, color: GREY }}
       >
         <StyledBreakDownView>
           <BreakdownRow label="Subtotal" value={this.props.formattedSubtotal} />

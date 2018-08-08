@@ -68,6 +68,7 @@ class Header extends React.PureComponent {
     this.handleOnCloseExitFilter = this.handleOnCloseExitFilter.bind(this);
     this.handleSavedFilters = this.handleSavedFilters.bind(this);
     this.getXIconOnPressFunction = this.getXIconOnPressFunction.bind(this);
+    this.getHeaderRightIcon = this.getHeaderRightIcon.bind(this);
   }
   /**
    * @returns {undefined}
@@ -134,6 +135,19 @@ class Header extends React.PureComponent {
     return filterSettings;
   }
   /**
+   * @returns {undefined}
+   */
+  getHeaderRightIcon() {
+    switch (true) {
+      case this.props.filterSlideOpened:
+        return <CheckIcon handleOnPress={this.handleOnCloseSaveFilter} />;
+      case this.props.showCart:
+        return <CartIcon iconColor={WHITE} />;
+      default:
+        return null;
+    }
+  }
+  /**
    * @returns {JSX.Element} XML
    */
   render() {
@@ -157,11 +171,6 @@ class Header extends React.PureComponent {
       />
     );
 
-    const renderCartIcon = this.props.showCart && (
-      <CartIcon
-        iconColor={WHITE}
-      />);
-
     const showFilter = this.props.studioHasMultipleLocations && this.props.hasClassFilter && !this.props.filterSlideOpened;
     return (
       <View style={{ height: 80 + (isIphoneX() ? 20 : 0), overflow: 'hidden', zIndex: 2, ...this.props.headerStyle }}>
@@ -173,6 +182,7 @@ class Header extends React.PureComponent {
           <PageTitle>
             {this.props.title}
           </PageTitle>
+
           <View style={{ flexDirection: 'row' }}>
             {showFilter && <TouchableOpacity onPress={this.props.showFilter} style={{ width: 90, marginRight: 20 }}>
               <FilterView>
@@ -181,7 +191,7 @@ class Header extends React.PureComponent {
               </FilterView>
             </TouchableOpacity>}
             <View style={{ width: 60 }}>
-              {this.props.filterSlideOpened ? <CheckIcon handleOnPress={this.handleOnCloseSaveFilter} /> : renderCartIcon}
+              {this.getHeaderRightIcon()}
             </View>
           </View>
         </StudioColoredTop>
@@ -194,6 +204,7 @@ Header.defaultProps = {
   title: '',
   isSliderHeader: false,
   hasClassFilter: false,
+  hasClassHistory: false,
   showCart: true,
 };
 
@@ -218,6 +229,7 @@ Header.propTypes = {
   studioHasSpotBooking: PropTypes.bool,
   cart: PropTypes.arrayOf(PropTypes.shape()),
   setCartEventsData: PropTypes.func,
+  hasClassHistory: PropTypes.bool,
 };
 
 const mapStateToProps = state => ({

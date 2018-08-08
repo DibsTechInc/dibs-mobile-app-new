@@ -13,6 +13,7 @@ import animation from './AnimationReducer';
 import packages from './PackagesReducer';
 import filters from './FiltersReducer';
 import friendReferrals from './FriendReferralsReducer';
+import pastEvents from './PastEventsReducer';
 
 export default combineReducers({
   alerts,
@@ -28,4 +29,5 @@ export default combineReducers({
   packages,
   filters,
   friendReferrals,
+  pastEvents,
 });

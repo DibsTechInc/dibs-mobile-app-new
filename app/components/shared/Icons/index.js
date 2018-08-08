@@ -14,3 +14,4 @@ export { default as FiltersIcon } from './FiltersIcon';
 export { default as PackageIcon } from './PackageIcon';
 export { default as RafIcon } from './RafIcon';
 export { default as AddToCalendarIcon } from './AddToCalendarIcon';
+export { default as MyClassesIcon } from './MyClassesIcon';

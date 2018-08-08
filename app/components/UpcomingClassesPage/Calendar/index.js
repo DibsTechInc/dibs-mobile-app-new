@@ -6,6 +6,7 @@ import moment from 'moment-timezone';
 import { View } from 'react-native';
 
 import Config from '../../../../config.json';
+import { FadeInView } from '../../shared';
 import { HEIGHT } from '../../../constants';
 import theme from './theme';
 import {
@@ -84,7 +85,7 @@ class CalendarComponent extends React.PureComponent {
    */
   render() {
     return (
-      <View style={{ position: 'relative' }}>
+      <FadeInView style={{ position: 'relative', flex: 0 }}>
         <Calendar
           style={{
             height: (HEIGHT / 3),
@@ -122,7 +123,7 @@ class CalendarComponent extends React.PureComponent {
             top: 15,
           }}
         />
-      </View>
+      </FadeInView>
     );
   }
 }
