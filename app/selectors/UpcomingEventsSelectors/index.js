@@ -198,7 +198,7 @@ export const getUpcomingEventDropIsEarlyCancel = createSelector(
 
 export const getUserUsedPass = createSelector(
   getUpcomingEventByEventid,
-  event => (event ? Boolean(event.passes.find(id => id !== null)) : false)
+  event => (event ? Boolean(event.passes.find(({ id }) => id !== null)) : false)
 );
 
 export const getDetailedUpcomingEventsOnCurrentDay = createSelector(

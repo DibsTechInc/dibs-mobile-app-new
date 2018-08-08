@@ -100,26 +100,27 @@ class UpcomingEvent extends PureComponent {
    * @returns {string} extra notice
    */
   displayAdditionalNotice() {
-    let extraNotice = 'Please note! This is a late drop, meaning you will not get any credit back to your account for dropping this class.';
     const { passes } = this.props;
     const hasUnlimitedPass = (passes && passes.length && passes[0].studioPackage) && passes[0].studioPackage.unlimited;
     const isDibsEarlyCancel = !this.props.isOffsite && this.props.isEarlyCancel;
 
-    if (isDibsEarlyCancel) {
-      extraNotice = '';
-    }
+    let extraNotice;
 
-    // TODO: fix tmr selector broken
-    // if (isDibsEarlyCancel && this.props.userUsedPass) {
-    //   extraNotice = `You will get back your ${this.props.studioName} package uses you used to purchase this class.`;
-    // }
+    switch (true) {
+      case Boolean(isDibsEarlyCancel && this.props.userUsedPass):
+        extraNotice = `You will get back your ${this.props.studioName} package uses you used to purchase this class.`;
+        break;
 
-    if (isDibsEarlyCancel && !this.props.userUsedPass) {
-      extraNotice = `You will receive credit back to your account with ${this.props.studioName}. This credit will be for the full amount you paid for this class.`;
-    }
+      case Boolean(isDibsEarlyCancel):
+        extraNotice = `You will receive credit back to your account with ${this.props.studioName}. This credit will be for the full amount you paid for this class.`;
+        break;
 
-    if (hasUnlimitedPass && !isDibsEarlyCancel) {
-      extraNotice = `${extraNotice} ${this.props.lateDropText}`;
+      case Boolean(hasUnlimitedPass):
+        extraNotice = `${extraNotice} ${this.props.lateDropText}`;
+        break;
+
+      default:
+        extraNotice = 'Please note! This is a late drop, meaning you will not get any credit back to your account for dropping this class.';
     }
 
     return this.props.isWaitlist ? '' : extraNotice;
