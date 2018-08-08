@@ -160,8 +160,6 @@ class UpcomingEvent extends PureComponent {
       />
     );
 
-    console.log(this.props.start_time, 'wtf in upcoming events')
-
     const descriptionContainer = (<View style={{ margin: 10, marginLeft: 20 }}>
       <View style={{ marginBottom: 20 }}>
         <HeaderText>

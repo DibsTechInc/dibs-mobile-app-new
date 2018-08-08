@@ -175,7 +175,7 @@ export const getDetailedMostRecentUpcomingEvents = createSelector(
   generateDetailedUpcomingEvents
 );
 
-export const getUpcomingEventFromRouteParam = createSelector(
+export const getUpcomingEventByEventid = createSelector(
   [
     getDetailedMostRecentUpcomingEvents,
     (_, eventid) => eventid,
@@ -185,18 +185,19 @@ export const getUpcomingEventFromRouteParam = createSelector(
 
 export const getUpcomingEventDropIsEarlyCancel = createSelector(
   [
-    getUpcomingEventFromRouteParam,
+    getUpcomingEventByEventid,
     getStudioCancelTime,
   ],
   (event, studioCancelTime) => {
     if (!event) return false;
-    const eventStart = moment.tz(moment.utc(event.start_time), event.MainTZ);
+    const eventStart = moment.tz(
+      moment.utc(event.start_time).format('YYYY-MM-DDTHH:mm:ss'), event.mainTZ);
     return eventStart > moment().clone().add(studioCancelTime, 'h');
   }
 );
 
 export const getUserUsedPass = createSelector(
-  getUpcomingEventFromRouteParam,
+  getUpcomingEventByEventid,
   event => (event ? Boolean(event.passes.find(id => id !== null)) : false)
 );
 
