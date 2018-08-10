@@ -1,5 +1,5 @@
 import { createActions } from 'redux-actions';
-import { cloneDeep, uniq } from 'lodash';
+import { cloneDeep, uniq, debounce } from 'lodash';
 import Sentry from 'sentry-expo';
 import moment from 'moment';
 
@@ -194,7 +194,7 @@ export function applyFreeClassPromoToCart() {
  * @param {function} callback on compleition, node style
  * @returns {function} redux thunk makes request
  */
-export function submitCartForPurchase() {
+function unDebouncedSubmitCartForPurchase() {
   return async function innerSubmitCartForPurchase(dispatch, getState, dibsFetch) {
     const state = getState();
     const { promoCode, cart } = state;
@@ -247,4 +247,6 @@ export function submitCartForPurchase() {
     dispatch(setCartPurchasingFalse());
   };
 }
+
+export const submitCartForPurchase = debounce(unDebouncedSubmitCartForPurchase, 500, { leading: true, trailing: false });
 
