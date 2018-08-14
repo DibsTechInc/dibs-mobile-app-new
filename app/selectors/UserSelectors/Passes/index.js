@@ -113,18 +113,14 @@ export const getUsersNextPass = createSelector(
 
       if (!pass) return null;
       if (source === 'zf' && moment.tz(currentEvent.start_time, currentEvent.mainTZ) > moment(pass.expiresAt)) return null;
-      if (source === 'zf') {
+      if (source === 'zf' && pass.studioPackage.zf_series_type_id) {
         const seriesTypeId = pass.studioPackage.zf_series_type_id;
         if (currentEvent.zf_series_types && !currentEvent.zf_series_types[seriesTypeId]) return null;
       }
       if (!pass.studioPackage.unlimited) return pass;
 
-      // Onsite passes check pass.autopay because if an autopay fails the pass autopay will be marked as false
-      // Offsite passes need to check packageIsAutopay studioPackage.autopay === 'FORCE
-      // Return null if pass isn't onsite autopay and isn't offsite autopay
-      const isOnsitePassAutopay = pass.autopay && pass.onDibs;
-      const isOffsitePassAutopay = pass.packageIsAutopay && !pass.onDibs;
-      if (pass.studioPackage.unlimited && !isOnsitePassAutopay && !isOffsitePassAutopay && moment.tz(currentEvent.start_time, currentEvent.mainTZ) > moment(pass.expiresAt)) return null;
+      // Make sure non-autopay passes cant be used passed their expiry
+      if (moment.tz(currentEvent.start_time, currentEvent.mainTZ) > moment(pass.expiresAt) && !pass.autopay) return null;
 
       const cartItem = cartItems.find(item => (item.eventid === eventid && item.passid === pass.id));
       if (cartItem) return null;
