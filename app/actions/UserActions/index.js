@@ -96,7 +96,7 @@ export function recordStudioVisit() {
  * @param {boolean} [showAlert=true] if false will not show native alert on fail
  * @returns {function} thunk
  */
-export function requestUserData(showAlert = true) {
+export function requestUserData({ showAlert, firstLoad }) {
   return async function innerRequestUserData(dispatch, getState, dibsFetch) {
     try {
       const res = await dibsFetch(`/api/user?dibs_studio_id=${getDibsStudioId(getState())}`, {
@@ -108,7 +108,7 @@ export function requestUserData(showAlert = true) {
         dispatch(recordStudioVisit());
         dispatch(requestCreditCardInfo());
         dispatch(requestUserEvents());
-      } else if (showAlert) {
+      } else if (showAlert || firstLoad) {
         await AsyncStorage.removeItem(Config.USER_TOKEN_KEY);
         dispatch(logOutUser());
       } else {

@@ -171,7 +171,7 @@ class App extends Component {
       } else await store.dispatch(requestStudioData(false));
 
       if (token) {
-        await store.dispatch(requestUserData(false));
+        await store.dispatch(requestUserData({ showAlert: false, firstLoad: true }));
       }
 
       this.setState({ fetchedAssets: true, userToken: token });
