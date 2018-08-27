@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { View, Animated } from 'react-native';
+import { View, ScrollView, Animated } from 'react-native';
 import PropTypes from 'prop-types';
 
 import { HeavyText } from '../../styled';
@@ -72,15 +72,17 @@ class Filters extends React.PureComponent {
           <FadeInView style={{ width: WIDTH, marginLeft: 25, marginBottom: 25, marginTop: 35 }}>
             {this.props.displaySlideDownContents &&
               <FadeInView>
-                <HeavyText style={{ color: WHITE, marginBottom: 15 }}>Location</HeavyText>
-                <FilterButton
-                  location={{ value: 0 }}
-                  name="All Locations"
-                  isDefaultFilter={!this.props.selectedLocationId.length}
-                  selectFilter={this.props.selectFilter}
-                  handleLocationChange={this.handleLocationChange}
-                />
-                {locationFilters}
+                <ScrollView contentContainerStyle={{ height: HEIGHT }}>
+                  <HeavyText style={{ color: WHITE, marginBottom: 15 }}>Location</HeavyText>
+                  <FilterButton
+                    location={{ value: 0 }}
+                    name="All Locations"
+                    isDefaultFilter={!this.props.selectedLocationId.length}
+                    selectFilter={this.props.selectFilter}
+                    handleLocationChange={this.handleLocationChange}
+                  />
+                  {locationFilters}
+                </ScrollView>
               </FadeInView>}
           </FadeInView>
         </Animated.View>
