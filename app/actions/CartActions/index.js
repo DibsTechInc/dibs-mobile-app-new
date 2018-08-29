@@ -8,6 +8,7 @@ import {
   getSortedCartEvents,
   getUserHasPasses,
   getCanUseCardToPurchase,
+  getPromoCodeData,
 } from '../../selectors';
 
 import {
@@ -109,7 +110,7 @@ export function removeSpotFromCart(eventid, spot = null) {
     dispatch(setAllSpotBookingSpotsPickedFalse());
     dispatch(setCartEventsData(clonedCartItems));
     dispatch(setUserForSpot({ eventid, userid: null, x: spot.x, y: spot.y }));
-  }
+  };
 }
 
  /** Refresh cart once user logs in or out to account for passes
@@ -197,7 +198,8 @@ export function applyFreeClassPromoToCart() {
 function unDebouncedSubmitCartForPurchase() {
   return async function innerSubmitCartForPurchase(dispatch, getState, dibsFetch) {
     const state = getState();
-    const { promoCode, cart } = state;
+    const { cart } = state;
+    const promoCode = getPromoCodeData(state);
     dispatch(setCartPurchasingTrue());
 
     if (!getCanUseCardToPurchase(state) && !getUserHasPasses(state)) {
