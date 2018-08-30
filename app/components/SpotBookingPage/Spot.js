@@ -67,10 +67,10 @@ class Spot extends React.PureComponent {
    * @returns {JSX.Element} HTML
    */
   render() {
-    if (this.props.empty) return <BaseSpot />;
     const displayID = this.props.displayZingfitId ? this.props.source_id : this.props.id;
 
-    if (!this.props.available) {
+    if (this.props.empty) return <BaseSpot />;
+    if (!displayID || !this.props.available) {
       return (
         <UnavailableSpot>
           <NormalText style={{ color: GREY }}>{displayID}</NormalText>
