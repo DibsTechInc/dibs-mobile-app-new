@@ -1,13 +1,13 @@
 import React from 'react';
+import { AsyncStorage } from 'react-native';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
-import { NavigationActions } from 'react-navigation';
+import { NavigationActions, withNavigation } from 'react-navigation';
 import { Svg, Path, LinearGradient, Stop, Defs } from 'react-native-svg';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 import { Updates } from 'expo';
 import Sentry from 'sentry-expo';
-import { generateDetailedEvents } from '../../helpers';
 
 import backgroundImg from '../../../assets/img/main-page.png';
 import {
@@ -40,6 +40,8 @@ import { enqueueNotice } from '../../actions';
 import { HeavyText, FlexRow, SpaceBetweenRow } from '../styled';
 import IconLink from './IconLink';
 import UpcomingEventSlider from './UpcomingEventSlider';
+import Config from '../../../config.json';
+import { LANDING_ROUTE } from '../../constants/RouteConstants';
 
 const BackgroundImage = styled.Image`
   left: 0;
@@ -110,6 +112,8 @@ class MainPage extends React.PureComponent {
 
     this.navigateToDrawer = this.navigateToDrawer.bind(this);
     this.onClickUpdate = this.onClickUpdate.bind(this);
+
+    this.checkIfLoggedIn();
   }
   /**
    * @returns {undefined}
@@ -137,6 +141,15 @@ class MainPage extends React.PureComponent {
    */
   onClickUpdate() {
     Updates.reload();
+  }
+  /**
+   * @returns {undefined}
+   */
+  async checkIfLoggedIn() {
+    const token = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
+    if (!token) {
+      this.props.navigation.navigate(LANDING_ROUTE);
+    }
   }
   /**
    * @returns {undefined}
@@ -221,4 +234,4 @@ const mapDispatchToProps = {
   enqueueNotice,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(MainPage);
+export default withNavigation(connect(mapStateToProps, mapDispatchToProps)(MainPage));

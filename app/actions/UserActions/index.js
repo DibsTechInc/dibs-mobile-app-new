@@ -18,7 +18,6 @@ import {
   enqueueApiError,
   enqueueNotice,
 } from '../index';
-import { getDibsStudioId } from '../../selectors/StudioSelectors';
 
 export const setUser = createAction('SET_USER', payload => payload);
 
@@ -96,10 +95,11 @@ export function recordStudioVisit() {
  * @param {boolean} [showAlert=true] if false will not show native alert on fail
  * @returns {function} thunk
  */
-export function requestUserData({ showAlert, firstLoad }) {
+export function requestUserData({ showAlert }) {
   return async function innerRequestUserData(dispatch, getState, dibsFetch) {
+    const dibsStudioId = Config.DIBS_STUDIO_ID;
     try {
-      const res = await dibsFetch(`/api/user?dibs_studio_id=${getDibsStudioId(getState())}`, {
+      const res = await dibsFetch(`/api/user?dibs_studio_id=${dibsStudioId}`, {
         method: 'GET',
         requiresAuth: true,
       });
@@ -108,15 +108,14 @@ export function requestUserData({ showAlert, firstLoad }) {
         dispatch(recordStudioVisit());
         dispatch(requestCreditCardInfo());
         dispatch(requestUserEvents());
-      } else if (showAlert || firstLoad) {
-        await AsyncStorage.removeItem(Config.USER_TOKEN_KEY);
-        dispatch(logOutUser());
       } else {
-        throw new Error('Failed to get user data');
+        throw new Error(res.message);
       }
     } catch (err) {
       console.log(err);
       Sentry.captureException(new Error(err.message), { logger: 'my.module' });
+      await AsyncStorage.removeItem(Config.USER_TOKEN_KEY);
+      dispatch(logOutUser());
       if (showAlert) dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong loading your account.' }));
       else throw err;
     }
