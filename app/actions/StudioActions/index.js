@@ -32,7 +32,7 @@ export function requestStudioData(showAlert = true) {
         return;
       }
       if (showAlert) dispatch(enqueueApiError({ text: 'Something went wrong loading your app.', message: `${res.message}.` }));
-      else throw new Error('Failed to get the studio data');
+      else throw new Error(res.message);
       return;
     } catch (err) {
       console.log(err);

@@ -32,7 +32,7 @@ export function requestCreditCardInfo(showAlert = true) {
       else if (showAlert && !['The user does not have a card', 'User action required'].includes(res.message)) {
         dispatch(enqueueApiError({ title: 'Error!', message: `${res.message}.` }));
       } else if (!['The user does not have a card', 'User action required'].includes(res.message)) {
-        throw new Error('Failed to get the user\'s billing info');
+        throw new Error(res.message);
       }
     } catch (err) {
       console.log(err);

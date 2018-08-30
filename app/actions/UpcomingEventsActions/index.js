@@ -56,7 +56,7 @@ export function requestUserEvents(showAlert = true) {
       } else if (showAlert) {
         dispatch(enqueueApiError({ title: 'Error!', message: `${res.message}.` }));
       } else { // if it does not handle the error with an alert it throws an error
-        throw new Error('Failed to get upcoming classes on initial load');
+        throw new Error(res.message);
       }
     } catch (err) {
       console.log(err);
