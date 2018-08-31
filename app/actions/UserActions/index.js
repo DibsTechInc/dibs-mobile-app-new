@@ -95,7 +95,7 @@ export function recordStudioVisit() {
  * @param {boolean} [showAlert=true] if false will not show native alert on fail
  * @returns {function} thunk
  */
-export function requestUserData({ showAlert }) {
+export function requestUserData() {
   return async function innerRequestUserData(dispatch, getState, dibsFetch) {
     const dibsStudioId = Config.DIBS_STUDIO_ID;
     try {
@@ -116,8 +116,6 @@ export function requestUserData({ showAlert }) {
       Sentry.captureException(new Error(err.message), { logger: 'my.module' });
       await AsyncStorage.removeItem(Config.USER_TOKEN_KEY);
       dispatch(logOutUser());
-      if (showAlert) dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong loading your account.' }));
-      else throw err;
     }
   };
 }
