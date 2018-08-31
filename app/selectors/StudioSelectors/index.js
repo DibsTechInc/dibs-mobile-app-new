@@ -142,6 +142,11 @@ export const getStudioRafAwardAmount = createSelector(
   dibsConfig => dibsConfig.raf_award || 5
 );
 
+export const getStudioSpotLabel = createSelector(
+  getStudioDibsConfig,
+  dibsConfig => dibsConfig.spot_label || ''
+);
+
 /**
  * @param {Object} state in store
  * @returns {boolean} if the studio has credit tiers

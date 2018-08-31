@@ -111,9 +111,10 @@ class EventListItem extends React.PureComponent {
    * @returns {JSX.Element} HTML
    */
   render() {
+    const spotName = this.props.studioSpotLabel || 'Spot';
     let lastRoomSpot;
     if (this.props.studioHasSpotBooking && this.props.spotIds.length) {
-      lastRoomSpot = `Bike ${this.props.lastRoomSpot.source_id}`;
+      lastRoomSpot = `${spotName} ${this.props.lastRoomSpot.source_id}`;
     }
 
     return (
@@ -176,7 +177,7 @@ class EventListItem extends React.PureComponent {
               </ScheduleText>
             ) : null}
             {this.props.isCartEvent && this.props.studioHasSpotBooking && <ScheduleText numberOfLines={1} style={{ color: GREY }}>
-              {this.props.spotIds.length ? lastRoomSpot : 'No Bike Selected'}
+              {this.props.spotIds.length ? lastRoomSpot : `No ${spotName} Selected`}
             </ScheduleText>}
           </View>
         </CenterColumn>
@@ -221,6 +222,7 @@ EventListItem.propTypes = {
   addEventToCart: PropTypes.func.isRequired,
   removeOneEventItem: PropTypes.func,
   price: PropTypes.number,
+  studioSpotLabel: PropTypes.string,
 };
 
 // const mapStateToProps = state => ({});

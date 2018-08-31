@@ -24,6 +24,7 @@ import {
   getLastRoomSpot,
   getDetailedCartCredits,
   getUserHasPasses,
+  getStudioSpotLabel,
 } from '../../selectors';
 
 import {
@@ -281,6 +282,7 @@ class CartPage extends PureComponent {
           cartItem={item}
           studioHasSpotBooking={this.props.studioHasSpotBooking}
           lastRoomSpot={this.props.lastRoomSpot}
+          studioSpotLabel={this.props.studioSpotLabel}
           {...item}
         />
       ))}
@@ -369,6 +371,7 @@ CartPage.propTypes = {
   studioHasSpotBooking: PropTypes.bool,
   lastRoomSpot: PropTypes.shape(),
   userHasPasses: PropTypes.bool,
+  studioSpotLabel: PropTypes.string,
 };
 
 const mapStateToProps = state => ({
@@ -386,6 +389,7 @@ const mapStateToProps = state => ({
   studioHasSpotBooking: getStudioHasSpotBooking(state),
   lastRoomSpot: getLastRoomSpot(state),
   userHasPasses: getUserHasPasses(state),
+  studioSpotLabel: getStudioSpotLabel(state),
 });
 
 const mapDispatchToProps = {

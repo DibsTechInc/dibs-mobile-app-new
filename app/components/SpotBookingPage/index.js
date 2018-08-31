@@ -20,6 +20,7 @@ import {
   getEventsData,
   getAllSpotBookingSpotsPicked,
   getCurrentSpotBookingEventFormattedTimes,
+  getStudioSpotLabel,
 } from '../../selectors';
 
 import {
@@ -69,10 +70,12 @@ class SpotBookingPage extends React.PureComponent {
       return null;
     }
 
+    const spotName = this.props.studioSpotLabel || 'Spot';
+
     return (
       <FadeInView>
         <Header
-          title="Choose a Bike"
+          title={`Choose a ${spotName}`}
           headerStyle={{ width: WIDTH }}
           spotBookingOpened={this.props.spotBookingOpened}
           closePickingSpotsModal={this.props.closePickingSpotsModal}
@@ -102,7 +105,7 @@ class SpotBookingPage extends React.PureComponent {
             setSpotInCart={this.props.setSpotInCart}
             removeSpotFromCart={this.props.removeSpotFromCart}
             spotBookingOpened={this.props.spotBookingOpened}
-            addToCart={this.props.addToCart}
+            addEventToCart={this.props.addEventToCart}
           />
         </ScrollView>
         <SwipableButton
@@ -123,11 +126,12 @@ SpotBookingPage.propTypes = {
   removeSpotFromCart: PropTypes.func,
   spotBookingOpened: PropTypes.bool,
   closePickingSpotsModal: PropTypes.func,
-  addToCart: PropTypes.func,
   userHasPickedAllSpots: PropTypes.bool,
   navigation: PropTypes.shape(),
   setCurrentSpotBookingEventId: PropTypes.func,
   formattedTimes: PropTypes.shape(),
+  addEventToCart: PropTypes.func,
+  studioSpotLabel: PropTypes.string,
 };
 
 const mapStateToProps = state => ({
@@ -136,6 +140,7 @@ const mapStateToProps = state => ({
   getSpotGridForEventWithSetter: getSpotGridForEventWithSetter(state),
   userHasPickedAllSpots: getAllSpotBookingSpotsPicked(state),
   formattedTimes: getCurrentSpotBookingEventFormattedTimes(state),
+  studioSpotLabel: getStudioSpotLabel(state),
 });
 
 const mapDispatchToProps = {

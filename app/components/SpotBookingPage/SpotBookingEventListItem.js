@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import RoomGrid from './RoomGrid';
 import { FadeInView, LinearLoader } from '../shared';
+import { NormalText } from '../styled';
 import Config from '../../../config.json';
 
 /**
@@ -40,7 +41,8 @@ class SpotBookingEventListItem extends React.PureComponent {
   render() {
     if (!this.props.event.room) {
       return (
-        <FadeInView style={{ flex: 0, marginBottom: 50 }}>
+        <FadeInView style={{ flex: 0, marginBottom: 50, position: 'absolute', top: '35%' }}>
+          <NormalText style={{ textAlign: 'center', marginBottom: 10 }}>Loading spots...</NormalText>
           <LinearLoader color={Config.STUDIO_COLOR} />
         </FadeInView>);
     }
