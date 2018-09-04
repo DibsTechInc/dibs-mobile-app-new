@@ -30,7 +30,7 @@ class GridRow extends React.PureComponent {
       /> : <Spot key={Math.random()} empty />));
 
     return (
-      <View>
+      <View style={{ flexDirection: 'column-reverse' }}>
         {spotRow}
       </View>
     );
