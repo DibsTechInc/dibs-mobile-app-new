@@ -128,8 +128,10 @@ export const getCartPassesValue = createSelector(
   getUserStudioPassesInCart,
   passes => passes.reduce(
     (acc, pass) => acc.plus(
-      Decimal(pass.studioPackage.unlimited ? pass.eventPrices : pass.passValue)
-        .times(pass.studioPackage.unlimited ? 1 : pass.quantity)
+      Decimal(
+        pass.displayPassValue ?
+          pass.passValue : pass.eventPrices
+      ).times(pass.displayPassValue ? pass.quantity : 1)
     ),
     Decimal(0)
   ).toNumber()
@@ -154,10 +156,14 @@ export const getCartEventsAdjustedPrices = createSelector(
     getUserStudioPassesInCart,
   ],
   (cartItems, passesInCart) => cartItems.map((cartItem) => {
-    const pass = passesInCart.find(p => +p.id === +cartItem.passid);
-    const eventPassValue = Math.min(((pass.studioPackage.unlimited || !pass.passValue) ? cartItem.price : pass.passValue), cartItem.price);
-    const adjustedPrice = Decimal(eventPassValue).times(cartItem.quantity).toNumber();
-    return adjustedPrice; // classes priced higher than their pass value earn zero credit
+    const pass = passesInCart.find(p => p.id === cartItem.passid);
+    if (!pass) return 0; // events paid without passes will be handled separately
+    const eventPassValue = Math.min(
+      (pass.displayPassValue ?
+        pass.passValue : cartItem.price),
+      cartItem.price
+    );
+    return Decimal(eventPassValue).times(cartItem.quantity).toNumber(); // classes priced higher than their pass value earn zero credit
   })
 );
 

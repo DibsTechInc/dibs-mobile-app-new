@@ -53,10 +53,19 @@ export const getUserStudioPassesInCart = createSelector(
       pass => cartEvents.find(event => event.passid === pass.id)
     )
     .map((pass) => {
-      const cartEventsWithThisPass = cartEvents.filter(event => event.passid === pass.id);
-      const quantity = cartEventsWithThisPass.reduce((acc, { quantity: q }) => acc + q, 0);
-      const eventPrices = +cartEventsWithThisPass.reduce((acc, { price }) => acc.plus(price), Decimal(0));
-      return { ...pass, quantity, eventPrices };
+      const cartItemsWithThisPass = cartEvents.filter(event => event.passid === pass.id);
+      const quantity = cartItemsWithThisPass.reduce((acc, { quantity: q }) => acc + q, 0);
+      const eventPrices =
+        cartItemsWithThisPass.reduce(
+          (acc, { price }) => acc.plus(price), Decimal(0)).toNumber();
+      return {
+        ...pass,
+        quantity,
+        eventPrices,
+        displayPassValue:
+          (!pass.source_serviceid
+            && !pass.studioPackage.unlimited),
+      };
     })
   )
 );
