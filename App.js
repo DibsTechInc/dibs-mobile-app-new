@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 import { Font, ScreenOrientation, Asset } from 'expo';
 import Sentry from 'sentry-expo';
 import styled from 'styled-components';
-import { AsyncStorage, View } from 'react-native';
+import { AsyncStorage, View, AppState } from 'react-native';
 import Promise from 'bluebird';
 
 import { WHITE, EVENT_POLL_INTERVAL } from './app/constants';
@@ -85,7 +85,11 @@ class App extends Component {
       fontLoaded: false,
       imageLoaded: false,
       isReady: false,
+      appState: AppState.currentState,
     };
+    this.onAppStateChange = this.onAppStateChange.bind(this);
+
+    AppState.addEventListener('change', this.onAppStateChange);
   }
   /**
    * @returns {undefined}
@@ -97,10 +101,11 @@ class App extends Component {
     await this.getAssets();
     this.eventRefreshInterval = setInterval(async () => {
       try {
+        const state = store.getState();
         if (
           !(await AsyncStorage.getItem(Config.USER_TOKEN_KEY))
-          || !store.getState().user.id
-          || !store.getState().studio.data
+          || !state.user.id
+          || !state.studio.data
         ) return;
         store.dispatch(removeExpiredEvents());
         store.dispatch(requestEventData({}, false));
@@ -115,6 +120,17 @@ class App extends Component {
    */
   componentWillUnmount() {
     clearInterval(this.eventRefreshInterval);
+    AppState.removeEventListener('change', this.onAppStateChange);
+  }
+  /**
+   * @param {string} nextAppState after it changes
+   * @returns {undefined}
+   */
+  onAppStateChange(nextAppState) {
+    if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+      this.getAssets();
+    }
+    this.setState({ appState: nextAppState });
   }
   /**
    * @returns {undefined}
