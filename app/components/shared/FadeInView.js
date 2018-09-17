@@ -7,8 +7,16 @@ import { Animated } from 'react-native';
  * @extends {Component}
  */
 class FadeInView extends React.PureComponent {
-  state = {
-    fadeAnim: new Animated.Value(0),
+  /**
+   * @constructor
+   * @constructs FadeInView
+   * @param {Object} props for component
+   */
+  constructor(props) {
+    super(props);
+    this.state = {
+      fadeAnim: new Animated.Value(0),
+    };
   }
   /**
    * @returns {undefined}

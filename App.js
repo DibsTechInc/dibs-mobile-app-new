@@ -116,6 +116,15 @@ class App extends Component {
     }, EVENT_POLL_INTERVAL);
   }
   /**
+   * @param {Object} _ nextProps
+   * @param {Object} nextState to be set before update
+   * @returns {boolean} if component should re-render
+   */
+  shouldComponentUpdate(_, nextState) {
+    if (nextState.appState !== this.state.appState) return false;
+    return true;
+  }
+  /**
    * @returns {undefined}
    */
   componentWillUnmount() {
@@ -128,7 +137,7 @@ class App extends Component {
    */
   onAppStateChange(nextAppState) {
     if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
-      this.getAssets();
+      this.setState({ fetchedAssets: false }, () => this.getAssets());
     }
     this.setState({ appState: nextAppState });
   }
