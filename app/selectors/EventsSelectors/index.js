@@ -10,6 +10,7 @@ import {
   getStudioCustomTimeFormat,
   getStudioInterval,
   getStudioFirstClassFixedPrice,
+  getStudioMaximumCartQuantity,
 } from '../StudioSelectors';
 import { getUpcomingEventsData } from '../UpcomingEventsSelectors';
 import {
@@ -161,6 +162,7 @@ export const getScheduleEvents = createUnboundedSelector(
       ...((state.cart && state.cart.packages) || []),
     ].length,
     getStudioFirstClassFixedPrice,
+    getStudioMaximumCartQuantity,
   ],
   (
     events,
@@ -173,7 +175,8 @@ export const getScheduleEvents = createUnboundedSelector(
     memberFixedPrice,
     hasMadePurchaseAtStudio,
     totalCartQuantity,
-    firstClassFixedPrice
+    firstClassFixedPrice,
+    maxCartQuantity
   ) => events.map(({ instructor, location, ...event }) => {
     const formatLocalTime = time => moment(time).tz(event.mainTZ).format(timeFormat);
     const eventItemsInCart = cartItems.filter(cartEvent => cartEvent.eventid === event.id);
@@ -181,7 +184,7 @@ export const getScheduleEvents = createUnboundedSelector(
                                            .reduce((acc, quantity) => acc + quantity, 0);
     const maxSeatsReached = Boolean(
       (quantityInCart + event.current_enrollment) === event.maximum_enrollment
-      || quantityInCart === (Config.MAXIMUM_CART_QUANTITY || 4)
+      || quantityInCart === maxCartQuantity
     );
     const bookedEvent = upcomingEvents.find(userEvent => userEvent.eventid === event.id);
     const passid = getPassId(event.id);

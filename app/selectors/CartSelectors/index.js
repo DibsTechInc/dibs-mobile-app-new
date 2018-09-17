@@ -7,7 +7,7 @@ import { format as formatCurrency } from 'currency-formatter';
 import Config from '../../../config.json';
 import { getEventsData } from '../EventsSelectors';
 import { getUserPasses } from '../UserSelectors/Passes';
-import { getStudioCustomTimeFormat, getStudioCurrency, getStudioShortDateFormat } from '../StudioSelectors';
+import { getStudioCustomTimeFormat, getStudioCurrency, getStudioShortDateFormat, getStudioMaximumCartQuantity } from '../StudioSelectors';
 import { getUpcomingEventsData } from '../UpcomingEventsSelectors';
 import { getDetailedStudioPackages } from '../StudioSelectors/Packages';
 import { getDetailedStudioCreditTiers, getStudioCreditTiers } from '../StudioSelectors/CreditTiers';
@@ -125,8 +125,17 @@ export const getDetailedCartEvents = createSelector(
     getStudioCustomTimeFormat,
     getUpcomingEventsData,
     getStudioShortDateFormat,
+    getStudioMaximumCartQuantity,
   ],
-  (items, currency, userPasses, timeFormat, upcomingEvents, shortDateFormat) => items.map(({ instructor, location, ...item }) => {
+  (
+    items,
+    currency,
+    userPasses,
+    timeFormat,
+    upcomingEvents,
+    shortDateFormat,
+    maxCartQuantity
+  ) => items.map(({ instructor, location, ...item }) => {
     const formatLocalTime = time => moment(time).tz(item.mainTZ).format(timeFormat);
     const localStartTime = moment.tz(item.start_time, item.mainTZ);
 
@@ -141,7 +150,7 @@ export const getDetailedCartEvents = createSelector(
     }, Decimal(0));
     const maxSeatsReached = Boolean(
       (item.quantity + item.current_enrollment) === item.maximum_enrollment
-      || item.quantity === (Config.MAXIMUM_CART_QUANTITY || 4)
+      || item.quantity === maxCartQuantity
     );
     const bookedEvent = upcomingEvents.find(userEvent => userEvent.eventid === item.eventid);
 

@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { DEFAULT_MAX_CART_QUANTITY } from '../../constants';
 
 /**
  * @param {Object} state in store
@@ -121,6 +122,13 @@ export function getStudioName(state) {
   return getStudioData(state).name || 'Dibs';
 }
 
+/**
+ * @param {Object} state in store
+ * @returns {number} maximum allowed number of event items in cart (per class)
+ */
+export function getStudioMaximumCartQuantity(state) {
+  return getStudioDibsConfig(state).maximum_class_cart_quantity || DEFAULT_MAX_CART_QUANTITY;
+}
 
 export const getStudioShortDateFormat = createSelector(
   getStudioCountry,
