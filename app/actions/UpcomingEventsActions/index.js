@@ -151,7 +151,7 @@ export function dropUserFromEvent(eventid) {
         dispatch(refreshUser(res.user));
         dispatch(enqueueApiError({ title: 'Success!', message: `You were dropped from ${eventName}` }));
       } else {
-        dispatch(enqueueApiError({ title: 'Error!', message: `${res.message}.` }));
+        dispatch(enqueueApiError({ title: 'Error!', message: res.message }));
       }
     } catch (err) {
       console.log(err);
