@@ -24,6 +24,7 @@ import {
   getUserHasMadePurchaseAtStudio,
 } from '../UserSelectors';
 import { setSpotInCart } from '../../actions';
+import { ROOM_ITEMS_ID } from '../../constants';
 
 /**
  * getEventsState
@@ -284,4 +285,16 @@ export const getSpotGridForEventWithSetter = createSelector(
     );
     return spotGrid;
   }
+);
+
+export const getRoomItemsWithSetter = createSelector(
+  [
+    getSpotGridForEvent,
+  ],
+  getSpotGrid => eventid => getSpotGrid(eventid)
+    .map(spotRow =>
+      spotRow
+        .filter(spot =>
+          spot && ((spot.source_id || spot.spot_label) >= ROOM_ITEMS_ID)))
+    .reduce((prev, curr) => prev.concat(curr), [])
 );

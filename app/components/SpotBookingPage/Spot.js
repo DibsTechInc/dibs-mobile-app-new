@@ -2,28 +2,51 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { LIGHT_GREY, GREY, BLACK, WHITE } from '../../constants';
+import {
+  LIGHT_GREY,
+  GREY,
+  BLACK,
+  WHITE,
+  ROOM_INSTRUCTOR_PLACEHOLDER,
+  ROOM_ITEMS_ENUM,
+  ROOM_ITEMS_ID,
+} from '../../constants';
+
 import { NormalText } from '../styled';
 import Config from '../../../config.json';
 
 const BaseSpot = styled.View`
-  width: 30px;
-  height: 30px;
+  width: 25px;
+  height: 25px;
   margin: 4px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
 `;
 
 const UnavailableSpot = BaseSpot.extend`
   border-width: 1;
-  align-items: center;
-  justify-content: center;
-  border-radius: 20px;
   background-color: ${LIGHT_GREY};
   border-color: ${LIGHT_GREY};
 `;
 
+const InstructorSpot = BaseSpot.extend`
+  width: 40px;
+  height: 40px;
+  border-width: 1;
+  background-color: transparent;
+  border-color: ${BLACK};
+  overflow: hidden;
+`;
+
+const InstructorImage = styled.Image`
+  width: 40px;
+  height: 40px;
+`;
+
 const AvailableSpot = styled.TouchableOpacity`
-  width: 30px;
-  height: 30px;
+  width: 25px;
+  height: 25px;
   margin: 4px;
   border-width: 1;
   align-items: center;
@@ -68,21 +91,35 @@ class Spot extends React.PureComponent {
    */
   render() {
     const displayID = this.props.displayZingfitId ? this.props.source_id : this.props.id;
+    const instructorImgUrl = this.props.instructorImageURL || ROOM_INSTRUCTOR_PLACEHOLDER;
 
-    if (this.props.empty) return <BaseSpot />;
-    if (!displayID || !this.props.available) {
-      return (
-        <UnavailableSpot>
-          <NormalText style={{ color: GREY }}>{displayID}</NormalText>
-        </UnavailableSpot>
-      );
+    switch (true) {
+      case this.props.instructorImageURL && this.props.type === 'INSTRUCTOR':
+        return (
+          <InstructorSpot>
+            <InstructorImage
+              source={{ uri: instructorImgUrl }}
+            />
+          </InstructorSpot>
+        );
+
+      case this.props.empty || !displayID || displayID >= ROOM_ITEMS_ID:
+        return <BaseSpot />;
+
+      case !this.props.available:
+        return (
+          <UnavailableSpot>
+            <NormalText style={{ color: GREY }}>{displayID}</NormalText>
+          </UnavailableSpot>
+        );
+
+      default:
+        return (
+          <AvailableSpot onPress={this.toggleSpotInCart} userSelected={this.props.userSelected}>
+            <DisplayText userSelected={this.props.userSelected}>{displayID}</DisplayText>
+          </AvailableSpot>
+        );
     }
-
-    return (
-      <AvailableSpot onPress={this.toggleSpotInCart} userSelected={this.props.userSelected}>
-        <DisplayText userSelected={this.props.userSelected}>{displayID}</DisplayText>
-      </AvailableSpot>
-    );
   }
 }
 
@@ -98,6 +135,8 @@ Spot.propTypes = {
   y: PropTypes.number,
   eventid: PropTypes.number,
   removeSpotFromCart: PropTypes.func,
+  type: PropTypes.string,
+  instructorImageURL: PropTypes.string,
 };
 
 export default Spot;

@@ -6,8 +6,6 @@ import { connect } from 'react-redux';
 import { NavigationActions, withNavigation } from 'react-navigation';
 import { Svg, Path, LinearGradient, Stop, Defs } from 'react-native-svg';
 import { isIphoneX } from 'react-native-iphone-x-helper';
-import { Updates } from 'expo';
-import Sentry from 'sentry-expo';
 
 import backgroundImg from '../../../assets/img/main-page.png';
 import {
@@ -111,36 +109,7 @@ class MainPage extends React.PureComponent {
     super();
 
     this.navigateToDrawer = this.navigateToDrawer.bind(this);
-    this.onClickUpdate = this.onClickUpdate.bind(this);
-
     this.checkIfLoggedIn();
-  }
-  /**
-   * @returns {undefined}
-   */
-  async componentDidMount() {
-    try {
-      const update = await Updates.checkForUpdateAsync();
-      if (update.isAvailable) {
-        this.props.enqueueNotice({
-          title: 'A wild update has appeared!',
-          message: 'The app will now restart with the new updates.',
-          buttons: [
-            { text: 'Ok', onPress: this.onClickUpdate },
-          ],
-        });
-      }
-    } catch (err) {
-      console.log(err);
-      Sentry.captureException(new Error(err.message), { logger: 'my.module' });
-      // handle or log error
-    }
-  }
-  /**
-   * @returns {undefined}
-   */
-  onClickUpdate() {
-    Updates.reload();
   }
   /**
    * @returns {undefined}

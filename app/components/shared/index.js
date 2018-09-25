@@ -19,4 +19,6 @@ export { default as Emoji } from './Emoji';
 export { default as SpecialField } from './SpecialField';
 export { default as AddToCalendarButton } from './AddToCalendarButton';
 
+export * from './Images';
 export * from './Icons';
+

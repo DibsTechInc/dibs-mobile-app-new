@@ -55,6 +55,7 @@ class SpotBookingEventListItem extends React.PureComponent {
           removeSpotFromCart={this.props.removeSpotFromCart}
           eventid={this.props.event.eventid}
           instructorImageURL={this.props.event.instructorImageURL}
+          roomItems={this.props.roomItems}
         />
       </FadeInView>
     );
@@ -68,6 +69,7 @@ SpotBookingEventListItem.propTypes = {
   setSpotInCart: PropTypes.func,
   removeSpotFromCart: PropTypes.func,
   addEventToCart: PropTypes.func,
+  roomItems: PropTypes.arrayOf(PropTypes.shape()),
 };
 
 export default SpotBookingEventListItem;

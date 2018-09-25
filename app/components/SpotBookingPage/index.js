@@ -21,6 +21,7 @@ import {
   getAllSpotBookingSpotsPicked,
   getCurrentSpotBookingEventFormattedTimes,
   getStudioSpotLabel,
+  getRoomItemsWithSetter,
 } from '../../selectors';
 
 import {
@@ -102,6 +103,7 @@ class SpotBookingPage extends React.PureComponent {
             event={this.props.event}
             getRoomForEvent={this.props.getRoomForEvent}
             spots={this.props.getSpotGridForEventWithSetter(this.props.event.eventid)}
+            roomItems={this.props.getRoomItemsWithSetter(this.props.event.eventid)}
             setSpotInCart={this.props.setSpotInCart}
             removeSpotFromCart={this.props.removeSpotFromCart}
             spotBookingOpened={this.props.spotBookingOpened}
@@ -132,6 +134,7 @@ SpotBookingPage.propTypes = {
   formattedTimes: PropTypes.shape(),
   addEventToCart: PropTypes.func,
   studioSpotLabel: PropTypes.string,
+  getRoomItemsWithSetter: PropTypes.func,
 };
 
 const mapStateToProps = state => ({
@@ -141,6 +144,7 @@ const mapStateToProps = state => ({
   userHasPickedAllSpots: getAllSpotBookingSpotsPicked(state),
   formattedTimes: getCurrentSpotBookingEventFormattedTimes(state),
   studioSpotLabel: getStudioSpotLabel(state),
+  getRoomItemsWithSetter: getRoomItemsWithSetter(state),
 });
 
 const mapDispatchToProps = {

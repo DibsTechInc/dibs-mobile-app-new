@@ -18,15 +18,17 @@ class GridRow extends React.PureComponent {
       (spot ? <Spot
         key={spot.id}
         id={spot.id}
+        x={spot.x}
+        y={spot.y}
+        type={spot.type}
         displayZingfitId
         available={spot.available}
         source_id={spot.source_id}
         setSpotInCart={this.props.setSpotInCart}
         userSelected={spot.userSelected}
-        x={spot.x}
-        y={spot.y}
         eventid={this.props.eventid}
         removeSpotFromCart={this.props.removeSpotFromCart}
+        instructorImageURL={this.props.instructorImageURL}
       /> : <Spot key={Math.random()} empty />));
 
     return (
@@ -42,6 +44,7 @@ GridRow.propTypes = {
   setSpotInCart: PropTypes.func,
   removeSpotFromCart: PropTypes.func,
   eventid: PropTypes.number,
+  instructorImageURL: PropTypes.string,
 };
 
 export default GridRow;

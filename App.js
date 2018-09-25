@@ -1,8 +1,15 @@
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
-import { Font, ScreenOrientation, Asset } from 'expo';
+import {
+  Font,
+  ScreenOrientation,
+  Asset,
+  Updates,
+} from 'expo';
+
 import Sentry from 'sentry-expo';
 import styled from 'styled-components';
+
 import { AsyncStorage, View, AppState } from 'react-native';
 import Promise from 'bluebird';
 
@@ -13,6 +20,7 @@ import Navigator from './app/router';
 import LinearLoader from './app/components/shared/LinearLoader';
 import ErrorPage from './app/components/ErrorPage';
 import Modal from './app/components/Modal';
+
 import {
   requestStudioData,
   requestUserData,
@@ -24,6 +32,7 @@ import {
   syncUserPasses,
 } from './app/actions';
 
+// Image imports for caching
 import MainPage from './assets/img/main-page.png';
 import ActivityGrey from './assets/img/activity-grey.png';
 import ActivityWhite from './assets/img/activity-white.png';
@@ -46,6 +55,8 @@ import FilterWhite from './assets/img/filter-white.png';
 import CheckWhite from './assets/img/check-white.png';
 import AddToCalendar from './assets/img/add-to-calendar.png';
 import MyClassesIcon from './assets/img/my-classes.png';
+import ColumnSpotBooking from './assets/img/column-spotbooking.png';
+import DoorSpotBooking from './assets/img/door-spotbooking.png';
 
 // Native apps can only load downloaded fronts stored in assets/fonts folder
 import StudioFont from './assets/fonts/Regular.ttf';
@@ -137,11 +148,28 @@ class App extends Component {
    */
   onAppStateChange(nextAppState) {
     if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+      this.getUpdates();
       this.setState({ fetchedAssets: false }, () => this.getAssets());
     }
     this.setState({ appState: nextAppState });
   }
   /**
+   * @returns {undefined}
+   */
+  async getUpdates() {
+    if (__DEV__) return;
+
+    try {
+      const update = await Updates.checkForUpdateAsync();
+      if (update.isAvailable) {
+        Updates.reload();
+      }
+    } catch (err) {
+      console.log(err);
+      Sentry.captureException(new Error(err.message), { logger: 'my.module' });
+    }
+  }
+   /**
    * @returns {undefined}
    */
   async getFonts() {
@@ -178,6 +206,8 @@ class App extends Component {
       CheckWhite,
       AddToCalendar,
       MyClassesIcon,
+      ColumnSpotBooking,
+      DoorSpotBooking,
     ]);
 
     this.setState({ imageLoaded: true });
