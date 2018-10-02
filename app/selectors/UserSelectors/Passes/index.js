@@ -112,7 +112,6 @@ export const getUsersNextPass = createSelector(
       if (moment(currentEvent.start_time) < moment(pass.expiresAt) && pass.autopay && pass.usesLeft === 0 && !pass.unlimited) return null;
 
       if (!pass) return null;
-      if (source === 'zf' && moment.tz(currentEvent.start_time, currentEvent.mainTZ) > moment(pass.expiresAt)) return null;
       if (source === 'zf' && pass.studioPackage.zf_series_type_id) {
         const seriesTypeId = pass.studioPackage.zf_series_type_id;
         if (currentEvent.zf_series_types && !currentEvent.zf_series_types[seriesTypeId]) return null;
