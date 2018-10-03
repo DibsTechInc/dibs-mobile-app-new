@@ -14,6 +14,7 @@ import { AsyncStorage, View, AppState } from 'react-native';
 import Promise from 'bluebird';
 
 import { WHITE, EVENT_POLL_INTERVAL } from './app/constants';
+
 import store from './app/store'; // lol App store... - Dylan
 import Config from './config.json';
 import Navigator from './app/router';
@@ -31,6 +32,7 @@ import {
   logFatalError,
   syncUserPasses,
 } from './app/actions';
+import { getUserIsResettingPassword } from './app/selectors';
 
 // Image imports for caching
 import MainPage from './assets/img/main-page.png';
@@ -147,6 +149,7 @@ class App extends Component {
    * @returns {undefined}
    */
   onAppStateChange(nextAppState) {
+    if (getUserIsResettingPassword(store.getState())) return;
     if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
       this.getUpdates();
       this.setState({ fetchedAssets: false }, () => this.getAssets());

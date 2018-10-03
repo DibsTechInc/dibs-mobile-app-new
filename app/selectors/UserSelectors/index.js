@@ -75,6 +75,14 @@ export function getUserHasMadePurchaseAtStudio(state) {
   return Boolean(getUser(state).hasMadePurchaseAtStudio);
 }
 
+/**
+ * @param {Object} state in store
+ * @returns {boolean} true if user is resetting their password
+ */
+export function getUserIsResettingPassword(state) {
+  return Boolean(getUser(state).resettingPassword);
+}
+
 export const getUsersFullName = createSelector(
   [
     getUserFirstName,

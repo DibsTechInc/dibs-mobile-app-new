@@ -20,6 +20,8 @@ import {
 } from '../index';
 
 export const setUser = createAction('SET_USER', payload => payload);
+export const setUserResettingPassword =
+  createAction('CREATE_USER_RESETTING_PASSWORD', payload => payload);
 
 /**
  * @param {Object} user json to set in state

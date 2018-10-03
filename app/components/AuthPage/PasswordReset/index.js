@@ -8,6 +8,7 @@ import {
   createPasswordReset,
   submitPasswordResetCode,
   submitPasswordReset,
+  setUserResettingPassword,
 } from '../../../actions';
 import { FadeInView, LinearLoader } from '../../shared';
 
@@ -41,6 +42,13 @@ class PasswordReset extends React.PureComponent {
    */
   componentDidMount() {
     this.createResetLink();
+    this.props.setUserResettingPassword(true);
+  }
+  /**
+   * @returns {undefined}
+   */
+  componentWillUnmount() {
+    this.props.setUserResettingPassword(false);
   }
   /**
    * @returns {undefined}
@@ -104,12 +112,14 @@ PasswordReset.propTypes = {
   createPasswordReset: PropTypes.func.isRequired,
   submitPasswordResetCode: PropTypes.func.isRequired,
   submitPasswordReset: PropTypes.func.isRequired,
+  setUserResettingPassword: PropTypes.func.isRequired,
 };
 
 const mapDispatchToProps = {
   createPasswordReset,
   submitPasswordResetCode,
   submitPasswordReset,
+  setUserResettingPassword,
 };
 
 export default connect(null, mapDispatchToProps)(PasswordReset);

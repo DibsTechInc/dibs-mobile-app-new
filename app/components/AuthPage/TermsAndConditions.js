@@ -8,7 +8,7 @@ import {
   CustomStatusBar,
   BackArrow,
 } from '../shared';
-import { BLACK } from '../../constants';
+import { BLACK, WHITE } from '../../constants';
 /**
  * @class TermsAndConditions
  * @extends {React.Component}
@@ -38,8 +38,8 @@ class TermsAndConditions extends PureComponent {
   render() {
     return (
       <FadeInView>
-        <CustomStatusBar backgroundColor={'transparent'} barStyle="dark-content" />
-        <View style={{ height: 50, backgroundColor: '#f5f5f5' }}>
+        <CustomStatusBar backgroundColor="transparent" barStyle="dark-content" />
+        <View style={{ height: 50, backgroundColor: WHITE }}>
           <BackArrow
             onPress={this.handleOnPress}
             style={{ marginLeft: 15, marginTop: 10 }}
