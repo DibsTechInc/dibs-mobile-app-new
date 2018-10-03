@@ -27,11 +27,14 @@ const s3 = new AWS.S3();
 const getObjectAsync = Promise.promisify(s3.getObject, { context: s3 });
 
 /**
+ * @param {number} totalNumApps being updated
  * @param {Object} SQL query result which contains app.json and config.json
  * @returns {Object} result of the publish for a particular studio
  */
-async function publishStudioAppUpdate({ appJson, configJson }) {
+async function publishStudioAppUpdate(totalNumApps, { appJson, configJson }, i) {
   const dibsStudioId = configJson.DIBS_STUDIO_ID;
+
+  console.log(`Starting publish for studio ${dibsStudioId}... (${i + 1}/${totalNumApps})`);
   try {
     const getS3Object = key => getObjectAsync({
       Bucket: S3_BUCKET,
@@ -77,7 +80,7 @@ async function publishStudioAppUpdate({ appJson, configJson }) {
         reject(new Error(`Failed to publish the app for studio ${dibsStudioId}`))
         : resolve()));
     });
-    console.log(`Finished publish for studio ${dibsStudioId}.\n`);
+    console.log(`Finished publish for studio ${dibsStudioId} (${i + 1}/${totalNumApps}).\n`);
     return { success: true };
   } catch (err) {
     console.log('\nERROR PUBLISHING UPDATE:');
@@ -113,7 +116,7 @@ async function publishStudioAppUpdate({ appJson, configJson }) {
 
     const results = await Promise.map(
       configs,
-      publishStudioAppUpdate,
+      publishStudioAppUpdate.bind(null, configs.length),
       { concurrency: 1 }
     );
 
