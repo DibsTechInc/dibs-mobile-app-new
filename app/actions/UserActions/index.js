@@ -407,6 +407,56 @@ export function submitPasswordReset(uuId, password) {
 }
 
 /**
+ * @param {object} type,source type is the identifier for the source and source is the data used to retrieve the user
+ * @returns {function} redux thunk
+ */
+export function getUserWaivers({ type, source }) {
+  return async function innerGetUserWaivers(dispatch, getState, dibsFetch) {
+    try {
+      const dibsStudioId = Config.DIBS_STUDIO_ID;
+      const url = `/api/user/waiver/${dibsStudioId}/${type}/${source}`;
+      const {
+        success,
+        payload,
+        message,
+      } = await dibsFetch(url);
+
+      if (success) {
+        dispatch(refreshUser(payload.value));
+      } else {
+        dispatch(enqueueApiError({ title: 'Error!', message }));
+      }
+    } catch (err) {
+      console.log(err);
+      Sentry.captureException(new Error(err.message), { logger: 'my.module' });
+      dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong while getting your waiver status.' }));
+    }
+  };
+}
+
+/**
+ * @param {string} waiverChecked whether the user signed the toc
+ * @param {string} userid whether the user signed the toc
+ * @returns {function} redux thunk
+ */
+export function updateUserWaiverChecked(waiverChecked, userid) {
+  return async function innerUpdateUserWaiverChecked(dispatch, getState, dibsFetch) {
+    const dibsStudioId = Config.DIBS_STUDIO_ID;
+    const url = `/api/user/waiver/waiver-checked/${waiverChecked}`;
+    try {
+      await dibsFetch(url, {
+        method: 'PUT',
+        body: { userid, dibs_studio_id: dibsStudioId },
+      });
+    } catch (err) {
+      console.log(err);
+      Sentry.captureException(new Error(err.message), { logger: 'my.module' });
+      dispatch(enqueueApiError({ title: 'Error!', message: 'Something went wrong while updating your waiver status.' }));
+    }
+  };
+}
+
+/**
  * @returns {function} redux thunk
  */
 export function disableUserAccount() {

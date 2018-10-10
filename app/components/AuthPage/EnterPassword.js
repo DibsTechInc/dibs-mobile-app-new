@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import {
@@ -11,8 +11,22 @@ import { KeyboardAccessoryView } from 'react-native-keyboard-accessory';
 
 import Config from '../../../config.json';
 
-import { submitLogin, reactivateUserAccount } from '../../actions';
-import { FadeInView, InputField, LinearLoader, MaterialButton } from '../shared';
+import {
+  getStudioWaiverRequirement,
+  getStudioName,
+} from '../../selectors';
+import {
+  submitLogin,
+  reactivateUserAccount,
+  getUserWaivers,
+  updateUserWaiverChecked,
+} from '../../actions';
+import {
+  FadeInView,
+  InputField,
+  LinearLoader,
+  MaterialButton,
+} from '../shared';
 import { DEFAULT_BG } from '../../constants';
 
 import { NormalText } from '../styled';
@@ -22,6 +36,8 @@ import {
   PASSWORD_RESET_ROUTE,
   LANDING_ROUTE,
 } from '../../constants/RouteConstants/index';
+
+import TermsCheckBox from './TermsCheckBox';
 
 const StyledButtonView = styled.View`
   padding: 8px;
@@ -34,14 +50,14 @@ const ErrorText = NormalText.extend`
   fontSize: 12px;
   color: red;
   position: absolute;
-  top: 50%;
+  top: ${props => props.requiresWaiver ? '70%' : '50%'};
 `;
 
 /**
  * @class EnterPassword
  * @extends Component
  */
-class EnterPassword extends PureComponent {
+class EnterPassword extends React.PureComponent {
   /**
    * @constructor
    * @constructs EnterPassword
@@ -54,10 +70,42 @@ class EnterPassword extends PureComponent {
       isLoading: false,
       validInput: false,
       errorText: '',
+      tAndCError: '',
+      tAndC: false,
     };
 
     this.handleOnPress = this.handleOnPress.bind(this);
     this.navigateToPasswordReset = this.navigateToPasswordReset.bind(this);
+    this.handleTermsAndConditions = this.handleTermsAndConditions.bind(this);
+    this.handleOnCheck = this.handleOnCheck.bind(this);
+  }
+
+  /**
+   * @returns {undefined}
+   */
+  async componentDidMount() {
+    const { email } = this.props.navigation.state.params;
+    await this.props.getUserWaivers({ type: 'email', source: email });
+
+    this.handleTermsAndConditions();
+  }
+
+  /**
+   * @returns {undefined}
+   */
+  handleTermsAndConditions() {
+    this.setState({
+      tAndC: this.props.userHasSignedWaiver,
+    });
+  }
+
+  /**
+   * @returns {undefined}
+   */
+  handleOnCheck() {
+    this.setState({
+      tAndC: !this.state.tAndC,
+    });
   }
 
   /**
@@ -65,6 +113,12 @@ class EnterPassword extends PureComponent {
    */
   async handleOnPress() {
     const { email, accountDisabled } = this.props.navigation.state.params;
+
+    if (this.props.studioRequiresWaiverSigned && !this.state.tAndC) {
+      this.setState({ isLoading: false, errorText: 'You must agree to the Terms and Conditions' });
+      return;
+    }
+
     if (accountDisabled) {
       const response = await new Promise(res => this.props.reactivateUserAccount(email, this.state.password, res));
 
@@ -75,6 +129,7 @@ class EnterPassword extends PureComponent {
 
     await new Promise(res => this.setState({ isLoading: true, validInput: true }, res));
     const response = await new Promise(res => this.props.submitLogin(email, this.state.password, res));
+    await this.props.updateUserWaiverChecked(this.state.tAndC, this.props.userId);
     await new Promise(res => this.setState({ errorText: '' }, res));
 
     if (response.code !== 200) {
@@ -109,6 +164,8 @@ class EnterPassword extends PureComponent {
       );
     }
 
+    const shouldShowTerms = this.props.studioRequiresWaiverSigned && !this.props.userHasSignedWaiver;
+
     return (
       <FadeInView>
         <ScrollView keyboardShouldPersistTaps="always" contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', height: '70%', position: 'relative' }}>
@@ -124,15 +181,26 @@ class EnterPassword extends PureComponent {
             autoCapitalize="none"
             onSubmitEditing={this.handleOnPress}
             onChangeText={password => this.setState({ password })}
-            containerStyle={{ marginBottom: 30, width: 200, minWidth: 200 }}
+            containerStyle={{ marginBottom: shouldShowTerms ? 10 : 30, width: 200, minWidth: 200 }}
             labelStyle={{ marginBottom: 20, textAlign: 'center' }}
           />
-          {this.state.errorText.length && <ErrorText>{this.state.errorText}</ErrorText>}
+          {shouldShowTerms &&
+            <TermsCheckBox
+              studioName={this.props.studioName}
+              tAndC={this.state.tAndC}
+              tAndCError={this.state.tAndCError}
+              onPress={this.handleOnCheck}
+            />
+          }
+          {this.state.errorText.length &&
+            <ErrorText requiresWaiver={shouldShowTerms}>
+              {this.state.errorText}
+            </ErrorText>}
           <TouchableOpacity
             onPress={this.navigateToPasswordReset}
             style={{ marginBottom: 20 }}
           >
-            <NormalText>
+            <NormalText style={{ marginTop: shouldShowTerms ? 60 : 0 }}>
               Forgot your password?
             </NormalText>
           </TouchableOpacity>
@@ -159,11 +227,26 @@ EnterPassword.propTypes = {
   navigation: PropTypes.shape(),
   submitLogin: PropTypes.func,
   reactivateUserAccount: PropTypes.func,
+  studioRequiresWaiverSigned: PropTypes.bool,
+  getUserWaivers: PropTypes.func,
+  userHasSignedWaiver: PropTypes.bool,
+  studioName: PropTypes.string,
+  updateUserWaiverChecked: PropTypes.func,
+  userId: PropTypes.number,
 };
+
+const mapStateToProps = state => ({
+  userHasSignedWaiver: state.user.waiver,
+  userId: state.user.userid,
+  studioRequiresWaiverSigned: getStudioWaiverRequirement(state),
+  studioName: getStudioName(state),
+});
 
 const mapDispatchToProps = {
   submitLogin,
   reactivateUserAccount,
+  getUserWaivers,
+  updateUserWaiverChecked,
 };
 
-export default connect(null, mapDispatchToProps)(EnterPassword);
+export default connect(mapStateToProps, mapDispatchToProps)(EnterPassword);

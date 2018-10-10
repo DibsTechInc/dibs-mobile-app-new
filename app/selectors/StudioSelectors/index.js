@@ -94,7 +94,7 @@ export function getStudioCountry(state) {
  * @returns {boolean} studio waiver requirements
  */
 export function getStudioWaiverRequirement(state) {
-  return getStudioData(state).requiresWaiverSigned || false;
+  return getStudioData(state).requiresWaiverSigned;
 }
 
 /**

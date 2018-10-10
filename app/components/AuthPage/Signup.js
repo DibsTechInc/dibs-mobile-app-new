@@ -7,7 +7,6 @@ import {
   View,
   ScrollView,
 } from 'react-native';
-import { CheckBox } from 'react-native-elements';
 import styled from 'styled-components';
 import { KeyboardAccessoryView } from 'react-native-keyboard-accessory';
 import { promisify } from 'bluebird';
@@ -18,7 +17,6 @@ import CountryPicker from 'react-native-country-picker-modal';
 import { signUpUser, enqueueUserError } from '../../actions';
 import { MaterialButton, CustomStatusBar, FadeInView, InputField } from '../shared';
 import {
-  TERMS_AND_CONDITIONS_ROUTE,
   MAIN_ROUTE,
   LOGIN_ROUTE,
   DEFAULT_BG,
@@ -34,6 +32,7 @@ import {
 } from '../../selectors';
 import Config from '../../../config.json';
 import LinearLoader from '../shared/LinearLoader';
+import TermsCheckBox from './TermsCheckBox';
 
 import { NormalText } from '../styled';
 
@@ -49,9 +48,6 @@ const StyledText = NormalText.extend`
   font-size: ${WIDTH < 400 ? 13 : 16}
 `;
 
-const LinkedText = NormalText.extend`
-  color: ${Config.STUDIO_COLOR};
-`;
 
 /**
  * @class Signup
@@ -86,8 +82,6 @@ class Signup extends PureComponent {
     this.handleOnPress = this.handleOnPress.bind(this);
     this.checkForm = this.checkForm.bind(this);
     this.handleOnCheck = this.handleOnCheck.bind(this);
-    this.handleOnPressNavStudioTerms = this.handleOnPressNav.bind(this, { url: Config.STUDIO_TERMS_LINK });
-    this.handleOnPressNavDibsTerms = this.handleOnPressNav.bind(this, { url: Config.DIBS_TERMS_LINK });
   }
 
   /**
@@ -103,7 +97,9 @@ class Signup extends PureComponent {
   onPressFlag() {
     this.countryPicker.openModal();
   }
-
+  /**
+   * @returns {undefined}
+   */
   setErrorMessages() {
     const { formInfo } = this.checkForm();
 
@@ -158,6 +154,7 @@ class Signup extends PureComponent {
         return null;
       }
     }
+    return null;
   }
 
   /**
@@ -167,13 +164,6 @@ class Signup extends PureComponent {
     this.setState({
       tAndC: !this.state.tAndC,
     });
-  }
-  /**
-   * @param{object} urlObj the nav object
-   * @returns {undefined}
-   */
-  handleOnPressNav(urlObj) {
-    this.props.navigation.navigate(TERMS_AND_CONDITIONS_ROUTE, urlObj);
   }
 
   /**
@@ -273,30 +263,12 @@ class Signup extends PureComponent {
               </CountryPicker>
               {this.state.phoneError.length && <NormalText style={{ color: RED, position: 'absolute', bottom: 10, fontSize: 12 }}>{this.state.phoneError}</NormalText>}
             </View>
-            <View style={{ width: 250, height: 30, position: 'relative', marginTop: 5, flexDirection: 'row' }}>
-              <CheckBox
-                title=""
-                iconType="material-community"
-                checkedIcon="checkbox-marked"
-                uncheckedIcon="checkbox-blank-outline"
-                checkedColor={Config.STUDIO_COLOR}
-                checked={this.state.tAndC}
-                containerStyle={{ backgroundColor: DEFAULT_BG, position: 'absolute', top: -10, left: -22 }}
-                textStyle={{ fontFamily: 'studio-font', fontSize: 16 }}
-                onPress={this.handleOnCheck}
-                size={20}
-              />
-              <View style={{ position: 'absolute', width: '90%', left: 22, top: 5 }}>
-                <NormalText style={{ flex: 1, flexWrap: 'wrap' }}>
-                  I have read & agreed to the <LinkedText onPress={this.handleOnPressNavStudioTerms}>
-                    {this.props.studioName}
-                  </LinkedText> and <LinkedText onPress={this.handleOnPressNavDibsTerms}>
-                  Dibs
-                </LinkedText> Terms and Conditions.
-                </NormalText>
-              </View>
-              {this.state.tAndCError.length && <NormalText style={{ color: RED, position: 'absolute', bottom: -55, fontSize: 12 }}>{this.state.tAndCError}</NormalText>}
-            </View>
+            <TermsCheckBox
+              studioName={this.props.studioName}
+              tAndC={this.state.tAndC}
+              tAndCError={this.state.tAndCError}
+              onPress={this.handleOnCheck}
+            />
           </View>
         </ScrollView>
         <KeyboardAccessoryView
