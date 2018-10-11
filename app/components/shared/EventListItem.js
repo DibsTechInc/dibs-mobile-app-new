@@ -5,7 +5,7 @@ import { View } from 'react-native';
 import { connect } from 'react-redux';
 
 import { WHITE, LIGHT_GREY, DARK_TEXT_GREY, BLACK, GREY } from '../../constants';
-import { addEventToCart, removeOneEventItem } from '../../actions';
+import { addEventToCart, removeOneEventItem, enqueueNotice } from '../../actions';
 import { FlexRow, FlexCenter, RightAlignedColumn, HeavyText, NormalText } from '../styled';
 import Button from './PurchaseItem/Button';
 import Overlay from './PurchaseItem/Overlay';
@@ -83,6 +83,16 @@ class EventListItem extends React.PureComponent {
    * @returns {undefined}
    */
   addToCart() {
+    if (this.props.custom_attributes
+      && this.props.custom_attributes.notice_message) {
+      this.props.enqueueNotice({
+        message: this.props.custom_attributes.notice_message,
+        buttons: [
+          { text: 'OK', onPress: () => { } },
+        ],
+      });
+    }
+
     this.props.addEventToCart({
       eventid: this.props.eventid,
       passid: this.props.passid,
@@ -223,12 +233,14 @@ EventListItem.propTypes = {
   removeOneEventItem: PropTypes.func,
   price: PropTypes.number,
   studioSpotLabel: PropTypes.string,
+  enqueueNotice: PropTypes.func,
+  custom_attributes: PropTypes.shape(),
 };
 
-// const mapStateToProps = state => ({});
 const mapDispatchToProps = {
   addEventToCart,
   removeOneEventItem,
+  enqueueNotice,
 };
 
 export default connect(null, mapDispatchToProps)(EventListItem);
