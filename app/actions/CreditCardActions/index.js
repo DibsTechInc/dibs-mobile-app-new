@@ -23,7 +23,7 @@ export function requestCreditCardInfo(showAlert = true) {
     if (getState().creditCard.loading) return;
     dispatch(setCreditCardLoadingTrue());
     try {
-      const res = await dibsFetch('/api/user/credit_card', {
+      const res = await dibsFetch('/api/user/credit-card', {
         method: 'GET',
         requiresAuth: true,
       });
@@ -53,7 +53,7 @@ export function updateCreditCard({ ccNum, ccCVC, expiration }, callback = () => 
     if (getState().creditCard.loading) return;
     dispatch(setCreditCardLoadingTrue());
     try {
-      const res = await dibsFetch('/api/user/credit_card', {
+      const res = await dibsFetch('/api/user/credit-card', {
         method: 'PUT',
         requiresAuth: true,
         body: {
