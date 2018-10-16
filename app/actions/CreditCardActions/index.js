@@ -23,7 +23,7 @@ export function requestCreditCardInfo(showAlert = true) {
     if (getState().creditCard.loading) return;
     dispatch(setCreditCardLoadingTrue());
     try {
-      const res = await dibsFetch('/api/user/credit-card', {
+      const res = await dibsFetch('/api/user/credit_card', {
         method: 'GET',
         requiresAuth: true,
       });
