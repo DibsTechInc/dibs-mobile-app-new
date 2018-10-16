@@ -73,7 +73,7 @@ Sentry.config(Config.SENTRY_DSN).install();
 const StyledLoadingPage = styled.View`
   align-items: center;
   background: ${Config.STUDIO_COLOR};
-  color ${WHITE};
+  color: ${WHITE};
   justify-content: center;
   flex: 5;
 `;
