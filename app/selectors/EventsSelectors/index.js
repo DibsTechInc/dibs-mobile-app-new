@@ -259,6 +259,11 @@ export const getSpotGridForEvent = createSelector(
   getRoom => eventid => getRoom(eventid).spotGrid || []
 );
 
+export const getCustomRoomUrl = createSelector(
+  getRoomForEvent,
+  getRoom => eventid => getRoom(eventid).custom_room_url || ''
+);
+
 export const getSpotGridForEventWithSelectedSpots = createSelector(
   [
     getSpotGridForEvent,

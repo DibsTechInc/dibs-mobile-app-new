@@ -6,6 +6,8 @@ import { FadeInView, LinearLoader } from '../shared';
 import { NormalText } from '../styled';
 import Config from '../../../config.json';
 
+import { WIDTH, HEIGHT } from '../../constants';
+
 /**
  * @class SpotBookingEventListItem
  * @extends {React.PureComponent}
@@ -55,6 +57,7 @@ class SpotBookingEventListItem extends React.PureComponent {
           removeSpotFromCart={this.props.removeSpotFromCart}
           eventid={this.props.event.eventid}
           instructorImageURL={this.props.event.instructorImageURL}
+          customRoomUrl={this.props.customRoomUrl}
           roomItems={this.props.roomItems}
         />
       </FadeInView>
@@ -69,6 +72,7 @@ SpotBookingEventListItem.propTypes = {
   setSpotInCart: PropTypes.func,
   removeSpotFromCart: PropTypes.func,
   addEventToCart: PropTypes.func,
+  customRoomUrl: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   roomItems: PropTypes.arrayOf(PropTypes.shape()),
 };
 

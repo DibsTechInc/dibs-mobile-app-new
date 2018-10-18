@@ -22,6 +22,7 @@ import {
   getCurrentSpotBookingEventFormattedTimes,
   getStudioSpotLabel,
   getRoomItemsWithSetter,
+  getCustomRoomUrl,
 } from '../../selectors';
 
 import {
@@ -72,6 +73,8 @@ class SpotBookingPage extends React.PureComponent {
     }
 
     const spotName = this.props.studioSpotLabel || 'Spot';
+    const customRoomUrl = this.props.getCustomRoomUrl && this.props.getCustomRoomUrl(this.props.event.eventid);
+    const height = this.props.getCustomRoomUrl ? (HEIGHT + 150) : HEIGHT;
 
     return (
       <FadeInView>
@@ -82,7 +85,7 @@ class SpotBookingPage extends React.PureComponent {
           closePickingSpotsModal={this.props.closePickingSpotsModal}
           showCart={false}
         />
-        <ScrollView contentContainerStyle={{ alignItems: 'center', height: HEIGHT, marginTop: 20, marginBottom: 20 }}>
+        <ScrollView contentContainerStyle={{ alignItems: 'center', height, marginTop: 20, marginBottom: 20 }}>
           <InfoView>
             <HeavyText>
               {this.props.formattedTimes.startTimeDate}
@@ -104,6 +107,7 @@ class SpotBookingPage extends React.PureComponent {
             getRoomForEvent={this.props.getRoomForEvent}
             spots={this.props.getSpotGridForEventWithSetter(this.props.event.eventid)}
             roomItems={this.props.getRoomItemsWithSetter(this.props.event.eventid)}
+            customRoomUrl={customRoomUrl}
             setSpotInCart={this.props.setSpotInCart}
             removeSpotFromCart={this.props.removeSpotFromCart}
             spotBookingOpened={this.props.spotBookingOpened}
@@ -135,6 +139,7 @@ SpotBookingPage.propTypes = {
   addEventToCart: PropTypes.func,
   studioSpotLabel: PropTypes.string,
   getRoomItemsWithSetter: PropTypes.func,
+  getCustomRoomUrl: PropTypes.func,
 };
 
 const mapStateToProps = state => ({
@@ -145,6 +150,7 @@ const mapStateToProps = state => ({
   formattedTimes: getCurrentSpotBookingEventFormattedTimes(state),
   studioSpotLabel: getStudioSpotLabel(state),
   getRoomItemsWithSetter: getRoomItemsWithSetter(state),
+  getCustomRoomUrl: getCustomRoomUrl(state),
 });
 
 const mapDispatchToProps = {

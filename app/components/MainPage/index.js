@@ -49,7 +49,6 @@ const BackgroundImage = styled.Image`
   position: absolute;
   right: 0;
   top: 0;
-  width: ${WIDTH};
 `;
 
 const MainPageHeader = SpaceBetweenRow.extend`

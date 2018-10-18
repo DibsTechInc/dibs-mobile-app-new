@@ -8,7 +8,6 @@ import {
   BLACK,
   WHITE,
   ROOM_INSTRUCTOR_PLACEHOLDER,
-  ROOM_ITEMS_ENUM,
   ROOM_ITEMS_ID,
 } from '../../constants';
 
@@ -52,7 +51,7 @@ const AvailableSpot = styled.TouchableOpacity`
   align-items: center;
   justify-content: center;
   border-radius: 20px;
-  background-color: ${props => props.userSelected ? Config.STUDIO_COLOR : 'transparent'};
+  background-color: ${props => props.userSelected ? Config.STUDIO_COLOR : WHITE};
   border-color: ${props => props.userSelected ? Config.STUDIO_COLOR : BLACK};
 `;
 
@@ -90,8 +89,16 @@ class Spot extends React.PureComponent {
    * @returns {JSX.Element} HTML
    */
   render() {
+    const hasCustomRoomConfigs = this.props.customRoomUrl && this.props.top_position && this.props.left_position;
     const displayID = this.props.displayZingfitId ? this.props.source_id : this.props.id;
     const instructorImgUrl = this.props.instructorImageURL || ROOM_INSTRUCTOR_PLACEHOLDER;
+    const customPositioning = hasCustomRoomConfigs
+      ? {
+        top: `${this.props.top_position}%`,
+        left: `${this.props.left_position}%`,
+        position: 'absolute',
+      }
+      : {};
 
     switch (true) {
       case this.props.instructorImageURL && this.props.type === 'INSTRUCTOR':
@@ -108,15 +115,30 @@ class Spot extends React.PureComponent {
 
       case !this.props.available:
         return (
-          <UnavailableSpot>
-            <NormalText style={{ color: GREY }}>{displayID}</NormalText>
+          <UnavailableSpot
+            style={{
+              borderColor: hasCustomRoomConfigs ? BLACK : 'transparent',
+              ...customPositioning,
+            }}
+          >
+            <NormalText style={{ color: GREY }}>
+              {displayID}
+            </NormalText>
           </UnavailableSpot>
         );
 
       default:
         return (
-          <AvailableSpot onPress={this.toggleSpotInCart} userSelected={this.props.userSelected}>
-            <DisplayText userSelected={this.props.userSelected}>{displayID}</DisplayText>
+          <AvailableSpot
+            style={customPositioning}
+            onPress={this.toggleSpotInCart}
+            userSelected={this.props.userSelected}
+          >
+            <DisplayText
+              userSelected={this.props.userSelected}
+            >
+              {displayID}
+            </DisplayText>
           </AvailableSpot>
         );
     }
@@ -137,6 +159,9 @@ Spot.propTypes = {
   removeSpotFromCart: PropTypes.func,
   type: PropTypes.string,
   instructorImageURL: PropTypes.string,
+  customRoomUrl: PropTypes.string,
+  top_position: PropTypes.number,
+  left_position: PropTypes.number,
 };
 
 export default Spot;

@@ -2,8 +2,10 @@ import React from 'react';
 import { View } from 'react-native';
 import PropTypes from 'prop-types';
 
+import CustomRoomGrid from './CustomRoomGrid';
 import GridRow from './GridRow';
 import RoomItemMap from './RoomItemMap';
+
 
 /**
  * @class RoomGrid
@@ -19,11 +21,14 @@ class RoomGrid extends React.PureComponent {
       <GridRow
         key={Math.random()}
         row={spotRow}
-        setSpotInCart={this.props.setSpotInCart}
-        removeSpotFromCart={this.props.removeSpotFromCart}
-        eventid={this.props.eventid}
-        instructorImageURL={this.props.instructorImageURL}
+        {...this.props}
       />));
+
+    if (this.props.customRoomUrl) {
+      return (
+        <CustomRoomGrid {...this.props} />
+      );
+    }
 
     const roomItems = this.props.roomItems.map((roomItem) => {
       if (!roomItem || !roomItem.name) {
@@ -50,11 +55,8 @@ class RoomGrid extends React.PureComponent {
 
 RoomGrid.propTypes = {
   spotGrid: PropTypes.arrayOf(PropTypes.array),
-  eventid: PropTypes.number,
-  setSpotInCart: PropTypes.func,
-  removeSpotFromCart: PropTypes.func,
-  instructorImageURL: PropTypes.string,
   roomItems: PropTypes.arrayOf(PropTypes.shape()),
+  customRoomUrl: PropTypes.string,
 };
 
 export default RoomGrid;
