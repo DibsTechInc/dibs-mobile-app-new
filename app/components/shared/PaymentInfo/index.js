@@ -1,16 +1,25 @@
 import React, { PureComponent } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { connect } from 'react-redux';
-import Promise from 'bluebird';
 import PropTypes from 'prop-types';
-
 import { LiteCreditCardInput } from 'react-native-credit-card-input';
-import { FadeInView, MaterialPanel } from '../../shared';
+import Promise from 'bluebird';
+
 import { GREY, LIGHT_GREY } from '../../../constants';
 import Config from '../../../../config.json';
-import { updateCreditCard } from '../../../actions/CreditCardActions';
-import CreditCardDisplay from './CreditCardDisplay';
+import { updateCreditCard } from '../../../actions';
+import {
+  getCCIsLoading,
+  getCCLastFour,
+  getCCExpMonth,
+  getCCExpYear,
+  getCCType,
+  getCCIsValid,
+  getIfHasNoCC,
+} from '../../../selectors';
 
+import { FadeInView, MaterialPanel } from '../../shared';
+import CreditCardDisplay from './CreditCardDisplay';
 import AmexIcon from '../../../../assets/img/stp_card_amex.png';
 import DinersIcon from '../../../../assets/img/stp_card_diners.png';
 import DiscoverIcon from '../../../../assets/img/stp_card_discover.png';
@@ -43,6 +52,7 @@ class PaymentInfo extends PureComponent {
       type: '',
     };
 
+    this.setStateAsync = Promise.promisify(this.setState.bind(this));
     this.onChange = this.onChange.bind(this);
     this.updateCreditCard = this.updateCreditCard.bind(this);
   }
@@ -51,8 +61,8 @@ class PaymentInfo extends PureComponent {
    * @param {object} formData the form for CC
    * @returns {undefined}
    */
-  onChange(formData) {
-    this.setState({
+  async onChange(formData) {
+    await this.setStateAsync({
       valid: formData.valid,
       numberStatus: formData.status.number,
       expiryStatus: formData.status.expiry,
@@ -61,7 +71,8 @@ class PaymentInfo extends PureComponent {
       expiry: formData.values.expiry,
       cvc: formData.values.cvc,
       type: formData.values.type,
-    }, () => this.state.valid && this.updateCreditCard());
+    });
+    if (this.state.valid) this.updateCreditCard();
   }
 
   /**
@@ -82,8 +93,7 @@ class PaymentInfo extends PureComponent {
    * @returns {undefined}
    */
   async updateCreditCard() {
-    const hasCC = this.props.creditCard.expMonth;
-
+    const { userHasNoCard } = this.props;
     const month = this.state.expiry.split('/')[0];
     const year = this.state.expiry.split('/')[1];
 
@@ -96,8 +106,18 @@ class PaymentInfo extends PureComponent {
       },
     };
 
-    await new Promise(resolve => this.props.updateCreditCard(payload, resolve));
-    if (hasCC) this.props.setEditCC();
+    await this.props.updateCreditCard(payload);
+    if (!userHasNoCard && this.props.hasValidCC) this.props.setEditCC();
+    await this.setStateAsync({
+      valid: false,
+      numberStatus: 'incomplete',
+      expiryStatus: 'incomplete',
+      cvcStatus: 'incomplete',
+      number: '',
+      expiry: '',
+      cvc: '',
+      type: '',
+    });
   }
 
   /**
@@ -134,38 +154,44 @@ class PaymentInfo extends PureComponent {
    * @returns {JSX} XML
    */
   render() {
-    const hasCC = this.props.creditCard.expMonth;
-    const displayStyle = (this.state.valid || hasCC || this.props.isUpdatingCard) ?
-    { flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' } :
-    {};
-
+    const displayHeight = 120;
+    const displayStyle =
+      (this.state.valid || this.props.hasValidCC || this.props.isUpdatingCard) ?
+        { flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }
+        : {};
+    let editLabel;
     let paymentDisplay;
 
-    const labels = {
-      number: 'Card Number',
-      expiry: 'Expiration',
-      cvc: 'CVC',
-    };
+    if (this.props.hasValidCC) {
+      editLabel = this.props.isUpdatingCard ? 'Cancel' : 'Update';
+    }
 
-    const creditCardInput = (
-      <LiteCreditCardInput
-        autoFocus={this.props.isUpdatingCard}
-        cardScale={0.7}
-        labels={labels}
-        allowScroll
-        labelStyle={{ paddingTop: 10, fontFamily: 'studio-font' }}
-        validColor="black"
-        invalidColor="red"
-        placeholderColor="darkgray"
-        onChange={this.onChange}
-        inputStyle={{ fontFamily: 'studio-font' }}
-      />
-    );
+    if (this.props.loadingCreditCard) {
+      return (
+        <MaterialPanel
+          height={displayHeight}
+          style={{
+            shadowOffset: { width: 3, height: 3 },
+            width: '100%',
+            borderBottomWidth: 1,
+            borderBottomColor: LIGHT_GREY,
+          }}
+          heading="Payment Info"
+          headingRight={editLabel}
+          headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}
+          headerStyle={{ marginLeft: 10, color: GREY }}
+        >
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <ActivityIndicator />
+          </View>
+        </MaterialPanel>
+      );
+    }
 
-    if (hasCC) {
-      const displayCCNum = `•••• •••• •••• ${this.props.creditCard.last4}`;
-      const displayDate = `${this.props.creditCard.expMonth}/${this.props.creditCard.expYear}`;
-      const cardIcon = this.renderCardIcon(this.props.creditCard.type);
+    if (this.props.hasValidCC && !this.props.isUpdatingCard) {
+      const displayCCNum = `•••• •••• •••• ${this.props.ccLastFour}`;
+      const displayDate = `${this.props.ccExpMonth}/${this.props.ccExpYear}`;
+      const cardIcon = this.renderCardIcon(this.props.ccType);
 
       paymentDisplay = (
         <CreditCardDisplay
@@ -175,9 +201,7 @@ class PaymentInfo extends PureComponent {
           displayDate={displayDate}
         />
       );
-    }
-
-    if (this.state.valid) {
+    } else if (this.state.valid) {
       const len = this.state.number.split(' ').length;
       const lastFour = this.state.number.split(' ')[len - 1];
       const displayCCNum = `•••• •••• •••• ${lastFour}`;
@@ -191,44 +215,36 @@ class PaymentInfo extends PureComponent {
           displayDate={this.state.expiry}
         />
       );
-    }
-
-    let creditCardDisplay;
-    const displayHeight = 120;
-
-    if (this.props.isUpdatingCard || !hasCC) {
-      creditCardDisplay = creditCardInput;
-    } else if (this.state.valid || hasCC) {
-      creditCardDisplay = paymentDisplay;
-    }
-
-    let editLabel;
-
-    if (hasCC) {
-      editLabel = this.props.isUpdatingCard ? 'Cancel' : 'Update';
-    }
-
-    if (this.props.creditCard.loading) {
-      return (
-        <MaterialPanel
-          height={displayHeight}
-          style={{ shadowOffset: { width: 3, height: 3 }, width: '100%', borderBottomWidth: 1, borderBottomColor: LIGHT_GREY }}
-          heading="Payment Info"
-          headingRight={editLabel}
-          headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}
-          headerStyle={{ marginLeft: 10, color: GREY }}
-        >
-          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-            <ActivityIndicator />
-          </View>
-        </MaterialPanel>
+    } else if (this.props.isUpdatingCard || this.props.userHasNoCard) {
+      paymentDisplay = (
+        <LiteCreditCardInput
+          autoFocus
+          cardScale={0.7}
+          labels={{
+            number: 'Card Number',
+            expiry: 'Expiration',
+            cvc: 'CVC',
+          }}
+          allowScroll
+          labelStyle={{ paddingTop: 10, fontFamily: 'studio-font' }}
+          validColor="black"
+          invalidColor="red"
+          placeholderColor="darkgray"
+          onChange={this.onChange}
+          inputStyle={{ fontFamily: 'studio-font' }}
+        />
       );
     }
 
     return (
       <MaterialPanel
         height={displayHeight}
-        style={{ shadowOffset: { width: 3, height: 3 }, width: '100%', borderBottomWidth: 1, borderBottomColor: LIGHT_GREY }}
+        style={{
+          shadowOffset: { width: 3, height: 3 },
+          width: '100%',
+          borderBottomWidth: 1,
+          borderBottomColor: LIGHT_GREY,
+        }}
         heading="Payment Info"
         headingRight={editLabel}
         headerRightStyle={{ color: Config.STUDIO_COLOR, marginRight: 10 }}
@@ -236,22 +252,39 @@ class PaymentInfo extends PureComponent {
         onPressHeadingRight={this.props.setEditCC}
       >
         <FadeInView>
-          {creditCardDisplay}
+          {paymentDisplay}
         </FadeInView>
       </MaterialPanel>
     );
   }
 }
 
+const numberLike = PropTypes.oneOfType([
+  PropTypes.string,
+  PropTypes.number,
+]).isRequired;
+
 PaymentInfo.propTypes = {
-  creditCard: PropTypes.shape().isRequired,
-  updateCreditCard: PropTypes.func.isRequired,
   isUpdatingCard: PropTypes.bool.isRequired,
   setEditCC: PropTypes.func.isRequired,
+  loadingCreditCard: PropTypes.bool.isRequired,
+  ccLastFour: numberLike,
+  ccExpMonth: numberLike,
+  ccExpYear: numberLike,
+  ccType: PropTypes.string.isRequired,
+  hasValidCC: PropTypes.bool.isRequired,
+  userHasNoCard: PropTypes.bool.isRequired,
+  updateCreditCard: PropTypes.func.isRequired, // eslint-disable-line react/no-unused-prop-types
 };
 
 const mapStateToProps = state => ({
-  creditCard: state.creditCard,
+  loadingCreditCard: getCCIsLoading(state),
+  ccLastFour: getCCLastFour(state),
+  ccExpMonth: getCCExpMonth(state),
+  ccExpYear: getCCExpYear(state),
+  ccType: getCCType(state),
+  hasValidCC: getCCIsValid(state),
+  userHasNoCard: getIfHasNoCC(state),
 });
 
 const mapDispatchToProps = {

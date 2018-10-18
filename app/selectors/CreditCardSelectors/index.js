@@ -75,7 +75,7 @@ export function getIfCardIsUnavailable(state) {
 
 export const getCCIsValid = createSelector(
   getCCState,
-  cc => (cc.last4 && cc.expMonth && cc.expYear)
+  cc => Boolean(cc.last4 && cc.expMonth && cc.expYear)
 );
 
 export const getCanUseCardToPurchase = createSelector(

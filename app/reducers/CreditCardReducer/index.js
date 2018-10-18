@@ -1,15 +1,16 @@
-import { handleActions, combineActions } from 'redux-actions';
+import { handleActions } from 'redux-actions';
 import {
   setCreditCard,
   removeCreditCard,
-  setCreditCardLoadingTrue,
-  setCreditCardLoadingFalse,
+  setCreditCardLoading,
+  setUserHasNoCard,
 } from '../../actions/CreditCardActions';
 
+const initialState = { loading: false, hasNoCard: false };
+
 export default handleActions({
-  [setCreditCard]: (state, { payload }) => ({ ...state, ...payload }),
-  [removeCreditCard]: state => ({ loading: state.loading }),
-  [combineActions(
-    setCreditCardLoadingTrue,
-    setCreditCardLoadingFalse)]: (state, { payload }) => ({ ...state, loading: payload }),
-}, { loading: false });
+  [setCreditCard]: (state, { payload }) => ({ ...state, ...payload, hasNoCard: false }),
+  [removeCreditCard]: () => initialState,
+  [setCreditCardLoading]: (state, { payload }) => ({ ...state, loading: payload }),
+  [setUserHasNoCard]: (state, { payload }) => ({ ...state, hasNoCard: payload }),
+}, initialState);

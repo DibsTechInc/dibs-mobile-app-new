@@ -18,11 +18,7 @@ class EditCC extends PureComponent {
    */
   constructor() {
     super();
-
-    this.state = {
-      isUpdatingCard: false,
-    };
-
+    this.state = { isUpdatingCard: false };
     this.setEditCC = this.setEditCC.bind(this);
   }
 
@@ -30,9 +26,7 @@ class EditCC extends PureComponent {
    * @returns {undefined}
    */
   setEditCC() {
-    this.setState({
-      isUpdatingCard: !this.state.isUpdatingCard,
-    });
+    this.setState({ isUpdatingCard: !this.state.isUpdatingCard });
   }
 
   /**
