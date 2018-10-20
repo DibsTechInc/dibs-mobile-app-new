@@ -89,6 +89,9 @@ class Spot extends React.PureComponent {
    * @returns {JSX.Element} HTML
    */
   render() {
+
+    console.log(this.props.type, 'propsz');
+
     const hasCustomRoomConfigs = this.props.customRoomUrl && this.props.top_position && this.props.left_position;
     const displayID = this.props.displayZingfitId ? this.props.source_id : this.props.id;
     const instructorImgUrl = this.props.instructorImageURL || ROOM_INSTRUCTOR_PLACEHOLDER;
@@ -113,7 +116,7 @@ class Spot extends React.PureComponent {
       case this.props.empty || !displayID || displayID >= ROOM_ITEMS_ID:
         return <BaseSpot />;
 
-      case !this.props.available:
+      case !this.props.available || this.props.type === 'BROKEN':
         return (
           <UnavailableSpot
             style={{
