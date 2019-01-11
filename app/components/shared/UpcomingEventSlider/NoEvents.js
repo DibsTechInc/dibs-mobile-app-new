@@ -55,7 +55,7 @@ class NoEvents extends React.PureComponent {
     return (
       <FadeInView style={{ alignItems: 'center' }}>
         <NoEventsText>
-          No upcoming classes on {this.props.naturalDate}.
+          You haven&apos;t booked a class for today.
         </NoEventsText>
         <MaterialButton
           style={{ width: 120, height: 40 }}
