@@ -22,7 +22,7 @@ import {
 } from '../';
 
 import {
-  getUserFlashCreditAmountInCart,
+  getUserFlashCreditAmount,
   getUserStudioCreditsAmount,
   getUserRAFCreditAmount,
   getUserStudioCreditLoadBonusAmount,
@@ -105,7 +105,7 @@ export const getFormattedPromoCodeAmount = createSelector(
 );
 
 export const getCartFlashCreditAmount = createSelector(
-  getUserFlashCreditAmountInCart,
+  getUserFlashCreditAmount,
   getSortedCartEvents,
   (fcAmount, events) => (events.length && fcAmount)
 );

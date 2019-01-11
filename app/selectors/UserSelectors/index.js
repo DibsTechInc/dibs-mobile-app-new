@@ -185,36 +185,21 @@ export const getUserFlashCreditAtStudio = createSelector(
     getUserFlashCredits,
     getDibsStudioId,
   ],
-  (flashCredits, dibsStudioId) => flashCredits.filter(fc => fc.dibs_studio_id === dibsStudioId)
+  (flashCredits, dibsStudioId) => (flashCredits.find(fc => fc.dibs_studio_id === dibsStudioId) || {})
 );
 
 export const getUserHasFlashCredit = createSelector(
   getUserFlashCreditAtStudio,
-  flashCredits => Boolean(flashCredits.length)
+  fc => Boolean(fc.credit)
 );
 
 export const getUserFlashCreditAmount = createSelector(
   getUserFlashCreditAtStudio,
-  flashCredits => flashCredits.reduce((acc, fc) => acc.plus(fc.credit), Decimal(0)).toNumber()
+  flashCredit => (flashCredit.credit || 0)
 );
 
 export const getFormattedUserFlashCreditAmount = createSelector(
   getUserFlashCreditAmount,
-  getStudioCurrency,
-  (amount, code) => formatCurrency(amount, { code })
-);
-
-export const getUserFlashCreditAmountInCart = createSelector(
-  getUserFlashCreditAtStudio,
-  state => state.cart.events.filter(item => item.price)
-                            .reduce((acc, item) => acc + item.quantity, 0), // <====3
-  (flashCredits, totalQuantity) =>
-    flashCredits.reduce((acc, fc, i) =>
-      (i < totalQuantity ? acc.plus(fc.credit) : acc, Decimal(0)).toNumber())
-);
-
-export const getFormattedUserFlashCreditAmountInCart = createSelector(
-  getUserFlashCreditAmountInCart,
   getStudioCurrency,
   (amount, code) => formatCurrency(amount, { code })
 );
