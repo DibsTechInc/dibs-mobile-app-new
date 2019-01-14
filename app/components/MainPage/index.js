@@ -165,7 +165,7 @@ class MainPage extends React.PureComponent {
             />
             <IconBorder />
             <IconLink
-              text={'YOUR CALENDAR'}
+              text={'MY CALENDAR'}
               route={UPCOMING_CLASS_ROUTE}
               alignItems="center"
               renderIcon={() => <CalendarIcon />}
