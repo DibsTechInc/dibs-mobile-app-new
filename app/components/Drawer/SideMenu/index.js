@@ -132,7 +132,7 @@ class SideMenu extends React.PureComponent {
           renderIcon={() => <ActivityIcon fromSideMenu />}
         />
         <NavLink
-          label="Calendar"
+          label="Studio Schedule"
           route={UPCOMING_CLASS_ROUTE}
           renderIcon={() => <CalendarIcon fromSideMenu />}
         />

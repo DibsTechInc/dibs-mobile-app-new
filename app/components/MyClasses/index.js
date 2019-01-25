@@ -8,9 +8,13 @@ import { withNavigation } from 'react-navigation';
 import {
   getDetailedUpcomingEvents,
   getDetailedPastEvents,
+  getUserHasUpcomingEvents,
 } from '../../selectors';
 
-import { FadeInView } from '../shared';
+import {
+  FadeInView,
+  MaterialButton,
+} from '../shared';
 
 import {
   WHITE,
@@ -18,6 +22,7 @@ import {
   LIGHT_GREY,
   GREY,
   CLASS_INFO_ROUTE,
+  SCHEDULE_ROUTE,
 } from '../../constants';
 import Header from '../Header';
 
@@ -44,7 +49,16 @@ class MyClasses extends React.PureComponent {
 
     this.upcomingClasses = this.generateClassList.bind(this, 'upcomingEvents');
     this.pastClasses = this.generateClassList.bind(this, 'pastEvents');
+    this.goToSchedule = this.goToSchedule.bind(this);
   }
+
+  /**
+   * @returns {undefined}
+   */
+  goToSchedule() {
+    this.props.navigation.navigate(SCHEDULE_ROUTE);
+  }
+
    /**
    * @param {array} classList - array of objects
    * @returns {undefined}
@@ -115,6 +129,11 @@ class MyClasses extends React.PureComponent {
             />
             {this.pastClasses()}
           </SettingsList>
+          <MaterialButton
+            text={this.props.userHasUpcomingEvents ? 'Book More' : 'Book Now'}
+            onPress={this.goToSchedule}
+            style={{ width: 200, height: 40, alignSelf: 'center', marginBottom: 40 }}
+          />
         </View>
       </FadeInView>
     );
@@ -125,11 +144,13 @@ MyClasses.propTypes = {
   upcomingEvents: PropTypes.arrayOf(PropTypes.shape()), // used in func generateClassList
   pastEvents: PropTypes.arrayOf(PropTypes.shape()), // used in func generateClassList
   navigation: PropTypes.shape(),
+  userHasUpcomingEvents: PropTypes.bool,
 };
 
 const mapStateToProps = state => ({
   upcomingEvents: getDetailedUpcomingEvents(state),
   pastEvents: getDetailedPastEvents(state),
+  userHasUpcomingEvents: getUserHasUpcomingEvents(state),
 });
 
 const MyClassesWithNavigation = withNavigation(MyClasses);
