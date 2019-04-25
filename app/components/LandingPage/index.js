@@ -53,7 +53,7 @@ class LandingPage extends Component {
 
     this.state = {
       currentIndex: 0,
-      isFlexStudios: Config.DIBS_STUDIO_ID === '1', // Flex studios specific
+      isFlexStudios: Config.DIBS_STUDIO_ID === 1, // Flex studios specific
       currentFlexStudiosId: null, // Flex studios specific
     };
 
@@ -73,9 +73,9 @@ class LandingPage extends Component {
    * @returns {undefined}
    */
   async checkCurrentLocation() {
-    if (Config.DIBS_STUDIO_ID !== '1') return;
+    if (Config.DIBS_STUDIO_ID !== 1) return;
     const currentFlexStudiosId = await AsyncStorage.getItem(Config.FLEX_STUDIO_LOCATION);
-    console.log(currentFlexStudiosId, '?dd?');
+
     await new Promise(res => this.setState({ currentFlexStudiosId }, res));
   }
 
@@ -90,7 +90,7 @@ class LandingPage extends Component {
    * @returns {undefined}
    */
   async handleOnPressChangeLocation() {
-    if (Config.DIBS_STUDIO_ID !== '1') return;
+    if (Config.DIBS_STUDIO_ID !== 1) return;
     const idToChange = this.state.currentFlexStudiosId === '1' ? '153' : '1';
     await AsyncStorage.setItem(Config.FLEX_STUDIO_LOCATION, idToChange);
 

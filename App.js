@@ -257,7 +257,7 @@ class App extends Component {
    * @returns {undefined}
    */
   async checkCurrentLocation() {
-    if (Config.DIBS_STUDIO_ID !== '1') return;
+    if (Config.DIBS_STUDIO_ID !== 1) return;
     const currentLocationStudioId = await AsyncStorage.getItem(Config.FLEX_STUDIO_LOCATION);
     const locationId = currentLocationStudioId || '1';
 

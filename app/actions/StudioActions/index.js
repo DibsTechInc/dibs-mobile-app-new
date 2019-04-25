@@ -16,11 +16,12 @@ export const {
 
 /**
  * @param {boolean} [showAlert=true] if false will not show native alert on fail
+ * @param {string|number} locationId the location id for flex specifically
  * @returns {function} thunk
  */
 export function requestStudioData(showAlert = true, locationId) {
   const id = locationId || Config.DIBS_STUDIO_ID;
-  console.log(typeof id, 'id got?')
+
   return async function innerRequestStudioData(dispatch, getState, dibsFetch) {
     if (getState().studio.loading) return;
     try {
@@ -29,7 +30,7 @@ export function requestStudioData(showAlert = true, locationId) {
       const res = await dibsFetch(path, { method: 'GET' });
       if (res.success) {
         dispatch(setStudio(res.studio));
-        await AsyncStorage.setItem(id, JSON.stringify(res.studio));
+        await AsyncStorage.setItem(String(id), JSON.stringify(res.studio));
         dispatch(setStudioLoadingFalse());
         return;
       }
