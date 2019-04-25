@@ -73,7 +73,7 @@ async function publishStudioAppUpdate(totalNumApps, { appJson, configJson }, i) 
     console.log(`Starting publish process for studio ${dibsStudioId}...`);
     const releaseChannel = configJson[`RELEASE_CHANNEL_${program.prod ? 'PROD' : 'DEV'}`];
     await new Promise((resolve, reject) => {
-      const publish = spawn('exp', ['publish', '--release-channel', releaseChannel]);
+      const publish = spawn('expo', ['publish', '--release-channel', releaseChannel]);
       publish.stdout.on('data', data => console.log(data.toString()));
       publish.stderr.on('data', data => console.log(data.toString()));
       publish.on('exit', code => (code ?
