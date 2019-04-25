@@ -18,16 +18,18 @@ export const {
  * @param {boolean} [showAlert=true] if false will not show native alert on fail
  * @returns {function} thunk
  */
-export function requestStudioData(showAlert = true) {
+export function requestStudioData(showAlert = true, locationId) {
+  const id = locationId || Config.DIBS_STUDIO_ID;
+  console.log(typeof id, 'id got?')
   return async function innerRequestStudioData(dispatch, getState, dibsFetch) {
     if (getState().studio.loading) return;
     try {
-      const path = `/api/studio?new_id_format=1&studioid=${Config.DIBS_STUDIO_ID}`;
+      const path = `/api/studio?new_id_format=1&studioid=${id}`;
       dispatch(setStudioLoadingTrue());
       const res = await dibsFetch(path, { method: 'GET' });
       if (res.success) {
         dispatch(setStudio(res.studio));
-        await AsyncStorage.setItem(Config.STUDIO_DATA_KEY, JSON.stringify(res.studio));
+        await AsyncStorage.setItem(id, JSON.stringify(res.studio));
         dispatch(setStudioLoadingFalse());
         return;
       }

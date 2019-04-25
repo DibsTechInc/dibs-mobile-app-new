@@ -1,5 +1,6 @@
 
 import React, { Component } from 'react';
+import { Updates } from 'expo';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
@@ -52,16 +53,50 @@ class LandingPage extends Component {
 
     this.state = {
       currentIndex: 0,
+      isFlexStudios: Config.DIBS_STUDIO_ID === '1', // Flex studios specific
+      currentFlexStudiosId: null, // Flex studios specific
     };
 
     this.handleOnChangeIndex = this.handleOnChangeIndex.bind(this);
+    this.checkCurrentLocation = this.checkCurrentLocation.bind(this);
+    this.handleOnPressChangeLocation = this.handleOnPressChangeLocation.bind(this);
   }
+
+  /**
+   * @returns {undefined}
+   */
+  async componentDidMount() {
+    await this.checkCurrentLocation();
+  }
+
+  /**
+   * @returns {undefined}
+   */
+  async checkCurrentLocation() {
+    if (Config.DIBS_STUDIO_ID !== '1') return;
+    const currentFlexStudiosId = await AsyncStorage.getItem(Config.FLEX_STUDIO_LOCATION);
+    console.log(currentFlexStudiosId, '?dd?');
+    await new Promise(res => this.setState({ currentFlexStudiosId }, res));
+  }
+
   /**
    * @returns {undefined}
    */
   handleOnPress() {
     this.props.navigation.navigate(VERIFY_ROUTE);
   }
+
+  /**
+   * @returns {undefined}
+   */
+  async handleOnPressChangeLocation() {
+    if (Config.DIBS_STUDIO_ID !== '1') return;
+    const idToChange = this.state.currentFlexStudiosId === '1' ? '153' : '1';
+    await AsyncStorage.setItem(Config.FLEX_STUDIO_LOCATION, idToChange);
+
+    Updates.reload();
+  }
+
   /**
    * @param {number} index the current index of the swipe page
    * @returns {undefined}
@@ -84,6 +119,10 @@ class LandingPage extends Component {
    * @returns {JSX} XML
    */
   render() {
+    // Hard coded names for Flex
+    const otherStudioName = this.state.currentFlexStudiosId === '1'
+      ? 'Woodbury' : 'Union Square';
+
     return (
       <View style={{ flex: 1 }}>
         <CustomStatusBar backgroundColor={'transparent'} barStyle="dark-content" />
@@ -104,6 +143,13 @@ class LandingPage extends Component {
               }
             </StyledWelcomeView>
             <StyledButtonsView>
+              {this.state.isFlexStudios && this.state.currentFlexStudiosId && (
+                <MaterialButton
+                  onPress={this.handleOnPressChangeLocation}
+                  text={`${otherStudioName} location`}
+                  style={{ width: '75%', height: 40, marginBottom: 10 }}
+                />
+              )}
               <MaterialButton
                 onPress={this.handleOnPress}
                 text="Continue"

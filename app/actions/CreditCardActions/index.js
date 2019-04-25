@@ -4,7 +4,8 @@ import Sentry from 'sentry-expo';
 import Config from '../../../config.json';
 import { enqueueApiError } from '../';
 
-const stripe = require('stripe-client')(Config.STRIPE_PUBLIC_KEY);
+const key = __DEV__ ? Config.STRIPE_TEST_KEY : Config.STRIPE_PUBLIC_KEY;
+const stripe = require('stripe-client')(key);
 
 
 const id = x => x; // identity fn

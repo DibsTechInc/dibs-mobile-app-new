@@ -97,6 +97,7 @@ class App extends Component {
       fontLoaded: false,
       imageLoaded: false,
       isReady: false,
+      currentFlexStudiosId: null,
       appState: AppState.currentState,
     };
     this.onAppStateChange = this.onAppStateChange.bind(this);
@@ -107,6 +108,9 @@ class App extends Component {
    * @returns {undefined}
    */
   async componentDidMount() {
+    // Flex specific - check curr location
+    await this.checkCurrentLocation();
+
     await this.getFonts();
     await Promise.delay(Config.LOADING_QUOTES.length && 2000);
     await this.getImages();
@@ -127,6 +131,7 @@ class App extends Component {
       }
     }, EVENT_POLL_INTERVAL);
   }
+
   /**
    * @param {Object} _ nextProps
    * @param {Object} nextState to be set before update
@@ -218,21 +223,24 @@ class App extends Component {
    * @returns {undefined}
    */
   async getAssets() {
+    const isFlexStudios = Config.DIBS_STUDIO_ID === '1';
+    const flexLocation = this.state.currentFlexStudiosId;
+
     try {
       const token = await AsyncStorage.getItem(Config.USER_TOKEN_KEY);
       let studioData = await AsyncStorage.getItem(Config.STUDIO_DATA_KEY);
 
-      if (studioData && studioData.length) {
+      if (studioData && studioData.length && !isFlexStudios) {
         studioData = JSON.parse(studioData);
         store.dispatch(setStudio(studioData));
-      } else await store.dispatch(requestStudioData(false));
+      } else await store.dispatch(requestStudioData(false, flexLocation));
 
       if (token) {
         await store.dispatch(requestUserData());
       }
 
       this.setState({ fetchedAssets: true, userToken: token });
-      if (await AsyncStorage.getItem(Config.STUDIO_DATA_KEY)) await store.dispatch(requestStudioData(false));
+      if (await AsyncStorage.getItem(Config.STUDIO_DATA_KEY)) await store.dispatch(requestStudioData(false, flexLocation));
       if (token) {
         await store.dispatch(syncUserEvents());
         await store.dispatch(syncUserPasses());
@@ -244,6 +252,19 @@ class App extends Component {
       this.setState({ fetchedAssets: false, errorOccurred: true });
     }
   }
+
+  /**
+   * @returns {undefined}
+   */
+  async checkCurrentLocation() {
+    if (Config.DIBS_STUDIO_ID !== '1') return;
+    const currentLocationStudioId = await AsyncStorage.getItem(Config.FLEX_STUDIO_LOCATION);
+    const locationId = currentLocationStudioId || '1';
+
+    await AsyncStorage.setItem(Config.FLEX_STUDIO_LOCATION, locationId);
+    await new Promise(res => this.setState({ currentFlexStudiosId: locationId }, res));
+  }
+
   /**
    * @param {Error} err that was thrown
    * @returns {undefined}
