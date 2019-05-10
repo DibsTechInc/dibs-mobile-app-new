@@ -17,7 +17,7 @@ import { VERIFY_ROUTE, DARK_TEXT_GREY } from '../../constants';
 
 import Config from '../../../config.json';
 import { FadeInView, CustomStatusBar, MaterialButton } from '../shared';
-import { FlexCenter, NormalText } from '../styled';
+import { FlexCenter, NormalText, HeavyText } from '../styled';
 import { getStudioName } from '../../selectors';
 
 const StyledView = styled.View`
@@ -120,8 +120,28 @@ class LandingPage extends Component {
    */
   render() {
     // Hard coded names for Flex
-    const otherStudioName = this.state.currentFlexStudiosId === '1'
+    const { currentFlexStudiosId } = this.state;
+
+    const currentStudioLocation = currentFlexStudiosId === '1'
+    ? 'Union Square' : 'Woodbury';
+
+    const otherStudioLocation = currentFlexStudiosId === '1'
       ? 'Woodbury' : 'Union Square';
+
+    let subtext = <StyledGrayText>Press continue to sign in</StyledGrayText>;
+    if (Config.DIBS_STUDIO_ID === 1) {
+      subtext = (
+        <View style={{ alignItems: 'center', marginTop: 10 }}>
+          <StyledGrayText style={{ fontSize: 14 }}>
+            Press <NormalText size="14">{otherStudioLocation}</NormalText> to switch to that location
+          </StyledGrayText>
+          <StyledGrayText style={{ fontSize: 14 }}>
+            Press <NormalText size="14">Continue</NormalText> to stay at {currentStudioLocation} location
+          </StyledGrayText>
+        </View>
+      );
+    }
+
 
     return (
       <View style={{ flex: 1 }}>
@@ -134,7 +154,7 @@ class LandingPage extends Component {
           <FadeInView>
             <StyledWelcomeView>
               <NormalText>Welcome to {this.props.studioName}!</NormalText>
-              <StyledGrayText>Press continue to sign in</StyledGrayText>
+              {subtext}
               {this.props.navigation.state.params &&
                 this.props.navigation.state.params.accountReactivated &&
                 <NormalText style={{ paddingHorizontal: 10, paddingVertical: 15, textAlign: 'center' }}>
@@ -146,7 +166,7 @@ class LandingPage extends Component {
               {this.state.isFlexStudios && this.state.currentFlexStudiosId && (
                 <MaterialButton
                   onPress={this.handleOnPressChangeLocation}
-                  text={`${otherStudioName} location`}
+                  text={`${otherStudioLocation}`}
                   style={{ width: '75%', height: 40, marginBottom: 10 }}
                 />
               )}
