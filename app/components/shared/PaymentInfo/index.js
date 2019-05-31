@@ -160,7 +160,24 @@ class PaymentInfo extends PureComponent {
         { flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }
         : {};
     let editLabel;
-    let paymentDisplay;
+    let paymentDisplay = (
+      <LiteCreditCardInput
+        autoFocus
+        cardScale={0.7}
+        labels={{
+          number: 'Card Number',
+          expiry: 'Expiration',
+          cvc: 'CVC',
+        }}
+        allowScroll
+        labelStyle={{ paddingTop: 10, fontFamily: 'studio-font' }}
+        validColor="black"
+        invalidColor="red"
+        placeholderColor="darkgray"
+        onChange={this.onChange}
+        inputStyle={{ fontFamily: 'studio-font' }}
+      />
+    );
 
     if (this.props.hasValidCC) {
       editLabel = this.props.isUpdatingCard ? 'Cancel' : 'Update';

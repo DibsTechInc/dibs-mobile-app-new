@@ -104,23 +104,17 @@ class UpcomingEvent extends PureComponent {
     const hasUnlimitedPass = (passes && passes.length && passes[0].studioPackage) && passes[0].studioPackage.unlimited;
     const isDibsEarlyCancel = !this.props.isOffsite && this.props.isEarlyCancel;
 
-    let extraNotice;
+    let extraNotice = `You will receive credit back to your account with ${this.props.studioName}. This credit will be for the full amount you paid for this class.`;
 
-    switch (true) {
-      case Boolean(isDibsEarlyCancel && this.props.userUsedPass):
-        extraNotice = `You will get back your ${this.props.studioName} package uses you used to purchase this class.`;
-        break;
+    if (isDibsEarlyCancel && this.props.userUsedPass) {
+      extraNotice = `You will get back your ${this.props.studioName} package uses you used to purchase this class.`;
+    }
 
-      case Boolean(isDibsEarlyCancel):
-        extraNotice = `You will receive credit back to your account with ${this.props.studioName}. This credit will be for the full amount you paid for this class.`;
-        break;
-
-      case Boolean(hasUnlimitedPass):
+    if (!isDibsEarlyCancel) {
+      extraNotice = 'Please note! This is a late drop, meaning you will not get any credit back to your account for dropping this class.';
+      if (hasUnlimitedPass) {
         extraNotice = `${extraNotice} ${this.props.lateDropText}`;
-        break;
-
-      default:
-        extraNotice = 'Please note! This is a late drop, meaning you will not get any credit back to your account for dropping this class.';
+      }
     }
 
     return this.props.isWaitlist ? '' : extraNotice;
