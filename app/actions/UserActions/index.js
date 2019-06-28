@@ -81,8 +81,9 @@ export function logOutUser() {
  */
 export function recordStudioVisit() {
   return async function innerRecordStudioVisit(dispatch, getState, dibsFetch) {
+    const { studio } = getState();
     try {
-      await dibsFetch(`/api/user/visit/${Config.DIBS_STUDIO_ID}`, {
+      await dibsFetch(`/api/user/visit/${studio.data.id}`, {
         method: 'POST',
         requiresAuth: true,
       });
@@ -99,9 +100,9 @@ export function recordStudioVisit() {
  */
 export function requestUserData() {
   return async function innerRequestUserData(dispatch, getState, dibsFetch) {
-    const dibsStudioId = Config.DIBS_STUDIO_ID;
+    const { studio } = getState();
     try {
-      const res = await dibsFetch(`/api/user?dibs_studio_id=${dibsStudioId}`, {
+      const res = await dibsFetch(`/api/user?dibs_studio_id=${studio.data.id}`, {
         method: 'GET',
         requiresAuth: true,
       });
@@ -320,6 +321,7 @@ export function updateUserEmailPreferences(list) {
  */
 export function createPasswordReset(email) {
   return async function innerCreatePasswordReset(dispatch, getState, dibsFetch) {
+    const { studio } = getState();
     try {
       const {
         success,
@@ -329,7 +331,7 @@ export function createPasswordReset(email) {
         method: 'POST',
         body: {
           email,
-          studioId: Config.DIBS_STUDIO_ID,
+          studioId: studio.data.id,
           shortCode: true,
         },
       });
@@ -413,8 +415,8 @@ export function submitPasswordReset(uuId, password) {
 export function getUserWaivers({ type, source }) {
   return async function innerGetUserWaivers(dispatch, getState, dibsFetch) {
     try {
-      const dibsStudioId = Config.DIBS_STUDIO_ID;
-      const url = `/api/user/waiver/${dibsStudioId}/${type}/${source}`;
+      const { studio } = getState();
+      const url = `/api/user/waiver/${studio.data.id}/${type}/${source}`;
       const {
         success,
         payload,
@@ -441,12 +443,12 @@ export function getUserWaivers({ type, source }) {
  */
 export function updateUserWaiverChecked(waiverChecked, userid) {
   return async function innerUpdateUserWaiverChecked(dispatch, getState, dibsFetch) {
-    const dibsStudioId = Config.DIBS_STUDIO_ID;
+    const { studio } = getState();
     const url = `/api/user/waiver/waiver-checked/${waiverChecked}`;
     try {
       await dibsFetch(url, {
         method: 'PUT',
-        body: { userid, dibs_studio_id: dibsStudioId },
+        body: { userid, dibs_studio_id: studio.data.id },
       });
     } catch (err) {
       console.log(err);

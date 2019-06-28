@@ -5,7 +5,11 @@ import Decimal from 'decimal.js';
 import { getUser } from '../index';
 import { getEventsData } from '../../EventsSelectors';
 import { getUpcomingEventsData } from '../../UpcomingEventsSelectors';
-import { getStudioSource, getStudioShortDateFormat } from '../../StudioSelectors';
+import {
+  getStudioSource,
+  getStudioShortDateFormat,
+  getDibsStudioId,
+} from '../../StudioSelectors';
 import Config from '../../../../config.json';
 
 const getCartEvents = state => ((state.cart && state.cart.events) || []);
@@ -19,13 +23,19 @@ export function getUserPasses(state) {
 }
 
 export const getUserStudioPasses = createSelector(
-  getUserPasses,
-  passes => passes.filter(p => p.dibs_studio_id === Config.DIBS_STUDIO_ID).filter(p => p.isValid)
+  [
+    getUserPasses,
+    getDibsStudioId,
+  ],
+  (passes, dibsStudioId) => passes.filter(p => p.dibs_studio_id === dibsStudioId).filter(p => p.isValid)
 );
 
 export const getAllUserStudioPasses = createSelector(
-  getUserPasses,
-  passes => passes.filter(p => p.dibs_studio_id === Config.DIBS_STUDIO_ID)
+  [
+    getUserPasses,
+    getDibsStudioId,
+  ],
+  (passes, dibsStudioId) => passes.filter(p => p.dibs_studio_id === dibsStudioId)
 );
 
 export const getUserStudioPassesLeft = createSelector(
