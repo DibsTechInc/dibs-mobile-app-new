@@ -111,7 +111,7 @@ class UpcomingEvent extends PureComponent {
     }
 
     if (!isDibsEarlyCancel) {
-      extraNotice = 'Please note! This is a late drop, meaning you will not get any credit back to your account for dropping this class.';
+      extraNotice = 'Please note! If this drop is within 12 hours of the class, you will not get any credit back to your account for dropping this class.';
       if (hasUnlimitedPass) {
         extraNotice = `${extraNotice} ${this.props.lateDropText}`;
       }
