@@ -21,7 +21,7 @@ const FilterStyledButton = styled.TouchableOpacity`
   border-width: 1px;
 `;
 
-const FilterText = NormalText.extend`
+const FilterText = styled(NormalText)`
   color: ${props => props.isSelected ? Config.STUDIO_COLOR : WHITE}
 `;
 

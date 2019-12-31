@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 import { ScrollView } from 'react-native';
 import { KeyboardAccessoryView } from 'react-native-keyboard-accessory';
 
@@ -7,7 +8,7 @@ import { DEFAULT_BG } from '../../../constants';
 import { FlexRow } from '../../styled';
 import { MaterialButton, FadeInView, InputField } from '../../shared';
 
-const ButtonContainer = FlexRow.extend`
+const ButtonContainer = styled(FlexRow)`
   align-items: center;
   justify-content: center;
   padding: 8px;

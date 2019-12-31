@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { ScrollView, View } from 'react-native';
+import styled from 'styled-components';
 
 import { WHITE, LIGHT_GREY } from '../../../constants';
 import { SpaceBetweenRow, HeavyText } from '../../styled';
 import { FadeInView, TransactionBreakdown } from '../';
 
-const CreditRow = SpaceBetweenRow.extend`
+const CreditRow = styled(SpaceBetweenRow)`
   align-items: center;
   border-bottom-width: 1px;
   border-color: ${LIGHT_GREY};
@@ -15,7 +16,7 @@ const CreditRow = SpaceBetweenRow.extend`
   margin-bottom: 10;
 `;
 
-const PayAmount = HeavyText.extend`
+const PayAmount = styled(HeavyText)`
   font-size: 18px;
 `;
 

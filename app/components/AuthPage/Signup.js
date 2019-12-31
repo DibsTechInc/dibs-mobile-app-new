@@ -43,7 +43,7 @@ const StyledButtonView = styled.View`
   align-items: center;
 `;
 
-const StyledText = NormalText.extend`
+const StyledText = styled(NormalText)`
   margin-bottom: 7%;
   font-size: ${WIDTH < 400 ? 13 : 16}
 `;
@@ -175,9 +175,9 @@ class Signup extends PureComponent {
     this.setState({ cca2: country.cca2 });
   }
 
-    /**
-   * @returns {Object} object containing canShowButton and canRegister booleans
-   */
+  /**
+ * @returns {Object} object containing canShowButton and canRegister booleans
+ */
   checkForm() {
     const isValidPhoneNumber = this.phone.isValidNumber();
 
@@ -222,7 +222,7 @@ class Signup extends PureComponent {
                 containerStyle={{ marginBottom: 30, width: 250 }}
                 customFocus
               />
-              {this.state.nameError.length && <NormalText style={{ color: RED, position: 'absolute', bottom: 10, fontSize: 12 }}>{this.state.nameError}</NormalText>}
+              {this.state.nameError.length ? <NormalText style={{ color: RED, position: 'absolute', bottom: 10, fontSize: 12 }}>{this.state.nameError}</NormalText> : undefined}
             </View>
             <View style={{ position: 'relative' }}>
               <InputField
@@ -232,7 +232,7 @@ class Signup extends PureComponent {
                 placeholder="Password (6 char min)"
                 containerStyle={{ marginBottom: 30, width: 250 }}
               />
-              {this.state.passwordError.length && <NormalText style={{ color: RED, position: 'absolute', bottom: 10, fontSize: 12 }}>{this.state.passwordError}</NormalText>}
+              {this.state.passwordError.length ? <NormalText style={{ color: RED, position: 'absolute', bottom: 10, fontSize: 12 }}>{this.state.passwordError}</NormalText> : undefined}
             </View>
             <View style={{ position: 'relative' }}>
               <PhoneInput
@@ -261,7 +261,7 @@ class Signup extends PureComponent {
               >
                 <View />
               </CountryPicker>
-              {this.state.phoneError.length && <NormalText style={{ color: RED, position: 'absolute', bottom: 10, fontSize: 12 }}>{this.state.phoneError}</NormalText>}
+              {this.state.phoneError.length ? <NormalText style={{ color: RED, position: 'absolute', bottom: 10, fontSize: 12 }}>{this.state.phoneError}</NormalText> : undefined}
             </View>
             <TermsCheckBox
               studioName={this.props.studioName}

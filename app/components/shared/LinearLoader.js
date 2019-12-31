@@ -32,7 +32,7 @@ const QuoteView = styled.View`
   align-items: center;
 `;
 
-const NormalQuoteText = NormalText.extend`
+const NormalQuoteText = styled(NormalText)`
   color: ${props => props.color};
   text-align: center;
 `;

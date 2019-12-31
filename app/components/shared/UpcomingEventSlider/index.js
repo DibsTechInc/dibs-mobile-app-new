@@ -148,7 +148,7 @@ class UpcomingClassSlider extends React.PureComponent {
         onStartShouldSetResponder={() => false}
         pointerEvents="box-none"
       >
-        {this.props.navigation.state.key === MAIN_ROUTE && (
+        {!!this.props.navigation.state.key === MAIN_ROUTE && (
           <Animated.View style={{ top: this.state.headerTop, left: 0, right: 0, position: 'absolute' }}>
             <Header title="Calendar" isSliderHeader />
           </Animated.View>
@@ -164,16 +164,16 @@ class UpcomingClassSlider extends React.PureComponent {
           allowDragging={Boolean(!this.props.expanded && this.props.events.length)}
         >
           <Panel roundEdge={this.props.expanded}>
-            {!this.props.expanded && this.props.events.length && (
+            {!this.props.expanded && this.props.events.length ? (
               <SvgContainer>
                 <Svg width={60} height={4}>
                   <Path d="M 3 2 L 57 2" stroke={LIGHT_GREY} strokeWidth={4} strokeLinecap="round" />
                 </Svg>
               </SvgContainer>
-            )}
-            {!this.props.events.length && (
+            ) : undefined}
+            {!this.props.events.length ? (
               <NoEvents />
-            )}
+            ) : undefined}
             <PaginatedSlider
               forReceiptPage={false}
               events={this.props.events}

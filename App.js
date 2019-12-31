@@ -1,16 +1,14 @@
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
-import {
-  Font,
-  ScreenOrientation,
-  Asset,
-  Updates,
-} from 'expo';
+import { ScreenOrientation, Updates } from 'expo';
 
-import Sentry from 'sentry-expo';
+import { Asset } from 'expo-asset';
+import * as Font from 'expo-font';
+
+import * as Sentry from 'sentry-expo';
 import styled from 'styled-components';
 
-import { AsyncStorage, View, AppState } from 'react-native';
+import { AsyncStorage, View, AppState, YellowBox } from 'react-native';
 import Promise from 'bluebird';
 
 import { WHITE, EVENT_POLL_INTERVAL } from './app/constants';
@@ -68,7 +66,7 @@ import StudioFontHeavy from './assets/fonts/Bold.ttf';
 // Sentry.enableInExpoDevelopment = true;
 
 // load up the guardian robot
-Sentry.config(Config.SENTRY_DSN).install();
+Sentry.init({ dsn: Config.SENTRY_DSN, enableInExpoDevelopment: true });
 
 const StyledLoadingPage = styled.View`
   align-items: center;
@@ -88,8 +86,6 @@ class App extends Component {
    */
   constructor() {
     super();
-    ScreenOrientation.allow(ScreenOrientation.Orientation.PORTRAIT);
-
     this.state = {
       fetchedAssets: false,
       userToken: null,
@@ -103,11 +99,14 @@ class App extends Component {
     this.onAppStateChange = this.onAppStateChange.bind(this);
 
     AppState.addEventListener('change', this.onAppStateChange);
+    console.disableYellowBox = true;
   }
   /**
    * @returns {undefined}
    */
   async componentDidMount() {
+    await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
+
     // Flex specific - check curr location
     await this.checkCurrentLocation();
 
@@ -176,9 +175,9 @@ class App extends Component {
       Sentry.captureException(new Error(err.message), { logger: 'my.module' });
     }
   }
-   /**
-   * @returns {undefined}
-   */
+  /**
+  * @returns {undefined}
+  */
   async getFonts() {
     await Font.loadAsync({
       'studio-font': StudioFont,
@@ -296,10 +295,10 @@ class App extends Component {
           {(this.state.fetchedAssets && this.state.imageLoaded) ? (
             <Navigator userToken={this.state.userToken} />
           ) : (
-            <StyledLoadingPage>
-              <LinearLoader showQuote={this.state.fontLoaded} />
-            </StyledLoadingPage>
-          )}
+              <StyledLoadingPage>
+                <LinearLoader showQuote={this.state.fontLoaded} />
+              </StyledLoadingPage>
+            )}
           <Modal />
         </View>
       </Provider>

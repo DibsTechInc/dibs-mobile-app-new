@@ -27,15 +27,15 @@ const MarginedView = styled.View`
   margin-horizontal: 25;
 `;
 
-const DescriptionView = MarginedView.extend`
+const DescriptionView = styled(MarginedView)`
   width: 50%;
 `;
 
-const PackageName = HeavyText.extend`
+const PackageName = styled(HeavyText)`
   font-size: 18;
 `;
 
-const GreyText = NormalText.extend`
+const GreyText = styled(NormalText)`
   color: ${TEXT_GREY};
 `;
 
@@ -121,7 +121,7 @@ class Package extends React.PureComponent {
   render() {
     return (
       <Container showOverlay={this.state.showOverlay}>
-        {this.state.showOverlay && (
+        {!!this.state.showOverlay && (
           <Overlay
             {...this.props}
             removeItem={this.removeFromCart}
@@ -140,14 +140,14 @@ class Package extends React.PureComponent {
             <NormalText>
               {this.props.additionalPackageDescription}
             </NormalText>}
-          {!this.props.unlimited && !this.props.onlyFirstPurchase &&
+          {!this.props.unlimited && !this.props.onlyFirstPurchase ?
             <NormalText>
               {this.props.formattedPricePerClass} / class
-            </NormalText>}
-          {this.props.autopay && this.props.commitment_period &&
+            </NormalText> : undefined}
+          {this.props.autopay && this.props.commitment_period ?
             <GreyText>
               {this.props.commitment_period} month commitment
-            </GreyText>}
+            </GreyText> : undefined}
           <GreyText>
             {this.props.isCartPage ? this.props.cartExpirationText : this.props.expirationText}
           </GreyText>

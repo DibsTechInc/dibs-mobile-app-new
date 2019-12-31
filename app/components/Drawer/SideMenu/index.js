@@ -47,7 +47,7 @@ const StyledContainer = styled.View`
   height: 100%;
 `;
 
-const StyledHeader = SpaceBetweenRow.extend`
+const StyledHeader = styled(SpaceBetweenRow)`
   align-items: center;
 `;
 
@@ -57,7 +57,7 @@ const StyledCloseButtonContainer = styled.View`
   margin-top: 20;
 `;
 
-const StyledHeavyText = HeavyText.extend`
+const StyledHeavyText = styled(HeavyText)`
   color: ${DARK_TEXT_GREY};
   font-size: 16;
   max-width: 180px;
@@ -110,7 +110,7 @@ class SideMenu extends React.PureComponent {
           value={this.props.creditBalance}
           hasFlashCredit={this.props.hasFlashCredit}
         />
-        {Boolean(this.props.firstPassName) && (
+        {Boolean(this.props.firstPassName) ? (
           <BalanceDisplay
             label="Current Package"
             value={[
@@ -120,7 +120,7 @@ class SideMenu extends React.PureComponent {
               `(Exp. ${this.props.firstPassExp})`,
             ]}
           />
-        )}
+        ) : undefined}
         <NavLink
           label="Main"
           route={MAIN_ROUTE}

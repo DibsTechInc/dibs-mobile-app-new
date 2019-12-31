@@ -9,7 +9,7 @@ import { FlexRow, HeavyText } from '../styled';
 import Overlay from './PurchaseItem/Overlay';
 import Button from './PurchaseItem/Button';
 
-const Container = FlexRow.extend`
+const Container = styled(FlexRow)`
   align-items: center;
   justify-content: space-between;
   background: ${WHITE},
@@ -24,11 +24,11 @@ const MarginedView = styled.View`
   margin-horizontal: 25;
 `;
 
-const DescriptionView = MarginedView.extend`
+const DescriptionView = styled(MarginedView)`
   width: 50%;
 `;
 
-const PayAmount = HeavyText.extend`
+const PayAmount = styled(HeavyText)`
   font-size: 18px;
 `;
 
@@ -97,14 +97,14 @@ class CreditLoadItem extends React.PureComponent {
   render() {
     return (
       <Container showOverlay={this.state.showOverlay}>
-        {this.state.showOverlay && (
+        {this.state.showOverlay ? (
           <Overlay
             {...this.props}
             removeItem={this.removeFromCart}
             addToCart={this.addToCart}
             fromPackage
           />
-        )}
+        ) : undefined}
         <DescriptionView>
           <PayAmount>
             {this.props.formattedPayAmount}

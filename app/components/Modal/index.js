@@ -32,7 +32,7 @@ const TouchableContainer = styled.TouchableOpacity`
   top: 0;
 `;
 
-const Title = HeavyText.extend`
+const Title = styled(HeavyText)`
   color: ${DARK_TEXT_GREY};
   margin-bottom: 7;
   padding-horizontal: 10;
@@ -41,7 +41,7 @@ const Title = HeavyText.extend`
   margin-top: 10px;
 `;
 
-const Message = NormalText.extend`
+const Message = styled(NormalText)`
   border-color: ${LIGHT_GREY};
   border-bottom-width: 1;
   color: ${DARK_TEXT_GREY};
@@ -56,7 +56,7 @@ const Message = NormalText.extend`
 //   width: 100%;
 // `;
 
-const ButtonRow = FlexRow.extend`
+const ButtonRow = styled(FlexRow)`
   justify-content: flex-end;
   width: 100%;
 `;
@@ -65,7 +65,7 @@ const Button = styled.TouchableOpacity`
   margin-right: 10;
 `;
 
-const ButtonText = HeavyText.extend`
+const ButtonText = styled(HeavyText)`
   color: ${Config.STUDIO_COLOR};
   padding-horizontal: 10;
   padding-vertical: 15;

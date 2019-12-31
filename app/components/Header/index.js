@@ -24,7 +24,7 @@ import {
 import { FlexRow, HeavyText, NormalText } from '../styled';
 import { BackArrow, CustomStatusBar, CartIcon, XIcon, FiltersIcon, CheckIcon } from '../shared';
 
-const StudioColoredTop = FlexRow.extend`
+const StudioColoredTop = styled(FlexRow)`
   align-items: center;
   background-color: ${Config.STUDIO_COLOR};
   height: ${60 + (isIphoneX() ? 30 : 0)};
@@ -44,7 +44,7 @@ const FilterView = styled.View`
   align-items: center;
 `;
 
-const PageTitle = HeavyText.extend`
+const PageTitle = styled(HeavyText)`
   color: ${WHITE};
   font-size: 16;
   text-align: center;
@@ -90,16 +90,16 @@ class Header extends React.PureComponent {
 
     }
   }
-    /**
-   * @returns {undefined}
-   */
+  /**
+ * @returns {undefined}
+ */
   async handleOnCloseSaveFilter() {
     this.props.hideFilter();
     await AsyncStorage.setItem(FILTERS_SETTINGS, JSON.stringify(this.props.filters));
   }
-    /**
-   * @returns {undefined}
-   */
+  /**
+ * @returns {undefined}
+ */
   async handleOnCloseExitFilter() {
     this.props.hideFilter();
     const savedFilters = this.handleSavedFilters();
@@ -163,13 +163,13 @@ class Header extends React.PureComponent {
         />
       </View>
     ) : (
-      <BackArrow
-        onPress={this.goBack}
-        style={{ marginLeft: 15 }}
-        stroke={WHITE}
-        strokeWidth={2.5}
-      />
-    );
+        <BackArrow
+          onPress={this.goBack}
+          style={{ marginLeft: 15 }}
+          stroke={WHITE}
+          strokeWidth={2.5}
+        />
+      );
 
     const showFilter = this.props.studioHasMultipleLocations && this.props.hasClassFilter && !this.props.filterSlideOpened;
     return (
@@ -184,7 +184,7 @@ class Header extends React.PureComponent {
           </PageTitle>
 
           <View style={{ flexDirection: 'row' }}>
-            {showFilter && <TouchableOpacity onPress={this.props.showFilter} style={{ width: 90, marginRight: 20 }}>
+            {!!showFilter && <TouchableOpacity onPress={this.props.showFilter} style={{ width: 90, marginRight: 20 }}>
               <FilterView>
                 <FiltersIcon />
                 <NormalText style={{ color: WHITE, marginLeft: 5, marginRight: 1 }}>Filters</NormalText>

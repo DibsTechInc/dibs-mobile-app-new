@@ -15,7 +15,7 @@ const BackButtonContainer = styled.View`
   width: 100%;
 `;
 
-const BodyText = NormalText.extend`
+const BodyText = styled(NormalText)`
   color: ${TEXT_GREY};
   margin-bottom: 20;
 `;

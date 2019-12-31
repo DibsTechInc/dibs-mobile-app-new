@@ -67,7 +67,7 @@ const StudioColoredQuantity = styled.TouchableOpacity`
   width: 40px;
 `;
 
-const QuantityDisplay = HeavyText.extend`
+const QuantityDisplay = styled(HeavyText)`
   color: ${DARK_TEXT_GREY};
   font-size: 16;
 `;

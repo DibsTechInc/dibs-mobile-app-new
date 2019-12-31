@@ -51,7 +51,7 @@ const BackgroundImage = styled.Image`
   top: 0;
 `;
 
-const MainPageHeader = SpaceBetweenRow.extend`
+const MainPageHeader = styled(SpaceBetweenRow)`
   align-items: center;
   margin-top: ${isIphoneX() * 15};
 `;
@@ -63,7 +63,7 @@ const Content = styled.View`
   padding-horizontal: ${WIDTH / 10};
 `;
 
-const Greeting = HeavyText.extend`
+const Greeting = styled(HeavyText)`
   color: ${WHITE};
   font-size: 32;
 `;
@@ -74,7 +74,7 @@ const Welcome = styled.Text`
   font-family: 'studio-font';
 `;
 
-const IconRow = FlexRow.extend`
+const IconRow = styled(FlexRow)`
   align-items: flex-end;
   justify-content: space-between;
   margin-top: 15;

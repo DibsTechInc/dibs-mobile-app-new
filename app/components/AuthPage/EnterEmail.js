@@ -29,7 +29,7 @@ const StyledButtonView = styled.View`
   align-items: center;
 `;
 
-const ErrorText = NormalText.extend`
+const ErrorText = styled(NormalText)`
   fontSize: 12px;
   color: red;
   position: absolute;
@@ -41,11 +41,11 @@ const ErrorText = NormalText.extend`
  * @extends Component
  */
 class EnterEmail extends PureComponent {
-    /**
-   * @constructor
-   * @constructs EnterEmail
-   * @param {Object} props for component
-   */
+  /**
+ * @constructor
+ * @constructs EnterEmail
+ * @param {Object} props for component
+ */
   constructor(props) {
     super(props);
     this.state = {
@@ -59,9 +59,9 @@ class EnterEmail extends PureComponent {
     this.onChangeText = this.onChangeText.bind(this);
   }
 
-   /**
-   * @returns {undefined}
-   */
+  /**
+  * @returns {undefined}
+  */
   componentWillUnmount() {
     Keyboard.dismiss();
   }
@@ -72,9 +72,9 @@ class EnterEmail extends PureComponent {
   onChangeText(email) {
     this.setState({ email });
   }
-    /**
-   * @returns {undefined}
-   */
+  /**
+ * @returns {undefined}
+ */
   async handleOnPress() {
     const { email } = this.state;
 
@@ -129,7 +129,7 @@ class EnterEmail extends PureComponent {
             labelStyle={{ marginBottom: 20, textAlign: 'center' }}
             blurOnSubmit={this.state.validInput}
           />
-          {this.state.errorText.length && <ErrorText>{this.state.errorText}</ErrorText>}
+          {this.state.errorText.length ? <ErrorText>{this.state.errorText}</ErrorText> : undefined}
         </ScrollView>
         <KeyboardAccessoryView
           alwaysVisible

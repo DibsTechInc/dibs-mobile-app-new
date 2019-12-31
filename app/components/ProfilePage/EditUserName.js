@@ -23,7 +23,7 @@ const StyledButtonView = styled.View`
   align-items: center;
 `;
 
-const StyledText = NormalText.extend`
+const StyledText = styled(NormalText)`
   margin-bottom: 7%;
 `;
 
@@ -106,8 +106,8 @@ class EditUserName extends PureComponent {
             placeholder={this.props.lastName}
             containerStyle={{ marginBottom: 20, width: 250 }}
           />
-          {this.state.errorMessage.length && <StyledText style={{ position: 'absolute', left: '20%', top: '64%', color: RED, fontSize: 12 }}>{this.state.errorMessage}</StyledText>}
-          {this.state.successMessage.length && <StyledText style={{ position: 'absolute', left: '20%', top: '64%', fontSize: 12 }}>{this.state.successMessage}</StyledText>}
+          {this.state.errorMessage.length ? <StyledText style={{ position: 'absolute', left: '20%', top: '64%', color: RED, fontSize: 12 }}>{this.state.errorMessage}</StyledText> : undefined}
+          {this.state.successMessage.length ? <StyledText style={{ position: 'absolute', left: '20%', top: '64%', fontSize: 12 }}>{this.state.successMessage}</StyledText> : undefined}
         </ScrollView>
         <KeyboardAccessoryView
           alwaysVisible

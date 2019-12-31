@@ -74,7 +74,7 @@ const CheckoutView = styled.View`
   elevation: 3;
 `;
 
-const SavingsText = NormalText.extend`
+const SavingsText = styled(NormalText)`
   color: ${BLACK};
 `;
 

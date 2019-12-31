@@ -1,11 +1,12 @@
 import React, { PureComponent } from 'react';
+import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import Dash from 'react-native-dash';
 
 import { WHITE } from '../../../constants';
 import { FlexRow, NormalText } from '../../styled';
 
-const StyledView = FlexRow.extend`
+const StyledView = styled(FlexRow)`
   align-items: center;
   margin-left: 10;
   width: 90%;

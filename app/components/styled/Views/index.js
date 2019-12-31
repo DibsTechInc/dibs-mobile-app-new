@@ -17,7 +17,7 @@ export const RightAlignedColumn = styled.View`
   align-items: flex-end;
 `;
 
-export const SpaceBetweenRow = FlexRow.extend`
+export const SpaceBetweenRow = styled(FlexRow)`
   justify-content: space-between;
 `;
 

@@ -73,7 +73,7 @@ class BuyItemsPage extends React.PureComponent {
    * @returns {JSX.Element} HTML
    */
   render() {
-    const showNoticeContainer = this.state.showPackageNotice && (<NoticeContainer>
+    const showNoticeContainer = this.state.showPackageNotice ? (<NoticeContainer>
       <NormalText>
         If you book a class on the schedule that is lower than your class package price, you will earn the difference back in credit to your account.
       </NormalText>
@@ -84,7 +84,7 @@ class BuyItemsPage extends React.PureComponent {
           </HeavyText>
         </TouchableOpacity>
       </View>
-    </NoticeContainer>);
+    </NoticeContainer>):undefined;
 
     return (
       <FadeInView>

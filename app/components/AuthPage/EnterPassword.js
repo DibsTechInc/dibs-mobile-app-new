@@ -46,7 +46,7 @@ const StyledButtonView = styled.View`
   align-items: center;
 `;
 
-const ErrorText = NormalText.extend`
+const ErrorText = styled(NormalText)`
   fontSize: 12px;
   color: red;
   position: absolute;
@@ -184,7 +184,7 @@ class EnterPassword extends React.PureComponent {
             containerStyle={{ marginBottom: shouldShowTerms ? 10 : 30, width: 200, minWidth: 200 }}
             labelStyle={{ marginBottom: 20, textAlign: 'center' }}
           />
-          {shouldShowTerms &&
+          {!!shouldShowTerms &&
             <TermsCheckBox
               studioName={this.props.studioName}
               tAndC={this.state.tAndC}
@@ -192,7 +192,7 @@ class EnterPassword extends React.PureComponent {
               onPress={this.handleOnCheck}
             />
           }
-          {this.state.errorText.length &&
+          {!!this.state.errorText.length &&
             <ErrorText requiresWaiver={shouldShowTerms}>
               {this.state.errorText}
             </ErrorText>}
