@@ -125,6 +125,7 @@ Building the App
 
 Run `node ./bin/publish.js -s [studio-id] [-d|--downloadAssets] [-c|--downloadConfigs] [-p|--prod]`
 
+`-s` - the studio id to run this for
 `-c` - downloads configs from db
 `-d` - downloads assets from S3
 `-p` - sets as prod deployment
@@ -140,7 +141,7 @@ be rejected by Apple's Application Loader.
 Submitting to the App Store
 ===========================
 
-IN PROGRESS...Stay tuned.
+See [here](https://docs.expo.io/versions/latest/distribution/uploading-apps/)
 
 Over The Air Updates
 ==================
