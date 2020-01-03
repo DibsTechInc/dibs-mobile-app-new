@@ -1,4 +1,5 @@
 import React from 'react';
+import { Platform, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
 import { withNavigation } from 'react-navigation';
 import { View, TouchableOpacity, AsyncStorage } from 'react-native';
@@ -34,7 +35,7 @@ const StudioColoredTop = styled(FlexRow)`
 const FilterView = styled.View`
   width: 90px;
   height: 25px;
-  margin: 20px;
+  margin: 20px 0;
   border-width: 1;
   border-color: ${WHITE};
   border-radius: 10;
@@ -153,6 +154,15 @@ class Header extends React.PureComponent {
   render() {
     const renderXIcon = this.props.upcomingEventSliderExpanded || this.props.isSliderHeader || this.props.filterSlideOpened || this.props.spotBookingOpened;
 
+    const styleSheet = StyleSheet.create({
+      container: {
+        height: 80 + (isIphoneX() ? 20 : Platform.OS === 'android' ? 30 : 0),
+        overflow: 'hidden',
+        zIndex: 2,
+        ...this.props.headerStyle
+      }
+    });
+
     const leftButton = (renderXIcon) ? (
       <View style={{ width: 30, marginLeft: 15 }}>
         <XIcon
@@ -173,7 +183,7 @@ class Header extends React.PureComponent {
 
     const showFilter = this.props.studioHasMultipleLocations && this.props.hasClassFilter && !this.props.filterSlideOpened;
     return (
-      <View style={{ height: 80 + (isIphoneX() ? 20 : 0), overflow: 'hidden', zIndex: 2, ...this.props.headerStyle }}>
+      <View style={styleSheet.container}>
         <CustomStatusBar backgroundColor={Config.STUDIO_COLOR} barStyle="light-content" />
         <StudioColoredTop>
           <View style={{ width: 60 }}>
@@ -184,7 +194,7 @@ class Header extends React.PureComponent {
           </PageTitle>
 
           <View style={{ flexDirection: 'row' }}>
-            {!!showFilter && <TouchableOpacity onPress={this.props.showFilter} style={{ width: 90, marginRight: 20 }}>
+            {!!showFilter && <TouchableOpacity onPress={this.props.showFilter} style={{ width: 'auto', marginRight: 20 }}>
               <FilterView>
                 <FiltersIcon />
                 <NormalText style={{ color: WHITE, marginLeft: 5, marginRight: 1 }}>Filters</NormalText>
