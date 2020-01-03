@@ -1,10 +1,9 @@
 node_modules/**/*
 .expo/*
 npm-debug.*
-config.json
-app.json
-assets/splash.png
-assets/icon.png
+config*.json
+app*.json
+assets/*.png
 assets/img/main-page.png
 assets/fonts/*.ttf
 .vscode/

@@ -123,35 +123,13 @@ If you opted to use the simulator, wait for it to open on your screen and follow
 Building the App
 ================
 
-Expo automatically creates production-ready bundles for iOS and Android.
-You are also able to set channels for each build, giving the ability to create dev and prod environments. This comes into play for OTA (Over The Air updates).
+Run `node ./bin/publish.js -s [studio-id] [-d|--downloadAssets] [-c|--downloadConfigs] [-p|--prod]`
 
-NOTE: The name of the release channel is set in the ```app_config_json``` column of the ```dibs_studios``` table. Look for ```RELEASE_CHANNEL_DEV``` and ```RELEASE_CHANNEL_PROD```.
+`-c` - downloads configs from db
+`-d` - downloads assets from S3
+`-p` - sets as prod deployment
 
-For new studios, you will need to update the ```app.json``` and the ```config.json``` files, and enter the names for the development and production release channels.
-The formatting we use is ```[STUDIONAME]_[MOBILE]``` for development and ```[STUDIONAME]_[MOBILE]_[PROD]``` for production.
-
-Please make sure to never use ```RELEASE_CHANNEL_PROD``` until features are ready to be in the App Store.
-
-We have an update script that automatically replaces all the necessary files for us.
-When creating a production app build for the first time (new studio), run the following command:
-
-This will replace all the necessary files for you and publish the production version of the build to our production release channel.
-After this step, you will be able to move on to actually building the app.
-
-Don't forget it's the ```dibs_studio_id``` and not the ```studioid```.
-
-```bash
-$ node ./bin/update.js -s [dibs_studio_id] -p
-```
-After checking to make sure everything working correctly, run the command below to create the build.
-
-```bash
-$ exp build:ios --release-channel [name of release channel]
-```
-
-Running the command above will also publish your app to your Expo profile and set its release channel to the corresponding build that was just published.
-More information on publishing in the next section.
+NOTE: Make sure that the `app.json`.`expo`.`sdkVersion` is set to `36.0.0` or above.
 
 Once the process has begun, Expo will ask if you want to provide the certifictes or have Expo generate them for you. Choose to have expo handle everything.
 When the bundle has finished building, you will be ready to submit to Testflight and eventually the App Store.

@@ -9,6 +9,8 @@ const AWS = require('aws-sdk');
 const { spawn } = require('child_process');
 const beautifyJsons = require('./helpers/beautify-jsons');
 
+const readline = require('readline-sync');
+
 const ALL_STUDIOS_QUERY =
   'SELECT app_json AS "appJson", app_config_json AS "configJson" FROM dibs_studios WHERE app_json IS NOT NULL AND (NOT $prod OR "liveMobileApp");';
 const STUDIO_QUERY =
@@ -31,7 +33,7 @@ const getObjectAsync = Promise.promisify(s3.getObject, { context: s3 });
  * @param {Object} SQL query result which contains app.json and config.json
  * @returns {Object} result of the publish for a particular studio
  */
-async function publishStudioAppUpdate(totalNumApps, { appJson, configJson }, i) {
+async function publishStudioAppUpdate(totalNumApps, { downloadAssets, downloadConfigs }, { appJson, configJson }, i) {
   const dibsStudioId = configJson.DIBS_STUDIO_ID;
 
   console.log(`Starting publish for studio ${dibsStudioId}... (${i + 1}/${totalNumApps})`);
@@ -45,29 +47,36 @@ async function publishStudioAppUpdate(totalNumApps, { appJson, configJson }, i) 
       data
     );
 
-    // Overwriting config files
-    console.log(`Overwriting config JSONs for studio ${dibsStudioId}...`);
-    writeFile('/app.json', new Buffer(JSON.stringify(appJson)));
-    writeFile('/config.json', new Buffer(JSON.stringify(configJson)));
-    console.log(`Finished overwriting config JSONs for studio ${dibsStudioId}.\n`);
 
-    // Overwriting fonts
-    console.log(`Overwriting font files for studio ${dibsStudioId}...`);
-    const regularFont = await getS3Object(`${configJson.STUDIO_FONT}-Regular.ttf`);
-    const boldFont = await getS3Object(`${configJson.STUDIO_FONT}-Bold.ttf`);
-    writeFile('/assets/fonts/Regular.ttf', regularFont.Body);
-    writeFile('/assets/fonts/Bold.ttf', boldFont.Body);
-    console.log(`Finished overwriting font files for studio ${dibsStudioId}.\n`);
+    if (!!downloadConfigs || readline.keyInYN('Do you want to get config JSONs from db? [y/N]')) {
+      // Overwriting config files
+      console.log(`Overwriting config JSONs for studio ${dibsStudioId}...`);
+      writeFile('/app.json', new Buffer(JSON.stringify(appJson)));
+      writeFile('/config.json', new Buffer(JSON.stringify(configJson)));
+      console.log(`Finished overwriting config JSONs for studio ${dibsStudioId}.\n`);
+    }
 
-    // Overwriting assets
-    console.log(`Overwriting image files for studio ${dibsStudioId}...`);
-    const iconImg = await getS3Object('icon.png');
-    const splashImg = await getS3Object('splash.png');
-    const mainPageImg = await getS3Object('main-page.png');
-    writeFile('/assets/icon.png', iconImg.Body);
-    writeFile('/assets/splash.png', splashImg.Body);
-    writeFile('/assets/img/main-page.png', mainPageImg.Body);
-    console.log(`Finished overwriting image files for studio ${dibsStudioId}.\n`);
+
+    if (!!downloadAssets || !!readline.keyInYN('Do you want to download assets from S3? [y/N]')) {
+      // Overwriting fonts
+      console.log(`Overwriting font files for studio ${dibsStudioId}...`);
+      const regularFont = await getS3Object(`${configJson.STUDIO_FONT}-Regular.ttf`);
+      const boldFont = await getS3Object(`${configJson.STUDIO_FONT}-Bold.ttf`);
+      writeFile('/assets/fonts/Regular.ttf', regularFont.Body);
+      writeFile('/assets/fonts/Bold.ttf', boldFont.Body);
+      console.log(`Finished overwriting font files for studio ${dibsStudioId}.\n`);
+
+      // Overwriting assets
+
+      console.log(`Overwriting image files for studio ${dibsStudioId}...`);
+      const iconImg = await getS3Object('icon.png');
+      const splashImg = await getS3Object('splash.png');
+      const mainPageImg = await getS3Object('main-page.png');
+      writeFile('/assets/icon.png', iconImg.Body);
+      writeFile('/assets/splash.png', splashImg.Body);
+      writeFile('/assets/img/main-page.png', mainPageImg.Body);
+      console.log(`Finished overwriting image files for studio ${dibsStudioId}.\n`);
+    }
 
     // Publish update
     console.log(`Starting publish process for studio ${dibsStudioId}...`);
@@ -96,7 +105,8 @@ async function publishStudioAppUpdate(totalNumApps, { appJson, configJson }, i) 
       .option('-a, --all', 'Update all studios')
       .option('-s, --studio <dibs_studio_id>', 'Studio ID to update', parseInt)
       .option('-p, --prod', 'Publishes app build to production release channels')
-      .parse(process.argv);
+      .option('-c, --downloadConfig', 'Downloads the configurations from db')
+      .option('-d, --downloadAssets', 'Downloads assets from S3').parse(process.argv);
     if (!program.all && !program.studio) {
       console.log('You must provide either the --all or --studio option. Run node bin/publish --help for more info.');
       process.exit(1);
@@ -105,18 +115,22 @@ async function publishStudioAppUpdate(totalNumApps, { appJson, configJson }, i) 
     const configs = await sequelize.query(
       ...(program.all ? [
         ALL_STUDIOS_QUERY,
-        { bind: { prod: Boolean(program.prod) },
-          type: sequelize.QueryTypes.SELECT },
+        {
+          bind: { prod: Boolean(program.prod) },
+          type: sequelize.QueryTypes.SELECT
+        },
       ] : [
-        STUDIO_QUERY,
-        { bind: { id: program.studio },
-          type: sequelize.QueryTypes.SELECT },
-      ])
+          STUDIO_QUERY,
+          {
+            bind: { id: program.studio },
+            type: sequelize.QueryTypes.SELECT
+          },
+        ])
     );
 
     const results = await Promise.map(
       configs,
-      publishStudioAppUpdate.bind(null, configs.length),
+      publishStudioAppUpdate.bind(null, configs.length, { downloadConfigs: program.downloadConfig, downloadAssets: program.downloadAssets }),
       { concurrency: 1 }
     );
 
