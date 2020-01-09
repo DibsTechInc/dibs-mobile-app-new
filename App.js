@@ -105,7 +105,8 @@ class App extends Component {
    * @returns {undefined}
    */
   async componentDidMount() {
-    await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
+    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
+
 
     // Flex specific - check curr location
     await this.checkCurrentLocation();
