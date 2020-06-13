@@ -3,7 +3,7 @@ import { AsyncStorage } from 'react-native';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
-import { NavigationActions, withNavigation } from 'react-navigation';
+import { NavigationActions, StackActions, withNavigation } from 'react-navigation';
 import { Svg, Path, LinearGradient, Stop, Defs } from 'react-native-svg';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 
@@ -123,17 +123,12 @@ class MainPage extends React.PureComponent {
    * @returns {undefined}
    */
   navigateToDrawer() {
-    const navigateAction = NavigationActions.navigate({
-      routeName: DRAWER_OPEN,
-    });
 
     const keyType = this.props.navigation.state.key.split('-')[0];
-    const pop = NavigationActions.pop();
-
     if (keyType === 'id') {
-      this.props.navigation.dispatch(pop);
+      this.props.navigation.pop();
     } else {
-      this.props.navigation.dispatch(navigateAction);
+      this.props.navigation.openDrawer();
     }
   }
   /**

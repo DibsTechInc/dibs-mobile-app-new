@@ -58,7 +58,8 @@
     "rn-sliding-up-panel": "^2.4.0",
     "sentry-expo": "^2.0.1",
     "stripe-client": "^1.1.5",
-    "styled-components": "^4.4.1"
+    "styled-components": "^4.4.1",
+    "expo-linear-gradient": "~8.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.7.7",
