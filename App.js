@@ -112,7 +112,7 @@ class App extends Component {
     await this.checkCurrentLocation();
 
     await this.getFonts();
-    await Promise.delay(Config.LOADING_QUOTES.length && 2000);
+    await Promise.delay(Config.LOADING_QUOTES?.length && 2000);
     await this.getImages();
     await this.getAssets();
     this.eventRefreshInterval = setInterval(async () => {

@@ -137,7 +137,7 @@ class EnterPassword extends React.PureComponent {
       return;
     }
 
-    await Promise.delay(Config.LOADING_QUOTES.length && 2000);
+    await Promise.delay(Config.LOADING_QUOTES?.length && 2000);
     this.props.navigation.navigate(MAIN_ROUTE);
   }
 
