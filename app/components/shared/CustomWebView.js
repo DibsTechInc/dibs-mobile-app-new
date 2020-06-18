@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { WebView } from 'react-native';
+import { WebView } from 'react-native-webview';
 
 /**
  * @class CustomWebView

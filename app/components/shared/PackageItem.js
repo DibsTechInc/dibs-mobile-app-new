@@ -136,7 +136,7 @@ class Package extends React.PureComponent {
           <HeavyText>
             {this.props.name}
           </HeavyText>
-          {this.props.additionalPackageDescription &&
+          {!!this.props.additionalPackageDescription &&
             <NormalText>
               {this.props.additionalPackageDescription}
             </NormalText>}
@@ -144,7 +144,7 @@ class Package extends React.PureComponent {
             <NormalText>
               {this.props.formattedPricePerClass} / class
             </NormalText> : undefined}
-          {this.props.autopay && this.props.commitment_period ?
+          {!!this.props.autopay && this.props.commitment_period ?
             <GreyText>
               {this.props.commitment_period} month commitment
             </GreyText> : undefined}
