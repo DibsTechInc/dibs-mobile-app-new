@@ -52,7 +52,7 @@ A lot of help [here](https://levelup.gitconnected.com/react-native-how-to-publis
       },
       "supportsTablet": true,
       "bundleIdentifier": "[bundle-id created on app id section]",
-      "buildNumber": "4"
+      "buildNumber": "1"
     },
     "icon": "./assets/icon.png",
     "name": "[Studio Name]",
@@ -76,7 +76,7 @@ A lot of help [here](https://levelup.gitconnected.com/react-native-how-to-publis
     },
     "privacy": "public",
     "updates": { "fallbackToCacheTimeout": 30000 },
-    "version": "1.0.5",
+    "version": "1.0.0",
     "platforms": ["ios"],
     "sdkVersion": "36.0.0",
     "description": "[Description]",
@@ -151,10 +151,27 @@ NOTE2: THis should be done from a mac
 1. Add to xcode
   1. open xcode
   1. Select Xcode > Open Developer Tool > Application Loader
-  1. Obtain the app specific password and put in
+  1. Obtain the app specific password and put in along with email associated with app-specific password
+  1. Select Choose from bottom right
+  1. Find the .IPA you downloaded and click Open
+  1. Click Next
+  1. Click Next when complete
+  1. Click Done
+
+# verification and testing
+1. Go to (https://appstoreconnect.apple.com/apps) and find the app that was submitted
+1. Click on Testflight, then on left App Store Connect Users or Add Groups to add testers
+1. When ready and tested, click Submit for Review and follow any requests
+
+# after deployment
+1. Make sure the app_json and app_config_json fields for the studio in `dibs_studio` are updated to house the json files, for others to use
+1. Upload the assets to the s3_ folder
+
+# alternative setup
+If the app_json and app_config_json fields in the `db.dibs_studio` are filled in, and there is a  valid s3 bucket with assets, you can run `node ./bin/download-assets.js --studio [studioid]` to get them
 
 # upgrade
-1. make sure to bump up `app.json > expo.version` to the next version
+1. make sure to bump up `app.json > expo.version` if making software changes and `app.json > expo.ios.buildNumber` to the next version (`buildNumber` should be incremental to new builds for an object, but expo.version should be the version of code in major.minor.defect format)
 1. follow same steps as promote
 
 # OTA Updates
