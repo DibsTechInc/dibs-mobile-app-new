@@ -115,7 +115,7 @@ A lot of help [here](https://levelup.gitconnected.com/react-native-how-to-publis
 }
 ```
 # test
-1. `expo login`
+1. `expo login` (if not logged in)
   - you will need an account for this step
   - you will also need the expo cli installed, `npm i -g expo-cli`
 1. `npm i`
@@ -156,3 +156,7 @@ NOTE2: THis should be done from a mac
 # upgrade
 1. make sure to bump up `app.json > expo.version` to the next version
 1. follow same steps as promote
+
+# OTA Updates
+
+Maybe later, visit (https://docs.expo.io/guides/configuring-ota-updates/) for more info.

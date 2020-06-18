@@ -66,7 +66,7 @@ import StudioFontHeavy from './assets/fonts/Bold.ttf';
 // Sentry.enableInExpoDevelopment = true;
 
 // load up the guardian robot
-Sentry.init({ dsn: Config.SENTRY_DSN, enableInExpoDevelopment: true });
+Sentry.init({ dsn: Config.SENTRY_DSN });
 
 const StyledLoadingPage = styled.View`
   align-items: center;
