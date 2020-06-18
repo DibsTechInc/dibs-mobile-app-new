@@ -115,16 +115,43 @@ A lot of help [here](https://levelup.gitconnected.com/react-native-how-to-publis
 }
 ```
 # test
-
+1. `expo login`
+  - you will need an account for this step
+  - you will also need the expo cli installed, `npm i -g expo-cli`
 1. `npm i`
 1. `run xcode ios simulator`
 1. `npm run start`
 1. click `Run on IOS Simulator` in chrome browser, or access via Expo app on IOS device by scanning the QR code
 
 # promote
-1. run `expo build:ios`
+NOTE: you may need to install keys from:
+  - (https://developer.apple.com/account/resources/certificates/list)
+    - click on one and Download
+NOTE2: THis should be done from a mac
+1. run `npm run build:ios`
   1. fill in your apple credentials
-
+  1. select `Expo handles all credentials. you can still provide overrides`
+  1. select `Let Expo handle the process`
+    1. If asked to reuse Apple Distribution Certificate, select `No, please create a new one`
+      - NEED TO CHECK THIS, probably should use current, as only 3 allowed per project
+  1. When asked to provide own Apple Push Notifications service key, select `Let Expo handle the process`
+    1. If asked to reuse select `No, please create a new one`
+      - NEED TO CHECK THIS
+1. download generated .ipa
+1. create app in app store if not created
+  1. go to (https://appstoreconnect.apple.com/apps)
+  1. Click + and New App
+    1. select iOS
+    1. Give a name
+    1. Give a Primary Language
+    1. Chose the bundleid you created before
+    1. give a sku (can be same as the bundleid)
+    1. select Full Access
+    1. click Create
+1. Add to xcode
+  1. open xcode
+  1. Select Xcode > Open Developer Tool > Application Loader
+  1. Obtain the app specific password and put in
 
 # upgrade
 1. make sure to bump up `app.json > expo.version` to the next version
