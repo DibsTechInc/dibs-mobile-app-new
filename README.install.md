@@ -1,21 +1,24 @@
 A lot of help [here](https://levelup.gitconnected.com/react-native-how-to-publish-an-expo-app-to-testflight-debug-common-errors-90e427b4b5ea)
 
 # Prereq
-1. Go to (appleid.apple.com) and set up an Application-specific Password (Security > App-Specific Passwords) and store so you have it
-1. Create the app id:
-  1. go to (developer.apple.com), Certificates, Identifiers, & Profiles > Idenfitiers > App IDs
-  1. click add button
-  1. select App IDs
-  1. give it a description, and a Bundle ID (Explicit) like `com.ondibs.[appname]app`
-  1. click Next, and Register
-1. set up sentry
-  1. go to (https://sentry.io/settings/dibs-technology-inc/projects/)
-  1. create a new project
-  1. Set Platform to Mobile > Objective-C
-  1. Set project Name to a name you want to use, but make it lowercase and with dashes, this will be your `sentry-project`
-  1. Click Create
-  1. Click until getting back to project
-  1. Copy down the dsn in the following:
+1. install xcode
+2. install expo
+  - `npm i -g expo-cli` or `sudo npm i -g expo-cli`
+3. Go to [appleid.apple.com] and set up an Application-specific Password (Security > App-Specific Passwords) and store so you have it
+4. Create the app id:
+  - go to [developer.apple.com], Certificates, Identifiers, & Profiles > Idenfitiers > App IDs
+  - click add button
+  - select App IDs
+  - give it a description, and a Bundle ID (Explicit) like `com.ondibs.[appname]app`
+  - click Next, and Register
+5. set up sentry
+  - go to [https://sentry.io/settings/dibs-technology-inc/projects/]
+  - create a new project
+  - Set Platform to Mobile > Objective-C
+  - Set project Name to a name you want to use, but make it lowercase and with dashes, this will be your `sentry-project`
+  - Click Create
+  - Click until getting back to project
+  - Copy down the dsn in the following:
 
 ```
 @import Sentry;
@@ -28,20 +31,20 @@ A lot of help [here](https://levelup.gitconnected.com/react-native-how-to-publis
     return YES;
 }
 ```
-  1. go to (https://sentry.io/settings/account/api/auth-tokens/) and save that `auth token` to be used as `sentry-authtoken`
+  - go to (https://sentry.io/settings/account/api/auth-tokens/) and save that `auth token` to be used as `sentry-authtoken`
 
 # New Project
 
 ## add images
 1. Add the icon of the project to `./assets/icon.png`
   - must be square and specifically 1024x1024
-1. ADd the splash screen of the project to `./assets/spash.png`
-1. Add the main page background to `./assets/img/main-page.png`
+2. Add the splash screen of the project to `./assets/spash.png`
+3. Add the main page background to `./assets/img/main-page.png`
 
 ## other config
-1. Create a random value using (https://www.random.org/strings/?num=1&len=20&digits=on&loweralpha=on&unique=on&format=html&rnd=new). This will be your `user-token-key`
+1. Create a random value using [https://www.random.org/strings/?num=1&len=20&digits=on&loweralpha=on&unique=on&format=html&rnd=new]. This will be your `user-token-key`
 
-1. create a `config.json` object, and populate with the following:
+2. create an `app.json` object, and populate with the following:
   - replace in [], and anything else that may need to change
 ```json
 {
@@ -86,7 +89,7 @@ A lot of help [here](https://levelup.gitconnected.com/react-native-how-to-publis
 }
 ```
 
-1. create an `app.json` object, and populate with the following:
+3. create an `config.json` object, and populate with the following:
 
 ```json
 {
@@ -118,62 +121,68 @@ A lot of help [here](https://levelup.gitconnected.com/react-native-how-to-publis
 1. `expo login` (if not logged in)
   - you will need an account for this step
   - you will also need the expo cli installed, `npm i -g expo-cli`
-1. `npm i`
-1. `run xcode ios simulator`
-1. `npm run start`
-1. click `Run on IOS Simulator` in chrome browser, or access via Expo app on IOS device by scanning the QR code
+    - may need to add `sudo` to the front
+2. `npm i`
+3. `npm run start`
+4. click `Run on IOS Simulator` in chrome browser, or access via Expo app on IOS device by scanning the QR code
+  - you will need xcode installed with an ios simulator
+  - you may need to run sudo `xcode-select -s /Applications/Xcode.app` the first time you run it
 
 # promote
 NOTE: you may need to install keys from:
-  - (https://developer.apple.com/account/resources/certificates/list)
+  - [https://developer.apple.com/account/resources/certificates/list]
     - click on one and Download
-NOTE2: THis should be done from a mac
+NOTE2: This should be done from a mac
 1. run `npm run build:ios`
-  1. fill in your apple credentials
-  1. select `Expo handles all credentials. you can still provide overrides`
-  1. select `Let Expo handle the process`
-    1. If asked to reuse Apple Distribution Certificate, select `No, please create a new one`
+  - fill in your apple credentials
+  - select `Expo handles all credentials. you can still provide overrides`
+  - select `Let Expo handle the process`
+    - If asked to reuse Apple Distribution Certificate, select `No, please create a new one`
       - NEED TO CHECK THIS, probably should use current, as only 3 allowed per project
-  1. When asked to provide own Apple Push Notifications service key, select `Let Expo handle the process`
-    1. If asked to reuse select `No, please create a new one`
+  - When asked to provide own Apple Push Notifications service key, select `Let Expo handle the process`
+    - If asked to reuse select `No, please create a new one`
       - NEED TO CHECK THIS
-1. download generated .ipa
-1. create app in app store if not created
-  1. go to (https://appstoreconnect.apple.com/apps)
-  1. Click + and New App
-    1. select iOS
-    1. Give a name
-    1. Give a Primary Language
-    1. Chose the bundleid you created before
-    1. give a sku (can be same as the bundleid)
-    1. select Full Access
-    1. click Create
-1. Add to xcode
-  1. open xcode
-  1. Select Xcode > Open Developer Tool > Application Loader
-  1. Obtain the app specific password and put in along with email associated with app-specific password
-  1. Select Choose from bottom right
-  1. Find the .IPA you downloaded and click Open
-  1. Click Next
-  1. Click Next when complete
-  1. Click Done
-
+2. download generated .ipa
+3. create app in app store if not created
+  - go to [https://appstoreconnect.apple.com/apps]
+  - Click + and New App
+    - select iOS
+    - Give a name
+    - Give a Primary Language
+    - Chose the bundleid you created before
+    - give a sku (can be same as the bundleid)
+    - select Full Access
+    - click Create
+4. Deploy
+  - Add to xcode (pre 11)
+    - open xcode
+    - Select Xcode > Open Developer Tool > Application Loader
+    - Obtain the app specific password and put in along with email associated with app-specific password
+    - Select Choose from bottom right
+    - Find the .IPA you downloaded and click Open
+    - Click Next
+    - Click Next when complete
+    - Click Done
+  - Add to transporter (post 11)
+    - download from app store if you don't have it
+    - add .ipa to the transporter
+    - hit Deliver button
 # verification and testing
 1. Go to (https://appstoreconnect.apple.com/apps) and find the app that was submitted
-1. Click on Testflight, then on left App Store Connect Users or Add Groups to add testers
-1. When ready and tested, click Submit for Review and follow any requests
+2. Click on Testflight, then on left App Store Connect Users or Add Groups to add testers
+3. When ready and tested, click Submit for Review and follow any requests
 
 # after deployment
 1. Make sure the app_json and app_config_json fields for the studio in `dibs_studio` are updated to house the json files, for others to use
-1. Upload the assets to the s3_ folder
+2. Upload the assets to the s3_ folder
 
 # alternative setup
 If the app_json and app_config_json fields in the `db.dibs_studio` are filled in, and there is a  valid s3 bucket with assets, you can run `node ./bin/download-assets.js --studio [studioid]` to get them
 
 # upgrade
 1. make sure to bump up `app.json > expo.version` if making software changes and `app.json > expo.ios.buildNumber` to the next version (`buildNumber` should be incremental to new builds for an object, but expo.version should be the version of code in major.minor.defect format)
-1. follow same steps as promote
+2. follow same steps as promote
 
 # OTA Updates
 
-Maybe later, visit (https://docs.expo.io/guides/configuring-ota-updates/) for more info.
+Maybe later, visit [https://docs.expo.io/guides/configuring-ota-updates/] for more info.
