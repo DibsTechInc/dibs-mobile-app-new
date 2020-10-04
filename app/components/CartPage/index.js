@@ -74,7 +74,7 @@ const CheckoutView = styled.View`
   elevation: 3;
 `;
 
-const SavingsText = NormalText.extend`
+const SavingsText = styled(NormalText)`
   color: ${BLACK};
 `;
 
@@ -160,9 +160,9 @@ class CartPage extends PureComponent {
       isUpdatingCard: !this.state.isUpdatingCard,
     });
   }
-   /**
-   * @returns {undefined}
-   */
+  /**
+  * @returns {undefined}
+  */
   handlePurchase() {
     this.setState({ isProcessingPayment: true });
     this.props.submitCartForPurchase();
@@ -179,9 +179,9 @@ class CartPage extends PureComponent {
   closePickingSpotsModal() {
     this.props.setCurrentSpotBookingEventId(null);
   }
-/**
-   * @returns {undefined}
-   */
+  /**
+     * @returns {undefined}
+     */
   clearEvents() {
     this.props.setCartEventsData([]);
   }
@@ -235,7 +235,7 @@ class CartPage extends PureComponent {
       />
     );
 
-    const renderCreditTiers = this.props.credits.length &&
+    const renderCreditTiers = !!this.props.credits.length &&
       (<View>
         <View style={{ marginLeft: 10, marginTop: 20 }}>
           <Text style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy' }}>
@@ -251,48 +251,48 @@ class CartPage extends PureComponent {
         ))}
       </View>);
 
-    const renderCartPackages = this.props.packages.length &&
-    (<View>
-      <View style={{ marginLeft: 10, marginTop: 20 }}>
-        <Text style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy' }}>
-          Packages
+    const renderCartPackages = !!this.props.packages.length &&
+      (<View>
+        <View style={{ marginLeft: 10, marginTop: 20 }}>
+          <Text style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy' }}>
+            Packages
         </Text>
-      </View>
-      {this.props.packages.map(pkg => (
-        <PackageItem
-          key={pkg.id}
-          {...pkg}
-          isCartPage
-          hasPackages={Boolean(this.props.packages.length)}
-        />
-      ))}
-    </View>);
+        </View>
+        {this.props.packages.map(pkg => (
+          <PackageItem
+            key={pkg.id}
+            {...pkg}
+            isCartPage
+            hasPackages={Boolean(this.props.packages.length)}
+          />
+        ))}
+      </View>);
 
-    const renderCartEvents = this.props.events.length &&
-    (<View>
-      <View style={{ marginLeft: 10, marginTop: 20 }}>
-        <Text style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy' }}>
-          Classes
+    const renderCartEvents = !!this.props.events.length &&
+      (<View>
+        <View style={{ marginLeft: 10, marginTop: 20 }}>
+          <Text style={{ fontSize: 16, color: GREY, fontFamily: 'studio-font-heavy' }}>
+            Classes
         </Text>
-      </View>
-      {this.props.events.map(item => (
-        <EventListItem
-          key={item.eventid}
-          isCartEvent
-          cartItem={item}
-          studioHasSpotBooking={this.props.studioHasSpotBooking}
-          lastRoomSpot={this.props.lastRoomSpot}
-          studioSpotLabel={this.props.studioSpotLabel}
-          {...item}
-        />
-      ))}
-    </View>);
+        </View>
+        {this.props.events.map(item => (
+          <EventListItem
+            key={item.eventid}
+            isCartEvent
+            cartItem={item}
+            studioHasSpotBooking={this.props.studioHasSpotBooking}
+            lastRoomSpot={this.props.lastRoomSpot}
+            studioSpotLabel={this.props.studioSpotLabel}
+            {...item}
+          />
+        ))}
+      </View>);
 
-    const renderPromoCodeField = Boolean(this.props.events.length || this.props.packages.length) && (
+    const renderPromoCodeField = Boolean(this.props.events.length || this.props.packages.length) ? (
       <PromoField
         events={this.props.events}
         packages={this.props.packages}
-      />);
+      />) : undefined;
 
     if (this.state.isProcessingPayment) {
       return (

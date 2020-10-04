@@ -23,7 +23,7 @@ const IconContainer = styled.View`
   width: 60;
 `;
 
-const LinkText = NormalText.extend`
+const LinkText = styled(NormalText)`
   color: ${DARK_TEXT_GREY};
 `;
 

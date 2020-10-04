@@ -12,7 +12,7 @@ const Link = styled.TouchableOpacity`
   justify-content: space-between;
 `;
 
-const LinkText = HeavyText.extend`
+const LinkText = styled(HeavyText)`
   text-align: center;
   color: ${WHITE};
   font-size: 16;

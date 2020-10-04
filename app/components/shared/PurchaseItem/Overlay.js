@@ -13,7 +13,7 @@ import { getStudioHasSpotBooking } from '../../../selectors';
 import { Overlay as StyledOverlay, FlexRow, NormalText } from '../../styled';
 import { TrashIcon, MinusIcon, PlusIcon } from '../../shared';
 
-const EventOverlay = StyledOverlay.extend`
+const EventOverlay = styled(StyledOverlay)`
   background-color: ${props => props.background};
   elevation: 3;
   justify-content: flex-end;
@@ -31,7 +31,7 @@ const ControlsContainer = styled.View`
   z-index: 5;
 `;
 
-const CartControls = FlexRow.extend`
+const CartControls = styled(FlexRow)`
   align-items: center;
   height: 30;
   justify-content: space-between;
@@ -43,7 +43,7 @@ const IconContainer = styled.View`
   width: 50;
 `;
 
-const Quantity = NormalText.extend`
+const Quantity = styled(NormalText)`
   color: ${TEXT_GREY};
   font-size: 16;
 `;

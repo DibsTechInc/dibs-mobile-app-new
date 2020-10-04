@@ -14,11 +14,11 @@ const LabelContainer = styled.View`
   margin-bottom: 3;
 `;
 
-const StyledLabelText = NormalText.extend`
+const StyledLabelText = styled(NormalText)`
   color: ${GREY};
 `;
 
-const StyledValueText = NormalText.extend`
+const StyledValueText = styled(NormalText)`
   color: ${Config.STUDIO_COLOR};
   font-size: 16;
 `;
@@ -39,7 +39,7 @@ class BalanceDisplay extends React.PureComponent {
           <StyledLabelText>
             {this.props.label}
           </StyledLabelText>
-          {this.props.hasFlashCredit && (
+          {!!this.props.hasFlashCredit && (
             <Icon
               iconName="bolt"
               size={15}
@@ -56,10 +56,10 @@ class BalanceDisplay extends React.PureComponent {
             </StyledValueText>
           ))
         ) : (
-          <StyledValueText numberOfLines={1}>
-            {this.props.value}
-          </StyledValueText>
-        )}
+            <StyledValueText numberOfLines={1}>
+              {this.props.value}
+            </StyledValueText>
+          )}
       </View>
     );
   }

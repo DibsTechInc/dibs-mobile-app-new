@@ -15,11 +15,11 @@ import { WHITE, GREY } from '../../../constants';
  * @extends {Component}
  */
 class EmailPreferences extends PureComponent {
-   /**
-   * @constructor
-   * @param {object} props from parent
-   * @constructs EmailPreferences
-   */
+  /**
+  * @constructor
+  * @param {object} props from parent
+  * @constructs EmailPreferences
+  */
   constructor(props) {
     super(props);
 
@@ -136,10 +136,10 @@ class EmailPreferences extends PureComponent {
             }}
           />
 
-          {this.state.message.length && <View style={{ width: '100%', height: 20, alignItems: 'center', justifyContent: 'center' }}>
+          {this.state.message.length ? <View style={{ width: '100%', height: 20, alignItems: 'center', justifyContent: 'center' }}>
             <Text style={{ color: Config.STUDIO_COLOR }}>{this.state.message}</Text>
           </View>
-          }
+            : undefined}
         </GiftedForm>
       </MaterialPanel>
     );

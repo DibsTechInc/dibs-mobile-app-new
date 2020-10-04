@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { AsyncStorage } from 'react-native';
-import { StackNavigator } from 'react-navigation';
+import { createAppContainer } from 'react-navigation';
+import { createStackNavigator } from 'react-navigation-stack';
 import Config from '../../config.json';
 
 import {
@@ -41,7 +42,7 @@ import {
 
 import ClassDetail from '../components/MyClasses/ClassDetail';
 
-const createStackNavigator = token => StackNavigator(
+const stackNav = token => createStackNavigator(
   {
     [LANDING_ROUTE]: {
       screen: LandingPage,
@@ -138,7 +139,7 @@ class Navigator extends Component {
    * @returns {JSX} XML
    */
   render() {
-    const Nav = createStackNavigator(this.props.userToken);
+    const Nav = createAppContainer(stackNav(this.props.userToken));
     return <Nav screenProps={{ isLoading: false }} />;
   }
 }

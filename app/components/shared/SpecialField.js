@@ -21,7 +21,7 @@ import {
 
 import Config from '../../../config.json';
 
-const SpecialFieldText = NormalText.extend`
+const SpecialFieldText = styled(NormalText)`
   flex: 2;
   margin-right: 10px;
 `;
@@ -41,12 +41,12 @@ const LoaderContainer = styled.View`
   padding-vertical: 10;
 `;
 
-const ErrorMessage = NormalText.extend`
+const ErrorMessage = styled(NormalText)`
   color: ${RED};
   margin-top: 10;
 `;
 
-const NoticeMessage = NormalText.extend`
+const NoticeMessage = styled(NormalText)`
   color: ${DARK_TEXT_GREY};
   margin-top: 10;
 `;

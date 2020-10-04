@@ -1,4 +1,5 @@
 import React from 'react';
+import { Platform, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
 import { withNavigation } from 'react-navigation';
 import { View, TouchableOpacity, AsyncStorage } from 'react-native';
@@ -24,7 +25,7 @@ import {
 import { FlexRow, HeavyText, NormalText } from '../styled';
 import { BackArrow, CustomStatusBar, CartIcon, XIcon, FiltersIcon, CheckIcon } from '../shared';
 
-const StudioColoredTop = FlexRow.extend`
+const StudioColoredTop = styled(FlexRow)`
   align-items: center;
   background-color: ${Config.STUDIO_COLOR};
   height: ${60 + (isIphoneX() ? 30 : 0)};
@@ -34,7 +35,7 @@ const StudioColoredTop = FlexRow.extend`
 const FilterView = styled.View`
   width: 90px;
   height: 25px;
-  margin: 20px;
+  margin: 20px 0;
   border-width: 1;
   border-color: ${WHITE};
   border-radius: 10;
@@ -44,7 +45,7 @@ const FilterView = styled.View`
   align-items: center;
 `;
 
-const PageTitle = HeavyText.extend`
+const PageTitle = styled(HeavyText)`
   color: ${WHITE};
   font-size: 16;
   text-align: center;
@@ -90,16 +91,16 @@ class Header extends React.PureComponent {
 
     }
   }
-    /**
-   * @returns {undefined}
-   */
+  /**
+ * @returns {undefined}
+ */
   async handleOnCloseSaveFilter() {
     this.props.hideFilter();
     await AsyncStorage.setItem(FILTERS_SETTINGS, JSON.stringify(this.props.filters));
   }
-    /**
-   * @returns {undefined}
-   */
+  /**
+ * @returns {undefined}
+ */
   async handleOnCloseExitFilter() {
     this.props.hideFilter();
     const savedFilters = this.handleSavedFilters();
@@ -153,6 +154,15 @@ class Header extends React.PureComponent {
   render() {
     const renderXIcon = this.props.upcomingEventSliderExpanded || this.props.isSliderHeader || this.props.filterSlideOpened || this.props.spotBookingOpened;
 
+    const styleSheet = StyleSheet.create({
+      container: {
+        height: 80 + (isIphoneX() ? 20 : Platform.OS === 'android' ? 30 : 0),
+        overflow: 'hidden',
+        zIndex: 2,
+        ...this.props.headerStyle
+      }
+    });
+
     const leftButton = (renderXIcon) ? (
       <View style={{ width: 30, marginLeft: 15 }}>
         <XIcon
@@ -163,17 +173,17 @@ class Header extends React.PureComponent {
         />
       </View>
     ) : (
-      <BackArrow
-        onPress={this.goBack}
-        style={{ marginLeft: 15 }}
-        stroke={WHITE}
-        strokeWidth={2.5}
-      />
-    );
+        <BackArrow
+          onPress={this.goBack}
+          style={{ marginLeft: 15 }}
+          stroke={WHITE}
+          strokeWidth={2.5}
+        />
+      );
 
     const showFilter = this.props.studioHasMultipleLocations && this.props.hasClassFilter && !this.props.filterSlideOpened;
     return (
-      <View style={{ height: 80 + (isIphoneX() ? 20 : 0), overflow: 'hidden', zIndex: 2, ...this.props.headerStyle }}>
+      <View style={styleSheet.container}>
         <CustomStatusBar backgroundColor={Config.STUDIO_COLOR} barStyle="light-content" />
         <StudioColoredTop>
           <View style={{ width: 60 }}>
@@ -184,7 +194,7 @@ class Header extends React.PureComponent {
           </PageTitle>
 
           <View style={{ flexDirection: 'row' }}>
-            {showFilter && <TouchableOpacity onPress={this.props.showFilter} style={{ width: 90, marginRight: 20 }}>
+            {!!showFilter && <TouchableOpacity onPress={this.props.showFilter} style={{ width: 'auto', marginRight: 20 }}>
               <FilterView>
                 <FiltersIcon />
                 <NormalText style={{ color: WHITE, marginLeft: 5, marginRight: 1 }}>Filters</NormalText>

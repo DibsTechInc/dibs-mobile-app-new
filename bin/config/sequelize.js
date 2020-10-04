@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-require('dotenv').load();
+require('dotenv').config();
 
 module.exports = {
   autoMigrateOldSchema: true,

@@ -1,4 +1,4 @@
-import { DrawerNavigator } from 'react-navigation';
+import { createDrawerNavigator } from 'react-navigation-drawer';
 
 import {
   MAIN_ROUTE,
@@ -27,7 +27,7 @@ import BuyItemsPage from '../BuyItemsPage';
 import ReferAFriendPage from '../ReferAFriendPage';
 import MyClasses from '../MyClasses';
 
-export default DrawerNavigator({
+export default createDrawerNavigator({
   [MAIN_ROUTE]: { screen: MainPage },
   [PROFILE_ROUTE]: { screen: ProfilePage },
   [SCHEDULE_ROUTE]: { screen: SchedulePage },

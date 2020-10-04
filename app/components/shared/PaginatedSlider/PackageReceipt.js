@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { ScrollView, View } from 'react-native';
+import styled from 'styled-components';
 
 import { WHITE, LIGHT_GREY, TEXT_GREY } from '../../../constants';
 import FadeInView from '../FadeInView';
 import { SpaceBetweenRow, HeavyText, NormalText } from '../../styled';
 import TransactionBreakdown from '../TransactionBreakdown';
 
-const PackageRow = SpaceBetweenRow.extend`
+const PackageRow = styled(SpaceBetweenRow)`
   align-items: center;
   border-bottom-width: 1px;
   border-color: ${LIGHT_GREY};
@@ -16,7 +17,7 @@ const PackageRow = SpaceBetweenRow.extend`
   margin-bottom: 10;
 `;
 
-const GreyText = NormalText.extend`
+const GreyText = styled(NormalText)`
   color: ${TEXT_GREY};
 `;
 
@@ -47,18 +48,18 @@ class PackageReceipt extends React.PureComponent {
                 <NormalText>
                   {this.props.additionalPackageDescription}
                 </NormalText>}
-              {!this.props.unlimited && !this.props.onlyFirstPurchase &&
+              {!this.props.unlimited && !this.props.onlyFirstPurchase ?
                 <NormalText>
                   {this.props.formattedPricePerClass} / class
-            </NormalText>}
-              {this.props.unlimited &&
+            </NormalText> : undefined}
+              {this.props.unlimited ?
                 <GreyText>
                   {this.props.commitment_period} month commitment
-            </GreyText>}
-              {!this.props.unlimited &&
+            </GreyText> : undefined}
+              {!this.props.unlimited ?
                 <GreyText>
                   {this.props.expirationText}
-                </GreyText>}
+                </GreyText> : undefined}
             </View>
           </PackageRow>
           <TransactionBreakdown

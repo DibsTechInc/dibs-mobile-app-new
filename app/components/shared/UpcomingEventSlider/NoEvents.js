@@ -15,7 +15,7 @@ const Container = styled.View`
   align-items: center;
 `;
 
-const NoEventsText = NormalText.extend`
+const NoEventsText = styled(NormalText)`
   color: ${DARK_TEXT_GREY};
   margin-bottom: 20;
   margin-top: 10;

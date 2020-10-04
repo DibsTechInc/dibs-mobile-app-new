@@ -10,7 +10,7 @@ import { FlexRow, FlexCenter, RightAlignedColumn, HeavyText, NormalText } from '
 import Button from './PurchaseItem/Button';
 import Overlay from './PurchaseItem/Overlay';
 
-const Container = FlexRow.extend`
+const Container = styled(FlexRow)`
   background: ${WHITE},
   border-bottom-width: 1;
   border-bottom-color: ${LIGHT_GREY};
@@ -20,7 +20,7 @@ const Container = FlexRow.extend`
   position: relative;
 `;
 
-const PriceColumn = FlexCenter.extend`
+const PriceColumn = styled(FlexCenter)`
   flex-basis: 25%;
 `;
 
@@ -30,15 +30,15 @@ const CenterColumn = styled.View`
   padding-horizontal: 5;
 `;
 
-const ButtonColumn = FlexCenter.extend`
+const ButtonColumn = styled(FlexCenter)`
   flex-basis: 30%;
 `;
 
-const Price = HeavyText.extend`
+const Price = styled(HeavyText)`
   font-size: 20;
 `;
 
-const ScheduleText = NormalText.extend`
+const ScheduleText = styled(NormalText)`
   color: ${DARK_TEXT_GREY};
   font-size: 16;
 `;
@@ -133,12 +133,12 @@ class EventListItem extends React.PureComponent {
           (this.props.soldOut && !this.props.waitlisted && !this.props.has_waitlist)
           || this.state.showOverlay
         ) ? (
-          <Overlay
-            {...this.props}
-            removeItem={this.removeFromCart}
-            addToCart={this.addToCart}
-          />
-        ) : null}
+            <Overlay
+              {...this.props}
+              removeItem={this.removeFromCart}
+              addToCart={this.addToCart}
+            />
+          ) : null}
         {this.props.isCartEvent ? null : (
           <PriceColumn>
             {this.props.passid ? (
@@ -151,10 +151,10 @@ class EventListItem extends React.PureComponent {
                 </Price>
               </RightAlignedColumn>
             ) : (
-              <Price>
-                {this.props.formattedRoundedPrice}
-              </Price>
-            )}
+                <Price>
+                  {this.props.formattedRoundedPrice}
+                </Price>
+              )}
           </PriceColumn>
         )}
         <CenterColumn isCartEvent={this.props.isCartEvent}>
@@ -162,7 +162,7 @@ class EventListItem extends React.PureComponent {
             <HeavyText>
               {this.props.isCartEvent ?
                 `${this.props.shortDayOfWeek} ${this.props.shortEventDate}`
-                  : `${this.props.startTimeInLocalTZ} - ${this.props.endTimeInLocalTZ}`
+                : `${this.props.startTimeInLocalTZ} - ${this.props.endTimeInLocalTZ}`
               }
             </HeavyText>
             {this.props.isCartEvent ? (
@@ -186,9 +186,9 @@ class EventListItem extends React.PureComponent {
                 {this.props.formattedRoundedPrice}
               </ScheduleText>
             ) : null}
-            {this.props.isCartEvent && this.props.studioHasSpotBooking && <ScheduleText numberOfLines={1} style={{ color: GREY }}>
+            {this.props.isCartEvent && this.props.studioHasSpotBooking ? <ScheduleText numberOfLines={1} style={{ color: GREY }}>
               {this.props.spotIds.length ? lastRoomSpot : `No ${spotName} Selected`}
-            </ScheduleText>}
+            </ScheduleText> : undefined}
           </View>
         </CenterColumn>
         <ButtonColumn>

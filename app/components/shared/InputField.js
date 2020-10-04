@@ -3,8 +3,9 @@ import { withNavigation } from 'react-navigation';
 import PropTypes from 'prop-types';
 import { TextInput } from 'react-native';
 import { StudioColorBottomBorder, HeavyText } from '../styled';
+import styled from 'styled-components';
 
-const Label = HeavyText.extend`
+const Label = styled(HeavyText)`
   margin-bottom: 5;
 `;
 

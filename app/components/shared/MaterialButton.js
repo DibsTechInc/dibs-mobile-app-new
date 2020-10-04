@@ -15,7 +15,7 @@ const StyledMaterial = styled.TouchableHighlight`
   justify-content: center;
 `;
 
-const StyledText = NormalText.extend`
+const StyledText = styled(NormalText)`
   color: ${props => props.textColor};
   font-size: ${props => props.fontSize};
 `;

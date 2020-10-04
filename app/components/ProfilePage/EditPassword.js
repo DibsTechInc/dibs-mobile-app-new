@@ -20,7 +20,7 @@ const StyledButtonView = styled.View`
   align-items: center;
 `;
 
-const StyledText = NormalText.extend`
+const StyledText = styled(NormalText)`
   margin-bottom: 7%;
 `;
 
@@ -106,7 +106,7 @@ class EditPassword extends PureComponent {
               placeholder="Current password"
               containerStyle={{ marginBottom: 30, width: 250 }}
             />
-            {this.state.currentPasswordError.length && <StyledText style={{ fontSize: 12, color: RED, position: 'absolute', bottom: -12 }}>{this.state.currentPasswordError}</StyledText>}
+            {this.state.currentPasswordError.length ? <StyledText style={{ fontSize: 12, color: RED, position: 'absolute', bottom: -12 }}>{this.state.currentPasswordError}</StyledText> : undefined}
           </View>
           <InputField
             autoCapitalize="none"
@@ -123,9 +123,9 @@ class EditPassword extends PureComponent {
             containerStyle={{ marginBottom: 5, width: 250 }}
           />
           <View style={{ width: 250 }}>
-            {this.state.passwordConfirmationError.length && <StyledText style={{ fontSize: 12, color: RED }}>{this.state.passwordConfirmationError}</StyledText>}
-            {this.state.samePasswordError.length && <StyledText style={{ fontSize: 12, color: RED }}>{this.state.samePasswordError}</StyledText>}
-            {this.state.successMessage.length && <StyledText style={{ fontSize: 12 }}>{this.state.successMessage}</StyledText>}
+            {this.state.passwordConfirmationError.length ? <StyledText style={{ fontSize: 12, color: RED }}>{this.state.passwordConfirmationError}</StyledText> : undefined}
+            {this.state.samePasswordError.length ? <StyledText style={{ fontSize: 12, color: RED }}>{this.state.samePasswordError}</StyledText> : undefined}
+            {this.state.successMessage.length ? <StyledText style={{ fontSize: 12 }}>{this.state.successMessage}</StyledText> : undefined}
           </View>
         </ScrollView>
         <KeyboardAccessoryView

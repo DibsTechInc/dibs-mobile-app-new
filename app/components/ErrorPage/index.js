@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Sentry from 'sentry-expo';
 import { connect } from 'react-redux';
 import { Updates } from 'expo';
+import styled from 'styled-components';
 
 import Config from '../../../config.json';
 
@@ -10,17 +11,17 @@ import { WHITE, DARK_TEXT_GREY } from '../../constants';
 import { FlexCenter, HeavyText, NormalText } from '../styled';
 import { MaterialButton } from '../shared';
 
-const Container = FlexCenter.extend`
+const Container = styled(FlexCenter)`
   background: ${WHITE};
 `;
 
-const Heading = HeavyText.extend`
+const Heading = styled(HeavyText)`
   color: ${Config.STUDIO_COLOR};
   font-size: 16;
   margin-bottom: 10;
 `;
 
-const Body = NormalText.extend`
+const Body = styled(NormalText)`
   color: ${DARK_TEXT_GREY};
   font-size: 16;
   padding-horizontal: 20;

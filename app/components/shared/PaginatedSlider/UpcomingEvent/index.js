@@ -28,7 +28,7 @@ import { AddToCalendarButton } from '../../../shared';
 import Map from './Map';
 import Header from '../../../Header';
 
-const EventRow = SpaceBetweenRow.extend`
+const EventRow = styled(SpaceBetweenRow)`
   align-items: center;
   padding-horizontal: 10;
   padding-vertical: 10;
@@ -41,23 +41,23 @@ const EventInfo = styled.View`
   margin-left: 5px;
 `;
 
-const HeavyEventText = HeavyText.extend`
+const HeavyEventText = styled(HeavyText)`
   color: ${DARK_TEXT_GREY};
   font-size: 16;
 `;
 
-const EventText = NormalText.extend`
+const EventText = styled(NormalText)`
   color: ${DARK_TEXT_GREY};
   font-size: 16;
   margin-top: 5;
 `;
 
-const DesciptionText = NormalText.extend`
+const DesciptionText = styled(NormalText)`
   margin-top: 15px;
   margin-bottom: 15px;
 `;
 
-const HeaderText = HeavyText.extend`
+const HeaderText = styled(HeavyText)`
   color: ${GREY};
 `;
 
@@ -96,9 +96,9 @@ class UpcomingEvent extends PureComponent {
       this.props.setUpcomingEventSliderExpandedFalse();
     }
   }
-/**
-   * @returns {string} extra notice
-   */
+  /**
+     * @returns {string} extra notice
+     */
   displayAdditionalNotice() {
     const { passes } = this.props;
     const hasUnlimitedPass = (passes && passes.length && passes[0].studioPackage) && passes[0].studioPackage.unlimited;
@@ -198,7 +198,7 @@ class UpcomingEvent extends PureComponent {
           backgroundColor: WHITE,
         }}
       >
-        {this.props.hasHeader && <Header title="Class Detail" />}
+        {!!this.props.hasHeader && <Header title="Class Detail" />}
         <ScrollView
           ref={node => this.scrollView = node}
           onScrollEndDrag={this.onScrollEnd}
@@ -217,13 +217,13 @@ class UpcomingEvent extends PureComponent {
                   <HeavyEventText>
                     {this.props.shortDayOfWeek} {this.props.shortEventDate}
                   </HeavyEventText>
-                  {!this.props.isTransactionHistory && <AddToCalendarButton
+                  {!this.props.isTransactionHistory ? <AddToCalendarButton
                     title={`${this.props.name} w/ ${this.props.instructorName}`}
                     startDate={this.props.start_time}
                     endDate={this.props.end_time}
                     location={this.props.locationName}
                     timeZone={this.props.mainTZ}
-                  />}
+                  /> : undefined}
                 </View>
                 <EventText numberOfLines={1}>
                   {this.props.formattedStartTime} @ {this.props.locationName}
@@ -236,21 +236,21 @@ class UpcomingEvent extends PureComponent {
                 <EventText numberOfLines={1}>
                   {this.props.instructorName}
                 </EventText>
-                {(this.props.quantity > 1 || this.props.isWaitlist) && (
+                {(this.props.quantity > 1 || this.props.isWaitlist) ? (
                   <EventText numberOfLines={1}>
                     {this.props.isWaitlist ? 'Waitlisted' : `${this.props.quantity} spot${this.props.quantity > 1 ? 's' : ''}`}
                   </EventText>
-                )}
+                ) : undefined}
               </View>
             </EventInfo>
             {renderRightSideContent}
           </EventRow>
-          {!this.props.isTransactionHistory && <Map
+          {!this.props.isTransactionHistory ? <Map
             latitude={this.props.latitude}
             longitude={this.props.longitude}
             locationName={this.props.locationName}
             allowInteraction={this.props.expanded}
-          />}
+          /> : undefined}
           <TransactionBreakdown
             formattedSubtotal={this.props.formattedSubtotal}
             taxAmount={this.props.tax_amount}
@@ -263,8 +263,8 @@ class UpcomingEvent extends PureComponent {
             formattedRAFCreditAmount={this.props.formattedRAFCreditAmount}
             formattedTotal={this.props.formattedTotal}
           />
-          {!this.props.isTransactionHistory && this.props.formattedDescription && descriptionContainer}
-          {!this.props.isTransactionHistory && <View style={{ paddingBottom: 60, paddingTop: 20, marginLeft: 20, marginRight: 20 }}>
+          {!this.props.isTransactionHistory && this.props.formattedDescription ? descriptionContainer : undefined}
+          {!this.props.isTransactionHistory ? <View style={{ paddingBottom: 60, paddingTop: 20, marginLeft: 20, marginRight: 20 }}>
             <HeaderText>
               Drop Policy
             </HeaderText>
@@ -274,7 +274,7 @@ class UpcomingEvent extends PureComponent {
             <DesciptionText>
               {this.props.lateDropText}
             </DesciptionText>
-          </View>}
+          </View> : undefined}
         </ScrollView>
       </FadeInView>
     );

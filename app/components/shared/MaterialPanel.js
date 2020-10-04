@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { View, TouchableOpacity } from 'react-native';
 import { DARK_TEXT_GREY } from '../../constants';
 import { MaterialPanelView, HeavyText } from '../styled';
+import styled from 'styled-components';
 
-
-const Heading = HeavyText.extend`
+const Heading = styled(HeavyText)`
   color: ${DARK_TEXT_GREY};
   font-size: 16px;
   margin-bottom: 15px;
@@ -28,12 +28,12 @@ class MaterialPanel extends React.PureComponent {
         isCartPage={this.props.isCartPage}
       >
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          {this.props.heading && (
+          {!!this.props.heading && (
             <Heading style={this.props.headerStyle}>
               {this.props.heading}
             </Heading>
           )}
-          {this.props.headingRight && (
+          {!!this.props.headingRight && (
             <TouchableOpacity onPress={this.props.onPressHeadingRight}>
               <Heading style={this.props.headerRightStyle}>
                 {this.props.headingRight}

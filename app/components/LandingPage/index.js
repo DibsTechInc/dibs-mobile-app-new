@@ -24,15 +24,15 @@ const StyledView = styled.View`
   flex: 1;
 `;
 
-const StyledButtonsView = StyledView.extend`
+const StyledButtonsView = styled(StyledView)`
   align-items: center;
 `;
 
-const StyledWelcomeView = FlexCenter.extend`
+const StyledWelcomeView = styled(FlexCenter)`
   flex: 5;
 `;
 
-const StyledGrayText = NormalText.extend`
+const StyledGrayText = styled(NormalText)`
   color: ${DARK_TEXT_GREY};
 `;
 
@@ -123,7 +123,7 @@ class LandingPage extends Component {
     const { currentFlexStudiosId } = this.state;
 
     const currentStudioLocation = currentFlexStudiosId === '1'
-    ? 'Union Square' : 'Woodbury';
+      ? 'Union Square' : 'Woodbury';
 
     const otherStudioLocation = currentFlexStudiosId === '1'
       ? 'Woodbury' : 'Union Square';
@@ -163,13 +163,13 @@ class LandingPage extends Component {
               }
             </StyledWelcomeView>
             <StyledButtonsView>
-              {this.state.isFlexStudios && this.state.currentFlexStudiosId && (
+              {this.state.isFlexStudios && this.state.currentFlexStudiosId ? (
                 <MaterialButton
                   onPress={this.handleOnPressChangeLocation}
                   text={`${otherStudioLocation}`}
                   style={{ width: '75%', height: 40, marginBottom: 10 }}
                 />
-              )}
+              ) : undefined}
               <MaterialButton
                 onPress={this.handleOnPress}
                 text="Continue"

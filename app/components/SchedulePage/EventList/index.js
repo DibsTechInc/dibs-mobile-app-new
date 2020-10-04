@@ -28,7 +28,7 @@ const ContainerWithMargin = styled.View`
   width: 100%;
 `;
 
-const NoEventsText = NormalText.extend`
+const NoEventsText = styled(NormalText)`
   text-align: center;
   color: ${DARK_TEXT_GREY};
   font-size: 16;
@@ -75,13 +75,13 @@ class EventList extends React.PureComponent {
               <LinearLoader color={Config.STUDIO_COLOR} />
             </ContainerWithMargin>
           ) : null}
-          {!this.props.isLoading && !this.props.events.length && (
+          {!this.props.isLoading && !this.props.events.length ? (
             <ContainerWithMargin>
               <NoEventsText>
                 {this.getNoEventsText()}
               </NoEventsText>
             </ContainerWithMargin>
-          )}
+          ) : undefined}
           {this.props.events.map(event => (
             <EventListItem
               key={event.eventid}

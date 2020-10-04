@@ -23,13 +23,13 @@ const BaseSpot = styled.View`
   border-radius: 20px;
 `;
 
-const UnavailableSpot = BaseSpot.extend`
+const UnavailableSpot = styled(BaseSpot)`
   border-width: 1;
   background-color: ${LIGHT_GREY};
   border-color: ${LIGHT_GREY};
 `;
 
-const InstructorSpot = BaseSpot.extend`
+const InstructorSpot = styled(BaseSpot)`
   width: 40px;
   height: 40px;
   border-width: 1;
@@ -55,7 +55,7 @@ const AvailableSpot = styled.TouchableOpacity`
   border-color: ${props => props.userSelected ? Config.STUDIO_COLOR : BLACK};
 `;
 
-const DisplayText = NormalText.extend`
+const DisplayText = styled(NormalText)`
   color: ${props => props.userSelected ? WHITE : BLACK};
 `;
 

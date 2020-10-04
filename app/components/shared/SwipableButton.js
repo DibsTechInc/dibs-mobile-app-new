@@ -18,7 +18,7 @@ const ContinueButton = styled.TouchableOpacity`
   border-color: ${Config.STUDIO_COLOR};
 `;
 
-const SwipeText = HeavyText.extend`
+const SwipeText = styled(HeavyText)`
   text-align: center;
   color: ${WHITE};
   flex: 1;

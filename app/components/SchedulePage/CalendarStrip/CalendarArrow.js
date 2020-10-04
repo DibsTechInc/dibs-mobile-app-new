@@ -30,7 +30,7 @@ class CalendarArrow extends React.PureComponent {
         activeOpacity={1}
         rightArrow={this.props.rightArrow}
       >
-        {!this.props.disabled && (
+        {!this.props.disabled ? (
           <Svg height={25} width={25}>
             <Path
               stroke={WHITE}
@@ -41,7 +41,7 @@ class CalendarArrow extends React.PureComponent {
               transform={`rotate(${this.props.rightArrow ? 180 : 0}, 12.5, 12.5)`}
             />
           </Svg>
-        )}
+        ) : undefined}
       </ArrowContainer>
     );
   }

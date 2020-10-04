@@ -24,7 +24,7 @@ const notificationStyle = props => ({
   zIndex: 1,
 });
 
-const NotificationText = NormalText.extend`
+const NotificationText = styled(NormalText)`
   font-size: ${props => props.fontSize};
   color: ${props => props.notificationTextColor};
 `;
@@ -84,7 +84,7 @@ export default class Notification extends React.PureComponent {
     if (!this.props.notificationCount) return this.props.children;
     return (
       <RelativeView>
-        {this.state.showPulse && (
+        {!!this.state.showPulse && (
           <Animated.View
             style={[
               notificationStyle(this.props),

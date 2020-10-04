@@ -6,6 +6,7 @@ import {
   Easing,
 } from 'react-native';
 import moment from 'moment-timezone';
+import styled from 'styled-components';
 
 import { setScheduleCurrentDate, addDaysToScheduleCurrentDate } from '../../../actions';
 import CalendarDay from './CalendarDay';
@@ -15,7 +16,7 @@ import { FlexRow, FlexCenter, HeavyText } from '../../styled';
 import { FadeInView } from '../../shared';
 import CalendarArrow from './CalendarArrow';
 
-const CalendarHeader = HeavyText.extend`
+const CalendarHeader = styled(HeavyText)`
   color: ${WHITE};
   text-align: center;
   font-size: 16px;
@@ -24,7 +25,7 @@ const CalendarHeader = HeavyText.extend`
   margin-top: 4;
 `;
 
-const DatesContainer = FlexCenter.extend`
+const DatesContainer = styled(FlexCenter)`
   flex-direction: row;
   flex: 1;
 `;

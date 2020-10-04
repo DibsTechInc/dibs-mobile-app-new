@@ -2,6 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import { CheckBox } from 'react-native-elements';
 
@@ -9,7 +10,7 @@ import { NormalText } from '../styled';
 import { DEFAULT_BG, RED, TERMS_AND_CONDITIONS_ROUTE } from '../../constants';
 import Config from '../../../config.json';
 
-const LinkedText = NormalText.extend`
+const LinkedText = styled(NormalText)`
   color: ${Config.STUDIO_COLOR};
 `;
 
@@ -44,7 +45,6 @@ class TermsCheckBox extends React.PureComponent {
     return (
       <View style={{ width: 250, height: 30, position: 'relative', marginTop: 5, flexDirection: 'row' }}>
         <CheckBox
-          title=""
           iconType="material-community"
           checkedIcon="checkbox-marked"
           uncheckedIcon="checkbox-blank-outline"
@@ -60,13 +60,13 @@ class TermsCheckBox extends React.PureComponent {
             I have read & agreed to the <LinkedText onPress={this.handleOnPressNavStudioTerms}>
               {this.props.studioName}
             </LinkedText> and <LinkedText onPress={this.handleOnPressNavDibsTerms}>
-            Dibs
+              Dibs
           </LinkedText> Terms and Conditions.
           </NormalText>
         </View>
-        {this.props.tAndCError.length && <NormalText style={{ color: RED, position: 'absolute', bottom: -55, fontSize: 12 }}>
+        {this.props.tAndCError.length ? <NormalText style={{ color: RED, position: 'absolute', bottom: -55, fontSize: 12 }}>
           {this.props.tAndCError}
-        </NormalText>}
+        </NormalText> : undefined}
       </View>
     );
   }
