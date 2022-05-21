@@ -136,9 +136,10 @@ NOTE2: This should be done from a mac
 
 
 [NEW NOTES FROM MAY 2022]
-1. RUN expo build:ios (or Android)
+1. RUN eas build --platform ios (or ANDROID)
 2. Use this for reference
-https://docs.expo.dev/classic/building-standalone-apps/
+https://docs.expo.dev/classic/building-standalone-apps/ (the old way)
+https://docs.expo.dev/build/setup/ (the new way)
 
 
 [NOTES FROM PRIOR TO MAY 2022]
