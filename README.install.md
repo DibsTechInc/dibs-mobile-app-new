@@ -142,6 +142,7 @@ https://docs.expo.dev/classic/building-standalone-apps/
 
 
 [NOTES FROM PRIOR TO MAY 2022]
+
 3. run `npm run build:ios`
   - fill in your apple credentials
   - select `Expo handles all credentials. you can still provide overrides`
