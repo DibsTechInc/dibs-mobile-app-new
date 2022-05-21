@@ -133,6 +133,8 @@ NOTE: you may need to install keys from:
   - [https://developer.apple.com/account/resources/certificates/list]
     - click on one and Download
 NOTE2: This should be done from a mac
+
+
 [NEW NOTES FROM MAY 2022]
 1. RUN expo build:ios (or Android)
 2. Use this for reference
