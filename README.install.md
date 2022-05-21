@@ -133,7 +133,14 @@ NOTE: you may need to install keys from:
   - [https://developer.apple.com/account/resources/certificates/list]
     - click on one and Download
 NOTE2: This should be done from a mac
-1. run `npm run build:ios`
+[NEW NOTES FROM MAY 2022]
+1. RUN expo build:ios (or Android)
+2. Use this for reference
+https://docs.expo.dev/classic/building-standalone-apps/
+
+
+[NOTES FROM PRIOR TO MAY 2022]
+3. run `npm run build:ios`
   - fill in your apple credentials
   - select `Expo handles all credentials. you can still provide overrides`
   - select `Let Expo handle the process`
@@ -142,8 +149,8 @@ NOTE2: This should be done from a mac
   - When asked to provide own Apple Push Notifications service key, select `Let Expo handle the process`
     - If asked to reuse select `No, please create a new one`
       - NEED TO CHECK THIS
-2. download generated .ipa
-3. create app in app store if not created
+4. download generated .ipa
+5. create app in app store if not created
   - go to [https://appstoreconnect.apple.com/apps]
   - Click + and New App
     - select iOS
@@ -153,7 +160,7 @@ NOTE2: This should be done from a mac
     - give a sku (can be same as the bundleid)
     - select Full Access
     - click Create
-4. Deploy
+6. Deploy
   - Add to xcode (pre 11)
     - open xcode
     - Select Xcode > Open Developer Tool > Application Loader
