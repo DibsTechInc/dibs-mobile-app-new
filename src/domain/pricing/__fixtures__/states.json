@@ -1,0 +1,1065 @@
+{
+  "single-event-card": {
+    "studio": {
+      "data": {
+        "id": 42,
+        "currency": "USD",
+        "source": "zf",
+        "primary_location_id": 100,
+        "locations": [
+          {
+            "id": 1,
+            "source_location_id": 100,
+            "tax_rate": 8.875,
+            "visible": true
+          },
+          {
+            "id": 2,
+            "source_location_id": 200,
+            "tax_rate": 0,
+            "visible": true
+          }
+        ],
+        "studio_packages": [
+          {
+            "id": 11,
+            "price": 200,
+            "classAmount": 10,
+            "commitment_period": 0,
+            "notification_period": 0
+          },
+          {
+            "id": 12,
+            "price": 150,
+            "discount_price": 120,
+            "classAmount": 5,
+            "commitment_period": 0,
+            "notification_period": 0
+          }
+        ],
+        "creditTiers": [
+          {
+            "id": 21,
+            "payAmount": 100,
+            "receiveAmount": 110,
+            "loadBonus": 10
+          },
+          {
+            "id": 22,
+            "payAmount": 50,
+            "receiveAmount": 50,
+            "loadBonus": 0
+          }
+        ]
+      }
+    },
+    "events": {
+      "data": [
+        {
+          "id": 501,
+          "location": {
+            "id": 1
+          }
+        },
+        {
+          "id": 502,
+          "location": {
+            "id": 2
+          }
+        }
+      ]
+    },
+    "upcomingEvents": {
+      "data": []
+    },
+    "promoCode": {
+      "data": {}
+    },
+    "user": {
+      "id": 7,
+      "credits": [],
+      "flash_credits": [],
+      "passes": []
+    },
+    "cart": {
+      "events": [
+        {
+          "eventid": 501,
+          "passid": null,
+          "price": 34,
+          "quantity": 1,
+          "name": "Yoga"
+        }
+      ],
+      "packages": [],
+      "credits": []
+    }
+  },
+  "multi-event-quantities-mixed-tax": {
+    "studio": {
+      "data": {
+        "id": 42,
+        "currency": "USD",
+        "source": "zf",
+        "primary_location_id": 100,
+        "locations": [
+          {
+            "id": 1,
+            "source_location_id": 100,
+            "tax_rate": 8.875,
+            "visible": true
+          },
+          {
+            "id": 2,
+            "source_location_id": 200,
+            "tax_rate": 0,
+            "visible": true
+          }
+        ],
+        "studio_packages": [
+          {
+            "id": 11,
+            "price": 200,
+            "classAmount": 10,
+            "commitment_period": 0,
+            "notification_period": 0
+          },
+          {
+            "id": 12,
+            "price": 150,
+            "discount_price": 120,
+            "classAmount": 5,
+            "commitment_period": 0,
+            "notification_period": 0
+          }
+        ],
+        "creditTiers": [
+          {
+            "id": 21,
+            "payAmount": 100,
+            "receiveAmount": 110,
+            "loadBonus": 10
+          },
+          {
+            "id": 22,
+            "payAmount": 50,
+            "receiveAmount": 50,
+            "loadBonus": 0
+          }
+        ]
+      }
+    },
+    "events": {
+      "data": [
+        {
+          "id": 501,
+          "location": {
+            "id": 1
+          }
+        },
+        {
+          "id": 502,
+          "location": {
+            "id": 2
+          }
+        }
+      ]
+    },
+    "upcomingEvents": {
+      "data": []
+    },
+    "promoCode": {
+      "data": {}
+    },
+    "user": {
+      "id": 7,
+      "credits": [],
+      "flash_credits": [],
+      "passes": []
+    },
+    "cart": {
+      "events": [
+        {
+          "eventid": 501,
+          "passid": null,
+          "price": 34,
+          "quantity": 2,
+          "name": "Yoga"
+        },
+        {
+          "eventid": 502,
+          "passid": null,
+          "price": 28,
+          "quantity": 1,
+          "name": "Barre"
+        }
+      ],
+      "packages": [],
+      "credits": []
+    }
+  },
+  "event-covered-by-pass": {
+    "studio": {
+      "data": {
+        "id": 42,
+        "currency": "USD",
+        "source": "zf",
+        "primary_location_id": 100,
+        "locations": [
+          {
+            "id": 1,
+            "source_location_id": 100,
+            "tax_rate": 8.875,
+            "visible": true
+          },
+          {
+            "id": 2,
+            "source_location_id": 200,
+            "tax_rate": 0,
+            "visible": true
+          }
+        ],
+        "studio_packages": [
+          {
+            "id": 11,
+            "price": 200,
+            "classAmount": 10,
+            "commitment_period": 0,
+            "notification_period": 0
+          },
+          {
+            "id": 12,
+            "price": 150,
+            "discount_price": 120,
+            "classAmount": 5,
+            "commitment_period": 0,
+            "notification_period": 0
+          }
+        ],
+        "creditTiers": [
+          {
+            "id": 21,
+            "payAmount": 100,
+            "receiveAmount": 110,
+            "loadBonus": 10
+          },
+          {
+            "id": 22,
+            "payAmount": 50,
+            "receiveAmount": 50,
+            "loadBonus": 0
+          }
+        ]
+      }
+    },
+    "events": {
+      "data": [
+        {
+          "id": 501,
+          "location": {
+            "id": 1
+          }
+        },
+        {
+          "id": 502,
+          "location": {
+            "id": 2
+          }
+        }
+      ]
+    },
+    "upcomingEvents": {
+      "data": []
+    },
+    "promoCode": {
+      "data": {}
+    },
+    "user": {
+      "id": 7,
+      "credits": [],
+      "flash_credits": [],
+      "passes": [
+        {
+          "id": 301,
+          "dibs_studio_id": 42,
+          "isValid": true,
+          "usesCount": 2,
+          "totalUses": 10,
+          "expiresAt": "2027-01-01T00:00:00Z",
+          "passValue": 20,
+          "source_serviceid": null,
+          "studioPackage": {
+            "unlimited": false
+          }
+        }
+      ]
+    },
+    "cart": {
+      "events": [
+        {
+          "eventid": 501,
+          "passid": 301,
+          "price": 34,
+          "quantity": 1,
+          "name": "Yoga"
+        }
+      ],
+      "packages": [],
+      "credits": []
+    }
+  },
+  "pass-event-plus-card-event": {
+    "studio": {
+      "data": {
+        "id": 42,
+        "currency": "USD",
+        "source": "zf",
+        "primary_location_id": 100,
+        "locations": [
+          {
+            "id": 1,
+            "source_location_id": 100,
+            "tax_rate": 8.875,
+            "visible": true
+          },
+          {
+            "id": 2,
+            "source_location_id": 200,
+            "tax_rate": 0,
+            "visible": true
+          }
+        ],
+        "studio_packages": [
+          {
+            "id": 11,
+            "price": 200,
+            "classAmount": 10,
+            "commitment_period": 0,
+            "notification_period": 0
+          },
+          {
+            "id": 12,
+            "price": 150,
+            "discount_price": 120,
+            "classAmount": 5,
+            "commitment_period": 0,
+            "notification_period": 0
+          }
+        ],
+        "creditTiers": [
+          {
+            "id": 21,
+            "payAmount": 100,
+            "receiveAmount": 110,
+            "loadBonus": 10
+          },
+          {
+            "id": 22,
+            "payAmount": 50,
+            "receiveAmount": 50,
+            "loadBonus": 0
+          }
+        ]
+      }
+    },
+    "events": {
+      "data": [
+        {
+          "id": 501,
+          "location": {
+            "id": 1
+          }
+        },
+        {
+          "id": 502,
+          "location": {
+            "id": 2
+          }
+        }
+      ]
+    },
+    "upcomingEvents": {
+      "data": []
+    },
+    "promoCode": {
+      "data": {}
+    },
+    "user": {
+      "id": 7,
+      "credits": [],
+      "flash_credits": [],
+      "passes": [
+        {
+          "id": 301,
+          "dibs_studio_id": 42,
+          "isValid": true,
+          "usesCount": 2,
+          "totalUses": 10,
+          "expiresAt": "2027-01-01T00:00:00Z",
+          "passValue": 20,
+          "source_serviceid": null,
+          "studioPackage": {
+            "unlimited": false
+          }
+        }
+      ]
+    },
+    "cart": {
+      "events": [
+        {
+          "eventid": 501,
+          "passid": 301,
+          "price": 34,
+          "quantity": 1,
+          "name": "Yoga"
+        },
+        {
+          "eventid": 502,
+          "passid": null,
+          "price": 28,
+          "quantity": 1,
+          "name": "Barre"
+        }
+      ],
+      "packages": [],
+      "credits": []
+    }
+  },
+  "percent-promo-on-package": {
+    "studio": {
+      "data": {
+        "id": 42,
+        "currency": "USD",
+        "source": "zf",
+        "primary_location_id": 100,
+        "locations": [
+          {
+            "id": 1,
+            "source_location_id": 100,
+            "tax_rate": 8.875,
+            "visible": true
+          },
+          {
+            "id": 2,
+            "source_location_id": 200,
+            "tax_rate": 0,
+            "visible": true
+          }
+        ],
+        "studio_packages": [
+          {
+            "id": 11,
+            "price": 200,
+            "classAmount": 10,
+            "commitment_period": 0,
+            "notification_period": 0
+          },
+          {
+            "id": 12,
+            "price": 150,
+            "discount_price": 120,
+            "classAmount": 5,
+            "commitment_period": 0,
+            "notification_period": 0
+          }
+        ],
+        "creditTiers": [
+          {
+            "id": 21,
+            "payAmount": 100,
+            "receiveAmount": 110,
+            "loadBonus": 10
+          },
+          {
+            "id": 22,
+            "payAmount": 50,
+            "receiveAmount": 50,
+            "loadBonus": 0
+          }
+        ]
+      }
+    },
+    "events": {
+      "data": [
+        {
+          "id": 501,
+          "location": {
+            "id": 1
+          }
+        },
+        {
+          "id": 502,
+          "location": {
+            "id": 2
+          }
+        }
+      ]
+    },
+    "upcomingEvents": {
+      "data": []
+    },
+    "promoCode": {
+      "data": {
+        "code": "TENOFF",
+        "type": "PERCENT_OFF",
+        "amount": 10,
+        "product": "PACKAGE"
+      }
+    },
+    "user": {
+      "id": 7,
+      "credits": [],
+      "flash_credits": [],
+      "passes": []
+    },
+    "cart": {
+      "events": [],
+      "packages": [
+        {
+          "packageid": 11,
+          "quantity": 1
+        }
+      ],
+      "credits": []
+    }
+  },
+  "cash-promo-plus-studio-credits": {
+    "studio": {
+      "data": {
+        "id": 42,
+        "currency": "USD",
+        "source": "zf",
+        "primary_location_id": 100,
+        "locations": [
+          {
+            "id": 1,
+            "source_location_id": 100,
+            "tax_rate": 8.875,
+            "visible": true
+          },
+          {
+            "id": 2,
+            "source_location_id": 200,
+            "tax_rate": 0,
+            "visible": true
+          }
+        ],
+        "studio_packages": [
+          {
+            "id": 11,
+            "price": 200,
+            "classAmount": 10,
+            "commitment_period": 0,
+            "notification_period": 0
+          },
+          {
+            "id": 12,
+            "price": 150,
+            "discount_price": 120,
+            "classAmount": 5,
+            "commitment_period": 0,
+            "notification_period": 0
+          }
+        ],
+        "creditTiers": [
+          {
+            "id": 21,
+            "payAmount": 100,
+            "receiveAmount": 110,
+            "loadBonus": 10
+          },
+          {
+            "id": 22,
+            "payAmount": 50,
+            "receiveAmount": 50,
+            "loadBonus": 0
+          }
+        ]
+      }
+    },
+    "events": {
+      "data": [
+        {
+          "id": 501,
+          "location": {
+            "id": 1
+          }
+        },
+        {
+          "id": 502,
+          "location": {
+            "id": 2
+          }
+        }
+      ]
+    },
+    "upcomingEvents": {
+      "data": []
+    },
+    "promoCode": {
+      "data": {
+        "code": "TAKE10",
+        "type": "CASH_OFF",
+        "amount": 10,
+        "product": "CLASS"
+      }
+    },
+    "user": {
+      "id": 7,
+      "credits": [
+        {
+          "dibs_studio_id": 42,
+          "credit": 25,
+          "load_bonus": 5,
+          "source": "zf"
+        }
+      ],
+      "flash_credits": [],
+      "passes": []
+    },
+    "cart": {
+      "events": [
+        {
+          "eventid": 501,
+          "passid": null,
+          "price": 34,
+          "quantity": 1,
+          "name": "Yoga"
+        }
+      ],
+      "packages": [],
+      "credits": []
+    }
+  },
+  "free-class-promo": {
+    "studio": {
+      "data": {
+        "id": 42,
+        "currency": "USD",
+        "source": "zf",
+        "primary_location_id": 100,
+        "locations": [
+          {
+            "id": 1,
+            "source_location_id": 100,
+            "tax_rate": 8.875,
+            "visible": true
+          },
+          {
+            "id": 2,
+            "source_location_id": 200,
+            "tax_rate": 0,
+            "visible": true
+          }
+        ],
+        "studio_packages": [
+          {
+            "id": 11,
+            "price": 200,
+            "classAmount": 10,
+            "commitment_period": 0,
+            "notification_period": 0
+          },
+          {
+            "id": 12,
+            "price": 150,
+            "discount_price": 120,
+            "classAmount": 5,
+            "commitment_period": 0,
+            "notification_period": 0
+          }
+        ],
+        "creditTiers": [
+          {
+            "id": 21,
+            "payAmount": 100,
+            "receiveAmount": 110,
+            "loadBonus": 10
+          },
+          {
+            "id": 22,
+            "payAmount": 50,
+            "receiveAmount": 50,
+            "loadBonus": 0
+          }
+        ]
+      }
+    },
+    "events": {
+      "data": [
+        {
+          "id": 501,
+          "location": {
+            "id": 1
+          }
+        },
+        {
+          "id": 502,
+          "location": {
+            "id": 2
+          }
+        }
+      ]
+    },
+    "upcomingEvents": {
+      "data": []
+    },
+    "promoCode": {
+      "data": {
+        "code": "FREEBIE",
+        "type": "FREE_CLASS",
+        "amount": 0,
+        "product": "CLASS"
+      }
+    },
+    "user": {
+      "id": 7,
+      "credits": [],
+      "flash_credits": [],
+      "passes": []
+    },
+    "cart": {
+      "events": [
+        {
+          "eventid": 501,
+          "passid": null,
+          "price": 34,
+          "quantity": 1,
+          "name": "Yoga"
+        }
+      ],
+      "packages": [],
+      "credits": []
+    }
+  },
+  "credit-tier-plus-package-with-credits": {
+    "studio": {
+      "data": {
+        "id": 42,
+        "currency": "USD",
+        "source": "zf",
+        "primary_location_id": 100,
+        "locations": [
+          {
+            "id": 1,
+            "source_location_id": 100,
+            "tax_rate": 8.875,
+            "visible": true
+          },
+          {
+            "id": 2,
+            "source_location_id": 200,
+            "tax_rate": 0,
+            "visible": true
+          }
+        ],
+        "studio_packages": [
+          {
+            "id": 11,
+            "price": 200,
+            "classAmount": 10,
+            "commitment_period": 0,
+            "notification_period": 0
+          },
+          {
+            "id": 12,
+            "price": 150,
+            "discount_price": 120,
+            "classAmount": 5,
+            "commitment_period": 0,
+            "notification_period": 0
+          }
+        ],
+        "creditTiers": [
+          {
+            "id": 21,
+            "payAmount": 100,
+            "receiveAmount": 110,
+            "loadBonus": 10
+          },
+          {
+            "id": 22,
+            "payAmount": 50,
+            "receiveAmount": 50,
+            "loadBonus": 0
+          }
+        ]
+      }
+    },
+    "events": {
+      "data": [
+        {
+          "id": 501,
+          "location": {
+            "id": 1
+          }
+        },
+        {
+          "id": 502,
+          "location": {
+            "id": 2
+          }
+        }
+      ]
+    },
+    "upcomingEvents": {
+      "data": []
+    },
+    "promoCode": {
+      "data": {}
+    },
+    "user": {
+      "id": 7,
+      "credits": [
+        {
+          "dibs_studio_id": 42,
+          "credit": 30,
+          "load_bonus": 10,
+          "source": "zf"
+        }
+      ],
+      "flash_credits": [],
+      "passes": []
+    },
+    "cart": {
+      "events": [],
+      "packages": [
+        {
+          "packageid": 11,
+          "quantity": 1
+        }
+      ],
+      "credits": [
+        {
+          "creditTierId": 21,
+          "quantity": 1
+        }
+      ]
+    }
+  },
+  "raf-credits-after-studio-credits": {
+    "studio": {
+      "data": {
+        "id": 42,
+        "currency": "USD",
+        "source": "zf",
+        "primary_location_id": 100,
+        "locations": [
+          {
+            "id": 1,
+            "source_location_id": 100,
+            "tax_rate": 8.875,
+            "visible": true
+          },
+          {
+            "id": 2,
+            "source_location_id": 200,
+            "tax_rate": 0,
+            "visible": true
+          }
+        ],
+        "studio_packages": [
+          {
+            "id": 11,
+            "price": 200,
+            "classAmount": 10,
+            "commitment_period": 0,
+            "notification_period": 0
+          },
+          {
+            "id": 12,
+            "price": 150,
+            "discount_price": 120,
+            "classAmount": 5,
+            "commitment_period": 0,
+            "notification_period": 0
+          }
+        ],
+        "creditTiers": [
+          {
+            "id": 21,
+            "payAmount": 100,
+            "receiveAmount": 110,
+            "loadBonus": 10
+          },
+          {
+            "id": 22,
+            "payAmount": 50,
+            "receiveAmount": 50,
+            "loadBonus": 0
+          }
+        ]
+      }
+    },
+    "events": {
+      "data": [
+        {
+          "id": 501,
+          "location": {
+            "id": 1
+          }
+        },
+        {
+          "id": 502,
+          "location": {
+            "id": 2
+          }
+        }
+      ]
+    },
+    "upcomingEvents": {
+      "data": []
+    },
+    "promoCode": {
+      "data": {}
+    },
+    "user": {
+      "id": 7,
+      "credits": [
+        {
+          "dibs_studio_id": 42,
+          "credit": 15,
+          "load_bonus": 0,
+          "source": "zf"
+        },
+        {
+          "dibs_studio_id": null,
+          "credit": 40,
+          "load_bonus": 0,
+          "source": "raf"
+        }
+      ],
+      "flash_credits": [],
+      "passes": []
+    },
+    "cart": {
+      "events": [
+        {
+          "eventid": 501,
+          "passid": null,
+          "price": 34,
+          "quantity": 1,
+          "name": "Yoga"
+        }
+      ],
+      "packages": [],
+      "credits": []
+    }
+  },
+  "flash-credit-with-pass": {
+    "studio": {
+      "data": {
+        "id": 42,
+        "currency": "USD",
+        "source": "zf",
+        "primary_location_id": 100,
+        "locations": [
+          {
+            "id": 1,
+            "source_location_id": 100,
+            "tax_rate": 8.875,
+            "visible": true
+          },
+          {
+            "id": 2,
+            "source_location_id": 200,
+            "tax_rate": 0,
+            "visible": true
+          }
+        ],
+        "studio_packages": [
+          {
+            "id": 11,
+            "price": 200,
+            "classAmount": 10,
+            "commitment_period": 0,
+            "notification_period": 0
+          },
+          {
+            "id": 12,
+            "price": 150,
+            "discount_price": 120,
+            "classAmount": 5,
+            "commitment_period": 0,
+            "notification_period": 0
+          }
+        ],
+        "creditTiers": [
+          {
+            "id": 21,
+            "payAmount": 100,
+            "receiveAmount": 110,
+            "loadBonus": 10
+          },
+          {
+            "id": 22,
+            "payAmount": 50,
+            "receiveAmount": 50,
+            "loadBonus": 0
+          }
+        ]
+      }
+    },
+    "events": {
+      "data": [
+        {
+          "id": 501,
+          "location": {
+            "id": 1
+          }
+        },
+        {
+          "id": 502,
+          "location": {
+            "id": 2
+          }
+        }
+      ]
+    },
+    "upcomingEvents": {
+      "data": []
+    },
+    "promoCode": {
+      "data": {}
+    },
+    "user": {
+      "id": 7,
+      "credits": [],
+      "flash_credits": [
+        {
+          "dibs_studio_id": 42,
+          "credit": 8,
+          "expiration": "2027-01-01T00:00:00Z"
+        }
+      ],
+      "passes": [
+        {
+          "id": 301,
+          "dibs_studio_id": 42,
+          "isValid": true,
+          "usesCount": 2,
+          "totalUses": 10,
+          "expiresAt": "2027-01-01T00:00:00Z",
+          "passValue": 20,
+          "source_serviceid": null,
+          "studioPackage": {
+            "unlimited": false
+          }
+        }
+      ]
+    },
+    "cart": {
+      "events": [
+        {
+          "eventid": 501,
+          "passid": 301,
+          "price": 15,
+          "quantity": 1,
+          "name": "Yoga"
+        }
+      ],
+      "packages": [],
+      "credits": []
+    }
+  }
+}
