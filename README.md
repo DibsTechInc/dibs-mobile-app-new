@@ -1,5 +1,35 @@
-# DIBS MOBILE APP
+# Dibs Mobile App (v2 rebuild)
 
-[Installation/Promotion Instructions](./README.install.md) - Current upkeep instructions
+Consumer loyalty + booking app for Dibs studios. Fresh rebuild — the legacy
+Expo SDK 36 app is preserved on the `legacy` git branch.
 
-[Legacy Instructions](./README.legacy.md) - (may have some good stuff to look at which may still apply)
+## Stack
+
+Expo SDK 56 · React Native 0.85 · TypeScript (strict) · Expo Router ·
+TanStack Query v5 (server state) · Zustand (UI state) · NativeWind v4 ·
+zod (API schemas) · decimal.js (money math)
+
+## Layout
+
+- `src/app/` — Expo Router routes only, no business logic
+- `src/domain/` — pure TypeScript business logic (pricing, passes, promos, spots) — no RN imports, fully unit-tested
+- `src/api/` — typed API client, zod schemas, TanStack Query hooks
+- `src/stores/` — zustand stores (cart, session, theme)
+- `src/theme/` — design tokens + per-studio dynamic theming
+- `legacy-reference/` — read-only copies of the legacy domain logic being ported (delete when the port is complete)
+- `config/studios/` — whitelabel build configs (consumed by app.config.ts later)
+
+## Key docs
+
+- `ARCHITECTURE_AUDIT.md` — the audit that led to this rebuild
+- `.claude/PLAN.md` — modernization plan
+- `.claude/CHECKOUT.md` / `CANCELLATION.md` / `SUBSCRIPTION_BILLING.md` — canonical business rules
+
+## Commands
+
+```
+npm install
+npm run ios / android
+npm run typecheck
+npm test
+```

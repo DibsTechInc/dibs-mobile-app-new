@@ -1,0 +1,1 @@
+../../.claude/STUDIO_ONBOARDING.md
