@@ -1,0 +1,41 @@
+{
+  "//": "Which STUDIO this builds is set by STUDIO_SLUG. app.config.ts reads it and resolves everything else from whitelabel/studios/<slug>/studio.json. Build a specific studio: STUDIO_SLUG=everyday-ballet eas build --profile development --platform ios",
+  "cli": {
+    "version": ">= 16.0.0",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "development": {
+      "//": "The everyday dev loop. Includes the dev client, so Metro can attach — this is what replaces Expo Go now that the app has native modules.",
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "resourceClass": "m-medium"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "http://localhost:3001/api/v2"
+      }
+    },
+    "preview": {
+      "//": "A release-configuration build that still installs outside the store — TestFlight rehearsals and studio-staff testing. Points at production because that is what a tester should see.",
+      "distribution": "internal",
+      "ios": {
+        "resourceClass": "m-medium",
+        "simulator": false
+      }
+    },
+    "production": {
+      "//": "Store submissions. app.config.ts calls validateStudioForRelease under this profile, so a studio missing its bundle id, Apple team, merchant id, or privacy policy URL fails here rather than at App Store Connect.",
+      "autoIncrement": true,
+      "ios": {
+        "resourceClass": "m-medium"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "//": "Apple credentials are configured PER PROJECT via `eas credentials`, not here and not at the account level. That is what lets one Expo organization submit to several different Apple Developer teams — Dibs's own team for the two rescue apps, and each studio's own team for any future studio-owned listing (Apple Guideline 4.2.6).",
+      "ios": {}
+    }
+  }
+}

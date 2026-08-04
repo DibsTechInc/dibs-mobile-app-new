@@ -37,5 +37,8 @@
     "logo": "assets/logo.png",
     "hero": "assets/hero.jpg",
     "iconSource": "assets/icon-source.png"
+  },
+  "eas": {
+    "projectId": "3de21050-73f8-4f81-861a-ee990cdaceb9"
   }
 }

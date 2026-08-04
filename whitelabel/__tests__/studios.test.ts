@@ -201,6 +201,20 @@ describe.each(slugs)('studio: %s', (slug) => {
     expect(splash.height).toBeGreaterThan(splash.width);
   });
 
+  it('is linked to its own EAS project, distinct from every other studio', () => {
+    // One project per studio, mapping 1:1 to a store listing. A shared or missing project id
+    // means builds and EAS Updates cannot tell the apps apart.
+    const gap = KNOWN_ASSET_GAPS[slug];
+    if (gap) return; // deferred studios are not built yet
+
+    expect(config.eas.projectId).toBeTruthy();
+    const others = slugs
+      .filter((other) => other !== slug)
+      .map((other) => loadStudioConfig(other).config.eas.projectId)
+      .filter(Boolean);
+    expect(others).not.toContain(config.eas.projectId);
+  });
+
   it('only demands Android identifiers when it actually targets Android', () => {
     // v1 is iOS-only. A missing package name must not block an iOS release.
     if (!config.store.platforms.includes('android')) {

@@ -189,6 +189,20 @@ export const studioConfigSchema = z.object({
     supportUrl: z.string().url().optional(),
   }),
 
+  /**
+   * The EAS project backing this studio's app — one project per studio, mapping 1:1 to a store
+   * listing so credentials and EAS Update channels stay isolated.
+   *
+   * `eas init` writes this id into a static app.json automatically; it cannot do that here
+   * because app.config.ts is generated per studio, so the id is recorded by hand. Without it,
+   * builds and updates cannot resolve which project they belong to.
+   */
+  eas: z
+    .object({
+      projectId: z.string().uuid().optional(),
+    })
+    .default({}),
+
   api: z.object({
     /**
      * Production API base for this studio's shipped app, including /api/v2.

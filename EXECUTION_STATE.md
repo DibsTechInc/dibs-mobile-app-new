@@ -5,7 +5,7 @@
 > The executor updates this file at the end of EVERY session. Statuses: `done` / `in-progress` / `blocked-on-Alicia (reason)` / `not-started`.
 
 **Last updated:** 2026-08-04 (session 1 — first build session, + Alicia's answers)
-**Gate status:** `npm run typecheck` clean · `npx jest` 422/422 · `npm run lint` 0 errors (2 pre-existing warnings)
+**Gate status:** `npm run typecheck` clean · `npx jest` 425/425 · `npm run lint` 0 errors (2 pre-existing warnings)
 **Next up:** P0 item 4 (theme system + core components) → P0 item 3 (auth wiring) → P0 item 8 (design mocks)
 
 ## ⚠️ Direction changes this session (see `MOBILE_MASTER_PLAN.md` §0.1)
@@ -28,7 +28,7 @@
 | D | Staging test user + studio state | **blocked-on-Alicia.** Shape has changed: the local DB is a prod restore, so real users exist, but Firebase passwords are live and `stripeid_test` may be empty. Name one test login |
 | E | Sandbox Stripe key path | **done** — local returns `pk_test_…`, prod returns `pk_live_…`. All pilots have `stripe_account_id_test` |
 | F | Local toolchain | **iOS done** (Xcode 26.2, CocoaPods 1.16.2). **Android absent** — no SDK, no `ANDROID_HOME`, no Java. **No longer blocking:** v1 is iOS-only, so Android verification is deferred with the platform |
-| G | Expo/EAS org + `eas init` | **logged in** — `eas whoami` shows `dibs-tech` and `alicia-dibs`, both Owner. Nothing more needed from Alicia except **which account owns the apps** (`dibs-tech` matches the App Store seller "Dibs Technology Inc"). `eas init` creates a project on that account, so it waits for that one word |
+| G | Expo/EAS org + `eas init` | **done 2026-08-04.** Account: **`dibs-tech`** (the Organization, chosen over the personal account). Projects created — `@dibs-tech/carlsbad-village-yoga` (`3de21050-…`) and `@dibs-tech/everyday-ballet` (`10359ad8-…`), one per studio. Ids recorded in each studio.json; `eas.json` has development/preview/production profiles |
 | H | Sentry DSN | not needed until P8 |
 
 ## P0 — Foundation
@@ -36,7 +36,7 @@
 | Item | Status |
 |---|---|
 | 0. Store enrollment kickoff | **superseded** for 210/88 by §0.1-A. Replaced by two questions for Alicia (ASC account access; did Android ever ship). Backend Lane 5 kickoff — **not-started, still needed before P3's card path** |
-| 1. Deps + `app.config.ts` + dev builds + `eas init` | **mostly done.** All deps installed, `app.json` → `app.config.ts` per studio, all three studios resolve. **Not done:** first `npx expo run:ios` dev build (not yet attempted); `eas init` blocked on G |
+| 1. Deps + `app.config.ts` + dev builds + `eas init` | **done except the first dev build.** Deps installed, `app.json` → `app.config.ts` per studio, `eas init` complete for both v1 studios, `eas.json` profiles written. **Not done:** first `npx expo run:ios` — no screens exist yet to look at, so it lands with the theme work |
 | 2. API client + zod schemas + endpoint re-verify | **done for the core.** Client, error normalization, query keys, `get-basic-config` schema, 40 tests. Endpoint re-verify: all 26 P1/P2 routes confirmed present. **Remaining:** schemas for the other P1/P2 endpoints, and the TanStack hooks (need auth first) |
 | 3. Auth wiring | **not-started** |
 | 4. Theme system | **partial** — `src/theme/color.ts` (accent derivation + WCAG guard, 19 tests) done. Tokens, provider, and the 6–8 core components not started |
@@ -65,9 +65,12 @@
    resized to 1440×2555 JPEG.
 6. ~~App/short names~~ **confirmed;** "Everyday Ballet" may truncate under the icon.
 7. ~~Flash credits~~ **deferred.**
-8. **Which EAS account owns the apps** — `dibs-tech` or `alicia-dibs`? Needed before `eas init`.
+8. ~~Which EAS account~~ **resolved: `dibs-tech`.** Both projects created.
 9. **Off-laptop backend** for device testing / TestFlight: Railway staging, or LAN-only for now?
 10. **Staging test user** (§0.5-D) — still open.
+11. **Apple credentials for EAS Submit** — configured per project via `eas credentials`, using
+    either an App Store Connect API key (recommended, non-interactive) or an Apple ID. Needed
+    before the first real build, not before development builds.
 
 ## Two things worth knowing that were not asked for
 

@@ -38,5 +38,8 @@
     "hero": "assets/hero.jpg",
     "iconSource": "assets/icon-source.png",
     "splash": "assets/splash.png"
+  },
+  "eas": {
+    "projectId": "10359ad8-4912-4003-a3c3-1f54b1989ff0"
   }
 }

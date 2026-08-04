@@ -20,6 +20,19 @@ import { validateStudioForRelease } from './whitelabel/schema.ts';
 const DEFAULT_STUDIO_SLUG = 'carlsbad-village-yoga';
 
 /**
+ * The Expo account that owns every project in this repo.
+ *
+ * Deliberately repo-level, not per-studio. An Expo account is unrelated to an Apple Developer
+ * account — EAS authenticates with Apple per project, via an App Store Connect API key or Apple
+ * ID in eas.json — so a studio-owned Apple team (263 and any future new studio) still lives
+ * under this same Expo organization. The one thing this DOES decide is who can reach build
+ * history, credentials, and EAS Update channels, which is why it is the org and not a personal
+ * account. Expo limits how many times a project can be transferred; picking correctly up front
+ * avoids spending one.
+ */
+const EXPO_ACCOUNT_OWNER = 'dibs-tech';
+
+/**
  * Release builds must be fully store-configured; development builds must not be blocked on
  * paperwork. EAS sets EAS_BUILD_PROFILE; treat anything but development/preview as a release.
  */
@@ -55,6 +68,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     name: studio.appName,
     // Expo project slug — also the EAS Update channel and the OTA identity for this app.
     slug: studio.slug,
+    owner: EXPO_ACCOUNT_OWNER,
     // Deep-link scheme. Per-studio so two Dibs apps on one phone cannot capture each other's links.
     scheme: `dibs-${studio.slug}`,
     // Per-studio: each app has its own version lineage. For the rescue apps this must exceed
@@ -162,6 +176,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
      */
     extra: {
       ...config.extra,
+      // EAS resolves builds and updates through this. Recorded per studio in studio.json
+      // because app.config.ts is dynamic and `eas init` cannot write into it.
+      eas: studio.eas.projectId ? { projectId: studio.eas.projectId } : undefined,
       studio: {
         slug: studio.slug,
         dibsStudioId: studio.dibsStudioId,
