@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Booking walkthrough &amp; account</title>
+<link rel="stylesheet" href="shared.css">
+<!--
+  DESIGN RATIONALE
+  The booking flow shown end to end, one step per frame, with the reasoning beside each.
+  Carlsbad carries the walkthrough; Everyday Ballet appears at the two screens where the
+  theming actually gets tested (the payment sheet and the success moment).
+
+  The load-bearing idea: every screen states what the client will be charged BEFORE they can
+  act, and the number never changes between screens. Price appears on the class card, again on
+  the detail, again in the sheet, and one final time on the confirmation — same number, four
+  times. That repetition is the whole trust argument.
+-->
+</head>
+<body>
+<div class="page">
+
+<header>
+  <h1>Booking a class, and the account</h1>
+  <p class="lede">
+    Six steps from schedule to booked, then what the client sees in their own account. The notes
+    beside each frame explain what the screen is doing and which platform rule it is honouring.
+  </p>
+  <div class="navlinks"><a href="home-options.html">← Home compositions</a></div>
+</header>
+
+<!-- ══ STEP 1 ══ -->
+<section class="optionblock">
+  <div class="rail">
+    <div class="framewrap">
+      <div class="framelabel">1 · Schedule</div>
+      <div class="frame studio-cvy">
+        <div class="statusbar"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+        <div class="scroll pad">
+          <div class="t-display" style="margin:6px 0 18px;">Schedule</div>
+
+          <div style="display:flex; gap:8px; margin-bottom:20px;">
+            <div style="text-align:center; padding:10px 12px; border-radius:8px; background:var(--accent-fill); color:var(--on-accent); min-width:48px;">
+              <div class="t-label">TUE</div><div class="t-numeral" style="color:var(--on-accent);">5</div>
+            </div>
+            <div style="text-align:center; padding:10px 12px; border-radius:8px; border:1px solid var(--border); min-width:48px;">
+              <div class="t-label c-3">WED</div><div class="t-numeral">6</div>
+            </div>
+            <div style="text-align:center; padding:10px 12px; border-radius:8px; border:1px solid var(--border); min-width:48px;">
+              <div class="t-label c-3">THU</div><div class="t-numeral">7</div>
+            </div>
+            <div style="text-align:center; padding:10px 12px; border-radius:8px; border:1px solid var(--border); min-width:48px;">
+              <div class="t-label c-3">FRI</div><div class="t-numeral">8</div>
+            </div>
+            <div style="text-align:center; padding:10px 12px; border-radius:8px; border:1px solid var(--border); min-width:48px;">
+              <div class="t-label c-3">SAT</div><div class="t-numeral">9</div>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:8px; margin-bottom:22px;">
+            <span class="chip on">All</span>
+            <span class="chip">Morning</span>
+            <span class="chip">Evening</span>
+          </div>
+
+          <div class="stack-12">
+            <div class="card">
+              <div class="row" style="align-items:flex-start;">
+                <div class="stack-4">
+                  <div class="t-numeral">7:30 AM</div>
+                  <div class="t-heading">Sunrise Slow Flow</div>
+                  <div class="t-sec c-2">Marisa · 60 min</div>
+                </div>
+                <div style="text-align:right;">
+                  <div class="t-sec c-2">Included</div>
+                  <div class="t-cap c-3">10-Class Pass</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card" style="border-color:var(--accent-border);">
+              <div class="row" style="align-items:flex-start;">
+                <div class="stack-4">
+                  <div class="t-numeral">6:00 PM</div>
+                  <div class="t-heading">Vinyasa Flow</div>
+                  <div class="t-sec c-2">Elan · 60 min</div>
+                </div>
+                <div style="text-align:right;">
+                  <div class="t-sec c-2">Included</div>
+                  <div class="t-cap c-3">10-Class Pass</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="row" style="align-items:flex-start;">
+                <div class="stack-4">
+                  <div class="t-numeral">7:30 PM</div>
+                  <div class="t-heading">Restore &amp; Breathe</div>
+                  <div class="t-sec c-2">Marisa · 75 min</div>
+                </div>
+                <span class="tag danger">Waitlist</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tabs studio-cvy">
+          <div class="tab"><span class="ico">◈</span>Home</div>
+          <div class="tab on"><span class="ico">☰</span>Schedule</div>
+          <div class="tab"><span class="ico">◇</span>Packages</div>
+          <div class="tab"><span class="ico">○</span>Account</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <div class="step">01</div>
+      <h3>The price is on the card</h3>
+      <p>
+        Every row answers "what will this cost me" before it is tapped — <b>Included · 10-Class
+        Pass</b>, or a dollar amount, or <b>Waitlist</b>. No one has to open a class to find out.
+      </p>
+      <ul>
+        <li><b>Capacity is stated, not implied.</b> "3 spots left" appears at ≤3; above that the
+          row simply says nothing, because a half-full class is not news.</li>
+        <li><b>Times are the studio's wall clock, printed verbatim.</b> A 6:00 PM class reads
+          6:00 PM on a phone in any timezone — and the "is this in the past" maths runs through
+          <code>studioNow()</code>, never the device clock.</li>
+        <li><b>Filters are chips, not a modal.</b> One tap to narrow, one to undo.</li>
+        <li>Instructor names hide entirely for studios where that data is meaningless — a config
+          flag, not a special case in the code.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══ STEP 2 ══ -->
+<section class="optionblock">
+  <div class="rail">
+    <div class="framewrap">
+      <div class="framelabel">2 · Class detail</div>
+      <div class="frame studio-cvy">
+        <div class="statusbar"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+        <div class="scroll pad" style="display:flex; flex-direction:column;">
+          <div style="flex:1;">
+            <div class="t-cap c-accent" style="margin:6px 0 20px;">← Tuesday, August 5</div>
+            <div class="t-hero" style="color:var(--accent-ink); line-height:1;">6:00<span style="font-size:26px; letter-spacing:0;"> PM</span></div>
+            <div class="t-display" style="margin-top:8px;">Vinyasa Flow</div>
+            <div class="t-sec c-2" style="margin-top:8px;">with Elan · 60 minutes · Studio A</div>
+
+            <div class="rule" style="margin:24px 0;"></div>
+
+            <div class="t-body" style="margin-bottom:24px;">
+              A breath-led flow that builds to a peak pose, then unwinds. Suitable for anyone with
+              a few classes behind them. Mats and props provided.
+            </div>
+
+            <div class="card flat">
+              <div class="row">
+                <div class="stack-4">
+                  <div class="t-heading">Included in your pass</div>
+                  <div class="t-sec c-2">10-Class Pass · 7 classes left</div>
+                </div>
+                <div class="t-numeral">$0</div>
+              </div>
+            </div>
+
+            <div class="t-cap c-3" style="margin-top:16px;">
+              Free to cancel until 6:00 AM tomorrow — 12 hours before class. After that the class
+              is deducted from your pass.
+            </div>
+          </div>
+
+          <div style="padding:18px 0 22px;">
+            <button class="btn primary">Book this class</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <div class="step">02</div>
+      <h3>The time is the headline</h3>
+      <p>
+        The Fraunces numeral is the largest thing on the screen. It is the fact the client is
+        actually here to confirm, and setting it as a display moment rather than metadata is most
+        of what makes this not look like gym software.
+      </p>
+      <ul>
+        <li><b>The cancellation window is stated in plain time, before booking.</b> Not "12-hour
+          policy" — <i>"until 6:00 AM tomorrow"</i>. The studio's own configured notice period,
+          rendered as a moment the client can picture.</li>
+        <li><b>What it costs is settled here:</b> $0, and which pass pays for it. Same answer the
+          schedule row gave.</li>
+        <li>One filled CTA on the screen. If a second action mattered as much, neither would.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══ STEP 3 ══ -->
+<section class="optionblock">
+  <div class="rail">
+    <div class="framewrap">
+      <div class="framelabel">3 · Payment sheet — pass covers it</div>
+      <div class="frame studio-cvy">
+        <div class="statusbar"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+        <div class="scroll pad" style="opacity:.5;">
+          <div class="t-cap c-accent" style="margin:6px 0 20px;">← Tuesday, August 5</div>
+          <div class="t-hero" style="color:var(--accent-ink); line-height:1;">6:00<span style="font-size:26px;"> PM</span></div>
+          <div class="t-display" style="margin-top:8px;">Vinyasa Flow</div>
+        </div>
+        <div class="sheetwrap">
+          <div class="scrim"></div>
+          <div class="sheet">
+            <div class="grabber"></div>
+            <div class="t-title" style="margin-bottom:16px;">How would you like to pay?</div>
+
+            <div class="card accent" style="margin-bottom:10px;">
+              <div class="row">
+                <div class="stack-4">
+                  <div class="t-heading">10-Class Pass</div>
+                  <div class="t-sec c-2">7 classes remaining</div>
+                </div>
+                <div style="width:22px; height:22px; border-radius:999px; background:var(--accent-fill); color:var(--on-accent); display:flex; align-items:center; justify-content:center; font-size:13px;">✓</div>
+              </div>
+            </div>
+
+            <div class="card" style="margin-bottom:10px;">
+              <div class="row">
+                <div class="stack-4">
+                  <div class="t-heading">Studio credit</div>
+                  <div class="t-sec c-2">$40.00 available</div>
+                </div>
+                <div style="width:22px; height:22px; border-radius:999px; border:1px solid var(--border);"></div>
+              </div>
+            </div>
+
+            <div class="card" style="margin-bottom:14px;">
+              <div class="row">
+                <div class="stack-4">
+                  <div class="t-heading">Visa ending 4242</div>
+                  <div class="t-sec c-2">$28.00</div>
+                </div>
+                <div style="width:22px; height:22px; border-radius:999px; border:1px solid var(--border);"></div>
+              </div>
+            </div>
+
+            <div class="t-cap c-accent" style="margin-bottom:18px;">Have a promo code?</div>
+
+            <div class="rule" style="margin-bottom:16px;"></div>
+            <div class="row" style="margin-bottom:16px;">
+              <div class="t-heading">Total</div>
+              <div class="t-numeral">$0.00</div>
+            </div>
+            <button class="btn primary">Confirm booking</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <div class="step">03</div>
+      <h3>The money moment</h3>
+      <p>
+        The best option is <b>already chosen</b> when the sheet opens. The client's job is to
+        confirm, not to shop. Alternatives stay visible so the choice is theirs, but nobody is
+        asked to pick from a list of one.
+      </p>
+      <ul>
+        <li><b>Preselection order mirrors the widget exactly:</b> eligible pass → credit that
+          covers the total → card. Same rules, same result, so the app and the web can never
+          quote a client different prices.</li>
+        <li><b>The promo entry is a quiet text link.</b> Present for the people who have a code,
+          invisible to everyone else — a prominent empty field makes every client feel they are
+          missing a discount.</li>
+        <li><b>A $0 total is always confirmable.</b> Pass-covered, credit-covered, and comped
+          bookings have no card by design.</li>
+        <li>The total is the <b>server's</b> number, not ours. Our own pricing maths is a display
+          estimate; if the two ever disagree the server wins and the divergence is logged.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══ STEP 4 ══ -->
+<section class="optionblock">
+  <div class="rail">
+    <div class="framewrap">
+      <div class="framelabel">4 · Paying by card — Everyday Ballet</div>
+      <div class="frame studio-eb">
+        <div class="statusbar"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+        <div class="scroll pad" style="opacity:.5;">
+          <div class="t-cap c-accent" style="margin:6px 0 20px;">← Tuesday, August 5</div>
+          <div class="t-hero" style="color:var(--accent-ink); line-height:1;">6:45<span style="font-size:26px;"> PM</span></div>
+          <div class="t-display" style="margin-top:8px;">Pointe Technique</div>
+        </div>
+        <div class="sheetwrap">
+          <div class="scrim"></div>
+          <div class="sheet">
+            <div class="grabber"></div>
+            <div class="t-title" style="margin-bottom:16px;">How would you like to pay?</div>
+
+            <div class="card accent" style="margin-bottom:10px;">
+              <div class="row">
+                <div class="stack-4">
+                  <div class="t-heading">Visa ending 4242</div>
+                  <div class="t-sec c-2">Expires 04/28</div>
+                </div>
+                <div style="width:22px; height:22px; border-radius:999px; background:var(--accent-fill); color:var(--on-accent); display:flex; align-items:center; justify-content:center; font-size:13px;">✓</div>
+              </div>
+            </div>
+
+            <div class="card" style="margin-bottom:10px;">
+              <div class="row">
+                <div class="t-heading">􀣺&nbsp; Apple Pay</div>
+                <div style="width:22px; height:22px; border-radius:999px; border:1px solid var(--border);"></div>
+              </div>
+            </div>
+
+            <div class="t-cap c-accent" style="margin:4px 0 16px;">Use a different card</div>
+
+            <div class="rule" style="margin-bottom:14px;"></div>
+            <div class="stack-8" style="margin-bottom:16px;">
+              <div class="row"><div class="t-sec c-2">Pointe Technique</div><div class="t-sec">$32.00</div></div>
+              <div class="row"><div class="t-sec c-2">Promo · WELCOME10</div><div class="t-sec c-accent">−$3.20</div></div>
+              <div class="row"><div class="t-sec c-2">Tax</div><div class="t-sec">$2.55</div></div>
+              <div class="rule" style="margin:10px 0;"></div>
+              <div class="row"><div class="t-heading">Total</div><div class="t-numeral">$31.35</div></div>
+            </div>
+            <button class="btn primary">Confirm booking · $31.35</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <div class="step">04</div>
+      <h3>The theming stress test</h3>
+      <p>
+        This is the screen where Everyday Ballet's pink proves the system. The fill stays the
+        studio's actual colour, the text on it flips to <b>dark ink automatically</b> because
+        white would sit at 2.34:1, and the accent used as <i>text</i> becomes a deeper rose so it
+        clears contrast on white. Three different values, one studio input.
+      </p>
+      <ul>
+        <li><b>The full breakdown is shown before the tap.</b> Price, promo, tax, total — a
+          client should never learn the real number from a receipt.</li>
+        <li><b>The amount is repeated on the button.</b> "Confirm booking · $31.35" is the last
+          thing under their thumb.</li>
+        <li>Apple Pay appears only once the studio's merchant ID is registered. Cards work
+          regardless — the option is absent, never broken.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══ STEP 5 ══ -->
+<section class="optionblock">
+  <div class="rail">
+    <div class="framewrap">
+      <div class="framelabel">5 · Booked</div>
+      <div class="frame studio-cvy">
+        <div class="statusbar"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+        <div class="scroll pad" style="display:flex; flex-direction:column;">
+          <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding-bottom:40px;">
+            <div style="width:64px; height:64px; border-radius:999px; border:1.5px solid var(--accent-border); background:var(--accent-wash); display:flex; align-items:center; justify-content:center; margin-bottom:28px;">
+              <span style="font-size:26px; color:var(--accent-ink);">✓</span>
+            </div>
+            <div class="t-display">You're in</div>
+            <div class="t-sec c-2" style="margin-top:10px; max-width:250px;">
+              We've emailed your confirmation. See you Tuesday.
+            </div>
+
+            <div class="card" style="margin-top:32px; width:100%; text-align:left;">
+              <div class="stack-4">
+                <div class="t-numeral" style="color:var(--accent-ink);">Tue, Aug 5 · 6:00 PM</div>
+                <div class="t-heading">Vinyasa Flow</div>
+                <div class="t-sec c-2">with Elan · Studio A</div>
+              </div>
+              <div class="rule" style="margin:14px 0;"></div>
+              <div class="row">
+                <div class="t-sec c-2">Paid with</div>
+                <div class="t-sec">10-Class Pass · 6 left</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stack-12" style="padding-bottom:22px;">
+            <button class="btn secondary">Add to calendar</button>
+            <button class="btn ghost" style="text-align:center;">Back to schedule</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <div class="step">05</div>
+      <h3>A designed moment, not an alert</h3>
+      <p>
+        The checkmark draws in over 400ms; nothing else moves. No confetti — the brief is explicit
+        that manufactured excitement reads as cheap on a surface this calm.
+      </p>
+      <ul>
+        <li><b>The pass count updates in front of them:</b> "6 left", down from 7. The client sees
+          the consequence of what they just did without going to look for it.</li>
+        <li><b>"Add to calendar" is the one place we convert the stored time</b> into a real
+          instant, using the studio's timezone. Everywhere else the stored value is printed
+          verbatim — get this wrong and the entry lands hours off.</li>
+        <li>This screen is what earns the push-notification permission ask later. We ask after a
+          <i>successful booking</i>, never on first launch.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══ STEP 6 ══ -->
+<section class="optionblock">
+  <div class="rail">
+    <div class="framewrap">
+      <div class="framelabel">6 · Cancelling — early</div>
+      <div class="frame studio-cvy">
+        <div class="statusbar"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+        <div class="scroll pad" style="opacity:.5;">
+          <div class="t-display" style="margin:6px 0 18px;">Your classes</div>
+        </div>
+        <div class="sheetwrap">
+          <div class="scrim"></div>
+          <div class="sheet">
+            <div class="grabber"></div>
+            <div class="t-title" style="margin-bottom:10px;">Cancel this class?</div>
+            <div class="t-body c-2" style="margin-bottom:20px;">
+              You're cancelling 31 hours before it starts, so the class goes straight back to your
+              pass.
+            </div>
+
+            <div class="card flat" style="margin-bottom:20px;">
+              <div class="stack-4">
+                <div class="t-numeral">Tue, Aug 5 · 6:00 PM</div>
+                <div class="t-heading">Vinyasa Flow</div>
+              </div>
+              <div class="rule" style="margin:12px 0;"></div>
+              <div class="row">
+                <div class="t-sec c-2">You'll get back</div>
+                <div class="t-sec">1 class · 10-Class Pass</div>
+              </div>
+            </div>
+
+            <div class="stack-12">
+              <button class="btn destructive">Cancel this class</button>
+              <button class="btn secondary">Keep my spot</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <div class="step">06</div>
+      <h3>Say what they get back, before they decide</h3>
+      <p>
+        The sheet states the consequence in the client's own terms — <b>"31 hours before"</b> and
+        <b>"1 class back on your pass"</b> — rather than quoting a policy. Late cancels get the
+        same treatment with the opposite content: what they lose, in the same position.
+      </p>
+      <ul>
+        <li><b>Destructive is the danger colour, never the accent.</b> A studio's brand colour
+          must not come to mean "you are about to lose something".</li>
+        <li><b>"Keep my spot" is the calmer, easier button.</b> Cancelling is available, not
+          encouraged.</li>
+        <li>The early/late decision compares the class time against <code>studioNow()</code>. Using
+          the device clock would be four to seven hours out for these studios — enough to charge
+          somebody for an on-time cancel.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══ ACCOUNT ══ -->
+<section class="optionblock">
+  <div class="optionhead">
+    <h2>The client's account</h2>
+    <p>
+      Two screens. The hub is where a client goes to find something; the wallet is where their
+      money lives. Both are dense but breathing — this is the part of a booking app that usually
+      turns into an undifferentiated list of grey rows.
+    </p>
+  </div>
+
+  <div class="rail">
+    <div class="framewrap">
+      <div class="framelabel">Account hub</div>
+      <div class="frame studio-cvy">
+        <div class="statusbar"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+        <div class="scroll pad">
+          <div class="t-display" style="margin:6px 0 4px;">Elan Marek</div>
+          <div class="t-sec c-2" style="margin-bottom:26px;">elan@example.com</div>
+
+          <div class="card accent" style="margin-bottom:26px;">
+            <div class="t-label upper c-3" style="margin-bottom:10px;">Your journey</div>
+            <div class="row" style="align-items:flex-end;">
+              <div>
+                <div class="t-hero" style="font-size:44px; line-height:44px; color:var(--accent-ink);">23</div>
+                <div class="t-sec c-2" style="margin-top:4px;">classes at Carlsbad</div>
+              </div>
+              <div style="text-align:right;">
+                <div class="t-sec">2 to go</div>
+                <div class="t-cap c-3">until 25</div>
+              </div>
+            </div>
+            <div style="height:3px; background:var(--accent-border); border-radius:999px; margin-top:16px; overflow:hidden;">
+              <div style="width:92%; height:100%; background:var(--accent-fill);"></div>
+            </div>
+            <div class="t-cap c-3" style="margin-top:10px;">Member since March 2024</div>
+          </div>
+
+          <div class="t-label upper c-3" style="margin-bottom:12px;">Account</div>
+          <div class="stack-16" style="margin-bottom:28px;">
+            <div class="row"><div class="t-body">Wallet &amp; payment</div><div class="t-sec c-3">›</div></div>
+            <div class="rule"></div>
+            <div class="row"><div class="t-body">Your classes</div><div class="t-sec c-3">›</div></div>
+            <div class="rule"></div>
+            <div class="row"><div class="t-body">Notifications</div><div class="t-sec c-3">›</div></div>
+            <div class="rule"></div>
+            <div class="row"><div class="t-body">Profile</div><div class="t-sec c-3">›</div></div>
+          </div>
+
+          <div class="card" style="margin-bottom:28px;">
+            <div class="stack-4">
+              <div class="t-heading">Give $10, get $10</div>
+              <div class="t-sec c-2">When a friend takes their first class, you both get $10 in studio credit.</div>
+            </div>
+            <div class="t-cap c-accent" style="margin-top:12px;">Share your link</div>
+          </div>
+
+          <div class="t-label upper c-3" style="margin-bottom:12px;">Support</div>
+          <div class="stack-16" style="margin-bottom:28px;">
+            <div class="row"><div class="t-body">Contact the studio</div><div class="t-sec c-3">›</div></div>
+            <div class="rule"></div>
+            <div class="row"><div class="t-body">Terms &amp; privacy</div><div class="t-sec c-3">›</div></div>
+          </div>
+
+          <div class="stack-16" style="padding-bottom:30px;">
+            <div class="t-body">Sign out</div>
+            <div class="rule"></div>
+            <div class="t-body c-danger">Delete account</div>
+            <div class="t-cap c-3" style="padding-top:14px;">Powered by Dibs</div>
+          </div>
+        </div>
+        <div class="tabs studio-cvy">
+          <div class="tab"><span class="ico">◈</span>Home</div>
+          <div class="tab"><span class="ico">☰</span>Schedule</div>
+          <div class="tab"><span class="ico">◇</span>Packages</div>
+          <div class="tab on"><span class="ico">○</span>Account</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="framewrap">
+      <div class="framelabel">Wallet</div>
+      <div class="frame studio-cvy">
+        <div class="statusbar"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+        <div class="scroll pad">
+          <div class="t-display" style="margin:6px 0 24px;">Wallet</div>
+
+          <div class="t-label upper c-3" style="margin-bottom:12px;">Passes</div>
+          <div class="card" style="margin-bottom:10px;">
+            <div class="row" style="align-items:flex-end;">
+              <div>
+                <div class="t-heading">10-Class Pass</div>
+                <div class="t-sec c-2" style="margin-top:2px;">Expires Nov 30</div>
+              </div>
+              <div style="text-align:right;">
+                <div class="t-hero" style="font-size:38px; line-height:38px; color:var(--accent-ink);">6</div>
+                <div class="t-cap c-3">left</div>
+              </div>
+            </div>
+          </div>
+          <div class="card flat" style="margin-bottom:26px;">
+            <div class="row">
+              <div class="t-sec c-2">Studio credit</div>
+              <div class="t-numeral">$40.00</div>
+            </div>
+          </div>
+
+          <div class="t-label upper c-3" style="margin-bottom:12px;">Upcoming payment</div>
+          <div class="card accent" style="margin-bottom:26px;">
+            <div class="stack-4">
+              <div class="t-heading">Unlimited Monthly</div>
+              <div class="t-sec c-2">Your next invoice will be charged on the 25th.</div>
+            </div>
+            <div class="rule" style="margin:14px 0; background:var(--accent-border);"></div>
+            <div class="row">
+              <div class="t-sec c-2">Aug 25</div>
+              <div class="t-numeral">$200.00</div>
+            </div>
+          </div>
+
+          <div class="t-label upper c-3" style="margin-bottom:12px;">Payment methods</div>
+          <div class="stack-12" style="margin-bottom:26px;">
+            <div class="card">
+              <div class="row">
+                <div class="stack-4">
+                  <div class="t-heading">Visa ending 4242</div>
+                  <div class="t-sec c-2">Expires 04/28 · Default</div>
+                </div>
+                <div class="t-sec c-3">···</div>
+              </div>
+            </div>
+            <button class="btn secondary">Add a payment method</button>
+          </div>
+
+          <div class="t-label upper c-3" style="margin-bottom:12px;">Recent</div>
+          <div class="stack-16" style="padding-bottom:30px;">
+            <div class="row">
+              <div class="stack-4"><div class="t-body">10-Class Pass</div><div class="t-cap c-3">Jul 12</div></div>
+              <div class="t-sec">$220.00</div>
+            </div>
+            <div class="rule"></div>
+            <div class="row">
+              <div class="stack-4"><div class="t-body">Vinyasa Flow</div><div class="t-cap c-3">Jul 9 · paid with pass</div></div>
+              <div class="t-sec c-3">$0.00</div>
+            </div>
+          </div>
+        </div>
+        <div class="tabs studio-cvy">
+          <div class="tab"><span class="ico">◈</span>Home</div>
+          <div class="tab"><span class="ico">☰</span>Schedule</div>
+          <div class="tab"><span class="ico">◇</span>Packages</div>
+          <div class="tab on"><span class="ico">○</span>Account</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <h3>What the account is doing</h3>
+      <p>
+        <b>The journey card is the only place the accent floods a surface</b>, and it earns it by
+        being the one emotional object on an otherwise administrative screen. The count is a
+        Fraunces numeral because a number a client is proud of should be set like one.
+      </p>
+      <ul>
+        <li><b>"Delete account" is present and quiet.</b> Apple requires it for any app with
+          sign-up. Tucked at the bottom in the danger colour, and its confirmation says plainly
+          what is kept for financial records and that an active membership must be cancelled
+          first — rather than hiding it and hoping nobody looks.</li>
+        <li><b>The upcoming payment is stated as a date and an amount</b>, framed around the 25th
+          billing cycle. A subscription client should never be surprised by a charge.</li>
+        <li><b>Passes lead with the number remaining</b>, large. It is the fact they open the
+          wallet to check.</li>
+        <li>Rows are separated by hairlines, not wrapped in individual cards. Cards are for things
+          that are interactive or genuinely need a boundary; a settings list is neither.</li>
+        <li>"Powered by Dibs" is the only Dibs mark anywhere in the app, set in tertiary text.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</div>
+</body>
+</html>

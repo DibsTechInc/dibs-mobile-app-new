@@ -43,7 +43,7 @@
 | 5. White-label config loader | **done** — schema, loader, 3 studios + template, 42 validation tests |
 | 6. Error/loading grammar | **done** — Skeleton, EmptyState, ErrorState + a `BookingUnavailableNotice` for the degraded studio-lifecycle state |
 | 7. CI | **done** — typecheck + lint + jest + per-studio config resolution + 4 grep guardrails |
-| 8. Full design mock set | **not-started** — the largest remaining P0 item, and a design gate. Scope shrank: 2 studios (210, 88), classes only, no flash-credit surface |
+| 8. Full design mock set | **in-progress** — `design/mockups/home-options.html` (3 Home compositions × both studios) and `booking-and-account.html` (6-step booking walkthrough + Account hub + Wallet) are ready for review, rendered and verified in a browser. Remaining: packages storefront, membership detail, auth, system-states reference |
 
 ## Bonus (not a numbered P0 item)
 
@@ -79,15 +79,15 @@
     therefore requires `legal.privacyPolicyLive: true`, flipped by hand after someone loads the
     URL and sees a policy.
 
-## Open design question
+## Awaiting a design decision
 
-**Background colour: `#FFFFFF` or the warm `#FDFBF7`?** `DESIGN_BRIEF.md` (2026-07-21) specifies
-the warm off-white and says "never pure white"; shared `CLAUDE.md` records Alicia retiring
-`#FDFBF7` for `#FFFFFF` the next day, platform-wide. Implemented as `#FFFFFF` (the newer
-decision) but isolated in ONE token at the top of `src/theme/tokens.ts` — flipping that line
-changes every screen. Worth settling before the mock set is generated, since the brief's
-argument (warm ground reads better under a full-bleed hero photo) is a good one for this surface
-specifically.
+**Which Home composition?** Three built and rendered — A "The Cover" (hero-led), B "The Agenda"
+(next-class-led, recommended), C "The Split" (asymmetric). See
+`design/mockups/home-options.html`. Nothing downstream gets built on Home until this is picked.
+
+~~Background colour~~ **settled 2026-08-04:** `#FFFFFF`. The `dibs-brand` skill states the cream
+`#FDFBF7` page background is retired platform-wide, which overrides `DESIGN_BRIEF.md`'s older
+"never pure white" line. Still a single token in `src/theme/tokens.ts` if it ever changes.
 
 ## Two things worth knowing that were not asked for
 

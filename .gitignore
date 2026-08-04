@@ -18,6 +18,9 @@ expo-env.d.ts
 *.key
 *.mobileprovision
 
+# Playwright MCP scratch output (screenshots, snapshots)
+.playwright-mcp/
+
 # Metro
 .metro-health-check*
 

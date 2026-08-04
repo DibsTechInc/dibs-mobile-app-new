@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home — three compositions</title>
+<link rel="stylesheet" href="shared.css">
+<!--
+  DESIGN RATIONALE
+  Three genuinely different answers to "what is Home for", not three skins of one layout.
+  Each is shown in both v1 studios, because the template only works if it survives a calm slate
+  blue AND a loud pink. All accent tones are the real output of deriveAccentScale().
+
+  The thing that keeps these from ageing into "generic app": the accent never floods a surface,
+  hierarchy is carried by the Fraunces/DM Sans interplay rather than by colour, and every screen
+  has exactly one filled CTA.
+-->
+</head>
+<body>
+<div class="page">
+
+<header>
+  <h1>Home — three compositions</h1>
+  <p class="lede">
+    Same components, same tokens, three different points of view about what a client wants when
+    they open the app. Each shown in both launch studios. Pick one to build, or tell me which
+    parts of which to combine.
+  </p>
+  <div class="navlinks">
+    <a href="booking-and-account.html">→ Booking walkthrough &amp; account</a>
+  </div>
+</header>
+
+<!-- ══════════════════ OPTION A ══════════════════ -->
+<section class="optionblock" id="option-a">
+  <div class="optionhead">
+    <h2>Option A — The Cover</h2>
+    <p>
+      The studio's photograph is the first thing you see, nearly half the screen, with the studio
+      name set over it in Fraunces. Underneath, your next class, then today's schedule. It reads
+      like the cover of a magazine that happens to let you book.
+    </p>
+    <div class="tradeoff">
+      <b>What it buys:</b> maximum brand presence — a studio owner opening this feels like they
+      hired a design studio. <b>What it costs:</b> the photo pushes real content below the fold,
+      so a client checking tomorrow's schedule scrolls past a picture they have seen 200 times.
+      <b>Watch:</b> Everyday Ballet's hero is high-key, so white text on it needs the scrim to
+      work harder than Carlsbad's does.
+    </div>
+  </div>
+
+  <div class="rail">
+    <!-- CVY -->
+    <div class="framewrap">
+      <div class="framelabel">Carlsbad Village Yoga</div>
+      <div class="frame studio-cvy">
+        <div class="hero" style="flex:0 0 360px; display:flex; flex-direction:column;">
+          <div class="statusbar on-photo"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+          <div style="flex:1"></div>
+          <div class="pad" style="padding-bottom:24px;">
+            <div class="t-label upper" style="color:rgba(255,255,255,.8); margin-bottom:6px;">Carlsbad · Tuesday, August 5</div>
+            <div class="t-display" style="color:#fff;">Good morning,<br>Elan</div>
+          </div>
+        </div>
+
+        <div class="scroll pad" style="padding-top:24px;">
+          <div class="stack-24">
+            <div>
+              <div class="t-label upper c-3" style="margin-bottom:10px;">Your next class</div>
+              <div class="card accent">
+                <div class="row" style="align-items:flex-start;">
+                  <div class="stack-4">
+                    <div class="t-numeral">Today · 6:00 PM</div>
+                    <div class="t-heading">Vinyasa Flow</div>
+                    <div class="t-sec c-2">with Elan · Studio A</div>
+                  </div>
+                  <span class="tag accent">Booked</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="row" style="margin-bottom:10px;">
+                <div class="t-label upper c-3">Today at the studio</div>
+                <div class="t-cap c-accent">See all</div>
+              </div>
+              <div class="stack-12">
+                <div class="card">
+                  <div class="row">
+                    <div class="stack-4">
+                      <div class="t-numeral">7:30 AM</div>
+                      <div class="t-heading">Sunrise Slow Flow</div>
+                      <div class="t-sec c-2">with Marisa · 60 min</div>
+                    </div>
+                    <span class="tag">Open</span>
+                  </div>
+                </div>
+                <div class="card">
+                  <div class="row">
+                    <div class="stack-4">
+                      <div class="t-numeral">12:00 PM</div>
+                      <div class="t-heading">Midday Reset</div>
+                      <div class="t-sec c-2">with David · 45 min</div>
+                    </div>
+                    <span class="tag accent">3 spots left</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabs studio-cvy">
+          <div class="tab on"><span class="ico">◈</span>Home</div>
+          <div class="tab"><span class="ico">☰</span>Schedule</div>
+          <div class="tab"><span class="ico">◇</span>Packages</div>
+          <div class="tab"><span class="ico">○</span>Account</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EB -->
+    <div class="framewrap">
+      <div class="framelabel">Everyday Ballet</div>
+      <div class="frame studio-eb">
+        <div class="hero" style="flex:0 0 360px; display:flex; flex-direction:column; background-position:center 20%;">
+          <div class="statusbar"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+          <div style="flex:1"></div>
+          <div class="pad" style="padding-bottom:24px;">
+            <div class="t-label upper" style="color:rgba(255,255,255,.85); margin-bottom:6px;">Tuesday, August 5</div>
+            <div class="t-display" style="color:#fff;">Good morning,<br>Tiekka</div>
+          </div>
+        </div>
+
+        <div class="scroll pad" style="padding-top:24px;">
+          <div class="stack-24">
+            <div>
+              <div class="t-label upper c-3" style="margin-bottom:10px;">Your next class</div>
+              <div class="card accent">
+                <div class="row" style="align-items:flex-start;">
+                  <div class="stack-4">
+                    <div class="t-numeral">Today · 5:30 PM</div>
+                    <div class="t-heading">Beginner BASIC Ballet</div>
+                    <div class="t-sec c-2">with Anna · Studio 1</div>
+                  </div>
+                  <span class="tag accent">Booked</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="row" style="margin-bottom:10px;">
+                <div class="t-label upper c-3">Today at the studio</div>
+                <div class="t-cap c-accent">See all</div>
+              </div>
+              <div class="stack-12">
+                <div class="card">
+                  <div class="row">
+                    <div class="stack-4">
+                      <div class="t-numeral">9:00 AM</div>
+                      <div class="t-heading">Barre Conditioning</div>
+                      <div class="t-sec c-2">with Marta · 50 min</div>
+                    </div>
+                    <span class="tag">Open</span>
+                  </div>
+                </div>
+                <div class="card">
+                  <div class="row">
+                    <div class="stack-4">
+                      <div class="t-numeral">6:45 PM</div>
+                      <div class="t-heading">Pointe Technique</div>
+                      <div class="t-sec c-2">with Anna · 60 min</div>
+                    </div>
+                    <span class="tag accent">2 spots left</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabs studio-eb">
+          <div class="tab on"><span class="ico">◈</span>Home</div>
+          <div class="tab"><span class="ico">☰</span>Schedule</div>
+          <div class="tab"><span class="ico">◇</span>Packages</div>
+          <div class="tab"><span class="ico">○</span>Account</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ OPTION B ══════════════════ -->
+<section class="optionblock" id="option-b">
+  <div class="optionhead">
+    <h2>Option B — The Agenda</h2>
+    <p>
+      Leads with the thing a returning client actually came for: what is next, and when. The time
+      is a Fraunces hero numeral — the single biggest element on the screen. The photograph
+      becomes a slim band behind the header rather than the header itself.
+    </p>
+    <div class="tradeoff">
+      <b>What it buys:</b> the fastest possible answer to "when is my class", and it reads as
+      confident rather than decorative. <b>What it costs:</b> less brand theatre on open — the
+      studio's photograph is a supporting element, not the star. <b>Note:</b> this is the
+      composition that degrades best when a client has nothing booked (the block becomes an
+      invitation to book, same size, same position).
+    </div>
+  </div>
+
+  <div class="rail">
+    <!-- CVY -->
+    <div class="framewrap">
+      <div class="framelabel">Carlsbad Village Yoga</div>
+      <div class="frame studio-cvy">
+        <div class="hero band" style="flex:0 0 132px; display:flex; flex-direction:column; background-position:center 40%;">
+          <div class="statusbar on-photo"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+          <div style="flex:1"></div>
+          <div class="pad" style="padding-bottom:14px;">
+            <div class="t-title" style="color:#fff; font-size:21px;">Carlsbad Village Yoga</div>
+          </div>
+        </div>
+
+        <div class="scroll pad" style="padding-top:28px;">
+          <div class="stack-32">
+            <div>
+              <div class="t-label upper c-3" style="margin-bottom:8px;">Next up · today</div>
+              <div class="t-hero" style="color:var(--accent-ink);">6:00<span style="font-size:26px; letter-spacing:0;"> PM</span></div>
+              <div class="t-title" style="margin-top:2px;">Vinyasa Flow</div>
+              <div class="t-sec c-2" style="margin-top:6px;">with Elan · Studio A · 60 min</div>
+              <div style="display:flex; gap:10px; margin-top:16px;">
+                <button class="btn secondary" style="width:auto; padding:10px 16px; min-height:0; font-size:14px;">Add to calendar</button>
+                <button class="btn ghost" style="width:auto; padding:10px 4px; font-size:14px;">Cancel</button>
+              </div>
+            </div>
+
+            <div class="rule"></div>
+
+            <div>
+              <div class="row" style="margin-bottom:12px;">
+                <div class="t-label upper c-3">Later today</div>
+                <div class="t-cap c-accent">Full schedule</div>
+              </div>
+              <div class="stack-16">
+                <div class="row" style="align-items:flex-start;">
+                  <div class="stack-4">
+                    <div class="t-numeral">7:30 PM</div>
+                    <div class="t-heading">Restore &amp; Breathe</div>
+                    <div class="t-sec c-2">with Marisa</div>
+                  </div>
+                  <span class="tag">Open</span>
+                </div>
+                <div class="rule"></div>
+                <div class="row" style="align-items:flex-start;">
+                  <div class="stack-4">
+                    <div class="t-numeral">8:45 PM</div>
+                    <div class="t-heading">Candlelight Yin</div>
+                    <div class="t-sec c-2">with David</div>
+                  </div>
+                  <span class="tag accent">3 spots left</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card flat">
+              <div class="row">
+                <div class="stack-4">
+                  <div class="t-sec c-2">10-Class Pass</div>
+                  <div class="t-numeral">7 classes left</div>
+                </div>
+                <div class="t-cap c-accent">Wallet</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabs studio-cvy">
+          <div class="tab on"><span class="ico">◈</span>Home</div>
+          <div class="tab"><span class="ico">☰</span>Schedule</div>
+          <div class="tab"><span class="ico">◇</span>Packages</div>
+          <div class="tab"><span class="ico">○</span>Account</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EB -->
+    <div class="framewrap">
+      <div class="framelabel">Everyday Ballet</div>
+      <div class="frame studio-eb">
+        <div class="hero band" style="flex:0 0 132px; display:flex; flex-direction:column; background-position:center 15%;">
+          <div class="statusbar on-photo"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+          <div style="flex:1"></div>
+          <div class="pad" style="padding-bottom:14px;">
+            <div class="t-title" style="color:#fff; font-size:21px;">Everyday Ballet</div>
+          </div>
+        </div>
+
+        <div class="scroll pad" style="padding-top:28px;">
+          <div class="stack-32">
+            <div>
+              <div class="t-label upper c-3" style="margin-bottom:8px;">Next up · today</div>
+              <div class="t-hero" style="color:var(--accent-ink);">5:30<span style="font-size:26px; letter-spacing:0;"> PM</span></div>
+              <div class="t-title" style="margin-top:2px;">Beginner BASIC Ballet</div>
+              <div class="t-sec c-2" style="margin-top:6px;">with Anna · Studio 1 · 60 min</div>
+              <div style="display:flex; gap:10px; margin-top:16px;">
+                <button class="btn secondary" style="width:auto; padding:10px 16px; min-height:0; font-size:14px;">Add to calendar</button>
+                <button class="btn ghost" style="width:auto; padding:10px 4px; font-size:14px;">Cancel</button>
+              </div>
+            </div>
+
+            <div class="rule"></div>
+
+            <div>
+              <div class="row" style="margin-bottom:12px;">
+                <div class="t-label upper c-3">Later today</div>
+                <div class="t-cap c-accent">Full schedule</div>
+              </div>
+              <div class="stack-16">
+                <div class="row" style="align-items:flex-start;">
+                  <div class="stack-4">
+                    <div class="t-numeral">6:45 PM</div>
+                    <div class="t-heading">Pointe Technique</div>
+                    <div class="t-sec c-2">with Anna</div>
+                  </div>
+                  <span class="tag accent">2 spots left</span>
+                </div>
+                <div class="rule"></div>
+                <div class="row" style="align-items:flex-start;">
+                  <div class="stack-4">
+                    <div class="t-numeral">8:00 PM</div>
+                    <div class="t-heading">Adult Open Barre</div>
+                    <div class="t-sec c-2">with Marta</div>
+                  </div>
+                  <span class="tag">Open</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card flat">
+              <div class="row">
+                <div class="stack-4">
+                  <div class="t-sec c-2">Unlimited Monthly</div>
+                  <div class="t-numeral">Renews Aug 28</div>
+                </div>
+                <div class="t-cap c-accent">Wallet</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabs studio-eb">
+          <div class="tab on"><span class="ico">◈</span>Home</div>
+          <div class="tab"><span class="ico">☰</span>Schedule</div>
+          <div class="tab"><span class="ico">◇</span>Packages</div>
+          <div class="tab"><span class="ico">○</span>Account</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ OPTION C ══════════════════ -->
+<section class="optionblock" id="option-c">
+  <div class="optionhead">
+    <h2>Option C — The Split</h2>
+    <p>
+      Asymmetric. The photograph occupies a tall offset block on the right; the greeting and next
+      class sit against it on the left, overlapping the edge. Content determines the layout rather
+      than a grid — the composition changes shape depending on whether you have a class booked.
+    </p>
+    <div class="tradeoff">
+      <b>What it buys:</b> the most distinctive of the three, and the least likely to be mistaken
+      for any other booking app. <b>What it costs:</b> the most fragile — it depends on the studio
+      photo having a workable subject position, and a portrait shot with a centred subject fights
+      the crop. It is also the hardest to keep coherent as content grows.
+      <b>My read:</b> gorgeous for a launch screenshot, riskier as the screen someone opens daily.
+    </div>
+  </div>
+
+  <div class="rail">
+    <!-- CVY -->
+    <div class="framewrap">
+      <div class="framelabel">Carlsbad Village Yoga</div>
+      <div class="frame studio-cvy">
+        <div class="statusbar"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+        <div class="scroll">
+          <div style="position:relative; height:330px;">
+            <div class="hero" style="position:absolute; top:0; right:0; width:238px; height:300px; border-radius:0 0 0 8px;"></div>
+            <div style="position:absolute; left:20px; top:26px; width:210px;">
+              <div class="t-label upper c-3" style="margin-bottom:6px;">Tuesday, Aug 5</div>
+              <div class="t-display">Good<br>morning,<br>Elan</div>
+            </div>
+            <div style="position:absolute; left:20px; bottom:0; right:20px;">
+              <div class="card" style="background:var(--raised);">
+                <div class="t-label upper c-3" style="margin-bottom:6px;">Your next class</div>
+                <div class="row" style="align-items:flex-end;">
+                  <div>
+                    <div class="t-numeral" style="color:var(--accent-ink);">Today · 6:00 PM</div>
+                    <div class="t-heading" style="margin-top:2px;">Vinyasa Flow</div>
+                  </div>
+                  <span class="tag accent">Booked</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pad" style="padding-top:28px;">
+            <div class="row" style="margin-bottom:12px;">
+              <div class="t-label upper c-3">Today at the studio</div>
+              <div class="t-cap c-accent">See all</div>
+            </div>
+            <div class="stack-16">
+              <div class="row" style="align-items:flex-start;">
+                <div class="stack-4">
+                  <div class="t-numeral">7:30 PM</div>
+                  <div class="t-heading">Restore &amp; Breathe</div>
+                  <div class="t-sec c-2">with Marisa</div>
+                </div>
+                <span class="tag">Open</span>
+              </div>
+              <div class="rule"></div>
+              <div class="row" style="align-items:flex-start;">
+                <div class="stack-4">
+                  <div class="t-numeral">8:45 PM</div>
+                  <div class="t-heading">Candlelight Yin</div>
+                  <div class="t-sec c-2">with David</div>
+                </div>
+                <span class="tag accent">3 spots left</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabs studio-cvy">
+          <div class="tab on"><span class="ico">◈</span>Home</div>
+          <div class="tab"><span class="ico">☰</span>Schedule</div>
+          <div class="tab"><span class="ico">◇</span>Packages</div>
+          <div class="tab"><span class="ico">○</span>Account</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EB -->
+    <div class="framewrap">
+      <div class="framelabel">Everyday Ballet</div>
+      <div class="frame studio-eb">
+        <div class="statusbar"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+        <div class="scroll">
+          <div style="position:relative; height:330px;">
+            <div class="hero" style="position:absolute; top:0; right:0; width:238px; height:300px; border-radius:0 0 0 8px; background-position:center 12%;"></div>
+            <div style="position:absolute; left:20px; top:26px; width:210px;">
+              <div class="t-label upper c-3" style="margin-bottom:6px;">Tuesday, Aug 5</div>
+              <div class="t-display">Good<br>morning,<br>Tiekka</div>
+            </div>
+            <div style="position:absolute; left:20px; bottom:0; right:20px;">
+              <div class="card" style="background:var(--raised);">
+                <div class="t-label upper c-3" style="margin-bottom:6px;">Your next class</div>
+                <div class="row" style="align-items:flex-end;">
+                  <div>
+                    <div class="t-numeral" style="color:var(--accent-ink);">Today · 5:30 PM</div>
+                    <div class="t-heading" style="margin-top:2px;">Beginner BASIC Ballet</div>
+                  </div>
+                  <span class="tag accent">Booked</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pad" style="padding-top:28px;">
+            <div class="row" style="margin-bottom:12px;">
+              <div class="t-label upper c-3">Today at the studio</div>
+              <div class="t-cap c-accent">See all</div>
+            </div>
+            <div class="stack-16">
+              <div class="row" style="align-items:flex-start;">
+                <div class="stack-4">
+                  <div class="t-numeral">6:45 PM</div>
+                  <div class="t-heading">Pointe Technique</div>
+                  <div class="t-sec c-2">with Anna</div>
+                </div>
+                <span class="tag accent">2 spots left</span>
+              </div>
+              <div class="rule"></div>
+              <div class="row" style="align-items:flex-start;">
+                <div class="stack-4">
+                  <div class="t-numeral">8:00 PM</div>
+                  <div class="t-heading">Adult Open Barre</div>
+                  <div class="t-sec c-2">with Marta</div>
+                </div>
+                <span class="tag">Open</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabs studio-eb">
+          <div class="tab on"><span class="ico">◈</span>Home</div>
+          <div class="tab"><span class="ico">☰</span>Schedule</div>
+          <div class="tab"><span class="ico">◇</span>Packages</div>
+          <div class="tab"><span class="ico">○</span>Account</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="optionblock">
+  <div class="optionhead">
+    <h2>My recommendation</h2>
+    <p>
+      <b>Option B, with Option A's hero kept for the very first launch after install.</b> The
+      photograph earns its space once — as the studio's cover on day one — and after that a
+      returning client is opening the app to answer one question, which B answers in the first
+      200 pixels. B is also the only one of the three whose empty state is as good as its full
+      state, which matters more than it sounds: most clients have nothing booked most of the time.
+    </p>
+    <p>
+      Option C is the one I would want in the App Store screenshots. If you love it, the honest
+      compromise is C's composition on Home and B's discipline everywhere else — but it will need
+      a photo brief for future studios, because it only works with a subject that sits off-centre.
+    </p>
+  </div>
+</section>
+
+</div>
+</body>
+</html>
