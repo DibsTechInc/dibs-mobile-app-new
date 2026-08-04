@@ -5,7 +5,7 @@
 > The executor updates this file at the end of EVERY session. Statuses: `done` / `in-progress` / `blocked-on-Alicia (reason)` / `not-started`.
 
 **Last updated:** 2026-08-04 (session 1 — first build session, + Alicia's answers)
-**Gate status:** `npm run typecheck` clean · `npx jest` 446/446 · `npm run lint` 0 errors (2 pre-existing warnings)
+**Gate status:** `npm run typecheck` clean · `npx jest` 443/443 · `npm run lint` 0 errors (2 pre-existing warnings)
 **Next up:** P0 item 3 (auth wiring) → P0 item 8 (design mocks) → first `npx expo run:ios` dev build
 
 ## ⚠️ Direction changes this session (see `MOBILE_MASTER_PLAN.md` §0.1)
