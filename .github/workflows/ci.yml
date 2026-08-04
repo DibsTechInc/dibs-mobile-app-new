@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master, 'feature/**']
+
+concurrency:
+  # A new push supersedes an in-flight run for the same ref.
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Two TypeScript projects: app code (no Node types) and build tooling (Node types).
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      # Includes the white-label config + brand-asset validation, so a broken studio.json
+      # cannot merge.
+      - name: Test
+        run: npx jest --ci
+
+      # Every studio's Expo config must actually resolve. This catches a bad accent, a missing
+      # asset, or a slug/directory mismatch that only shows up at build time.
+      - name: Resolve every studio's app config
+        run: |
+          set -euo pipefail
+          for dir in whitelabel/studios/*/; do
+            slug=$(basename "$dir")
+            [ "$slug" = "_template" ] && continue
+            echo "── $slug"
+            STUDIO_SLUG="$slug" npx expo config --type public > /dev/null
+          done
+
+  guardrails:
+    # The invariants from MOBILE_MASTER_PLAN §9 that a grep can actually enforce.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: No hardcoded studio ids in src/
+        run: |
+          if grep -rnE 'dibsStudioId\s*[:=]\s*[0-9]' src/ --include='*.ts' --include='*.tsx'; then
+            echo "::error::Studio ids must come from the white-label config (src/config/studio.ts), never a literal."
+            exit 1
+          fi
+
+      - name: No raw hex colours in components
+        run: |
+          # src/theme is where colour literals legitimately live; everything else uses tokens.
+          if grep -rnE "#[0-9a-fA-F]{6}" src/ --include='*.tsx' \
+               --exclude-dir=theme --exclude-dir=__tests__; then
+            echo "::error::Components must use theme tokens, never raw hex (§9 invariant 9)."
+            exit 1
+          fi
+
+      - name: No runtime imports from legacy-reference
+        run: |
+          # Matches import/require statements only. Comments that CITE legacy-reference as the
+          # source a module was ported from are correct and encouraged.
+          if grep -rnE "(from|require\()\s*['\"][^'\"]*legacy-reference" src/ \
+               --include='*.ts' --include='*.tsx'; then
+            echo "::error::legacy-reference/ is read-only history. Port logic, never import it."
+            exit 1
+          fi
+
+      - name: source must be 'dibs', never the dead 'zf' value
+        run: |
+          if grep -rnE "source:\s*'zf'" src/ --include='*.ts' --include='*.tsx'; then
+            echo "::error::'zf' is the dead legacy source value (§9 invariant 2). Use 'dibs'."
+            exit 1
+          fi
