@@ -19,6 +19,73 @@ These were decided by Alicia on 2026-07-06. An executing model must not reverse 
 
 ---
 
+## 0.1 Revision 2026-08-04 — direction changes that OVERRIDE the sections below
+
+Two decisions by Alicia mid-execution. Where they conflict with anything later in this
+document, **these win**. Sections §6.3, §10, §11 and the P3/P5 endpoint tables have not been
+rewritten line-by-line; read them through this filter.
+
+### A. Ship the rebuild as an UPDATE to the two existing apps, not as new listings
+
+Carlsbad Village Yoga and Everyday Ballet already have live iOS listings owned by
+**Dibs Technology Inc**. Both are stranded on 2021 builds and broken for their installed base.
+Verified from the public App Store on 2026-08-04:
+
+| Studio | Bundle id | Live version | Last updated |
+|---|---|---|---|
+| 210 Carlsbad Village Yoga | `com.ondibs.carlsbadvillageyogaapp` | 1.8 | 2021-04-01 |
+| 88 Everyday Ballet | `com.ondibs.everydayballetapp` | 1.6 | 2021-02-08 |
+
+The rebuild ships into those same bundle ids as a version update. Consequences:
+
+- **The Apple/Play enrollment long pole leaves the critical path for both rescue studios.**
+  §6.3's DUNS/organization-enrollment runbook now applies ONLY to genuinely new studio apps.
+- **The broken installs self-heal.** App Store updates auto-install for most users within days.
+  A new listing would instead require every affected client to find and install a different app
+  while the dead one sits on their home screen.
+- **Nothing is foreclosed.** Apple supports transferring an app between developer accounts with
+  users, ratings and reviews intact, so a studio-owned account remains available later. Verify
+  the current transfer-eligibility rules before relying on it.
+- **Guideline 4.2.6 risk drops.** Updating a years-old existing app reads very differently to a
+  reviewer than submitting a batch of new templated listings.
+
+Alicia is disabling/removing the two broken listings from sale ahead of the new version — the
+build config must simply target the same identifiers.
+
+Encoded in `whitelabel/schema.ts` as `store.ownership` (`dibs` | `studio`) and
+`store.releaseType` (`update` | `new`), with a guard that an `update` build must carry the live
+bundle id and a version that exceeds `lastKnownStoreVersion`.
+
+**Two open questions:** (1) confirm current access to the Dibs Technology Inc App Store Connect
+account; (2) neither package resolves on Google Play, so confirm whether Android ever shipped —
+if not, Android is a fresh listing for both and the package name is our choice.
+
+### B. v1 ships CLASSES ONLY — appointments are deferred
+
+The studios being rescued take group bookings only. Appointments are **not** "just as easy to
+include": they carry availability slots, service providers, categories, a separate booking
+endpoint (`complete-appointment-booking`), and the recurring-subscription payNow/hold split
+with its 20th/25th invoice cycle — which is the single most complex domain module in this plan
+and still has no verified call trace (the pre-P5 deliverable). Deferring appointments removes
+approximately all of P5 and a meaningful slice of P3.
+
+- **P5 (recurring appointment subscriptions) moves out of v1.** "View upcoming payments" and
+  "view previous payments" (capabilities 4 and 10) stay in scope only insofar as they cover
+  membership and package activity, which is what 210/88 actually have.
+- **Studio 263 moves out of v1 entirely** — it is appointments-only AND needs a new
+  studio-owned listing. It stays configured in `whitelabel/` so nothing about it leaks into
+  hardcoded code, with `features.appointments: true` and `features.classes: false`.
+- **Nothing is foreclosed.** `features.appointments` exists from day one; navigation gates on
+  BOTH the build's feature flag and the studio's own `show_appts` config, so a build never
+  renders a surface it has no code for.
+
+**Consequence to be aware of:** 263 was the only pilot with `locationDynamicPricing: true`, so
+**P6's flash-credit surface loses its test studio.** Flash credits either need a different
+studio enabled for testing, or that part of P6 defers with 263. Milestones and the stats pipes
+are unaffected.
+
+---
+
 ## 0.5 Prerequisites — resolve BEFORE P0 acceptance is attempted
 
 The executing model cannot conjure these. At session start, check each; if one is missing, record it in `EXECUTION_STATE.md` as blocked-on-Alicia and continue with unblocked work — **never guess a value.**
@@ -26,11 +93,11 @@ The executing model cannot conjure these. At session start, check each; if one i
 | # | Prerequisite | Status / source |
 |---|---|---|
 | A | **Canonical prod API URL** | `https://api.dibsonline.com` (Railway alias — verified live 2026-07-22, shared CLAUDE.md). ⚠️ Do NOT copy the widget's `.env-v2.txt` value (`dibs-api-v2.herokuapp.com` — legacy Heroku, now a stale fork) and do NOT use `api.ondibs.com` (an earlier guess that appeared in a prior revision of this plan). |
-| B | **Staging API URL confirmed alive post-Railway-cutover** | **UNCONFIRMED.** The backend topology moved (Railway + Crunchy Bridge) on 2026-07-21/22 — *after* this plan's endpoint verification. Alicia names the staging URL the app targets; the executor sanity-checks it before any P0 acceptance claim: `curl -s -X POST <staging>/api/v2/widget/get-basic-config -H 'Content-Type: application/json' -d '{"dibsStudioId":226}'` must return studio config. |
-| C | **Firebase client config** (apiKey, authDomain, projectId, appId) for the widget's Firebase project | Lift from `dibs-widget-new/src/firebaseConfig.js` + its `.env` (`REACT_APP_FIREBASE_*`). Same project the widget uses — no new Firebase setup, no isolation (§11). |
+| B | **Staging API URL confirmed alive post-Railway-cutover** | **RESOLVED 2026-08-04 — there is no remote staging.** Probed: `dibs-api-staging.herokuapp.com` → 503 Application Error (dead); `dibs-api-v2.herokuapp.com` → 503 Offline for Maintenance (dead); `api.dibsonline.com` → 200 (live prod). The dev loop therefore targets **local dibs-api on `http://localhost:3001/api/v2`**, matching the widget's own dev `.env`. Full findings + per-target URLs: `docs/environments.md`. **Still needs an Alicia decision** for anything requiring a backend reachable off this laptop (device push testing in P7, TestFlight beta in P10): stand up a Railway staging service, or accept LAN-only until launch. |
+| C | **Firebase client config** (apiKey, authDomain, projectId, appId) for the widget's Firebase project | **DONE 2026-08-04.** Lifted from `dibs-widget-new/.env` into this repo's gitignored `.env`; names documented in `.env.example`. Project `dibs-studio-clients` — the CLIENT project, never `dibs-admin-users`. |
 | D | **Staging test user + studio state** | A known email/password login at a pilot studio on staging, with at least one pass, some credit, and a saved sandbox card. Alicia supplies one or approves creating one. |
-| E | **Stripe sandbox key path verified** | Nothing to provision — the publishable key comes from `POST /get-stripe-publishable-key` at runtime — but verify the staging backend returns the SANDBOX key, not live. |
-| F | **Local toolchain for dev builds** | Xcode + CocoaPods (iOS) and Android Studio + SDK + one AVD (Android). Expo Go dies at P0 item 1 (native modules) — dev builds are mandatory from day one. If the Android toolchain is absent, Alicia decides: install it, or run iOS-first with Android acceptance batched (recorded per phase in `EXECUTION_STATE.md`). |
+| E | **Stripe sandbox key path verified** | **DONE 2026-08-04.** Local API returns `pk_test_…`, prod returns `pk_live_…`. All of 88/210/226/263 have `stripe_account_id_test` populated, so sandbox connected-account checkout is exercisable. |
+| F | **Local toolchain for dev builds** | **PARTIAL 2026-08-04. iOS ready** (Xcode 26.2, CocoaPods 1.16.2). **Android absent** — no `ANDROID_HOME`, no `~/Library/Android/sdk`, no Java runtime. Per this row's own rule this is now Alicia's call: install the Android toolchain, or run iOS-first with Android acceptance batched. Note the two rescue apps are iOS listings, so iOS-first also matches the shipping order. |
 | G | **Expo/EAS account + project** | `eas init` happens in P0, not P9 — P7's device push testing requires an EAS development build with real credentials, and first-build friction is better paid early. |
 | H | **Sentry DSN** | Needed at P8. Non-blocking until then. |
 
@@ -42,15 +109,15 @@ A white-label client mobile app (iOS + Android, Expo) for boutique fitness studi
 
 | # | Capability (Alicia's v1 list) | Phase |
 |---|---|---|
-| 1 | Book appointments (if studio offers them) | P3 |
+| 1 | ~~Book appointments (if studio offers them)~~ | **DEFERRED past v1 — §0.1-B** |
 | 2 | Book classes (if studio offers them) | P3 |
 | 3 | Buy packages | P4 |
 | 4 | View upcoming payments (subscriptions) | P5 |
 | 5 | Manage billing info (add/remove cards) | P2 |
 | 6 | See flash credits — fun and exciting | P6 |
 | 7 | Gamification pipes (bookings count, total spend, milestones) — pipes now, full UX later | P6 |
-| 8 | Create a subscription/membership | P4 (membership), P5 (recurring appt subscription) |
-| 9 | Cancel subscription/membership | P4/P5 |
+| 8 | Create a subscription/membership | P4 (membership). Recurring appt subscription **deferred — §0.1-B** |
+| 9 | Cancel subscription/membership | P4 (membership). Recurring appt **deferred — §0.1-B** |
 | 10 | View previous payments | P5 |
 | 11 | View credit amounts | P2 |
 | — | Apple Pay / Google Pay / cards | P3 |
@@ -164,7 +231,7 @@ Every phase ends with: `npm run typecheck && npm test && npm run lint` clean, th
 
 Everything later depends on this. No screens yet beyond a dev shell. (Honest sizing: seven workstreams including full auth flows, an 8-component theme system, the white-label pipeline, and CI is two weeks of work, not one.)
 
-0. **Kick off store enrollment for all three pilot studios NOW** (§6.3) — Apple Developer org enrollment (DUNS lead time) + Play Console, Dibs as Admin. Pure paperwork, zero code dependency, and the longest pole in the whole plan. (263's accent + app name: already resolved 2026-07-21, see §11.) **Also kick off backend Lane 5 NOW** — the 7.8 endpoint + widget migration (`July21/widget-class-checkout-migration-plan.md`). It must be live and widget-proven before P3's card path; starting it when P3 starts would block the crown-jewel phase by its full length (§10 chart).
+0. ~~**Kick off store enrollment for all three pilot studios NOW**~~ **SUPERSEDED by §0.1-A (2026-08-04).** The two v1 studios ship as updates to existing Dibs-owned listings, so no enrollment is on the critical path. What replaces this item: confirm access to the Dibs Technology Inc App Store Connect account, and confirm whether either app ever shipped on Google Play. Studio-owned enrollment (§6.3) applies only to genuinely new studio apps, of which 263 is the first — and 263 is deferred past v1 (§0.1-B). **Also kick off backend Lane 5 NOW** — the 7.8 endpoint + widget migration (`July21/widget-class-checkout-migration-plan.md`). It must be live and widget-proven before P3's card path; starting it when P3 starts would block the crown-jewel phase by its full length (§10 chart).
 
 1. **Deps + dev builds:** install the §2 "not yet installed" list. `@stripe/stripe-react-native` and `expo-notifications` need config plugins in `app.config.ts` — convert `app.json` → `app.config.ts` now (white-label requires it anyway, §6). ⚠️ **This commit ends Expo Go** — both libraries contain native code. From here the dev loop is a development build: `npx expo run:ios` / `npx expo run:android` locally (toolchain per §0.5-F), plus `eas init` + a minimal `development` profile in `eas.json` NOW (full per-studio profiles still land in P9; P7 device push testing needs the EAS project to exist). Budget a half-day for the first successful dev build on each platform — it never "just works."
 2. **API client** per §3.2 + zod schemas for the P1/P2 endpoints. Version-compat plumbing reads an optional `minAppVersion` field from `get-basic-config` and shows an update banner when the installed build is older — tolerate the field being absent (the backend side is item 7.9, additive + approval-gated, and must never block P0). There is no existing `/api/v2/version` endpoint — do not invent one. Also: a one-hour **endpoint re-verification grep** of every P1/P2 endpoint in this plan against current dibs-api `routes/routers.js` — the §4 tables were verified 2026-07-06 and auth mounts are being added on an ongoing basis (7.3 workstream); confirm each route's current auth expectation and that guest-mode endpoints (`get-basic-config`, `get-schedule`, packages, categories) remain public.
@@ -222,6 +289,10 @@ Profile, saved cards, credit balances. Design gate: Account hub, Wallet/Billing 
 **Acceptance:** add a card via PaymentSheet on staging Stripe, see it listed, remove it; credit balance matches the widget for the same test user; profile edit round-trips.
 
 ### P3 — Checkout: classes & single appointments 🎨 (est. 2 weeks — the crown jewel)
+
+> **⚠️ Narrowed to CLASSES ONLY for v1 (2026-08-04, §0.1-B).** Skip every appointment row in
+> the matrix below, including `complete-appointment-booking`. The build order already puts the
+> class paths first, so this mostly removes work rather than reordering it.
 
 Design gate: payment selection sheet, confirmation screen, booking-success moment.
 
@@ -281,6 +352,12 @@ Design gate: package storefront, membership card, cancel-membership dialog.
 **Acceptance:** buy a pack on staging → appears in Wallet and in the widget for the same user; enroll a membership → autopay row + pass created (`dibs_studio_id` populated); cancel → widget shows the same canceled state; studio notification email fires on cancel (dispatcher Hook A).
 
 ### P5 — Subscriptions (recurring appointments), payments past & upcoming 🎨 (est. 2 weeks)
+
+> **⚠️ DEFERRED PAST v1 in its entirety (2026-08-04, §0.1-B).** Recurring appointment
+> subscriptions are studio 263's model, and 263 is out of v1. Payment history and upcoming
+> charges for the v1 studios are membership- and package-shaped, and belong with P4.
+> Keep this section as the v1.1 spec — including its un-discharged pre-P5 source-trace
+> deliverable, which is still required before anyone builds it.
 
 Design gate: subscription card, upcoming-payments view, payment-history list.
 
@@ -444,6 +521,12 @@ Note: `dibsStudioId` + branding also come live from `get-basic-config` at runtim
 
 ### 6.3 Store acceptance — the real constraint (do not skip)
 
+> **⚠️ Scope narrowed 2026-08-04 (§0.1-A).** Everything in this section describes the
+> **studio-owned-account path**, which now applies ONLY to genuinely NEW studio apps. The two
+> v1 studios (210, 88) ship as version updates into existing listings owned by Dibs Technology
+> Inc — no enrollment, no DUNS, no new app record. Read this section when onboarding a studio
+> that has never had an app, not for the v1 rescue.
+
 **Apple Guideline 4.2.6/4.3:** apps generated from a template/app-generation service are rejected **unless submitted under the client's own developer account**. This is why every white-label fitness platform (Mindbody's branded apps included) requires each studio to enroll in the Apple Developer Program.
 
 Runbook per studio (bake into studio onboarding):
@@ -561,6 +644,12 @@ P10 QA/Launch      ██ 1.5w           TestFlight requires studios' ASC accoun
 ---
 
 ## 11. Pilot Studios (decided 2026-07-06)
+
+> **⚠️ Reordered 2026-08-04 (§0.1).** v1 = **210 Carlsbad Village Yoga** and **88 Everyday
+> Ballet** only — both classes-only, both existing Dibs-owned iOS listings to be updated in
+> place. **263 Independent Training Spot is deferred past v1** (appointments-only + needs a new
+> studio-owned listing). The table below still describes all three; treat 263's rows as v1.1
+> planning, and note that deferring it leaves flash credits (P6) without a test studio.
 
 Three pilots, chosen by Alicia. Between them they cover the entire feature surface — every phase's acceptance criteria should be verified against the pilot that exercises it. Live config pulled from `get-basic-config` on 2026-07-06:
 
