@@ -5,8 +5,8 @@
 > The executor updates this file at the end of EVERY session. Statuses: `done` / `in-progress` / `blocked-on-Alicia (reason)` / `not-started`.
 
 **Last updated:** 2026-08-04 (session 1 — first build session, + Alicia's answers)
-**Gate status:** `npm run typecheck` clean · `npx jest` 425/425 · `npm run lint` 0 errors (2 pre-existing warnings)
-**Next up:** P0 item 4 (theme system + core components) → P0 item 3 (auth wiring) → P0 item 8 (design mocks)
+**Gate status:** `npm run typecheck` clean · `npx jest` 443/443 · `npm run lint` 0 errors (2 pre-existing warnings)
+**Next up:** P0 item 3 (auth wiring) → P0 item 8 (design mocks) → first `npx expo run:ios` dev build
 
 ## ⚠️ Direction changes this session (see `MOBILE_MASTER_PLAN.md` §0.1)
 
@@ -39,9 +39,9 @@
 | 1. Deps + `app.config.ts` + dev builds + `eas init` | **done except the first dev build.** Deps installed, `app.json` → `app.config.ts` per studio, `eas init` complete for both v1 studios, `eas.json` profiles written. **Not done:** first `npx expo run:ios` — no screens exist yet to look at, so it lands with the theme work |
 | 2. API client + zod schemas + endpoint re-verify | **done for the core.** Client, error normalization, query keys, `get-basic-config` schema, 40 tests. Endpoint re-verify: all 26 P1/P2 routes confirmed present. **Remaining:** schemas for the other P1/P2 endpoints, and the TanStack hooks (need auth first) |
 | 3. Auth wiring | **not-started** |
-| 4. Theme system | **partial** — `src/theme/color.ts` (accent derivation + WCAG guard, 19 tests) done. Tokens, provider, and the 6–8 core components not started |
+| 4. Theme system | **done** — `tokens.ts` (Layer 1 DNA: type scale, spacing, radii, motion), `theme.ts` (DNA + studio merge), `ThemeProvider` with bundled Fraunces + DM Sans, and 8 components: Text, Button, Card, Chip/StatusTag, Input, Sheet, Skeleton/SkeletonList, EmptyState/ErrorState. 37 theme tests |
 | 5. White-label config loader | **done** — schema, loader, 3 studios + template, 42 validation tests |
-| 6. Error/loading grammar | **not-started** (lands with item 4) |
+| 6. Error/loading grammar | **done** — Skeleton, EmptyState, ErrorState + a `BookingUnavailableNotice` for the degraded studio-lifecycle state |
 | 7. CI | **done** — typecheck + lint + jest + per-studio config resolution + 4 grep guardrails |
 | 8. Full design mock set | **not-started** — the largest remaining P0 item, and a design gate. Scope shrank: 2 studios (210, 88), classes only, no flash-credit surface |
 
@@ -71,6 +71,16 @@
 11. **Apple credentials for EAS Submit** — configured per project via `eas credentials`, using
     either an App Store Connect API key (recommended, non-interactive) or an Apple ID. Needed
     before the first real build, not before development builds.
+
+## Open design question
+
+**Background colour: `#FFFFFF` or the warm `#FDFBF7`?** `DESIGN_BRIEF.md` (2026-07-21) specifies
+the warm off-white and says "never pure white"; shared `CLAUDE.md` records Alicia retiring
+`#FDFBF7` for `#FFFFFF` the next day, platform-wide. Implemented as `#FFFFFF` (the newer
+decision) but isolated in ONE token at the top of `src/theme/tokens.ts` — flipping that line
+changes every screen. Worth settling before the mock set is generated, since the brief's
+argument (warm ground reads better under a full-bleed hero photo) is a good one for this surface
+specifically.
 
 ## Two things worth knowing that were not asked for
 
