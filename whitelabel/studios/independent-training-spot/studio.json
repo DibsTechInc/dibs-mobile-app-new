@@ -1,0 +1,42 @@
+{
+  "slug": "independent-training-spot",
+  "dibsStudioId": 263,
+  "appName": "Independent Training Spot NYC",
+  "shortName": "IGTS",
+  "accentColor": "#1A92E4",
+  "timezone": "America/New_York",
+
+  "store": {
+    "ownership": "studio",
+    "releaseType": "new",
+    "version": "1.0.0",
+    "notes": "DEFERRED past v1 (Alicia, 2026-08-04). 263 is appointments-only and v1 ships classes only; it also needs a brand-new listing under the IGTS Apple/Play accounts (weeks of enrollment). Kept configured so nothing about it gets hardcoded elsewhere in the meantime."
+  },
+
+  "features": {
+    "classes": false,
+    "appointments": true
+  },
+
+  "display": {
+    "showInstructor": false
+  },
+
+  "ios": {},
+  "android": {},
+
+  "support": {
+    "email": "info@independenttrainingspot.com"
+  },
+  "legal": {},
+
+  "api": {
+    "url": "https://api.dibsonline.com/api/v2"
+  },
+
+  "assets": {
+    "logo": "assets/logo.png",
+    "hero": "assets/hero.png",
+    "iconSource": "assets/logo.png"
+  }
+}

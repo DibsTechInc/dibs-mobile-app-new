@@ -1,0 +1,55 @@
+{
+  "//": "Copy this directory to whitelabel/studios/<slug>/ and fill it in. Run `npm run whitelabel:validate` after editing. Schema + field docs: whitelabel/schema.ts. Store-account fields stay empty until the app has a listing; development builds work without them, release builds refuse.",
+
+  "slug": "example-studio",
+  "dibsStudioId": 12345,
+  "appName": "Example Studio",
+  "shortName": "Example",
+  "accentColor": "#356280",
+  "timezone": "America/New_York",
+
+  "//store": "ownership 'dibs' + releaseType 'update' = ship into an EXISTING Dibs-owned listing (bundleId must match it exactly). ownership 'studio' + releaseType 'new' = fresh listing under the studio's own account, per Apple 4.2.6.",
+  "store": {
+    "ownership": "studio",
+    "releaseType": "new",
+    "version": "1.0.0"
+  },
+
+  "//features": "v1 ships classes only. Set appointments true once that module exists.",
+  "features": {
+    "classes": true,
+    "appointments": false
+  },
+
+  "display": {
+    "showInstructor": true
+  },
+
+  "ios": {
+    "bundleId": "com.examplestudio.app",
+    "appleTeamId": "",
+    "ascAppId": "",
+    "merchantId": "merchant.com.examplestudio.app"
+  },
+  "android": {
+    "package": "com.examplestudio.app"
+  },
+
+  "support": {
+    "email": "hello@examplestudio.com"
+  },
+  "legal": {
+    "privacyPolicyUrl": "https://ondibs.com/legal/privacy/example-studio",
+    "supportUrl": "https://examplestudio.com/contact"
+  },
+
+  "api": {
+    "url": "https://api.dibsonline.com/api/v2"
+  },
+
+  "assets": {
+    "logo": "assets/logo.png",
+    "hero": "assets/hero.png",
+    "iconSource": "assets/icon-source.png"
+  }
+}

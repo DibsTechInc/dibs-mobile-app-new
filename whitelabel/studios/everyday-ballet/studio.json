@@ -1,0 +1,45 @@
+{
+  "slug": "everyday-ballet",
+  "dibsStudioId": 88,
+  "appName": "Everyday Ballet",
+  "shortName": "Everyday Ballet",
+  "accentColor": "#F986A5",
+  "timezone": "America/New_York",
+
+  "store": {
+    "ownership": "dibs",
+    "releaseType": "update",
+    "version": "2.0.0",
+    "lastKnownStoreVersion": "1.6",
+    "notes": "Live iOS listing under Dibs Technology Inc since 2021-02-08, currently broken. Rebuild ships as an in-place update to the same bundle id. No Play listing found for this package — confirm whether Android ever shipped."
+  },
+
+  "features": {
+    "classes": true,
+    "appointments": false
+  },
+
+  "display": {
+    "showInstructor": true
+  },
+
+  "ios": {
+    "bundleId": "com.ondibs.everydayballetapp"
+  },
+  "android": {},
+
+  "support": {
+    "email": "tiekka@everydayballet.com"
+  },
+  "legal": {},
+
+  "api": {
+    "url": "https://api.dibsonline.com/api/v2"
+  },
+
+  "assets": {
+    "logo": "assets/logo.png",
+    "hero": "assets/hero.png",
+    "iconSource": "assets/logo.png"
+  }
+}

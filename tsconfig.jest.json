@@ -9,7 +9,8 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "types": ["jest", "node"],
-    "noEmit": true
+    "noEmit": true,
+    "allowImportingTsExtensions": true
   },
-  "include": ["src/domain/**/*.ts"]
+  "include": ["src/domain/**/*.ts", "src/theme/**/*.ts", "whitelabel/**/*.ts"]
 }
