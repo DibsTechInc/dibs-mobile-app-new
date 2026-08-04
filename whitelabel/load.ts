@@ -105,6 +105,13 @@ export function loadStudioConfig(slug: string): LoadedStudio {
 export interface ImageSize {
   width: number;
   height: number;
+  /**
+   * True when the file carries an alpha channel. Only meaningful for PNG (JPEG never has one).
+   *
+   * This matters for exactly one reason: **App Store Connect rejects an app icon that has an
+   * alpha channel**, even a fully opaque one. Catching it here beats catching it at submission.
+   */
+  hasAlphaChannel: boolean;
 }
 
 /**
@@ -117,9 +124,16 @@ export interface ImageSize {
 export function readImageSize(filePath: string): ImageSize | null {
   const buf = fs.readFileSync(filePath);
 
-  // PNG: 8-byte signature, then a 25-byte IHDR chunk whose width/height are at 16 and 20.
-  if (buf.length >= 24 && buf.toString('ascii', 12, 16) === 'IHDR') {
-    return { width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) };
+  // PNG: 8-byte signature, then an IHDR chunk — width at 16, height at 20, colour type at 25.
+  // Colour types 4 (grey+alpha) and 6 (RGBA) carry an alpha channel; type 3 (palette) can carry
+  // one via a tRNS chunk, so treat it as suspect too.
+  if (buf.length >= 26 && buf.toString('ascii', 12, 16) === 'IHDR') {
+    const colorType = buf[25];
+    return {
+      width: buf.readUInt32BE(16),
+      height: buf.readUInt32BE(20),
+      hasAlphaChannel: colorType === 4 || colorType === 6 || colorType === 3,
+    };
   }
 
   // JPEG: walk the segment markers until an SOFn frame header, which carries the dimensions.
@@ -134,7 +148,11 @@ export function readImageSize(filePath: string): ImageSize | null {
       // SOF0..SOF15, excluding the non-frame markers DHT (c4), JPGA (c8) and DAC (cc).
       const isFrame = marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker);
       if (isFrame) {
-        return { height: buf.readUInt16BE(offset + 5), width: buf.readUInt16BE(offset + 7) };
+        return {
+          height: buf.readUInt16BE(offset + 5),
+          width: buf.readUInt16BE(offset + 7),
+          hasAlphaChannel: false, // JPEG has no alpha channel by definition.
+        };
       }
       offset += 2 + buf.readUInt16BE(offset + 2);
     }

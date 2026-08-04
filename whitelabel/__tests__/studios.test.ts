@@ -46,17 +46,10 @@ const KNOWN_ASSET_GAPS: Record<string, { hero?: string; icon?: string }> = {
     icon: '180×281 logo — too small and not square for a 1024² app icon',
     // Deferred past v1 anyway (§0.1-B), so these are not on the critical path.
   },
-  'carlsbad-village-yoga': {
-    hero:
-      'Supplied photo (Elan&David.jpg) is 2016×1512 LANDSCAPE — a class-wide room shot. A 9:16 ' +
-      'crop tops out at 850×1512, below splash resolution, and lands awkwardly on one person. ' +
-      'Needs a vertical photo from the studio.',
-    icon:
-      'The vector logo (EPS) is the real mark, and its embedded 1000² preview is now logo.png — ' +
-      'good enough for an in-app header, not for an icon. The icon needs the BADGE alone ' +
-      '(oval + figure, without the wordmark) exported from the EPS at 1024×1024. The supplied ' +
-      'icon.png is a 353×312 screenshot of the App Store listing, including the caption.',
-  },
+  // Carlsbad Village Yoga's assets landed 2026-08-04 and it is off this list. Its icon is derived
+  // from a 774² source (badge cropped, flattened, upscaled 1.61×) rather than a native 1024²
+  // export — good enough to ship, and a fresh export from the .eps would sharpen the App Store
+  // listing. Everyday Ballet's arrived the same day and were natively sized.
 };
 
 const slugs = listStudioSlugs();
@@ -193,6 +186,13 @@ describe.each(slugs)('studio: %s', (slug) => {
       expect(hero.height).toBeGreaterThanOrEqual(MIN_HERO_HEIGHT);
       expect(hero.height / hero.width).toBeGreaterThanOrEqual(MIN_HERO_ASPECT);
     }
+  });
+
+  it('has an app icon with no alpha channel', () => {
+    // App Store Connect rejects an icon carrying an alpha channel, even a fully opaque one.
+    // Both studios' supplied files had one and had to be flattened; this stops it recurring.
+    if (KNOWN_ASSET_GAPS[slug]?.icon) return;
+    expect(readImageSize(assets.iconSource)!.hasAlphaChannel).toBe(false);
   });
 
   it('ships a portrait splash when it declares one', () => {

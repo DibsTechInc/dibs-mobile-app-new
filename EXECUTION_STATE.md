@@ -5,7 +5,7 @@
 > The executor updates this file at the end of EVERY session. Statuses: `done` / `in-progress` / `blocked-on-Alicia (reason)` / `not-started`.
 
 **Last updated:** 2026-08-04 (session 1 — first build session, + Alicia's answers)
-**Gate status:** `npm run typecheck` clean · `npx jest` 419/419 · `npm run lint` 0 errors (2 pre-existing warnings)
+**Gate status:** `npm run typecheck` clean · `npx jest` 422/422 · `npm run lint` 0 errors (2 pre-existing warnings)
 **Next up:** P0 item 4 (theme system + core components) → P0 item 3 (auth wiring) → P0 item 8 (design mocks)
 
 ## ⚠️ Direction changes this session (see `MOBILE_MASTER_PLAN.md` §0.1)
@@ -56,12 +56,13 @@
 1. ~~App Store Connect access~~ **confirmed 2026-08-04.**
 2. ~~Google Play~~ **resolved:** never submitted; v1 is iOS-only.
 3. ~~Android toolchain~~ **resolved:** deferred with the platform.
-4. **210's app icon** — the only remaining asset gap that blocks a store build. Needs the
-   **badge alone** (oval + seated figure, *without* the "CARLSBAD VILLAGE YOGA" wordmark)
-   exported from `CARLSBAD_VILLAGE_YOGA_OPT_2-01.eps` at **1024×1024, opaque, no transparency**.
-   A few minutes in Illustrator or Preview.
-5. **210's hero photo** — needs a **vertical** shot. The supplied `Elan&David.jpg` is a 2016×1512
-   landscape room shot; a 9:16 crop lands at 850×1512, below splash resolution.
+4. ~~210's app icon~~ **shipped 2026-08-04** from the supplied 774² square: badge cropped out,
+   flattened to opaque, upscaled 1.61× to 1024². **Confirm Option B** (badge only) over Option A
+   (full lockup) — preview at `whitelabel/studios/carlsbad-village-yoga/icon-options-preview.html`.
+   *Optional polish:* a native 1024² badge export from the `.eps` would remove the slight
+   softness visible only on the App Store listing.
+5. ~~210's hero photo~~ **shipped 2026-08-04** — `new-background-image.png`, 1800×3194 vertical,
+   resized to 1440×2555 JPEG.
 6. ~~App/short names~~ **confirmed;** "Everyday Ballet" may truncate under the icon.
 7. ~~Flash credits~~ **deferred.**
 8. **Which EAS account owns the apps** — `dibs-tech` or `alicia-dibs`? Needed before `eas init`.
@@ -88,5 +89,5 @@
 - 2026-07-26 · §0.5-D: staging test user — still needs Alicia.
 - 2026-07-26 · §0.5-G: Expo/EAS — **logged in 2026-08-04**; only the account choice remains.
 - 2026-08-04 · §0.5-F: Android toolchain absent — **closed**, v1 is iOS-only.
-- 2026-08-04 · Brand assets: **88 fully resolved** (real 1024² icon, vertical hero, designed splash all wired in). **210 still needs a square badge export + a vertical photo** — it ships the placeholder icon until then.
+- 2026-08-04 · Brand assets: **both v1 studios resolved.** 88 has a native 1024² icon, a vertical hero and a designed splash. 210 now has a vertical hero and an icon derived from its 774² square (badge cropped, flattened, upscaled 1.61×). No studio ships the placeholder icon any more. Only 263 remains in the gap registry, and it is deferred.
 - 2026-08-04 · Backend Lane 5 (7.8 endpoint + widget migration) not started; blocks P3's card path.
