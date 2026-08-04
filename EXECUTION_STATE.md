@@ -5,7 +5,7 @@
 > The executor updates this file at the end of EVERY session. Statuses: `done` / `in-progress` / `blocked-on-Alicia (reason)` / `not-started`.
 
 **Last updated:** 2026-08-04 (session 1 — first build session, + Alicia's answers)
-**Gate status:** `npm run typecheck` clean · `npx jest` 443/443 · `npm run lint` 0 errors (2 pre-existing warnings)
+**Gate status:** `npm run typecheck` clean · `npx jest` 446/446 · `npm run lint` 0 errors (2 pre-existing warnings)
 **Next up:** P0 item 3 (auth wiring) → P0 item 8 (design mocks) → first `npx expo run:ios` dev build
 
 ## ⚠️ Direction changes this session (see `MOBILE_MASTER_PLAN.md` §0.1)
@@ -70,7 +70,14 @@
 10. **Staging test user** (§0.5-D) — still open.
 11. **Apple credentials for EAS Submit** — configured per project via `eas credentials`, using
     either an App Store Connect API key (recommended, non-interactive) or an Apple ID. Needed
-    before the first real build, not before development builds.
+    before the first real build, not before development builds. `appleTeamId` and `merchantId`
+    fill themselves in from that step; do not hand-write them.
+12. **The privacy policy page does not exist yet.** `https://dibsonline.com/apple/privacy-policy`
+    is recorded in all three configs, but it currently returns **HTTP 200 with the widget SPA
+    shell** — as does every other path on `dibsonline.com` and `ondibs.com`, because of the
+    catch-all rewrite. Nothing 404s, so a status-code check cannot detect this. The release gate
+    therefore requires `legal.privacyPolicyLive: true`, flipped by hand after someone loads the
+    URL and sees a policy.
 
 ## Open design question
 

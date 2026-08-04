@@ -184,8 +184,22 @@ export const studioConfigSchema = z.object({
   }),
 
   legal: z.object({
-    /** Required on every store listing. Hosting model decided in P9. */
+    /** Required on every store listing. */
     privacyPolicyUrl: z.string().url().optional(),
+    /**
+     * Has someone actually LOADED that URL and seen a privacy policy?
+     *
+     * This flag exists because presence is not evidence. Every path on `dibsonline.com` and
+     * `ondibs.com` answers **HTTP 200 with the widget's SPA shell** — the catch-all rewrite
+     * means `/apple/privacy-policy`, `/legal/privacy`, and `/total-nonsense` are indistinguishable
+     * from a live page to any check that only looks at the status code. Verified 2026-08-04:
+     * all of them return the same 1107-byte document titled "Dibs Widget".
+     *
+     * So a URL alone cannot gate a release. Flip this to true only after opening the link and
+     * reading a policy; until then `validateStudioForRelease` refuses, and the failure happens
+     * at build time instead of costing an App Store review cycle.
+     */
+    privacyPolicyLive: z.boolean().default(false),
     supportUrl: z.string().url().optional(),
   }),
 
@@ -251,6 +265,8 @@ const RELEASE_REQUIRED: ReadonlyArray<
   ['ios.merchantId', (c) => c.ios.merchantId, 'ios'],
   ['android.package', (c) => c.android.package, 'android'],
   ['legal.privacyPolicyUrl', (c) => c.legal.privacyPolicyUrl, 'any'],
+  // Not the URL — proof the URL serves a policy. See the note on the field.
+  ['legal.privacyPolicyLive', (c) => c.legal.privacyPolicyLive || undefined, 'any'],
 ];
 
 /**

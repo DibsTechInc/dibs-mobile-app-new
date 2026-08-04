@@ -40,7 +40,9 @@
     "email": "hello@examplestudio.com"
   },
   "legal": {
-    "privacyPolicyUrl": "https://ondibs.com/legal/privacy/example-studio",
+    "//privacyPolicyLive": "Flip to true only after LOADING the URL and seeing a policy. Every path on dibsonline.com returns HTTP 200 with the widget SPA shell, so a status code proves nothing.",
+    "privacyPolicyUrl": "https://dibsonline.com/apple/privacy-policy",
+    "privacyPolicyLive": false,
     "supportUrl": "https://examplestudio.com/contact"
   },
 

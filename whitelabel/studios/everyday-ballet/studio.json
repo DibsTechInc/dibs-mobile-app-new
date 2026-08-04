@@ -29,7 +29,10 @@
   "support": {
     "email": "tiekka@everydayballet.com"
   },
-  "legal": {},
+  "legal": {
+    "privacyPolicyUrl": "https://dibsonline.com/apple/privacy-policy",
+    "privacyPolicyLive": false
+  },
   "api": {
     "url": "https://api.dibsonline.com/api/v2"
   },
