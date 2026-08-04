@@ -12,5 +12,5 @@
     "noEmit": true,
     "allowImportingTsExtensions": true
   },
-  "include": ["src/domain/**/*.ts", "src/theme/**/*.ts", "whitelabel/**/*.ts"]
+  "include": ["src/domain/**/*.ts", "src/theme/**/*.ts", "src/api/**/*.ts", "whitelabel/**/*.ts"]
 }
