@@ -56,9 +56,11 @@ Encoded in `whitelabel/schema.ts` as `store.ownership` (`dibs` | `studio`) and
 `store.releaseType` (`update` | `new`), with a guard that an `update` build must carry the live
 bundle id and a version that exceeds `lastKnownStoreVersion`.
 
-**Two open questions:** (1) confirm current access to the Dibs Technology Inc App Store Connect
-account; (2) neither package resolves on Google Play, so confirm whether Android ever shipped —
-if not, Android is a fresh listing for both and the package name is our choice.
+**Both resolved 2026-08-04 (Alicia):** App Store Connect access is confirmed. Nothing has ever
+been submitted to Google Play, and **v1 is iOS-only** — `store.platforms: ['ios']` in every
+studio config, and release validation only demands Android identifiers when a studio actually
+targets Android. Android remains a development target throughout; it is only the *submission*
+that is out of scope.
 
 ### B. v1 ships CLASSES ONLY — appointments are deferred
 
@@ -79,10 +81,26 @@ approximately all of P5 and a meaningful slice of P3.
   BOTH the build's feature flag and the studio's own `show_appts` config, so a build never
   renders a surface it has no code for.
 
-**Consequence to be aware of:** 263 was the only pilot with `locationDynamicPricing: true`, so
-**P6's flash-credit surface loses its test studio.** Flash credits either need a different
-studio enabled for testing, or that part of P6 defers with 263. Milestones and the stats pipes
-are unaffected.
+**Consequence, now decided:** 263 was the only pilot with `locationDynamicPricing: true`, so
+P6's flash-credit surface had no test studio. **Flash credits are DEFERRED (Alicia,
+2026-08-04).** P6 ships as the stats/milestone pipes only — and milestones are themselves gated
+on locating that backend (§7 item 7.6), so P6 may reduce to the stats card alone. Neither the
+schema nor the endpoints are foreclosed; nothing about flash credits gets built in v1.
+
+### C. Brand assets — status as of 2026-08-04
+
+Studio-supplied originals live in `brand-assets/` (gitignored; the derived, correctly-sized
+files are committed under `whitelabel/studios/<slug>/assets/`).
+
+| Studio | Icon (1024² square) | Hero (vertical) | Splash |
+|---|---|---|---|
+| 88 Everyday Ballet | ✅ 1024×1024, opaque | ✅ 1440×2160 dancer | ✅ 1242×2436 wordmark |
+| 210 Carlsbad Village Yoga | ❌ needs the **badge alone** exported from the EPS at 1024² | ❌ only a landscape class photo | — falls back to icon-on-white |
+
+210's vector logo (`.eps`) carries a 1000² embedded preview, extracted and committed as its
+`logo.png` — good for an in-app header, too low-resolution once the badge is cropped out of it
+for an icon. The gap registry lives in `whitelabel/__tests__/studios.test.ts`; a studio without
+store-ready assets keeps the placeholder icon rather than shipping a squashed wordmark.
 
 ---
 

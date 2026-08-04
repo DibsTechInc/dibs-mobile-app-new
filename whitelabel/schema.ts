@@ -104,6 +104,15 @@ export const studioConfigSchema = z.object({
   store: z.object({
     ownership: z.enum(['dibs', 'studio']),
     releaseType: z.enum(['update', 'new']),
+    /**
+     * Which stores this app actually ships to.
+     *
+     * v1 is **iOS only** (Alicia, 2026-08-04): the two rescue apps are App Store listings and
+     * nothing has ever been submitted to Google Play. Release validation only demands Android
+     * identifiers when 'android' is listed here, so an iOS-only studio is not blocked on a
+     * package name nobody has chosen. Development builds still run on Android either way.
+     */
+    platforms: z.array(z.enum(['ios', 'android'])).nonempty().default(['ios']),
     /** The version this build ships as. Must exceed `lastKnownStoreVersion` for an update. */
     version: storeVersion.default('2.0.0'),
     /**
@@ -191,9 +200,18 @@ export const studioConfigSchema = z.object({
 
   assets: z
     .object({
+      /** Wordmark or lockup, for in-app headers. Any aspect ratio. */
       logo: z.string().default('assets/logo.png'),
+      /** The vertical brand photo: Home cover and auth backdrop. */
       hero: z.string().default('assets/hero.jpg'),
+      /** Square source the app icon is generated from. Must be ≥1024² and opaque. */
       iconSource: z.string().default('assets/icon-source.png'),
+      /**
+       * Optional purpose-made launch image. When absent the splash falls back to the icon on a
+       * plain background, which is the correct default — a studio without a designed splash
+       * should not get a stretched photo.
+       */
+      splash: z.string().optional(),
     })
     .default({
       logo: 'assets/logo.png',
@@ -204,13 +222,21 @@ export const studioConfigSchema = z.object({
 
 export type StudioConfig = z.infer<typeof studioConfigSchema>;
 
-/** Fields that must be present before a build can be submitted to a store. */
-const RELEASE_REQUIRED: ReadonlyArray<readonly [string, (c: StudioConfig) => unknown]> = [
-  ['ios.bundleId', (c) => c.ios.bundleId],
-  ['ios.appleTeamId', (c) => c.ios.appleTeamId],
-  ['ios.merchantId', (c) => c.ios.merchantId],
-  ['android.package', (c) => c.android.package],
-  ['legal.privacyPolicyUrl', (c) => c.legal.privacyPolicyUrl],
+/**
+ * Fields that must be present before a build can be submitted, per target platform.
+ *
+ * Keyed by platform so an iOS-only studio is never blocked on an Android package name that
+ * nobody has chosen — and, equally, so adding 'android' to a studio's platforms immediately
+ * starts demanding the identifiers that submission needs.
+ */
+const RELEASE_REQUIRED: ReadonlyArray<
+  readonly [string, (c: StudioConfig) => unknown, 'ios' | 'android' | 'any']
+> = [
+  ['ios.bundleId', (c) => c.ios.bundleId, 'ios'],
+  ['ios.appleTeamId', (c) => c.ios.appleTeamId, 'ios'],
+  ['ios.merchantId', (c) => c.ios.merchantId, 'ios'],
+  ['android.package', (c) => c.android.package, 'android'],
+  ['legal.privacyPolicyUrl', (c) => c.legal.privacyPolicyUrl, 'any'],
 ];
 
 /**
@@ -220,7 +246,10 @@ const RELEASE_REQUIRED: ReadonlyArray<readonly [string, (c: StudioConfig) => unk
  * work is never blocked on paperwork or on a bundle id we have not looked up yet.
  */
 export function validateStudioForRelease(config: StudioConfig): void {
-  const missing = RELEASE_REQUIRED.filter(([, get]) => !get(config)).map(([path]) => path);
+  const targets = new Set<string>(config.store.platforms);
+  const missing = RELEASE_REQUIRED.filter(
+    ([, get, platform]) => (platform === 'any' || targets.has(platform)) && !get(config),
+  ).map(([path]) => path);
   if (missing.length > 0) {
     throw new Error(
       `Studio "${config.slug}" cannot be released yet — missing: ${missing.join(', ')}.\n` +

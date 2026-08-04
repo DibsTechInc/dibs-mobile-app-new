@@ -32,6 +32,14 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   const slug = process.env.STUDIO_SLUG ?? DEFAULT_STUDIO_SLUG;
   const { config: studio } = loadStudioConfig(slug);
 
+  /**
+   * Studio-supplied assets, referenced relative to the repo root so Expo resolves them the same
+   * way it resolves ./assets. A studio without a usable square mark keeps the placeholder rather
+   * than getting a squashed wordmark — see KNOWN_ASSET_GAPS in the white-label test suite.
+   */
+  const studioAsset = (file: string): string => `./whitelabel/studios/${studio.slug}/${file}`;
+  const hasStoreReadyIcon = studio.assets.iconSource !== studio.assets.logo;
+
   if (isReleaseBuild()) validateStudioForRelease(studio);
 
   /**
@@ -57,11 +65,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     // `newArchEnabled: true` that app.json carried is gone because it is now redundant.
     userInterfaceStyle: 'light',
 
-    // TODO(P9): per-studio icon + splash generated from the studio's own square mark. The
-    // pilots' current assets are wordmarks/landscape banners and cannot produce either —
-    // see KNOWN_ASSET_GAPS in whitelabel/__tests__/studios.test.ts. Until those land, every
-    // build carries the placeholder Dibs mark.
-    icon: './assets/images/icon.png',
+    // The studio's own 1024² mark when they have supplied one; otherwise the placeholder,
+    // because a squashed wordmark reads worse than a neutral icon and hides the gap.
+    icon: hasStoreReadyIcon ? studioAsset(studio.assets.iconSource) : './assets/images/icon.png',
 
     ios: {
       supportsTablet: false,
@@ -99,12 +105,21 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       'expo-router',
       [
         'expo-splash-screen',
-        {
-          // #FFFFFF, not the retired #FDFBF7 warm off-white (shared CLAUDE.md, 2026-07-22).
-          backgroundColor: '#FFFFFF',
-          image: './assets/images/splash-icon.png',
-          imageWidth: 160,
-        },
+        // A studio-designed launch image fills the screen; otherwise centre a mark on white.
+        // #FFFFFF, not the retired #FDFBF7 warm off-white (shared CLAUDE.md, 2026-07-22).
+        studio.assets.splash
+          ? {
+              backgroundColor: '#FFFFFF',
+              image: studioAsset(studio.assets.splash),
+              resizeMode: 'cover',
+            }
+          : {
+              backgroundColor: '#FFFFFF',
+              image: hasStoreReadyIcon
+                ? studioAsset(studio.assets.iconSource)
+                : './assets/images/splash-icon.png',
+              imageWidth: 160,
+            },
       ],
       'expo-secure-store',
       [

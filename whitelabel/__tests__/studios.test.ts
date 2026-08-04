@@ -34,23 +34,28 @@ const MIN_HERO_ASPECT = 1.2; // height / width
 /**
  * Studios whose supplied assets are NOT yet store-ready, and why.
  *
- * All three pilots were onboarded for the WEB widget, where the hero is a landscape banner and
- * the logo is a wordmark. Neither shape works for a phone app: the splash wants a vertical
- * photo and the icon wants a 1024² square. Alicia has to collect these from each studio —
- * tracked in EXECUTION_STATE.md. Delete an entry when its assets arrive.
+ * The pilots were originally onboarded for the WEB widget, where the hero is a landscape banner
+ * and the logo is a wordmark — neither shape works on a phone, which wants a vertical photo and
+ * a 1024² square. Everyday Ballet's real assets arrived 2026-08-04 and it is off this list.
+ * Delete an entry when its assets land; adding a studio without either good assets or an entry
+ * here fails the build.
  */
 const KNOWN_ASSET_GAPS: Record<string, { hero?: string; icon?: string }> = {
   'independent-training-spot': {
     hero: '1200×656 landscape marketing banner — not a vertical hero photo',
     icon: '180×281 logo — too small and not square for a 1024² app icon',
+    // Deferred past v1 anyway (§0.1-B), so these are not on the critical path.
   },
   'carlsbad-village-yoga': {
-    hero: '1961×1258 landscape — high-res but the wrong shape; a vertical crop tops out ~707px wide',
-    icon: '206×154 logo — too small and not square',
-  },
-  'everyday-ballet': {
-    hero: '689×459 landscape and low-res — unusable as a splash at any crop',
-    icon: '1280×221 wide wordmark — cannot become a square icon without a separate mark',
+    hero:
+      'Supplied photo (Elan&David.jpg) is 2016×1512 LANDSCAPE — a class-wide room shot. A 9:16 ' +
+      'crop tops out at 850×1512, below splash resolution, and lands awkwardly on one person. ' +
+      'Needs a vertical photo from the studio.',
+    icon:
+      'The vector logo (EPS) is the real mark, and its embedded 1000² preview is now logo.png — ' +
+      'good enough for an in-app header, not for an icon. The icon needs the BADGE alone ' +
+      '(oval + figure, without the wordmark) exported from the EPS at 1024×1024. The supplied ' +
+      'icon.png is a 353×312 screenshot of the App Store listing, including the caption.',
   },
 };
 
@@ -166,11 +171,40 @@ describe.each(slugs)('studio: %s', (slug) => {
 
   it('has every branded asset present and readable', () => {
     for (const [name, file] of Object.entries(assets)) {
+      if (file === null) continue;
       expect(fs.existsSync(file)).toBe(true);
       const size = readImageSize(file);
       expect(size).not.toBeNull();
       expect(size!.width).toBeGreaterThan(0);
       expect(`${name}:${size!.height}`).not.toBe(`${name}:0`);
+    }
+  });
+
+  it('has store-ready icon and hero assets, unless a gap is recorded', () => {
+    const gap = KNOWN_ASSET_GAPS[slug] ?? {};
+
+    if (!gap.icon) {
+      const icon = readImageSize(assets.iconSource)!;
+      expect(icon.width).toBeGreaterThanOrEqual(MIN_ICON_SIZE);
+      expect(Math.abs(icon.width / icon.height - 1)).toBeLessThanOrEqual(ICON_ASPECT_TOLERANCE);
+    }
+    if (!gap.hero) {
+      const hero = readImageSize(assets.hero)!;
+      expect(hero.height).toBeGreaterThanOrEqual(MIN_HERO_HEIGHT);
+      expect(hero.height / hero.width).toBeGreaterThanOrEqual(MIN_HERO_ASPECT);
+    }
+  });
+
+  it('ships a portrait splash when it declares one', () => {
+    if (!assets.splash) return;
+    const splash = readImageSize(assets.splash)!;
+    expect(splash.height).toBeGreaterThan(splash.width);
+  });
+
+  it('only demands Android identifiers when it actually targets Android', () => {
+    // v1 is iOS-only. A missing package name must not block an iOS release.
+    if (!config.store.platforms.includes('android')) {
+      expect(config.android.package).toBeUndefined();
     }
   });
 

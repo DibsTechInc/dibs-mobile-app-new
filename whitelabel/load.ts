@@ -56,6 +56,8 @@ export interface LoadedStudio {
     logo: string;
     hero: string;
     iconSource: string;
+    /** null when the studio has no purpose-made launch image. */
+    splash: string | null;
   };
 }
 
@@ -95,6 +97,7 @@ export function loadStudioConfig(slug: string): LoadedStudio {
       logo: path.join(dir, config.assets.logo),
       hero: path.join(dir, config.assets.hero),
       iconSource: path.join(dir, config.assets.iconSource),
+      splash: config.assets.splash ? path.join(dir, config.assets.splash) : null,
     },
   };
 }

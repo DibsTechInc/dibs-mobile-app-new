@@ -12,6 +12,7 @@
   "store": {
     "ownership": "studio",
     "releaseType": "new",
+    "platforms": ["ios"],
     "version": "1.0.0"
   },
 
@@ -50,6 +51,7 @@
   "assets": {
     "logo": "assets/logo.png",
     "hero": "assets/hero.png",
-    "iconSource": "assets/icon-source.png"
+    "iconSource": "assets/icon-source.png",
+    "splash": "assets/splash.png"
   }
 }

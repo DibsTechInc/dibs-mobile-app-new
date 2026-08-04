@@ -4,8 +4,8 @@
 > Backend (dibs-api) items are tracked in `backend-workstream/STATUS.md`, not here.
 > The executor updates this file at the end of EVERY session. Statuses: `done` / `in-progress` / `blocked-on-Alicia (reason)` / `not-started`.
 
-**Last updated:** 2026-08-04 (session 1 — first build session)
-**Gate status:** `npm run typecheck` clean · `npx jest` 410/410 · `npm run lint` 0 errors (2 pre-existing warnings)
+**Last updated:** 2026-08-04 (session 1 — first build session, + Alicia's answers)
+**Gate status:** `npm run typecheck` clean · `npx jest` 419/419 · `npm run lint` 0 errors (2 pre-existing warnings)
 **Next up:** P0 item 4 (theme system + core components) → P0 item 3 (auth wiring) → P0 item 8 (design mocks)
 
 ## ⚠️ Direction changes this session (see `MOBILE_MASTER_PLAN.md` §0.1)
@@ -14,6 +14,9 @@
    not new listings. Store enrollment leaves the critical path.
 2. **v1 is classes-only.** Appointments deferred; **263 leaves v1 entirely** (appointments-only
    AND needs a new studio-owned listing).
+3. **v1 is iOS-only.** Nothing has ever shipped to Google Play; `store.platforms: ['ios']`.
+   Android stays a development target, just not a submission target.
+4. **Flash credits deferred** — 263 was their only test studio.
 
 ## Prerequisites (§0.5)
 
@@ -24,8 +27,8 @@
 | C | Firebase client config | **done** — lifted into gitignored `.env`, names in `.env.example`. Project `dibs-studio-clients` |
 | D | Staging test user + studio state | **blocked-on-Alicia.** Shape has changed: the local DB is a prod restore, so real users exist, but Firebase passwords are live and `stripeid_test` may be empty. Name one test login |
 | E | Sandbox Stripe key path | **done** — local returns `pk_test_…`, prod returns `pk_live_…`. All pilots have `stripe_account_id_test` |
-| F | Local toolchain | **iOS done** (Xcode 26.2, CocoaPods 1.16.2). **Android absent** — no SDK, no `ANDROID_HOME`, no Java. **blocked-on-Alicia**: install, or iOS-first (which also matches the shipping order) |
-| G | Expo/EAS org + `eas init` | **blocked-on-Alicia** (needs an Expo account login) |
+| F | Local toolchain | **iOS done** (Xcode 26.2, CocoaPods 1.16.2). **Android absent** — no SDK, no `ANDROID_HOME`, no Java. **No longer blocking:** v1 is iOS-only, so Android verification is deferred with the platform |
+| G | Expo/EAS org + `eas init` | **logged in** — `eas whoami` shows `dibs-tech` and `alicia-dibs`, both Owner. Nothing more needed from Alicia except **which account owns the apps** (`dibs-tech` matches the App Store seller "Dibs Technology Inc"). `eas init` creates a project on that account, so it waits for that one word |
 | H | Sentry DSN | not needed until P8 |
 
 ## P0 — Foundation
@@ -40,7 +43,7 @@
 | 5. White-label config loader | **done** — schema, loader, 3 studios + template, 42 validation tests |
 | 6. Error/loading grammar | **not-started** (lands with item 4) |
 | 7. CI | **done** — typecheck + lint + jest + per-studio config resolution + 4 grep guardrails |
-| 8. Full design mock set | **not-started** — the largest remaining P0 item, and a design gate |
+| 8. Full design mock set | **not-started** — the largest remaining P0 item, and a design gate. Scope shrank: 2 studios (210, 88), classes only, no flash-credit surface |
 
 ## Bonus (not a numbered P0 item)
 
@@ -48,23 +51,22 @@
 |---|---|
 | §3.7 `studioNow()` + `docs/time-semantics.md` | **done** — 29 tests incl. DST round-trips. Discharged the P6 flash-credit frame gate: `expires_at` is a **real instant**, so its countdown uses `Date.now()`, not `studioNow()` |
 
-## Open questions for Alicia (blocking nothing today, blocking a lot soon)
+## Open questions for Alicia
 
-1. **App Store Connect access** to the Dibs Technology Inc account still confirmed? Both rescue
-   apps live there.
-2. **Did either app ever ship on Google Play?** Neither package resolves on the Play Store. If
-   not, Android is a fresh listing for both and we pick the package names.
-3. **Android toolchain** — install it, or iOS-first with Android batched? (§0.5-F)
-4. **Brand assets.** Every pilot hero is a landscape web banner and every logo is a wordmark, so
-   none can produce a vertical splash or a 1024² app icon. Each studio needs to supply a vertical
-   photo and a square mark. Registry: `KNOWN_ASSET_GAPS` in `whitelabel/__tests__/studios.test.ts`.
-5. **App names for 210 and 88** — currently "Carlsbad Village Yoga" / short "CV Yoga", and
-   "Everyday Ballet" / short "Everyday Ballet" (15 chars, will truncate under the icon). Confirm
-   or override.
-6. **Flash credits lost their test studio** when 263 left v1 — it was the only pilot with
-   `locationDynamicPricing: true`. Enable another studio for testing, or defer that half of P6.
-7. **Off-laptop backend** for device/TestFlight testing: Railway staging, or LAN-only until launch?
-8. **Expo/EAS account** so `eas init` can run.
+1. ~~App Store Connect access~~ **confirmed 2026-08-04.**
+2. ~~Google Play~~ **resolved:** never submitted; v1 is iOS-only.
+3. ~~Android toolchain~~ **resolved:** deferred with the platform.
+4. **210's app icon** — the only remaining asset gap that blocks a store build. Needs the
+   **badge alone** (oval + seated figure, *without* the "CARLSBAD VILLAGE YOGA" wordmark)
+   exported from `CARLSBAD_VILLAGE_YOGA_OPT_2-01.eps` at **1024×1024, opaque, no transparency**.
+   A few minutes in Illustrator or Preview.
+5. **210's hero photo** — needs a **vertical** shot. The supplied `Elan&David.jpg` is a 2016×1512
+   landscape room shot; a 9:16 crop lands at 850×1512, below splash resolution.
+6. ~~App/short names~~ **confirmed;** "Everyday Ballet" may truncate under the icon.
+7. ~~Flash credits~~ **deferred.**
+8. **Which EAS account owns the apps** — `dibs-tech` or `alicia-dibs`? Needed before `eas init`.
+9. **Off-laptop backend** for device testing / TestFlight: Railway staging, or LAN-only for now?
+10. **Staging test user** (§0.5-D) — still open.
 
 ## Two things worth knowing that were not asked for
 
@@ -84,7 +86,7 @@
 
 - 2026-07-26 · §0.5-B: staging URL unconfirmed → **resolved 2026-08-04**: no remote staging exists; local API is the dev target. Residual decision on off-laptop testing remains.
 - 2026-07-26 · §0.5-D: staging test user — still needs Alicia.
-- 2026-07-26 · §0.5-G: Expo/EAS account — still needs Alicia.
-- 2026-08-04 · §0.5-F: Android toolchain absent on the build machine — needs Alicia's call.
-- 2026-08-04 · Brand assets unusable for splash/icon across all pilots — needs studio-supplied files.
+- 2026-07-26 · §0.5-G: Expo/EAS — **logged in 2026-08-04**; only the account choice remains.
+- 2026-08-04 · §0.5-F: Android toolchain absent — **closed**, v1 is iOS-only.
+- 2026-08-04 · Brand assets: **88 fully resolved** (real 1024² icon, vertical hero, designed splash all wired in). **210 still needs a square badge export + a vertical photo** — it ships the placeholder icon until then.
 - 2026-08-04 · Backend Lane 5 (7.8 endpoint + widget migration) not started; blocks P3's card path.
