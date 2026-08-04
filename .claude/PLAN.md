@@ -1,5 +1,7 @@
 # Dibs Mobile App Modernization Plan (Revised)
 
+> **⚠️ SUPERSEDED (2026-07-06):** the active plan is now `MOBILE_MASTER_PLAN.md` at the repo root (white-label-first scope, full feature/endpoint parity map, design workflow via `DESIGN_BRIEF.md`, executor guardrails). This file's architectural decisions remain valid background; its phasing and scope do not. Do not execute from this file.
+
 ## Overview
 
 Modernize the Dibs mobile app from a 2022 React Native/Expo SDK 36 codebase to a modern, whitelabel-capable booking application for end customers of appointment-based service businesses (fitness studios, salons, spas, etc.).

@@ -1,0 +1,19 @@
+{
+  // Build-time tooling: the Expo config and the white-label loader. These run in Node, so they
+  // get Node types — which app code deliberately does NOT (see tsconfig.json's exclude). If a
+  // file under src/ ever needs `fs`, that is the bug, not a missing type.
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    // node16 rather than the deprecated node10 resolver; these files are plain Node modules.
+    "module": "node16",
+    "moduleResolution": "node16",
+    "customConditions": null,
+    "allowImportingTsExtensions": true,
+    "types": ["node"],
+    "lib": ["ES2022"]
+  },
+  "include": ["app.config.ts", "whitelabel/**/*.ts"],
+  "exclude": ["whitelabel/**/__tests__/**"]
+}
