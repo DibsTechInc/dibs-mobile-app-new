@@ -6,7 +6,7 @@
 
 **Last updated:** 2026-08-04 (session 1 — first build session, + Alicia's answers)
 **Gate status:** `npm run typecheck` clean · `npx jest` 443/443 · `npm run lint` 0 errors (2 pre-existing warnings)
-**Next up:** P0 item 3 (auth wiring) → P0 item 8 (design mocks) → first `npx expo run:ios` dev build
+**Next up:** first `npx expo run:ios` dev build (to see Home's motion on device) → P0 item 3 (auth wiring) → P1 wiring Home to real data
 
 ## ⚠️ Direction changes this session (see `MOBILE_MASTER_PLAN.md` §0.1)
 
@@ -43,7 +43,7 @@
 | 5. White-label config loader | **done** — schema, loader, 3 studios + template, 42 validation tests |
 | 6. Error/loading grammar | **done** — Skeleton, EmptyState, ErrorState + a `BookingUnavailableNotice` for the degraded studio-lifecycle state |
 | 7. CI | **done** — typecheck + lint + jest + per-studio config resolution + 4 grep guardrails |
-| 8. Full design mock set | **in-progress** — `design/mockups/home-options.html` (3 Home compositions × both studios) and `booking-and-account.html` (6-step booking walkthrough + Account hub + Wallet) are ready for review, rendered and verified in a browser. Remaining: packages storefront, membership detail, auth, system-states reference |
+| 8. Full design mock set | **in-progress** — Home options reviewed and **A chosen + built**. Booking walkthrough + Account reviewed and approved ("all looks good"). Remaining mocks: packages storefront, membership detail, auth, system-states reference |
 
 ## Bonus (not a numbered P0 item)
 
@@ -79,11 +79,13 @@
     therefore requires `legal.privacyPolicyLive: true`, flipped by hand after someone loads the
     URL and sees a policy.
 
-## Awaiting a design decision
+## Design decisions made
 
-**Which Home composition?** Three built and rendered — A "The Cover" (hero-led), B "The Agenda"
-(next-class-led, recommended), C "The Split" (asymmetric). See
-`design/mockups/home-options.html`. Nothing downstream gets built on Home until this is picked.
+**Home composition: Option A, "The Cover"** — chosen by Alicia 2026-08-05, with a request that
+the app feel dynamic on open. Built at `src/features/home/HomeScreen.tsx` and live at `/`.
+Motion: hero settles 1.08→1.0 over 900ms while fading in, content blocks stagger up at 70ms
+intervals, then the hero drifts 1.0↔1.045 on a 14s cycle. All of it disabled under the OS
+reduce-motion setting. Primitives in `src/components/motion.tsx` (Reanimated).
 
 ~~Background colour~~ **settled 2026-08-04:** `#FFFFFF`. The `dibs-brand` skill states the cream
 `#FDFBF7` page background is retired platform-wide, which overrides `DESIGN_BRIEF.md`'s older
