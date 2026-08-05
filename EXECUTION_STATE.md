@@ -4,9 +4,9 @@
 > Backend (dibs-api) items are tracked in `backend-workstream/STATUS.md`, not here.
 > The executor updates this file at the end of EVERY session. Statuses: `done` / `in-progress` / `blocked-on-Alicia (reason)` / `not-started`.
 
-**Last updated:** 2026-08-04 (session 1 — first build session, + Alicia's answers)
+**Last updated:** 2026-08-05 (session 1 close — handoff at `DevAssist/Aug5/HANDOFF.md`)
 **Gate status:** `npm run typecheck` clean · `npx jest` 443/443 · `npm run lint` 0 errors (2 pre-existing warnings)
-**Next up:** first `npx expo run:ios` dev build (to see Home's motion on device) → P0 item 3 (auth wiring) → P1 wiring Home to real data
+**Next up:** wire Home to real data (P1) — this also unblocks the hero/scrim design question → P0 item 3 (auth wiring)
 
 ## ⚠️ Direction changes this session (see `MOBILE_MASTER_PLAN.md` §0.1)
 
@@ -36,7 +36,7 @@
 | Item | Status |
 |---|---|
 | 0. Store enrollment kickoff | **superseded** for 210/88 by §0.1-A. Replaced by two questions for Alicia (ASC account access; did Android ever ship). Backend Lane 5 kickoff — **not-started, still needed before P3's card path** |
-| 1. Deps + `app.config.ts` + dev builds + `eas init` | **done except the first dev build.** Deps installed, `app.json` → `app.config.ts` per studio, `eas init` complete for both v1 studios, `eas.json` profiles written. **Not done:** first `npx expo run:ios` — no screens exist yet to look at, so it lands with the theme work |
+| 1. Deps + `app.config.ts` + dev builds + `eas init` | **done.** Deps installed, `app.json` → `app.config.ts` per studio, `eas init` complete for both v1 studios, `eas.json` profiles written, and the **first iOS dev build succeeded on device 2026-08-05** (see the build gotchas in the handoff: a corrupt `react-native-worklets` install and a missing iOS 26.2 runtime both had to be cleared) |
 | 2. API client + zod schemas + endpoint re-verify | **done for the core.** Client, error normalization, query keys, `get-basic-config` schema, 40 tests. Endpoint re-verify: all 26 P1/P2 routes confirmed present. **Remaining:** schemas for the other P1/P2 endpoints, and the TanStack hooks (need auth first) |
 | 3. Auth wiring | **not-started** |
 | 4. Theme system | **done** — `tokens.ts` (Layer 1 DNA: type scale, spacing, radii, motion), `theme.ts` (DNA + studio merge), `ThemeProvider` with bundled Fraunces + DM Sans, and 8 components: Text, Button, Card, Chip/StatusTag, Input, Sheet, Skeleton/SkeletonList, EmptyState/ErrorState. 37 theme tests |
