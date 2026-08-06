@@ -68,10 +68,8 @@ export default function HomeRoute() {
       error={configError ?? schedule.error}
       isRefreshing={schedule.isRefetching || bookings.isRefetching}
       onRefresh={onRefresh}
-      // Class detail and the full schedule are the next two P1 screens. Until they exist these
-      // are inert on purpose — routing a tap somewhere unrelated is worse than a tap that waits.
-      onOpenClass={() => {}}
-      onSeeFullSchedule={() => {}}
+      onOpenClass={(eventId) => router.push(`/class/${eventId}`)}
+      onSeeFullSchedule={() => router.push('/schedule')}
       // Hidden only while Firebase is still resolving, so the label never flips from "Sign in"
       // to a name in front of somebody. Once resolved there is always an action: signed-out
       // clients get in, signed-in clients get a way back out.
