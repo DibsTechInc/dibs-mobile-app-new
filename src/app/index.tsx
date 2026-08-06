@@ -5,10 +5,12 @@
  * fully populated for a signed-out client; what a session adds is the greeting's name and the
  * "your next class" card.
  */
+import { router } from 'expo-router';
 import { useCallback, useMemo } from 'react';
 
 import { studio } from '@/config/studio';
 import { buildHomeData } from '@/domain/home/build-home-data';
+import { useAuth } from '@/features/auth/AuthProvider';
 import { HomeScreen } from '@/features/home/HomeScreen';
 import { useSchedule } from '@/features/schedule/useSchedule';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
@@ -17,21 +19,23 @@ export default function HomeRoute() {
   const { config, isLoading: configLoading, error: configError, refetch: refetchConfig } =
     useStudioConfig();
   const schedule = useSchedule();
+  const { status, account } = useAuth();
 
   const data = useMemo(() => {
     if (!config) return null;
     return buildHomeData({
       config,
       events: schedule.data ?? [],
+      firstName: account?.firstName ?? null,
       showInstructor: studio.display.showInstructor,
-      // firstName and nextBooking arrive with auth; until then the screen greets a guest, which
-      // is a real state a signed-out client is in and not a placeholder.
+      // nextBooking arrives with the upcoming-bookings query; a signed-in client without one
+      // simply has no "your next class" card, which is also the honest answer.
     });
     // `schedule.data` is a stable reference from TanStack until the data actually changes, so
     // this recomputes on new data rather than on every render — but it deliberately does NOT
     // depend on the clock. Home does not re-derive its greeting minute by minute; it is built
     // on mount and on refresh, which is when a person is actually looking at it.
-  }, [config, schedule.data]);
+  }, [config, schedule.data, account?.firstName]);
 
   const onRefresh = useCallback(() => {
     refetchConfig();
@@ -52,6 +56,17 @@ export default function HomeRoute() {
       // are inert on purpose — routing a tap somewhere unrelated is worse than a tap that waits.
       onOpenClass={() => {}}
       onSeeFullSchedule={() => {}}
+      // Hidden only while Firebase is still resolving, so the label never flips from "Sign in"
+      // to a name in front of somebody. Once resolved there is always an action: signed-out
+      // clients get in, signed-in clients get a way back out.
+      accountAction={
+        status === 'initializing'
+          ? undefined
+          : {
+              label: status === 'signedIn' ? (account?.firstName ?? 'Account') : 'Sign in',
+              onPress: () => router.push('/sign-in'),
+            }
+      }
     />
   );
 }

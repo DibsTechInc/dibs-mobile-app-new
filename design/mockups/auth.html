@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Auth — sign in, create account, reset</title>
+<link rel="stylesheet" href="shared.css">
+<!--
+  DESIGN RATIONALE
+
+  Auth is the screen most likely to look like software. Three decisions keep it from doing so.
+
+  1. THE PHOTO IS SHORTER THAN HOME'S, AND IT IS DOING A DIFFERENT JOB. On Home the hero is the
+     cover — 360px, the thing you came to look at. Here it is 300px and it is a threshold: enough
+     that you know whose app this is before you type anything, not so much that the form is
+     pushed under the keyboard. The heading sits ON the photo rather than under it, so the form
+     below starts at the top of clean white space with nothing competing.
+
+  2. THE THREE MODES ARE ONE SCREEN. Sign in, create account and reset are the same composition
+     with a different heading and a different field set. Navigating between three near-identical
+     screens produces a flash and loses whatever the client already typed; swapping the body does
+     neither. It also means "forgot your password" carries the email across instead of asking for
+     it twice.
+
+  3. NO CARD. The form sits directly on the page. A bordered box around a login form is the
+     single most reliable tell that a designer reached for a container instead of a composition —
+     and there is nothing for it to separate the fields FROM.
+
+  On restraint: exactly one filled accent element per frame (the CTA). Every other action is a
+  text link in accent-ink. The Everyday Ballet variant is the reason — its pink fails contrast
+  with white, so `--on-accent` flips to near-black, and any second pink fill would tip the screen
+  from studio to toy.
+
+  Not designed here, deliberately: social sign-in. v1 is email/password only, because offering
+  any third-party login obliges us to offer Sign in with Apple too (App Store 4.8), and shipping
+  neither avoids the rule entirely until we ship both.
+-->
+</head>
+<body>
+<div class="page">
+
+<header>
+  <h1>Auth — sign in, create account, reset</h1>
+  <p class="lede">
+    One screen, three modes, shown in both launch studios. The fourth column is the hostile-accent
+    stress test — a loud red-orange that has to stay premium under the same scarcity rules.
+    Accent tones are the real output of <code>deriveAccentScale()</code>, not hand-picked.
+  </p>
+  <div class="navlinks">
+    <a href="home-options.html">→ Home compositions</a>
+    <a href="booking-and-account.html">→ Booking walkthrough &amp; account</a>
+  </div>
+</header>
+
+<!-- ══════════════════ SIGN IN ══════════════════ -->
+<section class="optionblock" id="sign-in">
+  <div class="optionhead">
+    <h2>Sign in — the default arrival</h2>
+    <p>
+      Two fields and one button. The reset link sits directly under the password it relates to
+      rather than being banished to the bottom, because that is where someone is standing when
+      they realise they have forgotten it.
+    </p>
+    <div class="tradeoff">
+      <b>Copy note:</b> the error never distinguishes a wrong password from an unknown email.
+      Firebase does, and repeating that distinction would turn this form into a way to test
+      whether a given person is a client of this studio. <b>Watch:</b> Everyday Ballet's CTA is
+      near-black text on pink — verify it reads as deliberate and not as a disabled button.
+    </div>
+  </div>
+
+  <div class="rail">
+
+    <!-- CVY -->
+    <div class="framewrap">
+      <div class="framelabel">Carlsbad Village Yoga</div>
+      <div class="frame studio-cvy">
+        <div class="hero" style="flex:0 0 300px; display:flex; flex-direction:column;">
+          <div class="statusbar on-photo"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+          <div style="flex:1"></div>
+          <div class="pad" style="padding-bottom:26px;">
+            <div class="t-label upper" style="color:#fff; opacity:0.85; margin-bottom:6px;">Carlsbad Village Yoga</div>
+            <div class="t-display" style="color:#fff;">Sign in</div>
+          </div>
+        </div>
+        <div class="scroll">
+          <div class="pad" style="padding-top:28px;">
+            <div class="stack-16">
+              <div class="field">
+                <label>Email</label>
+                <div class="control">candace@example.com</div>
+              </div>
+              <div class="field">
+                <label>Password</label>
+                <div class="control focus">••••••••••</div>
+              </div>
+            </div>
+            <div style="margin-top:10px;">
+              <span class="t-cap c-accent">Forgot your password?</span>
+            </div>
+            <div style="margin-top:28px;">
+              <div class="btn primary">Sign in</div>
+            </div>
+            <div style="margin-top:26px; text-align:center;">
+              <span class="t-sec c-2">New to Carlsbad Village Yoga? </span>
+              <span class="t-sec c-accent" style="font-weight:500;">Create an account</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EB -->
+    <div class="framewrap">
+      <div class="framelabel">Everyday Ballet</div>
+      <div class="frame studio-eb">
+        <div class="hero" style="flex:0 0 300px; display:flex; flex-direction:column;">
+          <div class="statusbar on-photo"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+          <div style="flex:1"></div>
+          <div class="pad" style="padding-bottom:26px;">
+            <div class="t-label upper" style="color:#fff; opacity:0.85; margin-bottom:6px;">Everyday Ballet</div>
+            <div class="t-display" style="color:#fff;">Sign in</div>
+          </div>
+        </div>
+        <div class="scroll">
+          <div class="pad" style="padding-top:28px;">
+            <div class="stack-16">
+              <div class="field">
+                <label>Email</label>
+                <div class="control">tiekka@example.com</div>
+              </div>
+              <div class="field">
+                <label>Password</label>
+                <div class="control invalid">••••••</div>
+                <div class="msg err">That email and password don’t match. Check the password, or reset it below.</div>
+              </div>
+            </div>
+            <div style="margin-top:10px;">
+              <span class="t-cap c-accent">Forgot your password?</span>
+            </div>
+            <div style="margin-top:28px;">
+              <div class="btn primary">Sign in</div>
+            </div>
+            <div style="margin-top:26px; text-align:center;">
+              <span class="t-sec c-2">New to Everyday Ballet? </span>
+              <span class="t-sec c-accent" style="font-weight:500;">Create an account</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <div class="step">01</div>
+      <h3>Why the error sits under the password</h3>
+      <p>
+        The field-level message is attached to the control it is about, so a screen reader
+        announces it as the field's hint and a sighted client's eye does not have to travel to a
+        banner and back.
+      </p>
+      <p>
+        It is deliberately the <b>same message</b> for a wrong password and an unknown email. The
+        second-person alternative — "we don't have an account for that address" — is a free
+        client-list oracle for anyone with the studio's app installed.
+      </p>
+      <h3>What the button does while working</h3>
+      <p>
+        Label stays, spinner appears to its left, control dims to 45%. It never swaps to
+        "Signing in…" — a label that changes width makes the button jump under the thumb.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ CREATE ACCOUNT ══════════════════ -->
+<section class="optionblock" id="create-account">
+  <div class="optionhead">
+    <h2>Create an account — four things, and one of them is optional</h2>
+    <p>
+      First and last name share a row because together they are one idea. Phone is marked optional
+      in the label rather than in a hint, so the client can see it is skippable before they tap in.
+    </p>
+    <div class="tradeoff">
+      <b>Order note:</b> the Dibs record is created BEFORE the Firebase credential. Creating the
+      credential flips the session, and everything reacting to that flip is keyed on the Dibs
+      userid — so the row has to exist first. <b>Not asked for:</b> birthday. The backend accepts
+      it and nothing in v1 reads it; a field that buys nothing costs a client's patience.
+    </div>
+  </div>
+
+  <div class="rail">
+
+    <!-- CVY -->
+    <div class="framewrap">
+      <div class="framelabel">Carlsbad Village Yoga</div>
+      <div class="frame studio-cvy">
+        <div class="hero" style="flex:0 0 300px; display:flex; flex-direction:column;">
+          <div class="statusbar on-photo"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+          <div style="flex:1"></div>
+          <div class="pad" style="padding-bottom:26px;">
+            <div class="t-label upper" style="color:#fff; opacity:0.85; margin-bottom:6px;">Carlsbad Village Yoga</div>
+            <div class="t-display" style="color:#fff;">Create your<br>account</div>
+          </div>
+        </div>
+        <div class="scroll">
+          <div class="pad" style="padding-top:24px;">
+            <div class="stack-16">
+              <div class="fieldrow">
+                <div class="field">
+                  <label>First name</label>
+                  <div class="control">Candace</div>
+                </div>
+                <div class="field">
+                  <label>Last name</label>
+                  <div class="control">Gibson</div>
+                </div>
+              </div>
+              <div class="field">
+                <label>Email</label>
+                <div class="control">candace@example.com</div>
+              </div>
+              <div class="field">
+                <label>Password</label>
+                <div class="control focus">•••••••••</div>
+                <div class="msg">At least 8 characters.</div>
+              </div>
+              <div class="field">
+                <label>Phone — optional</label>
+                <div class="control placeholder">For class reminders</div>
+              </div>
+            </div>
+            <div style="margin-top:26px;">
+              <div class="btn primary">Create account</div>
+            </div>
+            <div style="margin-top:22px; text-align:center;">
+              <span class="t-sec c-2">Already have an account? </span>
+              <span class="t-sec c-accent" style="font-weight:500;">Sign in</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EB -->
+    <div class="framewrap">
+      <div class="framelabel">Everyday Ballet</div>
+      <div class="frame studio-eb">
+        <div class="hero" style="flex:0 0 300px; display:flex; flex-direction:column;">
+          <div class="statusbar on-photo"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+          <div style="flex:1"></div>
+          <div class="pad" style="padding-bottom:26px;">
+            <div class="t-label upper" style="color:#fff; opacity:0.85; margin-bottom:6px;">Everyday Ballet</div>
+            <div class="t-display" style="color:#fff;">Create your<br>account</div>
+          </div>
+        </div>
+        <div class="scroll">
+          <div class="pad" style="padding-top:24px;">
+            <div class="stack-16">
+              <div class="fieldrow">
+                <div class="field">
+                  <label>First name</label>
+                  <div class="control">Tiekka</div>
+                </div>
+                <div class="field">
+                  <label>Last name</label>
+                  <div class="control">Tellier</div>
+                </div>
+              </div>
+              <div class="field">
+                <label>Email</label>
+                <div class="control">tiekka@example.com</div>
+              </div>
+              <div class="field">
+                <label>Password</label>
+                <div class="control invalid">•••••</div>
+                <div class="msg err">Please use at least 8 characters.</div>
+              </div>
+              <div class="field">
+                <label>Phone — optional</label>
+                <div class="control">(646) 450-1224</div>
+              </div>
+            </div>
+            <div style="margin-top:26px;">
+              <div class="btn primary" style="opacity:0.45;">Create account</div>
+            </div>
+            <div style="margin-top:22px; text-align:center;">
+              <span class="t-sec c-2">Already have an account? </span>
+              <span class="t-sec c-accent" style="font-weight:500;">Sign in</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <div class="step">02</div>
+      <h3>Why the CTA dims instead of disappearing</h3>
+      <p>
+        A disabled control the client can still see teaches them what is left to fix. Removing it
+        leaves them scrolling for a button that was there a second ago.
+      </p>
+      <h3>The already-a-client case</h3>
+      <p>
+        One Dibs identity spans every studio, so someone who has booked at another Dibs studio
+        already has a record. Creating an account here just associates it, and the backend says so
+        (<code>code 18</code>). That is <b>not</b> an error and the screen never presents it as one.
+      </p>
+      <p>
+        What IS surfaced: an email that already has a Firebase credential — "There's already an
+        account with that email. Sign in instead, or reset the password."
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ RESET + SESSION STATES ══════════════════ -->
+<section class="optionblock" id="reset-and-states">
+  <div class="optionhead">
+    <h2>Reset, sent, and the two session states</h2>
+    <p>
+      Reset is one field. Its confirmation replaces the form rather than appearing above it —
+      nothing left to do on this screen means nothing left on this screen.
+    </p>
+    <div class="tradeoff">
+      <b>Copy note:</b> the confirmation says "if there's an account" on purpose. Reporting
+      success only for real addresses would leak the same client list the sign-in error is careful
+      not to. <b>The fourth frame</b> is the state nobody designs for: a valid login whose Dibs
+      record is missing. Every authenticated call rejects that client, so leaving them "signed in"
+      is a dead end with no exit — it gets a real explanation and a real button.
+    </div>
+  </div>
+
+  <div class="rail">
+
+    <!-- reset -->
+    <div class="framewrap">
+      <div class="framelabel">Reset — Carlsbad</div>
+      <div class="frame studio-cvy">
+        <div class="hero" style="flex:0 0 300px; display:flex; flex-direction:column;">
+          <div class="statusbar on-photo"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+          <div style="flex:1"></div>
+          <div class="pad" style="padding-bottom:26px;">
+            <div class="t-label upper" style="color:#fff; opacity:0.85; margin-bottom:6px;">Carlsbad Village Yoga</div>
+            <div class="t-display" style="color:#fff;">Reset your<br>password</div>
+          </div>
+        </div>
+        <div class="scroll">
+          <div class="pad" style="padding-top:28px;">
+            <p class="t-sec c-2" style="margin:0 0 20px;">
+              We’ll email you a link to choose a new one.
+            </p>
+            <div class="field">
+              <label>Email</label>
+              <div class="control focus">candace@example.com</div>
+            </div>
+            <div style="margin-top:28px;">
+              <div class="btn primary">Email me a link</div>
+            </div>
+            <div style="margin-top:26px; text-align:center;">
+              <span class="t-sec c-accent" style="font-weight:500;">Back to sign in</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- sent -->
+    <div class="framewrap">
+      <div class="framelabel">Reset sent — Everyday Ballet</div>
+      <div class="frame studio-eb">
+        <div class="hero" style="flex:0 0 300px; display:flex; flex-direction:column;">
+          <div class="statusbar on-photo"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+          <div style="flex:1"></div>
+          <div class="pad" style="padding-bottom:26px;">
+            <div class="t-label upper" style="color:#fff; opacity:0.85; margin-bottom:6px;">Everyday Ballet</div>
+            <div class="t-display" style="color:#fff;">Check your<br>email</div>
+          </div>
+        </div>
+        <div class="scroll">
+          <div class="pad" style="padding-top:28px;">
+            <p class="t-body c-2" style="margin:0 0 8px;">
+              If there’s an account for <b style="color:var(--text); font-weight:500;">tiekka@example.com</b>,
+              a reset link is on its way.
+            </p>
+            <p class="t-sec c-3" style="margin:0 0 28px;">
+              It can take a minute or two. Check your spam folder if it doesn’t arrive.
+            </p>
+            <div class="btn secondary">Back to sign in</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- signed in -->
+    <div class="framewrap">
+      <div class="framelabel">Signed in — Carlsbad</div>
+      <div class="frame studio-cvy">
+        <div class="hero" style="flex:0 0 300px; display:flex; flex-direction:column;">
+          <div class="statusbar on-photo"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+          <div style="flex:1"></div>
+          <div class="pad" style="padding-bottom:26px;">
+            <div class="t-label upper" style="color:#fff; opacity:0.85; margin-bottom:6px;">Carlsbad Village Yoga</div>
+            <div class="t-display" style="color:#fff;">Candace<br>Gibson</div>
+          </div>
+        </div>
+        <div class="scroll">
+          <div class="pad" style="padding-top:28px;">
+            <div class="t-label upper c-3" style="margin-bottom:6px;">Signed in as</div>
+            <p class="t-body" style="margin:0 0 6px;">candace@example.com</p>
+            <p class="t-sec c-3" style="margin:0 0 32px;">
+              Your bookings, passes and saved cards follow this account at every Dibs studio.
+            </p>
+            <div class="btn secondary">Sign out</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- account missing -->
+    <div class="framewrap">
+      <div class="framelabel">Valid login, no Dibs record</div>
+      <div class="frame studio-cvy">
+        <div class="hero" style="flex:0 0 300px; display:flex; flex-direction:column;">
+          <div class="statusbar on-photo"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+          <div style="flex:1"></div>
+          <div class="pad" style="padding-bottom:26px;">
+            <div class="t-label upper" style="color:#fff; opacity:0.85; margin-bottom:6px;">Carlsbad Village Yoga</div>
+            <div class="t-display" style="color:#fff;">Almost<br>there</div>
+          </div>
+        </div>
+        <div class="scroll">
+          <div class="pad" style="padding-top:28px;">
+            <p class="t-body" style="margin:0 0 8px;">
+              Your sign-in worked, but we can’t find a Carlsbad Village Yoga account for
+              <b style="font-weight:500;">candace@example.com</b>.
+            </p>
+            <p class="t-sec c-3" style="margin:0 0 28px;">
+              This usually means the account was never finished. Creating one takes a moment and
+              keeps the email you already use.
+            </p>
+            <div class="stack-12">
+              <div class="btn primary">Create an account</div>
+              <div class="btn secondary">Sign out</div>
+            </div>
+            <p class="t-cap c-3" style="margin:24px 0 0; text-align:center;">
+              Still stuck? info@carlsbadvillageyoga.com
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <div class="step">03</div>
+      <h3>The state that is usually a dead end</h3>
+      <p>
+        A Firebase credential with no <code>dibs_user</code> row happens: an abandoned sign-up, a
+        credential created against the wrong project, a case-mismatched email. Every authenticated
+        endpoint answers 403 for that client.
+      </p>
+      <p>
+        Most apps show a spinner forever or bounce to login, where the same credentials work and
+        the same nothing happens. This frame names what is wrong and offers both exits.
+      </p>
+      <h3>Why the studio's email is at the bottom</h3>
+      <p>
+        It is the studio's own <code>customerServiceEmail</code> from their live config, not a
+        Dibs address. To this client, the studio IS the company.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ HOSTILE ACCENT ══════════════════ -->
+<section class="optionblock" id="hostile-accent">
+  <div class="optionhead">
+    <h2>Stress test — a loud accent under the same rules</h2>
+    <p>
+      <code>#E8442A</code>, the "VOLT energy" case from the brief. Nothing about the composition
+      changes; the accent still appears exactly twice, once filled and once as a link.
+    </p>
+    <div class="tradeoff">
+      <b>What this proves:</b> the restraint is in the layout, not in the colours we happened to
+      pick. If a hot brand colour still reads as considered here, a studio cannot break their own
+      app by choosing badly. The hero is Carlsbad's photo purely so the only variable is the accent.
+    </div>
+  </div>
+
+  <div class="rail">
+    <div class="framewrap">
+      <div class="framelabel">Hostile accent — sign in</div>
+      <div class="frame studio-cvy" style="--accent:#e8442a; --accent-fill:#e8442a; --accent-pressed:#c9351d; --on-accent:#ffffff; --accent-ink:#c9351d; --accent-wash:#fdf0ed; --accent-border:#f4c0b5;">
+        <div class="hero" style="flex:0 0 300px; display:flex; flex-direction:column;">
+          <div class="statusbar on-photo"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+          <div style="flex:1"></div>
+          <div class="pad" style="padding-bottom:26px;">
+            <div class="t-label upper" style="color:#fff; opacity:0.85; margin-bottom:6px;">Volt Studio</div>
+            <div class="t-display" style="color:#fff;">Sign in</div>
+          </div>
+        </div>
+        <div class="scroll">
+          <div class="pad" style="padding-top:28px;">
+            <div class="stack-16">
+              <div class="field">
+                <label>Email</label>
+                <div class="control">rider@example.com</div>
+              </div>
+              <div class="field">
+                <label>Password</label>
+                <div class="control focus">••••••••••</div>
+              </div>
+            </div>
+            <div style="margin-top:10px;">
+              <span class="t-cap c-accent">Forgot your password?</span>
+            </div>
+            <div style="margin-top:28px;">
+              <div class="btn primary">Sign in</div>
+            </div>
+            <div style="margin-top:26px; text-align:center;">
+              <span class="t-sec c-2">New to Volt Studio? </span>
+              <span class="t-sec c-accent" style="font-weight:500;">Create an account</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <div class="step">04</div>
+      <h3>Open question for you</h3>
+      <p>
+        The heading sits on the photo in all of these. On <b>Everyday Ballet</b> the dancer image
+        is high-key, so the scrim has to work hard and can read as a smudge rather than a
+        treatment.
+      </p>
+      <p>
+        The alternative for that studio only: photo band with no text on it, heading below in
+        <code>--text</code>. It is the same fix flagged for Home. Worth deciding once, for both
+        surfaces, once you have seen them on a device.
+      </p>
+    </div>
+  </div>
+</section>
+
+</div>
+</body>
+</html>

@@ -125,5 +125,35 @@ export function useAuthActions() {
     return { ok: true };
   }, []);
 
-  return { signIn, signUp, resetPassword, isBusy };
+  /**
+   * Create the missing Dibs record for an email that already has a Firebase credential.
+   *
+   * The repair for "signed in, but no Dibs account". Sending that client back through sign-up
+   * would fail on `auth/email-already-in-use`, so the only correct move is to make the half that
+   * is actually missing. `create-new-dibs-user` is idempotent for our purposes: an email that
+   * already has a record comes back as code 11 or 18 with that record's id.
+   */
+  const completeAccountSetup = useCallback(
+    async (email: string, firstName: string, lastName: string): Promise<AuthActionResult> => {
+      setIsBusy(true);
+      try {
+        await createDibsUser(apiClient, {
+          email,
+          firstName,
+          lastName,
+          dibsStudioId: studio.dibsStudioId,
+        });
+        // Drop the cached "no account" answer so the next read sees the row we just made.
+        queryClient.removeQueries({ queryKey: ['account'] });
+        return { ok: true };
+      } catch (error) {
+        return { ok: false, message: describeApiError(error) };
+      } finally {
+        setIsBusy(false);
+      }
+    },
+    [queryClient],
+  );
+
+  return { signIn, signUp, resetPassword, completeAccountSetup, isBusy };
 }

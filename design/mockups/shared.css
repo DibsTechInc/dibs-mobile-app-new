@@ -294,3 +294,36 @@ h1 {
   line-height: 1;
   margin-bottom: 6px;
 }
+
+/* ---------- form field (mirrors src/components/Input.tsx) ---------- */
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field > label {
+  font-family: var(--body);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+.field > .control {
+  font-family: var(--body);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--r-input);
+  padding: 12px;
+  min-height: 44px;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+}
+.field > .control.placeholder { color: var(--text-3); }
+.field > .control.focus { border-color: var(--accent-border); }
+.field > .control.invalid { border-color: var(--danger); }
+.field > .msg { font-family: var(--body); font-size: 13px; line-height: 18px; color: var(--text-3); }
+.field > .msg.err { color: var(--danger); }
+.fieldrow { display: flex; gap: 12px; }
+.fieldrow > * { flex: 1; min-width: 0; }

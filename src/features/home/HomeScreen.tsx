@@ -92,6 +92,12 @@ export interface HomeScreenProps {
   onRefresh?: () => void;
   onOpenClass: (eventId: number) => void;
   onSeeFullSchedule: () => void;
+  /**
+   * The one persistent affordance over the photo. Labelled "Sign in" for a guest and with the
+   * client's own name once there is a session — an unlabelled avatar circle would be a quiz, and
+   * an entry point that only exists when signed out leaves a signed-in client no way to sign out.
+   */
+  accountAction?: { label: string; onPress: () => void };
 }
 
 export function HomeScreen({
@@ -102,6 +108,7 @@ export function HomeScreen({
   onRefresh,
   onOpenClass,
   onSeeFullSchedule,
+  accountAction,
 }: HomeScreenProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
@@ -143,6 +150,32 @@ export function HomeScreen({
           }}
           pointerEvents="none"
         />
+
+        {/* Sits in the safe area at the top right, over the photo — the only thing above the
+            greeting, and quiet enough not to compete with it. */}
+        {accountAction ? (
+          <FadeRise
+            index={0}
+            style={{
+              position: 'absolute',
+              top: insets.top + theme.spacing.sm,
+              right: theme.spacing.lg,
+            }}
+          >
+            <Text
+              variant="label"
+              color="inverse"
+              uppercase
+              onPress={accountAction.onPress}
+              accessibilityRole="button"
+              // Padded well past the label's own box: 44pt of tappable area, per the template's
+              // minimum, without a visible control fighting the photograph.
+              style={{ opacity: 0.9, paddingVertical: theme.spacing.md, paddingLeft: theme.spacing.base }}
+            >
+              {accountAction.label}
+            </Text>
+          </FadeRise>
+        ) : null}
 
         <FadeRise index={0} style={{ paddingHorizontal: theme.spacing.lg, paddingBottom: theme.spacing.lg }}>
           <Text variant="label" color="inverse" uppercase style={{ opacity: 0.85, marginBottom: theme.spacing.xs }}>
