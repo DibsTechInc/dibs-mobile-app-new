@@ -5,9 +5,9 @@
 > The executor updates this file at the end of EVERY session. Statuses: `done` / `in-progress` / `blocked-on-Alicia (reason)` / `not-started`.
 
 **Last updated:** 2026-08-06 (session 2 close)
-**Gate status:** `npm run typecheck` clean · `npx jest` 523/523 · `npm run lint` 0 errors (2 pre-existing warnings) · all 4 CI grep guardrails clean
-**Next up:** P1 continues — the schedule screen and class detail. Both of Home's tap targets
-(`onOpenClass`, `onSeeFullSchedule`) are deliberately inert until they exist.
+**Gate status:** `npm run typecheck` clean · `npx jest` 548/548 · `npm run lint` 0 errors (2 pre-existing warnings) · all 4 CI grep guardrails clean
+**Next up:** P2 — account hub + wallet (`get-passes`, `get-credit`, `stripe/get-all-payments`).
+That also unlocks the pass-coverage line on the schedule, which is currently a list price only.
 
 ## Session 2 (2026-08-06) — what landed
 
@@ -22,6 +22,24 @@ Four commits, local and unpushed.
 3. **Auth screens** — sign in / create account / reset, one screen with three modes, reachable
    from a labelled action on Home's hero. Mockup at `design/mockups/auth.html`.
 4. **Your next class** on Home, from `get-upcoming-appts`.
+5. **The app-open sequence** — the photograph holds the WHOLE screen, then the white panel
+   travels up from off-screen and lands at the hero band. Timing **B, chosen by Alicia**: 620ms
+   hold, 560ms rise, chrome fading in 140ms after the panel starts. Once per launch, not per
+   mount. Preview: `design/mockups/home-entrance.html`.
+6. **P1 browse — schedule screen + class detail**, both to the approved
+   `booking-and-account.html` mock. The cancellation window is now stated as a moment
+   ("Free to cancel until 6:00 AM tomorrow") from the studio's own configured notice.
+
+## P1 — Browse
+
+| Item | Status |
+|---|---|
+| Home | **done** — live config + schedule + next booking |
+| Schedule screen | **done** — day strip, one shared query with Home, `/schedule` |
+| Class detail | **done** — `/class/[eventId]`, resolves from the schedule cache |
+| Appointment browsing | **out of v1** (§0.1-B) |
+| Tab bar | **not-started, deliberately.** The approved mock has four tabs; two of them (Packages, Account) have no screens, and a tab that leads nowhere is a dead end. Add it when P2/P4 land. Navigation today is Home → Schedule → Detail with a real back affordance. |
+| Pass-coverage on class rows | **blocked on P2.** Rows show a list price and never claim a pass covers the class — knowing that needs the client's passes AND the same coverage decision checkout will make. A label promising what checkout refuses is the widget bug that charged a member for an unlimited class. |
 
 ## ⚠️ Direction changes this session (see `MOBILE_MASTER_PLAN.md` §0.1)
 
@@ -87,8 +105,20 @@ claim is "it compiles and the logic is tested", not "I saw it".
    stress test. Built already (P0 item 3 sanctions functional-before-gate), so this is a review,
    not a block.
 4. **Home now falls back to "Coming up" when the studio's day is over.** The approved Option A
-   mock has an empty state there whose only action is a screen that does not exist yet. Tell me
-   if you would rather keep the empty state once the schedule screen lands.
+   mock has an empty state there whose only action is a screen that does not exist yet. Now that
+   the schedule screen exists, the empty state would work again — say the word if you prefer it.
+5. **The hero asset requirement CHANGED with the full-screen opening.** What stays on screen at
+   rest is the top 43% of a **full-screen** crop; previously only the middle of a 360px band ever
+   showed. The hero must now be composed for the full frame with its subject high. The remote
+   `heroUrl` is worse for this than it was before: Carlsbad's is a 1961×1258 landscape banner
+   (2.7 MB PNG) and Everyday Ballet's is **689×459** — under a third of the 1170px the frame
+   needs at @3x, so it will visibly upscale. `home-entrance.html` shows the sequence running on
+   the real remote asset for comparison.
+6. **The native splash is now the seam.** Expo shows its own splash before Home's full-screen
+   photograph. If the splash were that same photo the handoff would be invisible and the app
+   would appear to open in one continuous move — a one-line change per studio in
+   `app.config.ts`. Everyday Ballet has a designed wordmark splash you may want to keep, so this
+   is your call.
 
 ## Open questions for Alicia
 
