@@ -54,6 +54,14 @@ import { motion } from '@/theme/tokens';
 const HERO_HEIGHT = 360;
 
 /**
+ * How much of the hero band the bottom scrim ramps across before reaching full strength.
+ *
+ * It reaches that strength exactly at the band's bottom edge and then HOLDS it to the foot of the
+ * screen — see the note on the gradient itself.
+ */
+const SCRIM_RAMP = 0.62;
+
+/**
  * The chrome over the photo appears slightly after the panel starts moving.
  *
  * It reads as the panel bringing the composition with it. Fading it in during the held
@@ -201,6 +209,50 @@ export function HomeScreen({
               accessible={false}
             />
           </HeroSettle>
+
+          {/*
+            THE SCRIMS LIVE HERE, NOT IN THE BAND — and they run the FULL height of the screen.
+
+            They sit outside HeroSettle deliberately: a gradient that scales with the photograph
+            makes its edge crawl across the frame as the hero drifts.
+
+            The full height is what removes the line. Confined to the 360px band, the bottom ramp
+            reached its darkest value at y=360 and then simply stopped — a hard horizontal edge
+            where 55% black met untouched photograph. At rest that edge is hidden under the panel,
+            which is why it was invisible until the panel started travelling from below it. Now
+            the ramp holds its final value all the way to the bottom of the screen, so there is no
+            edge anywhere for the rising panel to expose; it just slides up over an evenly
+            darkened photo and covers it.
+
+            The `locations` are computed rather than fixed so the ramp lands on the band's bottom
+            edge whatever the device height.
+          */}
+          <FadeRise
+            animate={playEntrance}
+            delay={CHROME_DELAY}
+            distance={0}
+            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+          >
+            <LinearGradient
+              colors={[theme.heroScrim.topFrom, theme.heroScrim.topTo]}
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                top: 0,
+                height: insets.top + theme.spacing.xxl + theme.spacing.lg,
+              }}
+            />
+            <LinearGradient
+              colors={[theme.heroScrim.from, theme.heroScrim.to, theme.heroScrim.to]}
+              locations={[
+                (HERO_HEIGHT * (1 - SCRIM_RAMP)) / screenHeight,
+                HERO_HEIGHT / screenHeight,
+                1,
+              ]}
+              style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
+            />
+          </FadeRise>
         </View>
       ) : null}
 
@@ -215,47 +267,6 @@ export function HomeScreen({
           backgroundColor: hasPhoto ? 'transparent' : theme.colors.surface,
         }}
       >
-        {/*
-          The legibility scrims, and the chrome they exist for, fade in TOGETHER and only once the
-          panel is on its way. During the held opening frame the photograph is untouched — a scrim
-          across the middle of a full-screen picture reads as a smudge, not as a treatment.
-
-          TWO scrims. The bottom ramp holds the greeting; the top one holds whatever sits in the
-          safe area, which the bottom ramp never reaches. Without it the account action is white
-          text on unmodified photo — invisible over a bright sky, and over Everyday Ballet's
-          high-key dancer.
-
-          Note for the design review: the bottom ramp works on Carlsbad's mid-tone studio shot and
-          fights EB's dancer, where darkening reads as a mistake. If EB looks wrong on device, the
-          fix is to put the greeting below the photo for that studio rather than to deepen the
-          scrim.
-        */}
-        {hasPhoto ? (
-          <FadeRise
-            animate={playEntrance}
-            delay={CHROME_DELAY}
-            distance={0}
-            // `pointerEvents: 'none'` in the style rather than as a prop — the scrims sit over
-            // the whole band and would otherwise swallow the account action's taps.
-            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none' }}
-          >
-            <LinearGradient
-              colors={[theme.heroScrim.topFrom, theme.heroScrim.topTo]}
-              style={{
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                top: 0,
-                height: insets.top + theme.spacing.xxl + theme.spacing.lg,
-              }}
-            />
-            <LinearGradient
-              colors={[theme.heroScrim.from, theme.heroScrim.to]}
-              style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: HERO_HEIGHT * 0.62 }}
-            />
-          </FadeRise>
-        ) : null}
-
         {/* Sits in the safe area at the top right, over the photo — the only thing above the
             greeting, and quiet enough not to compete with it. */}
         {accountAction ? (

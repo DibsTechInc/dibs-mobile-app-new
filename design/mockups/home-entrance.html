@@ -62,14 +62,21 @@
     position: absolute; top: 0; left: 0; right: 0; height: 360px;
     display: flex; flex-direction: column; justify-content: flex-end;
   }
+  /* The scrims belong to the photo layer, not the band, so they can run past the band's edge. */
+  .scrims { position: absolute; inset: 0; }
   .chrome { opacity: 0; }
   .scrim-top {
     position: absolute; left: 0; right: 0; top: 0; height: 104px;
     background: linear-gradient(to bottom, rgba(20,18,16,0.32), rgba(20,18,16,0));
   }
+  /* Full screen height, holding its final value below the band — see the note in the header.
+     Confined to the band it terminated in a hard edge that the rising panel exposed. */
   .scrim-bot {
-    position: absolute; left: 0; right: 0; bottom: 0; height: 223px;
-    background: linear-gradient(to bottom, rgba(20,18,16,0), rgba(20,18,16,0.55));
+    position: absolute; left: 0; right: 0; top: 0; height: 844px;
+    background: linear-gradient(to bottom,
+      rgba(20,18,16,0) 16.2%,
+      rgba(20,18,16,0.55) 42.6%,
+      rgba(20,18,16,0.55) 100%);
   }
   .signin {
     position: absolute; top: 56px; right: 20px;
@@ -171,14 +178,16 @@ function frame(v) {
     <div class="vhead"><h3>${v.name}</h3><span class="timing">${v.timing}</span></div>
     <div class="frame ${v.studio}" style="border-radius:30px">
       <div class="stage" id="f-${v.key}" style="flex:1; --hold:${v.hold}ms; --dur:${v.dur}ms;">
-        <div class="photolayer"><div class="photo"></div></div>
-
-        <div class="band">
-          <div class="chrome">
+        <div class="photolayer">
+          <div class="photo"></div>
+          <div class="scrims chrome">
             <div class="scrim-top"></div>
             <div class="scrim-bot"></div>
-            <div class="signin">Sign in</div>
           </div>
+        </div>
+
+        <div class="band">
+          <div class="signin chrome">Sign in</div>
           <div class="greeting chrome">
             <div class="t-label upper" style="color:#fff;opacity:0.85;margin-bottom:4px;">
               Carlsbad Village Yoga · Thursday, August 6
