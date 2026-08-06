@@ -15,23 +15,25 @@
  */
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ScrollView, View } from 'react-native';
+import { RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
   BookingUnavailableNotice,
   Card,
   EmptyState,
+  ErrorState,
   SkeletonList,
   StatusTag,
   Text,
 } from '@/components';
+import { ApiError, describeApiError } from '@/api/errors';
 import { FadeRise, HeroSettle } from '@/components/motion';
+import type { HomeData } from '@/domain/home/build-home-data';
+import type { ScheduleEntry } from '@/domain/schedule/types';
 import { formatStoredTime } from '@/domain/time/studio-now';
 import { useTheme } from '@/theme/ThemeProvider';
 import { motion } from '@/theme/tokens';
-
-import type { HomeData, ScheduleEntry } from './types';
 
 const HERO_HEIGHT = 360;
 
@@ -84,15 +86,25 @@ function ClassRow({ entry, onPress }: { entry: ScheduleEntry; onPress: () => voi
 export interface HomeScreenProps {
   data: HomeData | null;
   isLoading?: boolean;
+  /** Set when the screen has nothing to show BECAUSE something failed, not merely no data. */
+  error?: unknown;
+  isRefreshing?: boolean;
+  onRefresh?: () => void;
   onOpenClass: (eventId: number) => void;
   onSeeFullSchedule: () => void;
 }
 
-export function HomeScreen({ data, isLoading, onOpenClass, onSeeFullSchedule }: HomeScreenProps) {
+export function HomeScreen({
+  data,
+  isLoading,
+  error,
+  isRefreshing = false,
+  onRefresh,
+  onOpenClass,
+  onSeeFullSchedule,
+}: HomeScreenProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
-
-  const greeting = data?.firstName ? `Good morning,\n${data.firstName}` : 'Welcome';
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
@@ -137,7 +149,7 @@ export function HomeScreen({ data, isLoading, onOpenClass, onSeeFullSchedule }: 
             {data ? `${data.studioName} · ${data.todayLabel}` : ' '}
           </Text>
           <Text variant="display" color="inverse">
-            {greeting}
+            {data?.greeting ?? 'Welcome'}
           </Text>
         </FadeRise>
       </View>
@@ -149,9 +161,27 @@ export function HomeScreen({ data, isLoading, onOpenClass, onSeeFullSchedule }: 
           paddingBottom: insets.bottom + theme.spacing.xxl,
           gap: theme.spacing.lg,
         }}
+        refreshControl={
+          onRefresh ? (
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={onRefresh}
+              tintColor={theme.colors.textSecondary}
+            />
+          ) : undefined
+        }
       >
-        {isLoading || !data ? (
+        {isLoading ? (
           <SkeletonList count={3} />
+        ) : !data ? (
+          // No data AND not loading means the request failed. Distinguishing this from an empty
+          // schedule matters: "the studio has no classes" and "we could not reach the studio"
+          // call for different words and, crucially, a retry.
+          <ErrorState
+            message={describeApiError(error)}
+            retriable={!(error instanceof ApiError) || error.retriable}
+            onRetry={onRefresh}
+          />
         ) : (
           <>
             {!data.acceptingBookings ? (
@@ -172,7 +202,11 @@ export function HomeScreen({ data, isLoading, onOpenClass, onSeeFullSchedule }: 
                 >
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: theme.spacing.md }}>
                     <View style={{ gap: theme.spacing.xs, flexShrink: 1 }}>
-                      <Text variant="numeral">Today · {formatStoredTime(data.nextBooking.startsAt)}</Text>
+                      {/* The day comes from the data, not from an assumption that the next
+                          booking is always today — it very often is not. */}
+                      <Text variant="numeral">
+                        {data.nextBooking.whenLabel} · {formatStoredTime(data.nextBooking.startsAt)}
+                      </Text>
                       <Text variant="heading">{data.nextBooking.name}</Text>
                       <Text variant="secondary" color="secondary">
                         {[data.nextBooking.instructor && `with ${data.nextBooking.instructor}`, data.nextBooking.locationLabel]
@@ -195,23 +229,25 @@ export function HomeScreen({ data, isLoading, onOpenClass, onSeeFullSchedule }: 
                   marginBottom: theme.spacing.md,
                 }}
               >
+                {/* The heading tells the truth about what the list IS. When today is over the
+                    screen shows the next few sessions instead of an empty state whose only
+                    action is a screen that does not exist yet. */}
                 <Text variant="label" color="tertiary" uppercase>
-                  Today at the studio
+                  {data.classesLabel === 'today' ? 'Today at the studio' : 'Coming up'}
                 </Text>
                 <Text variant="caption" color="accent" onPress={onSeeFullSchedule}>
                   See all
                 </Text>
               </View>
 
-              {data.todaysClasses.length === 0 ? (
+              {data.classes.length === 0 ? (
                 <EmptyState
-                  title="Nothing left today."
-                  body="Tomorrow's schedule is open."
-                  action={{ label: 'See tomorrow', onPress: onSeeFullSchedule }}
+                  title="Nothing on the schedule."
+                  body={`${data.studioName} has not posted its next sessions yet.`}
                 />
               ) : (
                 <View style={{ gap: theme.spacing.md }}>
-                  {data.todaysClasses.map((entry) => (
+                  {data.classes.map((entry) => (
                     <ClassRow key={entry.eventId} entry={entry} onPress={() => onOpenClass(entry.eventId)} />
                   ))}
                 </View>

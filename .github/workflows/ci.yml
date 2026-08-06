@@ -55,7 +55,11 @@ jobs:
 
       - name: No hardcoded studio ids in src/
         run: |
-          if grep -rnE 'dibsStudioId\s*[:=]\s*[0-9]' src/ --include='*.ts' --include='*.tsx'; then
+          # __tests__ is excluded deliberately, as it is for the hex rule below: a fixture that
+          # names studio 210 is DOCUMENTING which real response it was captured from, which is
+          # the opposite of the failure this guards against.
+          if grep -rnE 'dibsStudioId\s*[:=]\s*[0-9]' src/ \
+               --include='*.ts' --include='*.tsx' --exclude-dir=__tests__; then
             echo "::error::Studio ids must come from the white-label config (src/config/studio.ts), never a literal."
             exit 1
           fi

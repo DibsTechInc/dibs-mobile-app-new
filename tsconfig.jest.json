@@ -10,7 +10,11 @@
     "skipLibCheck": true,
     "types": ["jest", "node"],
     "noEmit": true,
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": ["src/domain/**/*.ts", "src/theme/**/*.ts", "src/api/**/*.ts", "whitelabel/**/*.ts"]
 }

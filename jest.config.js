@@ -9,6 +9,10 @@
  *
  * RN component tests will get a separate jest-expo project when UI work starts; keep every
  * file matched by these roots free of React Native imports until then.
+ *
+ * ONE deliberate exception: `src/api/index.ts` wires the live client and therefore imports
+ * `@/config/studio` (expo-constants). Nothing in these roots may import it — everything else
+ * under src/api takes its dependencies as arguments precisely so it stays testable here.
  */
 module.exports = {
   testEnvironment: 'node',
@@ -18,6 +22,12 @@ module.exports = {
     '<rootDir>/src/api',
     '<rootDir>/whitelabel',
   ],
+  // The same `@/*` alias the app and tsconfig use. Without it a domain module could not name an
+  // API schema without a `../../..` chain, and the depth is what makes people copy types instead
+  // of importing them.
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+  },
   transform: {
     '^.+\\.tsx?$': ['ts-jest', { tsconfig: 'tsconfig.jest.json' }],
   },
