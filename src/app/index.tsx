@@ -9,16 +9,24 @@ import { router } from 'expo-router';
 import { useCallback, useMemo } from 'react';
 
 import { studio } from '@/config/studio';
+import { selectNextBooking } from '@/domain/bookings/select-next-booking';
 import { buildHomeData } from '@/domain/home/build-home-data';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { useUpcomingBookings } from '@/features/bookings/useUpcomingBookings';
 import { HomeScreen } from '@/features/home/HomeScreen';
 import { useSchedule } from '@/features/schedule/useSchedule';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
 
 export default function HomeRoute() {
-  const { config, isLoading: configLoading, error: configError, refetch: refetchConfig } =
-    useStudioConfig();
+  const {
+    config,
+    isLoading: configLoading,
+    error: configError,
+    refetch: refetchConfig,
+    timeZone,
+  } = useStudioConfig();
   const schedule = useSchedule();
+  const bookings = useUpcomingBookings();
   const { status, account } = useAuth();
 
   const data = useMemo(() => {
@@ -27,20 +35,27 @@ export default function HomeRoute() {
       config,
       events: schedule.data ?? [],
       firstName: account?.firstName ?? null,
+      // A guest, or a client with nothing booked, simply has no "your next class" card. That is
+      // the honest answer, not a gap to fill.
+      nextBooking: bookings.data
+        ? selectNextBooking(bookings.data, {
+            timeZone,
+            showInstructor: studio.display.showInstructor,
+          })
+        : null,
       showInstructor: studio.display.showInstructor,
-      // nextBooking arrives with the upcoming-bookings query; a signed-in client without one
-      // simply has no "your next class" card, which is also the honest answer.
     });
     // `schedule.data` is a stable reference from TanStack until the data actually changes, so
     // this recomputes on new data rather than on every render — but it deliberately does NOT
     // depend on the clock. Home does not re-derive its greeting minute by minute; it is built
     // on mount and on refresh, which is when a person is actually looking at it.
-  }, [config, schedule.data, account?.firstName]);
+  }, [config, schedule.data, bookings.data, account?.firstName, timeZone]);
 
   const onRefresh = useCallback(() => {
     refetchConfig();
     void schedule.refetch();
-  }, [refetchConfig, schedule]);
+    void bookings.refetch();
+  }, [refetchConfig, schedule, bookings]);
 
   return (
     <HomeScreen
@@ -50,7 +65,7 @@ export default function HomeRoute() {
       // than blanking the studio's photograph and greeting.
       isLoading={configLoading}
       error={configError ?? schedule.error}
-      isRefreshing={schedule.isRefetching}
+      isRefreshing={schedule.isRefetching || bookings.isRefetching}
       onRefresh={onRefresh}
       // Class detail and the full schedule are the next two P1 screens. Until they exist these
       // are inert on purpose — routing a tap somewhere unrelated is worse than a tap that waits.
