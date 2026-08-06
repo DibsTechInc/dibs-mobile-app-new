@@ -18,6 +18,7 @@ import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button, Input, SkeletonList, Text } from '@/components';
+import { bundledHero } from '@/config/studio-assets';
 import { FadeRise, HeroSettle } from '@/components/motion';
 import { emailProblem, passwordProblem } from '@/domain/auth/describe-auth-error';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -126,7 +127,10 @@ export function AuthScreen({
   // after they have typed two characters of it is nagging, not helping.
   const [touched, setTouched] = useState(false);
 
-  const hasPhoto = Boolean(heroUri);
+  // Same rule as Home: the bundled file wins, so auth opens on the studio's photograph with no
+  // network round trip. See `src/config/studio-assets.ts`.
+  const heroSource = bundledHero ?? heroUri ?? null;
+  const hasPhoto = heroSource !== null;
 
   const emailError = touched ? emailProblem(email) : null;
   const passwordError = touched && mode !== 'reset' ? passwordProblem(password) : null;
@@ -184,11 +188,11 @@ export function AuthScreen({
               style={{ position: 'absolute', top: 0, left: 0, right: 0, height: HERO_HEIGHT }}
             >
               <Image
-                source={heroUri ?? undefined}
+                source={heroSource}
                 style={{ flex: 1, backgroundColor: theme.colors.surface }}
                 contentFit="cover"
                 contentPosition="center"
-                transition={motion.slow}
+                transition={bundledHero ? 0 : motion.slow}
                 accessible={false}
               />
             </HeroSettle>

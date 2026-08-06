@@ -25,6 +25,13 @@ export interface StudioIdentity {
   display: {
     showInstructor: boolean;
   };
+  /**
+   * Where Home's opening photograph comes from.
+   *
+   * `'bundled'` is what makes the native splash hand off to Home without a visible cut — the same
+   * file is in the binary, so it is on screen in the first frame. See `studio-assets.ts`.
+   */
+  heroSource: 'bundled' | 'remote';
   supportEmail: string;
   privacyPolicyUrl: string | null;
   apiUrl: string;

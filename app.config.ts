@@ -63,6 +63,33 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   const devApiUrl = process.env.EXPO_PUBLIC_API_URL;
   const allowsLocalHttp = !isReleaseBuild() && devApiUrl?.startsWith('http://');
 
+  /**
+   * The launch image, chosen so the splash hands off to Home INVISIBLY.
+   *
+   * Home opens on the studio's hero filling the whole screen. If the splash shows that same file
+   * at the same fit, the moment the app's first frame replaces the splash there is nothing to
+   * see — the photograph simply stays where it is and then the content panel rises over it. Any
+   * other launch image makes that moment a cut.
+   *
+   * `resizeMode: 'cover'` matches `contentFit="cover"` on Home's full-window photo layer, so both
+   * compute the same crop for the same container. The two must stay in step: change one and the
+   * photograph will appear to jump at handoff.
+   *
+   * A studio on `heroSource: 'remote'` cannot have this — their hero is not in the binary — so
+   * they fall back to their designed splash, or to a mark on white. #FFFFFF, not the retired
+   * #FDFBF7 warm off-white (shared CLAUDE.md, 2026-07-22).
+   */
+  const usesBundledHero = studio.assets.heroSource !== 'remote';
+  const splashConfig = usesBundledHero
+    ? { backgroundColor: '#FFFFFF', image: studioAsset(studio.assets.hero), resizeMode: 'cover' as const }
+    : studio.assets.splash
+      ? { backgroundColor: '#FFFFFF', image: studioAsset(studio.assets.splash), resizeMode: 'cover' as const }
+      : {
+          backgroundColor: '#FFFFFF',
+          image: hasStoreReadyIcon ? studioAsset(studio.assets.iconSource) : './assets/images/splash-icon.png',
+          imageWidth: 160,
+        };
+
   return {
     ...config,
     name: studio.appName,
@@ -117,24 +144,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
     plugins: [
       'expo-router',
-      [
-        'expo-splash-screen',
-        // A studio-designed launch image fills the screen; otherwise centre a mark on white.
-        // #FFFFFF, not the retired #FDFBF7 warm off-white (shared CLAUDE.md, 2026-07-22).
-        studio.assets.splash
-          ? {
-              backgroundColor: '#FFFFFF',
-              image: studioAsset(studio.assets.splash),
-              resizeMode: 'cover',
-            }
-          : {
-              backgroundColor: '#FFFFFF',
-              image: hasStoreReadyIcon
-                ? studioAsset(studio.assets.iconSource)
-                : './assets/images/splash-icon.png',
-              imageWidth: 160,
-            },
-      ],
+      ['expo-splash-screen', splashConfig],
       'expo-secure-store',
       [
         '@stripe/stripe-react-native',
@@ -190,6 +200,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         // may only appear when the build has code for it AND the studio offers it.
         features: studio.features,
         display: studio.display,
+        // Which photograph Home opens on. 'bundled' is what makes the splash handoff invisible.
+        heroSource: studio.assets.heroSource,
         supportEmail: studio.support.email,
         privacyPolicyUrl: studio.legal.privacyPolicyUrl ?? null,
         // EXPO_PUBLIC_API_URL wins in development so a simulator, an emulator and a device on

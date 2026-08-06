@@ -201,6 +201,24 @@ describe.each(slugs)('studio: %s', (slug) => {
     expect(splash.height).toBeGreaterThan(splash.width);
   });
 
+  it('can have its hero bundled, which is what makes the splash handoff invisible', () => {
+    // `metro.config.js` resolves `@studio/hero` by reading THIS field out of studio.json and
+    // requiring that exact file. If the declared path is wrong the bundler throws, and the app
+    // does not build at all — so this is the check that turns a config typo into a red test
+    // instead of a failed build. It is deliberately independent of the readability test above:
+    // that one iterates whatever `assets` happens to contain; this one asserts the specific
+    // contract the bundler depends on.
+    expect(config.assets.hero).toMatch(/^assets\//);
+    expect(fs.existsSync(assets.hero)).toBe(true);
+  });
+
+  it('opens on a bundled photograph unless it has deliberately opted out', () => {
+    // 'remote' gives a studio the ability to change their photo without a store release, and
+    // costs them the seamless open — the image cannot be on screen at frame zero. Nobody should
+    // land on it by accident, so the default is asserted here rather than only in the schema.
+    expect(config.assets.heroSource).toBe('bundled');
+  });
+
   it('is linked to its own EAS project, distinct from every other studio', () => {
     // One project per studio, mapping 1:1 to a store listing. A shared or missing project id
     // means builds and EAS Updates cannot tell the apps apart.

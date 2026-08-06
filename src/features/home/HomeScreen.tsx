@@ -45,6 +45,7 @@ import {
   SlideUp,
   useAppOpenEntrance,
 } from '@/components/motion';
+import { bundledHero } from '@/config/studio-assets';
 import type { HomeData } from '@/domain/home/build-home-data';
 import type { ScheduleEntry } from '@/domain/schedule/types';
 import { formatStoredTime } from '@/domain/time/studio-now';
@@ -163,7 +164,16 @@ export function HomeScreen({
    * rectangle for 620ms before revealing the app is not a cover, it is a stall — so with no photo
    * the panel is simply already in place.
    */
-  const hasPhoto = Boolean(data?.heroUri);
+  /**
+   * The bundled hero wins over the live URL.
+   *
+   * It is the same file the native splash shows, so it is already on screen when Home's first
+   * frame draws and the handoff between them is invisible. A remote URL cannot do that — it has
+   * to be requested — so a studio on `heroSource: 'remote'` gets the live photograph and a
+   * visible cut, which is the trade they opted into. See `src/config/studio-assets.ts`.
+   */
+  const heroSource = bundledHero ?? data?.heroUri ?? null;
+  const hasPhoto = heroSource !== null;
   const overPhoto = hasPhoto ? ('inverse' as const) : ('secondary' as const);
 
   /**
@@ -201,11 +211,15 @@ export function HomeScreen({
         >
           <HeroSettle animate={playEntrance} style={{ flex: 1 }}>
             <Image
-              source={data?.heroUri ?? undefined}
+              source={heroSource}
               style={{ flex: 1, backgroundColor: theme.colors.surface }}
+              // Must match the splash's `resizeMode: 'cover'` in app.config.ts, or the
+              // photograph jumps at the handoff.
               contentFit="cover"
               contentPosition="center"
-              transition={motion.slow}
+              // No fade for a bundled image: it is already decoded and already on screen from
+              // the splash, so transitioning it in would fade the photo against itself.
+              transition={bundledHero ? 0 : motion.slow}
               accessible={false}
             />
           </HeroSettle>

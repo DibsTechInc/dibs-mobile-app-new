@@ -13,7 +13,8 @@ import {
 } from '@expo-google-fonts/dm-sans';
 import { Fraunces_400Regular, Fraunces_500Medium } from '@expo-google-fonts/fraunces';
 import { useFonts } from 'expo-font';
-import { createContext, use, useMemo, type ReactNode } from 'react';
+import * as SplashScreen from 'expo-splash-screen';
+import { createContext, use, useEffect, useMemo, type ReactNode } from 'react';
 
 import { studio as buildStudio } from '@/config/studio';
 
@@ -55,9 +56,24 @@ export function ThemeProvider({ children, overrides, fallback = null }: ThemePro
     [overrides],
   );
 
-  // A font that fails to load is not a reason to show nothing forever — the system face is
-  // wrong but legible, and a blank screen is not. Only an unresolved load blocks.
-  if (!fontsLoaded && !fontError) return <>{fallback}</>;
+  const ready = fontsLoaded || Boolean(fontError);
+
+  /**
+   * Hand off from the native splash the moment the first real frame can be drawn.
+   *
+   * This is the other half of the invisible handoff. The splash already shows the studio's hero;
+   * hiding it before the fonts resolve would put a blank frame between the splash and Home —
+   * exactly the seam the matching image was meant to remove, just moved a few hundred
+   * milliseconds later. `_layout` prevents the auto-hide; this is what releases it.
+   *
+   * A failed font load counts as ready: the system face is wrong but legible, and a splash that
+   * never lifts is an app that never starts.
+   */
+  useEffect(() => {
+    if (ready) SplashScreen.hideAsync().catch(() => {});
+  }, [ready]);
+
+  if (!ready) return <>{fallback}</>;
 
   return <ThemeContext value={theme}>{children}</ThemeContext>;
 }

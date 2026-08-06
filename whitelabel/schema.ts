@@ -232,6 +232,22 @@ export const studioConfigSchema = z.object({
       logo: z.string().default('assets/logo.png'),
       /** The vertical brand photo: Home cover and auth backdrop. */
       hero: z.string().default('assets/hero.jpg'),
+      /**
+       * Where the app-open photograph comes from.
+       *
+       * `'bundled'` (default) — the file above, baked into the binary. It is also what the
+       * native splash shows, which is what lets the splash hand off to Home's full-screen hero
+       * without a visible cut: same image, same crop, present in the very first frame.
+       *
+       * `'remote'` — `heroUrl` from get-basic-config, so the studio can change their photograph
+       * without a store release. The tradeoff is real and one-directional: a remote image cannot
+       * be on screen at frame zero, so the splash hands off to an empty wash while it downloads.
+       * Choose this only for a studio who genuinely wants to swap the photo themselves.
+       *
+       * ⚠️ The hero must be composed for the FULL frame with its subject high. Home holds the
+       * whole picture, then the content panel rises and leaves the top ~43% of it on screen.
+       */
+      heroSource: z.enum(['bundled', 'remote']).default('bundled'),
       /** Square source the app icon is generated from. Must be ≥1024² and opaque. */
       iconSource: z.string().default('assets/icon-source.png'),
       /**
@@ -244,6 +260,7 @@ export const studioConfigSchema = z.object({
     .default({
       logo: 'assets/logo.png',
       hero: 'assets/hero.jpg',
+      heroSource: 'bundled',
       iconSource: 'assets/icon-source.png',
     }),
 });
