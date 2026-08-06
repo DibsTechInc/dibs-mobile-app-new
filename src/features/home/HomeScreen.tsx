@@ -85,6 +85,13 @@ function ClassRow({ entry, onPress }: { entry: ScheduleEntry; onPress: () => voi
 
 export interface HomeScreenProps {
   data: HomeData | null;
+  /**
+   * The studio's name from the BUILD config.
+   *
+   * Used before — or instead of — the live one. A branded app whose first launch has no
+   * connection should still say whose app it is; it shipped knowing.
+   */
+  studioName: string;
   isLoading?: boolean;
   /** Set when the screen has nothing to show BECAUSE something failed, not merely no data. */
   error?: unknown;
@@ -102,6 +109,7 @@ export interface HomeScreenProps {
 
 export function HomeScreen({
   data,
+  studioName,
   isLoading,
   error,
   isRefreshing = false,
@@ -113,43 +121,83 @@ export function HomeScreen({
   const theme = useTheme();
   const insets = useSafeAreaInsets();
 
+  /**
+   * No photograph means no photograph TREATMENT.
+   *
+   * The scrim and the inverse text exist to hold white type on an image. Applied to the empty
+   * surface wash — which is what renders before the studio's config arrives, and permanently for
+   * a studio with no hero — they produce a grey smear with invisible white text on it. The
+   * fallback is not a dimmer version of the photo treatment; it is the absence of one.
+   */
+  const hasPhoto = Boolean(data?.heroUri);
+  const overPhoto = hasPhoto ? ('inverse' as const) : ('secondary' as const);
+
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
       {/* Hero. Overflow hidden so the drift scale never bleeds past the header. */}
-      <View style={{ height: HERO_HEIGHT, overflow: 'hidden', justifyContent: 'flex-end' }}>
-        <HeroSettle
-          style={{ position: 'absolute', top: 0, left: 0, right: 0, height: HERO_HEIGHT }}
-        >
-          <Image
-            source={data?.heroUri ?? undefined}
-            style={{ flex: 1, backgroundColor: theme.colors.surface }}
-            contentFit="cover"
-            contentPosition="center"
-            transition={motion.slow}
-            // The wash keeps the block from flashing white while the photo decodes. The studio's
-            // bundled hero already covered the splash, so this gap is short.
-            accessible={false}
-          />
-        </HeroSettle>
+      <View
+        style={{
+          height: HERO_HEIGHT,
+          overflow: 'hidden',
+          justifyContent: 'flex-end',
+          backgroundColor: theme.colors.surface,
+        }}
+      >
+        {hasPhoto ? (
+          <HeroSettle
+            style={{ position: 'absolute', top: 0, left: 0, right: 0, height: HERO_HEIGHT }}
+          >
+            <Image
+              source={data?.heroUri ?? undefined}
+              style={{ flex: 1, backgroundColor: theme.colors.surface }}
+              contentFit="cover"
+              contentPosition="center"
+              transition={motion.slow}
+              // The wash keeps the block from flashing white while the photo decodes. The studio's
+              // bundled hero already covered the splash, so this gap is short.
+              accessible={false}
+            />
+          </HeroSettle>
+        ) : null}
 
-        {/* The legibility scrim sits ABOVE the drifting photo and does NOT move with it —
-            a gradient that scales with the image makes its edge crawl across the frame.
+        {/* The legibility scrims sit ABOVE the drifting photo and do NOT move with it — a
+            gradient that scales with the image makes its edge crawl across the frame.
 
-            Note for the design review: this ramp works on Carlsbad's mid-tone studio shot and
-            fights Everyday Ballet's high-key dancer, where darkening reads as a mistake. If EB
-            looks wrong on device, the fix is to put the greeting below the photo for that
-            studio rather than to deepen the scrim. */}
-        <LinearGradient
-          colors={[theme.heroScrim.from, theme.heroScrim.to]}
-          style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: HERO_HEIGHT * 0.62,
-          }}
-          pointerEvents="none"
-        />
+            TWO of them. The bottom ramp holds the greeting; the top one holds whatever sits in
+            the safe area, which the bottom ramp never reaches. Without it the account action is
+            white text on unmodified photo — invisible over a bright sky, and over Everyday
+            Ballet's high-key dancer.
+
+            Note for the design review: the bottom ramp works on Carlsbad's mid-tone studio shot
+            and fights EB's dancer, where darkening reads as a mistake. If EB looks wrong on
+            device, the fix is to put the greeting below the photo for that studio rather than to
+            deepen the scrim. */}
+        {hasPhoto ? (
+          <>
+            <LinearGradient
+              colors={[theme.heroScrim.topFrom, theme.heroScrim.topTo]}
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                top: 0,
+                height: insets.top + theme.spacing.xxl + theme.spacing.lg,
+              }}
+              pointerEvents="none"
+            />
+            <LinearGradient
+              colors={[theme.heroScrim.from, theme.heroScrim.to]}
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: HERO_HEIGHT * 0.62,
+              }}
+              pointerEvents="none"
+            />
+          </>
+        ) : null}
 
         {/* Sits in the safe area at the top right, over the photo — the only thing above the
             greeting, and quiet enough not to compete with it. */}
@@ -164,13 +212,17 @@ export function HomeScreen({
           >
             <Text
               variant="label"
-              color="inverse"
+              color={overPhoto}
               uppercase
               onPress={accountAction.onPress}
               accessibilityRole="button"
               // Padded well past the label's own box: 44pt of tappable area, per the template's
               // minimum, without a visible control fighting the photograph.
-              style={{ opacity: 0.9, paddingVertical: theme.spacing.md, paddingLeft: theme.spacing.base }}
+              style={{
+                opacity: hasPhoto ? 0.9 : 1,
+                paddingVertical: theme.spacing.md,
+                paddingLeft: theme.spacing.base,
+              }}
             >
               {accountAction.label}
             </Text>
@@ -178,10 +230,17 @@ export function HomeScreen({
         ) : null}
 
         <FadeRise index={0} style={{ paddingHorizontal: theme.spacing.lg, paddingBottom: theme.spacing.lg }}>
-          <Text variant="label" color="inverse" uppercase style={{ opacity: 0.85, marginBottom: theme.spacing.xs }}>
-            {data ? `${data.studioName} · ${data.todayLabel}` : ' '}
+          <Text
+            variant="label"
+            color={hasPhoto ? 'inverse' : 'tertiary'}
+            uppercase
+            style={{ opacity: hasPhoto ? 0.85 : 1, marginBottom: theme.spacing.xs }}
+          >
+            {/* The build knows the studio's name even when the network does not, so a first
+                launch with no connection is still recognisably their app rather than anonymous. */}
+            {data ? `${data.studioName} · ${data.todayLabel}` : studioName}
           </Text>
-          <Text variant="display" color="inverse">
+          <Text variant="display" color={hasPhoto ? 'inverse' : 'primary'}>
             {data?.greeting ?? 'Welcome'}
           </Text>
         </FadeRise>

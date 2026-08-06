@@ -126,6 +126,8 @@ export function AuthScreen({
   // after they have typed two characters of it is nagging, not helping.
   const [touched, setTouched] = useState(false);
 
+  const hasPhoto = Boolean(heroUri);
+
   const emailError = touched ? emailProblem(email) : null;
   const passwordError = touched && mode !== 'reset' ? passwordProblem(password) : null;
   const nameError =
@@ -165,23 +167,38 @@ export function AuthScreen({
       style={{ flex: 1, backgroundColor: theme.colors.background }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <View style={{ height: HERO_HEIGHT, overflow: 'hidden', justifyContent: 'flex-end' }}>
-        <HeroSettle style={{ position: 'absolute', top: 0, left: 0, right: 0, height: HERO_HEIGHT }}>
-          <Image
-            source={heroUri ?? undefined}
-            style={{ flex: 1, backgroundColor: theme.colors.surface }}
-            contentFit="cover"
-            contentPosition="center"
-            transition={motion.slow}
-            accessible={false}
-          />
-        </HeroSettle>
-
-        <LinearGradient
-          colors={[theme.heroScrim.from, theme.heroScrim.to]}
-          style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: HERO_HEIGHT * 0.7 }}
-          pointerEvents="none"
-        />
+      <View
+        style={{
+          height: HERO_HEIGHT,
+          overflow: 'hidden',
+          justifyContent: 'flex-end',
+          backgroundColor: theme.colors.surface,
+        }}
+      >
+        {/* No photograph means no photograph treatment — the scrim and the inverse type exist to
+            hold white text on an image, and over the empty wash they make a grey smear with
+            invisible text on it. Same rule as Home. */}
+        {hasPhoto ? (
+          <>
+            <HeroSettle
+              style={{ position: 'absolute', top: 0, left: 0, right: 0, height: HERO_HEIGHT }}
+            >
+              <Image
+                source={heroUri ?? undefined}
+                style={{ flex: 1, backgroundColor: theme.colors.surface }}
+                contentFit="cover"
+                contentPosition="center"
+                transition={motion.slow}
+                accessible={false}
+              />
+            </HeroSettle>
+            <LinearGradient
+              colors={[theme.heroScrim.from, theme.heroScrim.to]}
+              style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: HERO_HEIGHT * 0.7 }}
+              pointerEvents="none"
+            />
+          </>
+        ) : null}
 
         <FadeRise
           index={0}
@@ -189,13 +206,13 @@ export function AuthScreen({
         >
           <Text
             variant="label"
-            color="inverse"
+            color={hasPhoto ? 'inverse' : 'tertiary'}
             uppercase
-            style={{ opacity: 0.85, marginBottom: theme.spacing.xs + 2 }}
+            style={{ opacity: hasPhoto ? 0.85 : 1, marginBottom: theme.spacing.xs + 2 }}
           >
             {studioName}
           </Text>
-          <Text variant="display" color="inverse">
+          <Text variant="display" color={hasPhoto ? 'inverse' : 'primary'}>
             {showSentConfirmation
               ? 'Check your\nemail'
               : headingFor(mode, session, resolvingSession)}

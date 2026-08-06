@@ -160,8 +160,12 @@ export function ErrorState({ message, onRetry, retriable = true }: ErrorStatePro
         {message}
       </Text>
       {onRetry && retriable ? (
+        // PRIMARY, not secondary. The accent is scarce because a screen usually has other things
+        // competing for it — an error state has exactly one action and nothing else. A bordered
+        // secondary button on a white field reads as a caption, which is how "Try again" ended up
+        // looking like a line of text rather than the way out.
         <View style={{ marginTop: theme.spacing.base }}>
-          <Button label="Try again" variant="secondary" fullWidth={false} onPress={onRetry} />
+          <Button label="Try again" fullWidth={false} onPress={onRetry} />
         </View>
       ) : null}
     </View>

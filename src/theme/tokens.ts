@@ -65,6 +65,17 @@ export const palette = {
 export const heroScrim = {
   from: 'rgba(20, 18, 16, 0)',
   to: 'rgba(20, 18, 16, 0.55)',
+  /**
+   * A second, much lighter ramp at the TOP of the hero.
+   *
+   * The bottom-up scrim protects the greeting and nothing else, so anything placed in the safe
+   * area — the account action, the status bar itself — sits on unmodified photo. On a bright sky
+   * or Everyday Ballet's high-key dancer that is white text on white. Half the strength of the
+   * bottom ramp and a third of the height: enough to hold a 12px label, not enough to read as a
+   * band across the top of the picture.
+   */
+  topFrom: 'rgba(20, 18, 16, 0.32)',
+  topTo: 'rgba(20, 18, 16, 0)',
 } as const;
 
 /** 8px base. Values exist to be chosen deliberately — not everything is 16. */

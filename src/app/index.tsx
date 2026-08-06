@@ -60,6 +60,7 @@ export default function HomeRoute() {
   return (
     <HomeScreen
       data={data}
+      studioName={studio.appName}
       // Only a genuinely blank screen counts as loading. Once the config has landed the screen
       // renders, and a still-loading schedule shows as an empty class list for a moment rather
       // than blanking the studio's photograph and greeting.
