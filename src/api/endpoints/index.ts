@@ -12,3 +12,4 @@
  */
 export { fetchBasicConfig } from './basic-config';
 export { fetchSchedule } from './schedule';
+export { createDibsUser, fetchUserAccount } from './user-account';

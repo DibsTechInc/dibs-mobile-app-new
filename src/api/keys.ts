@@ -13,6 +13,13 @@ export const queryKeys = {
 
   schedule: (dibsStudioId: number, range: string) => ['schedule', dibsStudioId, range] as const,
 
+  /**
+   * The signed-in client's Dibs record, keyed by the EMAIL the session carries — because the
+   * userid is the thing this query resolves, so it cannot also be the key. Keying on the live
+   * session's email is what guarantees a second client signing in on the same phone reads their
+   * own account rather than the previous one's cache entry.
+   */
+  accountByEmail: (email: string) => ['account', 'byEmail', email] as const,
   account: (userId: number) => ['account', userId] as const,
   passes: (userId: number, dibsStudioId: number) => ['passes', userId, dibsStudioId] as const,
   credit: (userId: number, dibsStudioId: number) => ['credit', userId, dibsStudioId] as const,
