@@ -4,10 +4,16 @@
 > Backend (dibs-api) items are tracked in `backend-workstream/STATUS.md`, not here.
 > The executor updates this file at the end of EVERY session. Statuses: `done` / `in-progress` / `blocked-on-Alicia (reason)` / `not-started`.
 
-**Last updated:** 2026-08-06 (session 2 close)
-**Gate status:** `npm run typecheck` clean · `npx jest` 548/548 · `npm run lint` 0 errors (2 pre-existing warnings) · all 4 CI grep guardrails clean
-**Next up:** P2 — account hub + wallet (`get-passes`, `get-credit`, `stripe/get-all-payments`).
-That also unlocks the pass-coverage line on the schedule, which is currently a list price only.
+**Last updated:** 2026-08-06 (session 2 close — handoff at `DevAssist/Aug6/HANDOFF.md`)
+**Gate status:** `npm run typecheck` clean · `npx jest` 579/579 · `npm run lint` 0 errors (2 pre-existing warnings) · all 4 CI grep guardrails clean
+**Next up:** P2 — account hub + wallet. ⚠️ **Read `DevAssist/Aug6/HANDOFF.md` §4 first.**
+`get-passes` never returns unlimited passes (backend bug), returns placeholder passes with no
+field to filter them by, and the local DB has **zero** rows in `passes` and `dibs_transactions`.
+`domain/passes` is built and tested; wiring it to a screen cannot be *verified* until one of
+those is resolved.
+
+⚠️ **The next session must rebuild natively** (`npx expo run:ios`) — the splash image changed in
+`app.config.ts` and that is baked into the binary — **and restart Metro**, whose config changed.
 
 ## Session 2 (2026-08-06) — what landed
 
