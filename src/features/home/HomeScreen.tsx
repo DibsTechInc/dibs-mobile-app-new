@@ -5,13 +5,18 @@
  * Fraunces; underneath, the client's next class, then today's schedule. Reference mock:
  * `design/mockups/home-options.html#option-a`.
  *
- * Motion on open (the "make it feel dynamic" ask):
+ * Motion on open — a SEQUENCE, not a simultaneous arrival (Alicia, 2026-08-06):
  *   1. the hero settles from 1.08 → 1.0 over 900ms as it fades in — the photo comes to rest
  *      rather than popping in, which is what makes the splash feel like it resolved into Home;
- *   2. the content blocks fade and rise in a 70ms stagger, so the screen assembles;
- *   3. the hero then drifts between 1.0 and 1.045 on a 14s cycle — low enough amplitude that it
+ *   2. the greeting fades in over it at 160ms — it belongs to the cover;
+ *   3. at 380ms everything BELOW the hero rises 36px as one piece over 460ms. The photograph
+ *      gets a beat to itself first, which is rather the point of a composition called "The
+ *      Cover"; before this the content arrived with it and the cover never had a moment;
+ *   4. the hero then drifts between 1.0 and 1.045 on a 14s cycle — low enough amplitude that it
  *      is felt rather than watched. A photograph that visibly zooms is a screensaver.
- * All of it collapses to nothing when the OS reduce-motion setting is on.
+ *
+ * The whole sequence runs ONCE PER LAUNCH, not per mount — see `useAppOpenEntrance`. It also
+ * collapses to nothing when the OS reduce-motion setting is on.
  */
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -28,7 +33,7 @@ import {
   Text,
 } from '@/components';
 import { ApiError, describeApiError } from '@/api/errors';
-import { FadeRise, HeroSettle } from '@/components/motion';
+import { FadeRise, HERO_BEAT, HeroSettle, useAppOpenEntrance } from '@/components/motion';
 import type { HomeData } from '@/domain/home/build-home-data';
 import type { ScheduleEntry } from '@/domain/schedule/types';
 import { formatStoredTime } from '@/domain/time/studio-now';
@@ -132,6 +137,15 @@ export function HomeScreen({
   const hasPhoto = Boolean(data?.heroUri);
   const overPhoto = hasPhoto ? ('inverse' as const) : ('secondary' as const);
 
+  /**
+   * False on every mount after the first of this launch.
+   *
+   * Home remounts each time you come back from another screen, and pull-to-refresh re-renders
+   * it. An entrance that replays on return stops reading as the app arriving and starts reading
+   * as the app being slow.
+   */
+  const playEntrance = useAppOpenEntrance();
+
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
       {/* Hero. Overflow hidden so the drift scale never bleeds past the header. */}
@@ -145,6 +159,7 @@ export function HomeScreen({
       >
         {hasPhoto ? (
           <HeroSettle
+            animate={playEntrance}
             style={{ position: 'absolute', top: 0, left: 0, right: 0, height: HERO_HEIGHT }}
           >
             <Image
@@ -203,7 +218,8 @@ export function HomeScreen({
             greeting, and quiet enough not to compete with it. */}
         {accountAction ? (
           <FadeRise
-            index={0}
+            animate={playEntrance}
+            delay={160}
             style={{
               position: 'absolute',
               top: insets.top + theme.spacing.sm,
@@ -229,7 +245,13 @@ export function HomeScreen({
           </FadeRise>
         ) : null}
 
-        <FadeRise index={0} style={{ paddingHorizontal: theme.spacing.lg, paddingBottom: theme.spacing.lg }}>
+        {/* The greeting belongs to the cover, so it arrives WITH the photograph — a touch behind
+            it, not in the wave that brings the schedule up. */}
+        <FadeRise
+          animate={playEntrance}
+          delay={160}
+          style={{ paddingHorizontal: theme.spacing.lg, paddingBottom: theme.spacing.lg }}
+        >
           <Text
             variant="label"
             color={hasPhoto ? 'inverse' : 'tertiary'}
@@ -263,90 +285,102 @@ export function HomeScreen({
           ) : undefined
         }
       >
-        {isLoading ? (
-          <SkeletonList count={3} />
-        ) : !data ? (
-          // No data AND not loading means the request failed. Distinguishing this from an empty
-          // schedule matters: "the studio has no classes" and "we could not reach the studio"
-          // call for different words and, crucially, a retry.
-          <ErrorState
-            message={describeApiError(error)}
-            retriable={!(error instanceof ApiError) || error.retriable}
-            onRetry={onRefresh}
-          />
-        ) : (
-          <>
-            {!data.acceptingBookings ? (
-              <FadeRise index={1}>
+        {/* EVERYTHING below the hero rises as ONE piece, after the photograph has had the screen
+            to itself. Whatever is in here at the time comes up together — skeleton, error or the
+            real schedule — so the sequence runs to the same length regardless of the network.
+
+            One unit rather than a per-block stagger: a stagger running inside a rising container
+            is two motion systems arguing, and the eye reads that as jitter, not sequence. */}
+        <FadeRise
+          animate={playEntrance}
+          delay={HERO_BEAT}
+          distance={36}
+          duration={460}
+          style={{ gap: theme.spacing.lg }}
+        >
+          {isLoading ? (
+            <SkeletonList count={3} />
+          ) : !data ? (
+            // No data AND not loading means the request failed. Distinguishing this from an empty
+            // schedule matters: "the studio has no classes" and "we could not reach the studio"
+            // call for different words and, crucially, a retry.
+            <ErrorState
+              message={describeApiError(error)}
+              retriable={!(error instanceof ApiError) || error.retriable}
+              onRetry={onRefresh}
+            />
+          ) : (
+            <>
+              {!data.acceptingBookings ? (
                 <BookingUnavailableNotice studioName={data.studioName} />
-              </FadeRise>
-            ) : null}
+              ) : null}
 
-            {data.nextBooking ? (
-              <FadeRise index={1}>
-                <Text variant="label" color="tertiary" uppercase style={{ marginBottom: theme.spacing.md }}>
-                  Your next class
-                </Text>
-                <Card
-                  emphasis="accent"
-                  onPress={() => onOpenClass(data.nextBooking!.eventId)}
-                  accessibilityLabel={`Your next class, ${data.nextBooking.name}`}
-                >
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: theme.spacing.md }}>
-                    <View style={{ gap: theme.spacing.xs, flexShrink: 1 }}>
-                      {/* The day comes from the data, not from an assumption that the next
-                          booking is always today — it very often is not. */}
-                      <Text variant="numeral">
-                        {data.nextBooking.whenLabel} · {formatStoredTime(data.nextBooking.startsAt)}
-                      </Text>
-                      <Text variant="heading">{data.nextBooking.name}</Text>
-                      <Text variant="secondary" color="secondary">
-                        {[data.nextBooking.instructor && `with ${data.nextBooking.instructor}`, data.nextBooking.locationLabel]
-                          .filter(Boolean)
-                          .join(' · ')}
-                      </Text>
+              {data.nextBooking ? (
+                <View>
+                  <Text variant="label" color="tertiary" uppercase style={{ marginBottom: theme.spacing.md }}>
+                    Your next class
+                  </Text>
+                  <Card
+                    emphasis="accent"
+                    onPress={() => onOpenClass(data.nextBooking!.eventId)}
+                    accessibilityLabel={`Your next class, ${data.nextBooking.name}`}
+                  >
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: theme.spacing.md }}>
+                      <View style={{ gap: theme.spacing.xs, flexShrink: 1 }}>
+                        {/* The day comes from the data, not from an assumption that the next
+                            booking is always today — it very often is not. */}
+                        <Text variant="numeral">
+                          {data.nextBooking.whenLabel} · {formatStoredTime(data.nextBooking.startsAt)}
+                        </Text>
+                        <Text variant="heading">{data.nextBooking.name}</Text>
+                        <Text variant="secondary" color="secondary">
+                          {[data.nextBooking.instructor && `with ${data.nextBooking.instructor}`, data.nextBooking.locationLabel]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </Text>
+                      </View>
+                      <StatusTag label="Booked" tone="accent" />
                     </View>
-                    <StatusTag label="Booked" tone="accent" />
-                  </View>
-                </Card>
-              </FadeRise>
-            ) : null}
-
-            <FadeRise index={data.nextBooking ? 2 : 1}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: theme.spacing.md,
-                }}
-              >
-                {/* The heading tells the truth about what the list IS. When today is over the
-                    screen shows the next few sessions instead of an empty state whose only
-                    action is a screen that does not exist yet. */}
-                <Text variant="label" color="tertiary" uppercase>
-                  {data.classesLabel === 'today' ? 'Today at the studio' : 'Coming up'}
-                </Text>
-                <Text variant="caption" color="accent" onPress={onSeeFullSchedule}>
-                  See all
-                </Text>
-              </View>
-
-              {data.classes.length === 0 ? (
-                <EmptyState
-                  title="Nothing on the schedule."
-                  body={`${data.studioName} has not posted its next sessions yet.`}
-                />
-              ) : (
-                <View style={{ gap: theme.spacing.md }}>
-                  {data.classes.map((entry) => (
-                    <ClassRow key={entry.eventId} entry={entry} onPress={() => onOpenClass(entry.eventId)} />
-                  ))}
+                  </Card>
                 </View>
-              )}
-            </FadeRise>
-          </>
-        )}
+              ) : null}
+
+              <View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: theme.spacing.md,
+                  }}
+                >
+                  {/* The heading tells the truth about what the list IS. When today is over the
+                      screen shows the next few sessions instead of an empty state whose only
+                      action is a screen that does not exist yet. */}
+                  <Text variant="label" color="tertiary" uppercase>
+                    {data.classesLabel === 'today' ? 'Today at the studio' : 'Coming up'}
+                  </Text>
+                  <Text variant="caption" color="accent" onPress={onSeeFullSchedule}>
+                    See all
+                  </Text>
+                </View>
+
+                {data.classes.length === 0 ? (
+                  <EmptyState
+                    title="Nothing on the schedule."
+                    body={`${data.studioName} has not posted its next sessions yet.`}
+                  />
+                ) : (
+                  <View style={{ gap: theme.spacing.md }}>
+                    {data.classes.map((entry) => (
+                      <ClassRow key={entry.eventId} entry={entry} onPress={() => onOpenClass(entry.eventId)} />
+                    ))}
+                  </View>
+                )}
+              </View>
+            </>
+          )}
+        </FadeRise>
       </ScrollView>
     </View>
   );

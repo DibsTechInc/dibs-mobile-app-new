@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home — the app-open sequence</title>
+<link rel="stylesheet" href="shared.css">
+<!--
+  DESIGN RATIONALE
+
+  A timing review, not a layout one. The layout is Option A as built; the only variable is WHEN
+  each part arrives.
+
+  What changed: the hero and the content used to arrive together, staggered 70ms apart, so the
+  photograph never had a beat. In a composition literally called "The Cover" that is the wrong
+  answer. Now the photo settles alone, the greeting joins it, and everything below rises as one
+  piece.
+
+  Two decisions worth arguing with:
+
+  ONE UNIT, NOT A STAGGER. The content was three blocks entering 70ms apart. Inside a container
+  that is itself rising, that reads as jitter rather than sequence — two motion systems arguing.
+  One piece is calmer and it matches how you described it: the schedule slides up.
+
+  36px, NOT 16. A 16px rise reads as "settling into place". You asked for something that comes up
+  from below, which needs more travel. But not much more: past roughly 60px it stops reading as
+  content arriving and starts reading as a modal sheet rising, which means something quite
+  different in an interface.
+
+  The variants below differ ONLY in the length of the beat the photo gets alone. B is what is
+  built. Replay them a few times each — the difference is small on the first viewing and
+  obvious by the fifth, which is the one that matters since this fires on every launch.
+-->
+<style>
+  .variants { display: flex; gap: 34px; align-items: flex-start; flex-wrap: wrap; }
+  .vcol { display: flex; flex-direction: column; gap: 10px; }
+  .vhead { display: flex; align-items: baseline; gap: 10px; }
+  .vhead h3 {
+    font-family: var(--display); font-weight: 500; font-size: 19px;
+    letter-spacing: -0.01em; margin: 0;
+  }
+  .vhead .timing { font-size: 12px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+  .vnote { font-size: 13px; line-height: 1.55; color: var(--text-2); width: 390px; }
+  .vnote b { color: var(--text); font-weight: 600; }
+  .replay {
+    align-self: flex-start; font-family: var(--body); font-size: 13px; font-weight: 600;
+    color: var(--text); background: #fff; border: 1px solid var(--border);
+    border-radius: var(--r-btn); padding: 8px 16px; cursor: pointer;
+  }
+  .replay:hover { border-color: #b8a99c; }
+  .replayall {
+    font-family: var(--body); font-size: 14px; font-weight: 600; color: #fff;
+    background: #7a5c4e; border: 0; border-radius: var(--r-btn);
+    padding: 11px 22px; cursor: pointer; margin-top: 16px;
+  }
+
+  /* ---- the sequence ---- */
+  .seq .heroimg,
+  .seq .cover,
+  .seq .body { opacity: 0; }
+
+  .seq.run .heroimg {
+    animation: heroSettle 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards,
+               heroFade 400ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .seq.run .cover {
+    animation: rise 380ms cubic-bezier(0.22, 1, 0.36, 1) 160ms forwards;
+    --dist: 16px;
+  }
+  .seq.run .body {
+    animation: rise var(--dur, 460ms) cubic-bezier(0.22, 1, 0.36, 1) var(--beat, 380ms) forwards;
+    --dist: var(--travel, 36px);
+  }
+
+  @keyframes heroSettle { from { transform: scale(1.08); } to { transform: scale(1); } }
+  @keyframes heroFade   { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(var(--dist)); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .heroimg {
+    position: absolute; inset: 0;
+    background-image: var(--hero); background-size: cover; background-position: center 28%;
+  }
+  .heroblock { position: relative; flex: 0 0 360px; overflow: hidden; display: flex; flex-direction: column; }
+  .scrim-top {
+    position: absolute; left: 0; right: 0; top: 0; height: 104px;
+    background: linear-gradient(to bottom, rgba(20,18,16,0.32), rgba(20,18,16,0));
+  }
+  .scrim-bot {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 223px;
+    background: linear-gradient(to bottom, rgba(20,18,16,0), rgba(20,18,16,0.55));
+  }
+  .cover, .scrim-top, .scrim-bot { position: relative; z-index: 2; }
+  .scrim-top, .scrim-bot { position: absolute; }
+  .signin {
+    position: absolute; top: 12px; right: 20px; z-index: 3;
+    font-family: var(--body); font-weight: 500; font-size: 12px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #fff; opacity: 0.9;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <h1>Home — the app-open sequence</h1>
+  <p class="lede">
+    The photograph now holds the screen on its own before the schedule rises under it. Same
+    layout in all three; the only variable is how long that beat lasts. <b>B is what is built.</b>
+    Replay each one several times — this fires on every launch, so the fifth viewing is the one
+    that decides whether it is elegant or tiresome.
+  </p>
+  <button class="replayall" onclick="runAll()">▶ Replay all three</button>
+</header>
+
+<section class="optionblock">
+  <div class="variants" id="variants"></div>
+</section>
+
+<section class="optionblock">
+  <div class="optionhead">
+    <h2>What else changed</h2>
+    <div class="tradeoff">
+      <b>It runs once per launch, not once per mount.</b> Home rebuilds itself every time you come
+      back to it from another screen, and it re-renders on pull-to-refresh. Left alone, this
+      entrance would replay every one of those times — and motion that repeats on a screen you are
+      moving <i>through</i> stops reading as arrival and starts reading as lag. So the sequence
+      fires on the first Home of an app launch and never again until you relaunch. The hero keeps
+      breathing either way; the drift is ambient, not an entrance, and stopping it would make the
+      screen feel deader than it was a moment earlier.
+      <br><br>
+      <b>The content rises whatever state it is in.</b> Skeleton, error, or the real schedule —
+      they all come up together at the same moment, so the sequence is the same length on a fast
+      network and a slow one. The alternative, waiting for data before animating, makes the app's
+      rhythm a function of the studio's wifi.
+      <br><br>
+      <b>Reduce-motion turns all of it off.</b> Someone who has asked their phone to stop moving
+      things has asked us too. The content is simply there.
+    </div>
+  </div>
+</section>
+
+</div>
+
+<script>
+const VARIANTS = [
+  {
+    key: 'a', name: 'A — Brisk', studio: 'studio-cvy',
+    beat: 240, dur: 400, travel: 32,
+    timing: 'beat 240ms · rise 400ms · 32px',
+    note: 'Barely a sequence. The photo gets a glance rather than a beat. Best if you think the ' +
+          'app should feel instant above all — but it gives up most of what you asked for.',
+  },
+  {
+    key: 'b', name: 'B — Considered', studio: 'studio-cvy',
+    beat: 380, dur: 460, travel: 36,
+    timing: 'beat 380ms · rise 460ms · 36px',
+    note: '<b>Built.</b> The photograph reads as the cover, then the schedule arrives under it. ' +
+          'Fully assembled at ~840ms, which is about the longest an entrance can run before you ' +
+          'start noticing you are waiting for it.',
+  },
+  {
+    key: 'c', name: 'C — Cinematic', studio: 'studio-cvy',
+    beat: 620, dur: 520, travel: 44,
+    timing: 'beat 620ms · rise 520ms · 44px',
+    note: 'Unmistakably a sequence, and lovely once. Fully assembled at ~1.14s. My worry is the ' +
+          'fortieth launch: a client checking whether the 6am has space should not sit through a ' +
+          'title card.',
+  },
+];
+
+const EB = { key: 'b-eb', name: 'B — on Everyday Ballet', studio: 'studio-eb',
+  beat: 380, dur: 460, travel: 36, timing: 'beat 380ms · rise 460ms · 36px',
+  note: 'The built timing against the high-key hero. Watch the scrim rather than the timing here ' +
+        '— this is the open question about whether darkening that photo reads as a treatment or ' +
+        'as a smudge.' };
+
+function frame(v) {
+  return `
+  <div class="vcol">
+    <div class="vhead"><h3>${v.name}</h3><span class="timing">${v.timing}</span></div>
+    <div class="frame ${v.studio} seq" id="f-${v.key}"
+         style="--beat:${v.beat}ms; --dur:${v.dur}ms; --travel:${v.travel}px;">
+      <div class="heroblock">
+        <div class="heroimg"></div>
+        <div class="scrim-top"></div>
+        <div class="scrim-bot"></div>
+        <div class="statusbar on-photo" style="position:relative;z-index:3"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
+        <div class="cover" style="margin-top:auto; padding:0 20px 24px;">
+          <div class="signin">Sign in</div>
+          <div class="t-label upper" style="color:#fff;opacity:0.85;margin-bottom:4px;">
+            Carlsbad Village Yoga · Thursday, August 6
+          </div>
+          <div class="t-display" style="color:#fff;">Good morning,<br>Elan</div>
+        </div>
+      </div>
+      <div class="scroll">
+        <div class="body pad" style="padding-top:24px;">
+          <div class="t-label upper c-3" style="margin-bottom:12px;">Today at the studio</div>
+          <div class="stack-12">
+            ${row('8:00 AM', 'Challenging flow', 'with Marta Estellés · 60 min', 'Open', '$22')}
+            ${row('9:30 AM', 'Flow', 'with Candace Gibson · 60 min', '3 spots left', '$22', true)}
+            ${row('5:30 PM', 'Candlelight Yin', 'with David Roth · 75 min', 'Open', '$22')}
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="replay" onclick="run('${v.key}')">▶ Replay</button>
+    <div class="vnote">${v.note}</div>
+  </div>`;
+}
+
+function row(time, name, sub, tag, price, hot) {
+  return `<div class="card">
+    <div class="row" style="align-items:flex-start">
+      <div>
+        <div class="t-numeral">${time}</div>
+        <div class="t-heading" style="margin-top:2px">${name}</div>
+        <div class="t-sec c-2" style="margin-top:2px">${sub}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="tag ${hot ? 'accent' : ''}">${tag}</div>
+        <div class="t-cap c-3" style="margin-top:6px">${price}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+document.getElementById('variants').innerHTML =
+  VARIANTS.map(frame).join('') + frame(EB);
+
+function run(key) {
+  const el = document.getElementById('f-' + key);
+  el.classList.remove('run');
+  void el.offsetWidth; // force reflow so the animation restarts
+  el.classList.add('run');
+}
+function runAll() { [...VARIANTS.map(v => v.key), EB.key].forEach(run); }
+setTimeout(runAll, 350);
+</script>
+</body>
+</html>
