@@ -51,13 +51,27 @@ export function useReducedMotion(): boolean {
 const EASE_OUT = Easing.bezier(0.22, 1, 0.36, 1);
 
 /**
- * How long the hero holds the screen alone before the content rises under it.
+ * A deeper ease-out for long travel.
  *
- * The screen is fully assembled at roughly `HERO_BEAT + 460ms`. Much past this and the app feels
- * precious rather than composed — an entrance you wait through is one you resent by the fortieth
- * launch. Much under it and there is no sequence at all, which is where this started.
+ * Something crossing most of the screen needs more deceleration than something moving 36px, or
+ * it arrives looking like it hit a wall rather than came to rest.
  */
-export const HERO_BEAT = 380;
+const EASE_OUT_DEEP = Easing.bezier(0.16, 1, 0.3, 1);
+
+/**
+ * How long the studio's photograph holds the WHOLE screen before the content slides up over it.
+ *
+ * This is the app opening: the picture is all there is, and then the app arrives on top of it.
+ * Long enough to register as a held image rather than a flicker, short enough that nobody taps
+ * the screen wondering whether it is stuck.
+ *
+ * It costs nothing on a return visit — the entrance runs once per launch — and on a real launch
+ * it is standing in for splash time rather than adding to it.
+ */
+export const COVER_HOLD = 620;
+
+/** How long the panel takes to travel the height of the screen. */
+export const PANEL_RISE = 560;
 
 /**
  * Has the app-open entrance already played in this launch?
@@ -147,6 +161,55 @@ export function FadeRise({
   }));
 
   return <Animated.View style={[animated, style]}>{children}</Animated.View>;
+}
+
+export interface SlideUpProps {
+  children: React.ReactNode;
+  /** How far below its resting place it starts. Usually the height of what it has to clear. */
+  distance: number;
+  delay?: number;
+  duration?: number;
+  animate?: boolean;
+  style?: StyleProp<ViewStyle>;
+}
+
+/**
+ * Travels up into place from off-screen. **No fade** — deliberately.
+ *
+ * Used for Home's content panel, which starts entirely below the bottom edge and rises over the
+ * full-screen hero. Opacity is wrong here: a white panel fading in over a photograph reads as
+ * haze settling on the picture, not as a surface arriving in front of it. An opaque edge moving
+ * up is what makes the motion legible — you can see exactly what is happening, which is the
+ * whole point of motion communicating causality.
+ *
+ * Uses a slightly deeper ease-out than `FadeRise`: a long travel needs a more pronounced
+ * deceleration or it arrives looking like it hit a wall.
+ */
+export function SlideUp({
+  children,
+  distance,
+  delay = 0,
+  duration = PANEL_RISE,
+  animate = true,
+  style,
+}: SlideUpProps) {
+  const reduced = useReducedMotion();
+  const still = reduced || !animate;
+  const progress = useSharedValue(still ? 1 : 0);
+
+  useEffect(() => {
+    if (still) {
+      progress.value = 1;
+      return;
+    }
+    progress.value = withDelay(delay, withTiming(1, { duration, easing: EASE_OUT_DEEP }));
+  }, [delay, duration, progress, still]);
+
+  const animated = useAnimatedStyle(() => ({
+    transform: [{ translateY: (1 - progress.value) * distance }],
+  }));
+
+  return <Animated.View style={[style, animated]}>{children}</Animated.View>;
 }
 
 export interface HeroSettleProps {

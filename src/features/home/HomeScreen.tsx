@@ -5,24 +5,30 @@
  * Fraunces; underneath, the client's next class, then today's schedule. Reference mock:
  * `design/mockups/home-options.html#option-a`.
  *
- * Motion on open — a SEQUENCE, not a simultaneous arrival (Alicia, 2026-08-06):
- *   1. the hero settles from 1.08 → 1.0 over 900ms as it fades in — the photo comes to rest
- *      rather than popping in, which is what makes the splash feel like it resolved into Home;
- *   2. the greeting fades in over it at 160ms — it belongs to the cover;
- *   3. at 380ms everything BELOW the hero rises 36px as one piece over 460ms. The photograph
- *      gets a beat to itself first, which is rather the point of a composition called "The
- *      Cover"; before this the content arrived with it and the cover never had a moment;
- *   4. the hero then drifts between 1.0 and 1.045 on a 14s cycle — low enough amplitude that it
- *      is felt rather than watched. A photograph that visibly zooms is a screensaver.
+ * ── The app-open sequence (Alicia, 2026-08-06) ───────────────────────────────────────────────
+ * The photograph is FULL SCREEN first. Nothing else — no scrim, no greeting, no chrome. Then the
+ * white panel carrying the schedule travels up from entirely below the bottom edge and comes to
+ * rest at the hero band, and the composed screen assembles as it lands.
  *
- * The whole sequence runs ONCE PER LAUNCH, not per mount — see `useAppOpenEntrance`. It also
- * collapses to nothing when the OS reduce-motion setting is on.
+ * The point is that the client sees the whole picture before the app arrives on top of it. This
+ * is the splash resolving into Home rather than a screen fading in, and it is why the photo layer
+ * is full-height and stationary while only the panel moves — resizing the photograph mid-flight
+ * would make its crop crawl, which is the one thing that would give the trick away.
+ *
+ *   t=0     full-screen photograph, settling 1.08 → 1.0. Held.
+ *   t=620   the panel begins its travel; scrim, greeting and account action begin to fade in
+ *   t=1180  everything at rest; the hero drifts 1.0 ↔ 1.045 on a 14s cycle from here on
+ *
+ * Runs ONCE PER LAUNCH, not per mount (`useAppOpenEntrance`) — Home rebuilds every time you come
+ * back to it, and an entrance that replays reads as lag rather than arrival. All of it collapses
+ * to nothing under the OS reduce-motion setting.
  */
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { RefreshControl, ScrollView, View } from 'react-native';
+import { RefreshControl, ScrollView, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ApiError, describeApiError } from '@/api/errors';
 import {
   BookingUnavailableNotice,
   Card,
@@ -32,8 +38,13 @@ import {
   StatusTag,
   Text,
 } from '@/components';
-import { ApiError, describeApiError } from '@/api/errors';
-import { FadeRise, HERO_BEAT, HeroSettle, useAppOpenEntrance } from '@/components/motion';
+import {
+  COVER_HOLD,
+  FadeRise,
+  HeroSettle,
+  SlideUp,
+  useAppOpenEntrance,
+} from '@/components/motion';
 import type { HomeData } from '@/domain/home/build-home-data';
 import type { ScheduleEntry } from '@/domain/schedule/types';
 import { formatStoredTime } from '@/domain/time/studio-now';
@@ -41,6 +52,15 @@ import { useTheme } from '@/theme/ThemeProvider';
 import { motion } from '@/theme/tokens';
 
 const HERO_HEIGHT = 360;
+
+/**
+ * The chrome over the photo appears slightly after the panel starts moving.
+ *
+ * It reads as the panel bringing the composition with it. Fading it in during the held
+ * full-screen moment would put a scrim and a greeting in the middle of a picture that is not yet
+ * a header, which looks like a mistake rather than a layout.
+ */
+const CHROME_DELAY = COVER_HOLD + 140;
 
 /** Capacity only becomes news at three or fewer. Above that, silence is more honest. */
 const SPOTS_LEFT_THRESHOLD = 3;
@@ -125,14 +145,15 @@ export function HomeScreen({
 }: HomeScreenProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const { height: screenHeight } = useWindowDimensions();
 
   /**
-   * No photograph means no photograph TREATMENT.
+   * No photograph means no photograph TREATMENT — and no full-screen hold either.
    *
    * The scrim and the inverse text exist to hold white type on an image. Applied to the empty
-   * surface wash — which is what renders before the studio's config arrives, and permanently for
-   * a studio with no hero — they produce a grey smear with invisible white text on it. The
-   * fallback is not a dimmer version of the photo treatment; it is the absence of one.
+   * surface wash they produce a grey smear with invisible white text on it. And holding a blank
+   * rectangle for 620ms before revealing the app is not a cover, it is a stall — so with no photo
+   * the panel is simply already in place.
    */
   const hasPhoto = Boolean(data?.heroUri);
   const overPhoto = hasPhoto ? ('inverse' as const) : ('secondary' as const);
@@ -140,55 +161,84 @@ export function HomeScreen({
   /**
    * False on every mount after the first of this launch.
    *
-   * Home remounts each time you come back from another screen, and pull-to-refresh re-renders
-   * it. An entrance that replays on return stops reading as the app arriving and starts reading
-   * as the app being slow.
+   * Home remounts each time you come back from another screen, and pull-to-refresh re-renders it.
+   * An entrance that replays on return stops reading as the app arriving and starts reading as
+   * the app being slow.
    */
-  const playEntrance = useAppOpenEntrance();
+  const playEntrance = useAppOpenEntrance() && hasPhoto;
+
+  /** How far the panel has to travel: from entirely below the bottom edge to its resting place. */
+  const panelTravel = screenHeight - HERO_HEIGHT;
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      {/* Hero. Overflow hidden so the drift scale never bleeds past the header. */}
-      <View
-        style={{
-          height: HERO_HEIGHT,
-          overflow: 'hidden',
-          justifyContent: 'flex-end',
-          backgroundColor: theme.colors.surface,
-        }}
-      >
-        {hasPhoto ? (
-          <HeroSettle
-            animate={playEntrance}
-            style={{ position: 'absolute', top: 0, left: 0, right: 0, height: HERO_HEIGHT }}
-          >
+      {/*
+        THE PHOTO LAYER — full screen, and it never resizes.
+
+        Sized to the whole window rather than to the hero band so the held opening frame is the
+        entire picture. It stays exactly where it is for the rest of the session; the panel slides
+        up and covers everything below the band. Animating the photo's own height instead would
+        make its crop crawl during the reveal, which is precisely what would make the whole thing
+        look like an effect rather than like the app opening.
+
+        Consequence worth knowing: what remains visible at rest is the TOP 43% of a full-screen
+        crop. The hero photograph therefore has to be composed for the full frame, with its
+        subject in the upper portion. Another reason the landscape web banners currently coming
+        back from get-basic-config are the wrong asset.
+      */}
+      {hasPhoto ? (
+        <View
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, height: screenHeight, overflow: 'hidden' }}
+          pointerEvents="none"
+        >
+          <HeroSettle animate={playEntrance} style={{ flex: 1 }}>
             <Image
               source={data?.heroUri ?? undefined}
               style={{ flex: 1, backgroundColor: theme.colors.surface }}
               contentFit="cover"
               contentPosition="center"
               transition={motion.slow}
-              // The wash keeps the block from flashing white while the photo decodes. The studio's
-              // bundled hero already covered the splash, so this gap is short.
               accessible={false}
             />
           </HeroSettle>
-        ) : null}
+        </View>
+      ) : null}
 
-        {/* The legibility scrims sit ABOVE the drifting photo and do NOT move with it — a
-            gradient that scales with the image makes its edge crawl across the frame.
+      {/*
+        THE HERO BAND — transparent. It holds the chrome at the right height and nothing else; the
+        photograph behind it belongs to the layer above.
+      */}
+      <View
+        style={{
+          height: HERO_HEIGHT,
+          justifyContent: 'flex-end',
+          backgroundColor: hasPhoto ? 'transparent' : theme.colors.surface,
+        }}
+      >
+        {/*
+          The legibility scrims, and the chrome they exist for, fade in TOGETHER and only once the
+          panel is on its way. During the held opening frame the photograph is untouched — a scrim
+          across the middle of a full-screen picture reads as a smudge, not as a treatment.
 
-            TWO of them. The bottom ramp holds the greeting; the top one holds whatever sits in
-            the safe area, which the bottom ramp never reaches. Without it the account action is
-            white text on unmodified photo — invisible over a bright sky, and over Everyday
-            Ballet's high-key dancer.
+          TWO scrims. The bottom ramp holds the greeting; the top one holds whatever sits in the
+          safe area, which the bottom ramp never reaches. Without it the account action is white
+          text on unmodified photo — invisible over a bright sky, and over Everyday Ballet's
+          high-key dancer.
 
-            Note for the design review: the bottom ramp works on Carlsbad's mid-tone studio shot
-            and fights EB's dancer, where darkening reads as a mistake. If EB looks wrong on
-            device, the fix is to put the greeting below the photo for that studio rather than to
-            deepen the scrim. */}
+          Note for the design review: the bottom ramp works on Carlsbad's mid-tone studio shot and
+          fights EB's dancer, where darkening reads as a mistake. If EB looks wrong on device, the
+          fix is to put the greeting below the photo for that studio rather than to deepen the
+          scrim.
+        */}
         {hasPhoto ? (
-          <>
+          <FadeRise
+            animate={playEntrance}
+            delay={CHROME_DELAY}
+            distance={0}
+            // `pointerEvents: 'none'` in the style rather than as a prop — the scrims sit over
+            // the whole band and would otherwise swallow the account action's taps.
+            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none' }}
+          >
             <LinearGradient
               colors={[theme.heroScrim.topFrom, theme.heroScrim.topTo]}
               style={{
@@ -198,20 +248,12 @@ export function HomeScreen({
                 top: 0,
                 height: insets.top + theme.spacing.xxl + theme.spacing.lg,
               }}
-              pointerEvents="none"
             />
             <LinearGradient
               colors={[theme.heroScrim.from, theme.heroScrim.to]}
-              style={{
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                bottom: 0,
-                height: HERO_HEIGHT * 0.62,
-              }}
-              pointerEvents="none"
+              style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: HERO_HEIGHT * 0.62 }}
             />
-          </>
+          </FadeRise>
         ) : null}
 
         {/* Sits in the safe area at the top right, over the photo — the only thing above the
@@ -219,12 +261,9 @@ export function HomeScreen({
         {accountAction ? (
           <FadeRise
             animate={playEntrance}
-            delay={160}
-            style={{
-              position: 'absolute',
-              top: insets.top + theme.spacing.sm,
-              right: theme.spacing.lg,
-            }}
+            delay={CHROME_DELAY}
+            distance={0}
+            style={{ position: 'absolute', top: insets.top + theme.spacing.sm, right: theme.spacing.lg }}
           >
             <Text
               variant="label"
@@ -245,11 +284,12 @@ export function HomeScreen({
           </FadeRise>
         ) : null}
 
-        {/* The greeting belongs to the cover, so it arrives WITH the photograph — a touch behind
-            it, not in the wave that brings the schedule up. */}
+        {/* Pure fade, no rise: the greeting sits directly above the panel's landing edge, and
+            anything moving there would fight the panel arriving. */}
         <FadeRise
           animate={playEntrance}
-          delay={160}
+          delay={CHROME_DELAY}
+          distance={0}
           style={{ paddingHorizontal: theme.spacing.lg, paddingBottom: theme.spacing.lg }}
         >
           <Text
@@ -268,35 +308,35 @@ export function HomeScreen({
         </FadeRise>
       </View>
 
-      <ScrollView
-        contentContainerStyle={{
-          paddingHorizontal: theme.spacing.lg,
-          paddingTop: theme.spacing.lg,
-          paddingBottom: insets.bottom + theme.spacing.xxl,
-          gap: theme.spacing.lg,
-        }}
-        refreshControl={
-          onRefresh ? (
-            <RefreshControl
-              refreshing={isRefreshing}
-              onRefresh={onRefresh}
-              tintColor={theme.colors.textSecondary}
-            />
-          ) : undefined
-        }
-      >
-        {/* EVERYTHING below the hero rises as ONE piece, after the photograph has had the screen
-            to itself. Whatever is in here at the time comes up together — skeleton, error or the
-            real schedule — so the sequence runs to the same length regardless of the network.
+      {/*
+        THE PANEL — opaque, and it starts entirely below the bottom edge of the screen.
 
-            One unit rather than a per-block stagger: a stagger running inside a rising container
-            is two motion systems arguing, and the eye reads that as jitter, not sequence. */}
-        <FadeRise
-          animate={playEntrance}
-          delay={HERO_BEAT}
-          distance={36}
-          duration={460}
-          style={{ gap: theme.spacing.lg }}
+        Opaque rather than fading, and square-edged rather than rounded: it comes to rest as the
+        page itself, not as a sheet sitting on top of one. Rounded top corners would promise it
+        can be dismissed.
+      */}
+      <SlideUp
+        animate={playEntrance}
+        distance={panelTravel}
+        delay={COVER_HOLD}
+        style={{ flex: 1, backgroundColor: theme.colors.background }}
+      >
+        <ScrollView
+          contentContainerStyle={{
+            paddingHorizontal: theme.spacing.lg,
+            paddingTop: theme.spacing.lg,
+            paddingBottom: insets.bottom + theme.spacing.xxl,
+            gap: theme.spacing.lg,
+          }}
+          refreshControl={
+            onRefresh ? (
+              <RefreshControl
+                refreshing={isRefreshing}
+                onRefresh={onRefresh}
+                tintColor={theme.colors.textSecondary}
+              />
+            ) : undefined
+          }
         >
           {isLoading ? (
             <SkeletonList count={3} />
@@ -311,9 +351,7 @@ export function HomeScreen({
             />
           ) : (
             <>
-              {!data.acceptingBookings ? (
-                <BookingUnavailableNotice studioName={data.studioName} />
-              ) : null}
+              {!data.acceptingBookings ? <BookingUnavailableNotice studioName={data.studioName} /> : null}
 
               {data.nextBooking ? (
                 <View>
@@ -380,8 +418,8 @@ export function HomeScreen({
               </View>
             </>
           )}
-        </FadeRise>
-      </ScrollView>
+        </ScrollView>
+      </SlideUp>
     </View>
   );
 }

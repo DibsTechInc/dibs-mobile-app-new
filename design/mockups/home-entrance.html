@@ -3,42 +3,39 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Home — the app-open sequence</title>
+<title>Home — the app opening</title>
 <link rel="stylesheet" href="shared.css">
 <!--
   DESIGN RATIONALE
 
-  A timing review, not a layout one. The layout is Option A as built; the only variable is WHEN
-  each part arrives.
+  The photograph is the whole screen first. Nothing on it. Then the white panel carrying the
+  schedule travels up from entirely below the bottom edge and comes to rest at the hero band.
 
-  What changed: the hero and the content used to arrive together, staggered 70ms apart, so the
-  photograph never had a beat. In a composition literally called "The Cover" that is the wrong
-  answer. Now the photo settles alone, the greeting joins it, and everything below rises as one
-  piece.
+  What makes it work, and what would break it:
 
-  Two decisions worth arguing with:
+  THE PHOTO NEVER RESIZES. It is full-height and stationary for the whole session; only the panel
+  moves. Animating the photo's height instead would make its crop crawl during the reveal, which
+  is exactly what would make this read as an effect rather than as the app opening.
 
-  ONE UNIT, NOT A STAGGER. The content was three blocks entering 70ms apart. Inside a container
-  that is itself rising, that reads as jitter rather than sequence — two motion systems arguing.
-  One piece is calmer and it matches how you described it: the schedule slides up.
+  NOTHING ON THE PHOTO DURING THE HOLD. No scrim, no greeting, no Sign in. A darkening ramp
+  across the middle of a full-screen picture reads as a smudge; it only becomes a legibility
+  treatment once there is a band for it to belong to. So the chrome fades in 140ms after the
+  panel starts moving — it arrives WITH the composition, not before it.
 
-  36px, NOT 16. A 16px rise reads as "settling into place". You asked for something that comes up
-  from below, which needs more travel. But not much more: past roughly 60px it stops reading as
-  content arriving and starts reading as a modal sheet rising, which means something quite
-  different in an interface.
+  THE PANEL DOES NOT FADE. A white surface fading in over a photograph reads as haze settling on
+  the picture. An opaque edge travelling up reads as a surface arriving in front of it, which is
+  what is actually happening.
 
-  The variants below differ ONLY in the length of the beat the photo gets alone. B is what is
-  built. Replay them a few times each — the difference is small on the first viewing and
-  obvious by the fifth, which is the one that matters since this fires on every launch.
+  THE CONSEQUENCE TO LOOK AT: what stays visible at rest is the TOP 43% of a full-screen crop.
+  The hero has to be composed for the full frame with its subject high. This is now the strongest
+  argument for replacing the landscape banners currently coming back from get-basic-config — see
+  the last frame, which shows the same sequence with the real remote asset.
 -->
 <style>
   .variants { display: flex; gap: 34px; align-items: flex-start; flex-wrap: wrap; }
   .vcol { display: flex; flex-direction: column; gap: 10px; }
   .vhead { display: flex; align-items: baseline; gap: 10px; }
-  .vhead h3 {
-    font-family: var(--display); font-weight: 500; font-size: 19px;
-    letter-spacing: -0.01em; margin: 0;
-  }
+  .vhead h3 { font-family: var(--display); font-weight: 500; font-size: 19px; letter-spacing: -0.01em; margin: 0; }
   .vhead .timing { font-size: 12px; color: var(--text-3); font-variant-numeric: tabular-nums; }
   .vnote { font-size: 13px; line-height: 1.55; color: var(--text-2); width: 390px; }
   .vnote b { color: var(--text); font-weight: 600; }
@@ -54,36 +51,18 @@
     padding: 11px 22px; cursor: pointer; margin-top: 16px;
   }
 
-  /* ---- the sequence ---- */
-  .seq .heroimg,
-  .seq .cover,
-  .seq .body { opacity: 0; }
-
-  .seq.run .heroimg {
-    animation: heroSettle 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards,
-               heroFade 400ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-  .seq.run .cover {
-    animation: rise 380ms cubic-bezier(0.22, 1, 0.36, 1) 160ms forwards;
-    --dist: 16px;
-  }
-  .seq.run .body {
-    animation: rise var(--dur, 460ms) cubic-bezier(0.22, 1, 0.36, 1) var(--beat, 380ms) forwards;
-    --dist: var(--travel, 36px);
-  }
-
-  @keyframes heroSettle { from { transform: scale(1.08); } to { transform: scale(1); } }
-  @keyframes heroFade   { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes rise {
-    from { opacity: 0; transform: translateY(var(--dist)); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .heroimg {
+  /* the device, restacked: photo layer / band / panel */
+  .stage { position: relative; overflow: hidden; }
+  .photolayer { position: absolute; inset: 0; overflow: hidden; }
+  .photo {
     position: absolute; inset: 0;
-    background-image: var(--hero); background-size: cover; background-position: center 28%;
+    background-image: var(--hero); background-size: cover; background-position: center;
   }
-  .heroblock { position: relative; flex: 0 0 360px; overflow: hidden; display: flex; flex-direction: column; }
+  .band {
+    position: absolute; top: 0; left: 0; right: 0; height: 360px;
+    display: flex; flex-direction: column; justify-content: flex-end;
+  }
+  .chrome { opacity: 0; }
   .scrim-top {
     position: absolute; left: 0; right: 0; top: 0; height: 104px;
     background: linear-gradient(to bottom, rgba(20,18,16,0.32), rgba(20,18,16,0));
@@ -92,27 +71,45 @@
     position: absolute; left: 0; right: 0; bottom: 0; height: 223px;
     background: linear-gradient(to bottom, rgba(20,18,16,0), rgba(20,18,16,0.55));
   }
-  .cover, .scrim-top, .scrim-bot { position: relative; z-index: 2; }
-  .scrim-top, .scrim-bot { position: absolute; }
   .signin {
-    position: absolute; top: 12px; right: 20px; z-index: 3;
+    position: absolute; top: 56px; right: 20px;
     font-family: var(--body); font-weight: 500; font-size: 12px; letter-spacing: 0.08em;
     text-transform: uppercase; color: #fff; opacity: 0.9;
   }
+  .greeting { position: relative; padding: 0 20px 24px; }
+  .panel {
+    position: absolute; top: 360px; left: 0; right: 0; bottom: 0;
+    background: var(--bg); overflow: hidden;
+    transform: translateY(484px);
+  }
+
+  .stage.run .photo { animation: settle 900ms cubic-bezier(0.22,1,0.36,1) forwards; }
+  .stage.run .panel {
+    animation: rise var(--dur, 560ms) cubic-bezier(0.16,1,0.3,1) var(--hold, 620ms) forwards;
+  }
+  .stage.run .chrome {
+    animation: appear 380ms cubic-bezier(0.22,1,0.36,1) calc(var(--hold, 620ms) + 140ms) forwards;
+  }
+  @keyframes settle { from { transform: scale(1.08); } to { transform: scale(1); } }
+  @keyframes rise   { from { transform: translateY(484px); } to { transform: translateY(0); } }
+  @keyframes appear { from { opacity: 0; } to { opacity: 1; } }
+
+  /* the landscape remote asset, for the comparison frame */
+  .remote-cvy { --hero: url('https://dibs-email-assets.s3.amazonaws.com/images/studio-images/cvyoga_hero.png'); }
 </style>
 </head>
 <body>
 <div class="page">
 
 <header>
-  <h1>Home — the app-open sequence</h1>
+  <h1>Home — the app opening</h1>
   <p class="lede">
-    The photograph now holds the screen on its own before the schedule rises under it. Same
-    layout in all three; the only variable is how long that beat lasts. <b>B is what is built.</b>
-    Replay each one several times — this fires on every launch, so the fifth viewing is the one
-    that decides whether it is elegant or tiresome.
+    The whole picture, held, then the schedule arrives on top of it from below. <b>B is what is
+    built.</b> The variants differ only in how long the photograph has the screen to itself.
+    Replay each several times — this fires on every launch, so the fifth viewing decides whether
+    it feels considered or slow.
   </p>
-  <button class="replayall" onclick="runAll()">▶ Replay all three</button>
+  <button class="replayall" onclick="runAll()">▶ Replay all</button>
 </header>
 
 <section class="optionblock">
@@ -121,23 +118,21 @@
 
 <section class="optionblock">
   <div class="optionhead">
-    <h2>What else changed</h2>
+    <h2>Two things this makes true</h2>
     <div class="tradeoff">
-      <b>It runs once per launch, not once per mount.</b> Home rebuilds itself every time you come
-      back to it from another screen, and it re-renders on pull-to-refresh. Left alone, this
-      entrance would replay every one of those times — and motion that repeats on a screen you are
-      moving <i>through</i> stops reading as arrival and starts reading as lag. So the sequence
-      fires on the first Home of an app launch and never again until you relaunch. The hero keeps
-      breathing either way; the drift is ambient, not an entrance, and stopping it would make the
-      screen feel deader than it was a moment earlier.
+      <b>The hero must now be composed for the FULL frame, with its subject high.</b> What stays
+      on screen at rest is the top 43% of a full-screen crop. Previously the photo was only ever
+      shown in a 360px band and cropped to its centre, so the middle of the picture was what
+      mattered. Now the whole thing is seen for a beat and then the top of it is what remains.
+      The last frame shows the sequence with Carlsbad's real remote asset — a 1961×1258 landscape
+      web banner — for comparison against the bundled vertical one.
       <br><br>
-      <b>The content rises whatever state it is in.</b> Skeleton, error, or the real schedule —
-      they all come up together at the same moment, so the sequence is the same length on a fast
-      network and a slow one. The alternative, waiting for data before animating, makes the app's
-      rhythm a function of the studio's wifi.
-      <br><br>
-      <b>Reduce-motion turns all of it off.</b> Someone who has asked their phone to stop moving
-      things has asked us too. The content is simply there.
+      <b>The native splash is now the seam.</b> Expo shows its own splash before any of this, so
+      the sequence is really: splash → full-screen photo → panel. If the splash were the same
+      photograph, the handoff would be invisible and the app would appear to open in one
+      continuous move. Worth doing, and it is a one-line change per studio in
+      <code>app.config.ts</code> — but Everyday Ballet has a designed wordmark splash you may
+      want to keep, so it is your call rather than mine.
     </div>
   </div>
 </section>
@@ -146,63 +141,64 @@
 
 <script>
 const VARIANTS = [
-  {
-    key: 'a', name: 'A — Brisk', studio: 'studio-cvy',
-    beat: 240, dur: 400, travel: 32,
-    timing: 'beat 240ms · rise 400ms · 32px',
-    note: 'Barely a sequence. The photo gets a glance rather than a beat. Best if you think the ' +
-          'app should feel instant above all — but it gives up most of what you asked for.',
-  },
-  {
-    key: 'b', name: 'B — Considered', studio: 'studio-cvy',
-    beat: 380, dur: 460, travel: 36,
-    timing: 'beat 380ms · rise 460ms · 36px',
-    note: '<b>Built.</b> The photograph reads as the cover, then the schedule arrives under it. ' +
-          'Fully assembled at ~840ms, which is about the longest an entrance can run before you ' +
-          'start noticing you are waiting for it.',
-  },
-  {
-    key: 'c', name: 'C — Cinematic', studio: 'studio-cvy',
-    beat: 620, dur: 520, travel: 44,
-    timing: 'beat 620ms · rise 520ms · 44px',
-    note: 'Unmistakably a sequence, and lovely once. Fully assembled at ~1.14s. My worry is the ' +
-          'fortieth launch: a client checking whether the 6am has space should not sit through a ' +
-          'title card.',
-  },
+  { key:'a', name:'A — Glimpse', studio:'studio-cvy', hold:380, dur:520,
+    timing:'hold 380ms · rise 520ms',
+    note:'The picture registers but you do not get to look at it. Choose this if you think the ' +
+         'hold is charming once and irritating thereafter.' },
+  { key:'b', name:'B — Held', studio:'studio-cvy', hold:620, dur:560,
+    timing:'hold 620ms · rise 560ms',
+    note:'<b>Built.</b> Long enough to read as a deliberate image rather than a flicker, and at ' +
+         'rest by ~1.18s. This is the top of my comfort range for something on every launch.' },
+  { key:'c', name:'C — Cover', studio:'studio-cvy', hold:1000, dur:620,
+    timing:'hold 1000ms · rise 620ms',
+    note:'A full second of photograph. Beautiful, and unmistakably a statement. My worry is the ' +
+         'client checking whether the 6am has space: they are not here for the picture.' },
+  { key:'eb', name:'B — Everyday Ballet', studio:'studio-eb', hold:620, dur:560,
+    timing:'hold 620ms · rise 560ms',
+    note:'The built timing on the high-key hero. Two things to judge: whether the scrim reads as ' +
+         'a treatment or a smudge when it fades in, and whether the top 43% of this photo is the ' +
+         'part you want left on screen.' },
+  { key:'remote', name:'B — the CURRENT remote asset', studio:'studio-cvy remote-cvy', hold:620, dur:560,
+    timing:'hold 620ms · rise 560ms',
+    note:'Same sequence, but pulling <code>heroUrl</code> as get-basic-config actually returns ' +
+         'it today: a 1961×1258 <b>landscape</b> web banner. Compare the held frame against B. ' +
+         'This is the case for replacing the S3 files with the vertical assets.' },
 ];
-
-const EB = { key: 'b-eb', name: 'B — on Everyday Ballet', studio: 'studio-eb',
-  beat: 380, dur: 460, travel: 36, timing: 'beat 380ms · rise 460ms · 36px',
-  note: 'The built timing against the high-key hero. Watch the scrim rather than the timing here ' +
-        '— this is the open question about whether darkening that photo reads as a treatment or ' +
-        'as a smudge.' };
 
 function frame(v) {
   return `
   <div class="vcol">
     <div class="vhead"><h3>${v.name}</h3><span class="timing">${v.timing}</span></div>
-    <div class="frame ${v.studio} seq" id="f-${v.key}"
-         style="--beat:${v.beat}ms; --dur:${v.dur}ms; --travel:${v.travel}px;">
-      <div class="heroblock">
-        <div class="heroimg"></div>
-        <div class="scrim-top"></div>
-        <div class="scrim-bot"></div>
-        <div class="statusbar on-photo" style="position:relative;z-index:3"><span>9:41</span><span>􀙇 􀛨 􀋨</span></div>
-        <div class="cover" style="margin-top:auto; padding:0 20px 24px;">
-          <div class="signin">Sign in</div>
-          <div class="t-label upper" style="color:#fff;opacity:0.85;margin-bottom:4px;">
-            Carlsbad Village Yoga · Thursday, August 6
+    <div class="frame ${v.studio}" style="border-radius:30px">
+      <div class="stage" id="f-${v.key}" style="flex:1; --hold:${v.hold}ms; --dur:${v.dur}ms;">
+        <div class="photolayer"><div class="photo"></div></div>
+
+        <div class="band">
+          <div class="chrome">
+            <div class="scrim-top"></div>
+            <div class="scrim-bot"></div>
+            <div class="signin">Sign in</div>
           </div>
-          <div class="t-display" style="color:#fff;">Good morning,<br>Elan</div>
+          <div class="greeting chrome">
+            <div class="t-label upper" style="color:#fff;opacity:0.85;margin-bottom:4px;">
+              Carlsbad Village Yoga · Thursday, August 6
+            </div>
+            <div class="t-display" style="color:#fff;">Good morning,<br>Elan</div>
+          </div>
         </div>
-      </div>
-      <div class="scroll">
-        <div class="body pad" style="padding-top:24px;">
-          <div class="t-label upper c-3" style="margin-bottom:12px;">Today at the studio</div>
-          <div class="stack-12">
-            ${row('8:00 AM', 'Challenging flow', 'with Marta Estellés · 60 min', 'Open', '$22')}
-            ${row('9:30 AM', 'Flow', 'with Candace Gibson · 60 min', '3 spots left', '$22', true)}
-            ${row('5:30 PM', 'Candlelight Yin', 'with David Roth · 75 min', 'Open', '$22')}
+
+        <div class="statusbar on-photo" style="position:absolute;top:0;left:0;right:0;z-index:5">
+          <span>9:41</span><span>􀙇 􀛨 􀋨</span>
+        </div>
+
+        <div class="panel">
+          <div class="pad" style="padding-top:24px;">
+            <div class="t-label upper c-3" style="margin-bottom:12px;">Today at the studio</div>
+            <div class="stack-12">
+              ${row('8:00 AM','Challenging flow','with Marta Estellés · 60 min','Open','$22')}
+              ${row('9:30 AM','Flow','with Candace Gibson · 60 min','3 spots left','$22',true)}
+              ${row('5:30 PM','Candlelight Yin','with David Roth · 75 min','Open','$22')}
+            </div>
           </div>
         </div>
       </div>
@@ -228,8 +224,7 @@ function row(time, name, sub, tag, price, hot) {
   </div>`;
 }
 
-document.getElementById('variants').innerHTML =
-  VARIANTS.map(frame).join('') + frame(EB);
+document.getElementById('variants').innerHTML = VARIANTS.map(frame).join('');
 
 function run(key) {
   const el = document.getElementById('f-' + key);
@@ -237,7 +232,7 @@ function run(key) {
   void el.offsetWidth; // force reflow so the animation restarts
   el.classList.add('run');
 }
-function runAll() { [...VARIANTS.map(v => v.key), EB.key].forEach(run); }
+function runAll() { VARIANTS.forEach(v => run(v.key)); }
 setTimeout(runAll, 350);
 </script>
 </body>
