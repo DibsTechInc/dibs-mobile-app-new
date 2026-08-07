@@ -125,7 +125,16 @@ export interface WalletScreenProps {
   isRefreshing?: boolean;
   onRefresh?: () => void;
   onBack: () => void;
+  /**
+   * Absent — not disabled — when a card cannot be added right now.
+   *
+   * A card form that cannot open is worse than one that has not appeared yet, and the two states
+   * that cause it (Stripe's key still in flight, identity not resolved) both resolve on their own
+   * within a moment.
+   */
   onAddCard?: () => void;
+  isAddingCard?: boolean;
+  addCardError?: string | null;
   onManageCard?: (card: SavedCard) => void;
   /** Where a client with no passes goes. Absent until the packages storefront lands (P4). */
   onBrowsePackages?: () => void;
@@ -138,11 +147,24 @@ export function WalletScreen({
   onRefresh,
   onBack,
   onAddCard,
+  isAddingCard = false,
+  addCardError,
   onManageCard,
   onBrowsePackages,
 }: WalletScreenProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+
+  // Defined once and rendered in both the empty and populated branches, so the two can never
+  // drift into offering different affordances for the same action.
+  const addCardButton = onAddCard ? (
+    <Button
+      label="Add a payment method"
+      variant="secondary"
+      loading={isAddingCard}
+      onPress={onAddCard}
+    />
+  ) : null;
 
   /** One place that decides what a section shows, so no two sections disagree about it. */
   const renderSection = (
@@ -275,6 +297,16 @@ export function WalletScreen({
             </View>
           ) : null}
 
+          {/* A failed card-add belongs beside the button that raised it, not in a system alert
+              that has to be dismissed before the client can see what they were doing. */}
+          {addCardError ? (
+            <View style={{ marginBottom: theme.spacing.md }}>
+              <Text variant="secondary" color="danger">
+                {addCardError}
+              </Text>
+            </View>
+          ) : null}
+
           {renderSection(data.cards.status, data.cards.items.length === 0, {
             loading: <SectionSkeleton />,
             empty: (
@@ -282,7 +314,7 @@ export function WalletScreen({
                 <Text variant="secondary" color="secondary">
                   No card saved yet. You can add one now or when you book.
                 </Text>
-                {onAddCard ? <Button label="Add a payment method" variant="secondary" onPress={onAddCard} /> : null}
+                {addCardButton}
               </View>
             ),
             content: (
@@ -290,7 +322,7 @@ export function WalletScreen({
                 {data.cards.items.map((card) => (
                   <CardRow key={card.id} card={card} onManage={onManageCard} />
                 ))}
-                {onAddCard ? <Button label="Add a payment method" variant="secondary" onPress={onAddCard} /> : null}
+                {addCardButton}
               </View>
             ),
           })}

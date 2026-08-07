@@ -63,6 +63,17 @@ export type UserAccountInfo = z.infer<typeof userAccountInfoSchema>;
  * against. It is the client's own contact detail, not a pointer into another system — the test
  * for admitting a field is whether the app would be wrong to act on it, not whether it is
  * personal.
+ *
+ * `platformStripeCustomerId` is the ONE exception to "the app reads none of the Stripe ids", and
+ * it earns it by preventing a specific bug. `create-setup-intent` mints a NEW platform customer
+ * when it is called without one, and writes it to `dibs_users.stripeid` **with no environment
+ * branch** — a sandbox `cus_` landing in the column production charge paths read raw. Passing the
+ * existing id is what keeps that branch from ever running. It is safe to carry because this
+ * endpoint already returns the environment-correct value (`isProduction ? stripeid_prod :
+ * stripeid_test`, `services/widget/get-user-has-account.js:51`), so the app never has to choose.
+ *
+ * `stripeIdAtThisStudio` is still deliberately dropped: nothing in the app needs the connected
+ * customer, and the charge paths resolve it server-side against the studio being charged.
  */
 export interface AccountIdentity {
   userid: number;
@@ -70,6 +81,8 @@ export interface AccountIdentity {
   firstName: string | null;
   lastName: string | null;
   phone: string | null;
+  /** The client's customer on the Dibs PLATFORM account, for this environment. Never charged. */
+  platformStripeCustomerId: string | null;
 }
 
 export function toAccountIdentity(response: UserAccountResponse): AccountIdentity | null {
@@ -81,6 +94,7 @@ export function toAccountIdentity(response: UserAccountResponse): AccountIdentit
     firstName: info.firstName?.trim() || null,
     lastName: info.lastName?.trim() || null,
     phone: info.mobilephone?.trim() || null,
+    platformStripeCustomerId: response.stripeIdAtDibs?.trim() || null,
   };
 }
 

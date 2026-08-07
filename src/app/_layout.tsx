@@ -9,6 +9,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { queryClient } from '@/api/query-client';
 import { AuthProvider } from '@/features/auth/AuthProvider';
 import { installAuthBridge } from '@/features/auth/bridge';
+import { StripeSdkProvider } from '@/features/payments/StripeSdkProvider';
 import { StudioConfigProvider } from '@/features/studio/StudioConfigProvider';
 
 // Module scope, not an effect. Effects run child-first, so by the time a provider's effect ran,
@@ -40,9 +41,18 @@ export default function RootLayout() {
             already ships the studio's seed accent. */}
         <StudioConfigProvider>
           <AuthProvider>
-            <Stack screenOptions={{ headerShown: false }} />
-            {/* Light content throughout: v1 has no dark mode, and the background is always light. */}
-            <StatusBar style="dark" />
+            {/* Fetches the publishable key for whatever API host this build points at, so the
+                sandbox/live choice is made by the backend rather than by a bundled constant. It
+                never blocks: children render immediately and only payment surfaces consult it. */}
+            <StripeSdkProvider>
+              {/* Wrapped in a fragment because StripeProvider types its children as a single
+                  element. */}
+              <>
+                <Stack screenOptions={{ headerShown: false }} />
+                {/* Light content throughout: v1 has no dark mode, and the background is always light. */}
+                <StatusBar style="dark" />
+              </>
+            </StripeSdkProvider>
           </AuthProvider>
         </StudioConfigProvider>
       </SafeAreaProvider>

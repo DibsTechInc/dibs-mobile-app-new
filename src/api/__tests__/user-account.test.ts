@@ -37,16 +37,26 @@ const REAL_ACCOUNT = {
 describe('toAccountIdentity', () => {
   it('keeps only what a session needs', () => {
     const identity = toAccountIdentity(REAL_ACCOUNT);
-    // Deliberately narrow: the response carries Stripe ids, a referral code and emergency
-    // contacts, and what a session does not hold cannot leak out of it. The phone number is in
-    // because the profile form edits it and needs the current value to compare against.
+    // Deliberately narrow: the response carries a referral code and emergency contacts, and what a
+    // session does not hold cannot leak out of it. Two fields earn their place — the phone,
+    // because the profile form edits it; and the PLATFORM Stripe customer, because passing it to
+    // create-setup-intent is what stops that endpoint minting a new one and writing it to the
+    // production column with no environment branch.
     expect(identity).toEqual({
       userid: 2502,
       email: 'Client@Example.com',
       firstName: 'Elan',
       lastName: 'Marsh',
       phone: '3104037905',
+      platformStripeCustomerId: 'cus_dibs456',
     });
+  });
+
+  it('does NOT carry the connected-account customer', () => {
+    // Nothing in the app needs it; the charge paths resolve it server-side against the studio
+    // actually being charged, which is the only place that can be sure it matches.
+    const identity = toAccountIdentity(REAL_ACCOUNT);
+    expect(Object.values(identity ?? {})).not.toContain('cus_studio123');
   });
 
   it('carries no phone rather than an empty string when the client has none', () => {

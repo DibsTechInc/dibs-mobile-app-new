@@ -11,6 +11,14 @@
  * raises a real error otherwise.
  */
 export { fetchBasicConfig } from './basic-config';
+export {
+  createSetupIntent,
+  ensureConnectedCustomer,
+  fetchPublishableKey,
+  removeCard,
+  setDefaultCard,
+  type CreateSetupIntentArgs,
+} from './cards';
 export { fetchSchedule } from './schedule';
 export { fetchUpcomingBookings } from './upcoming';
 export { updateProfile, type UpdateProfileArgs } from './profile';
