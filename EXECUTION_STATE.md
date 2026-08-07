@@ -4,12 +4,15 @@
 > Backend (dibs-api) items are tracked in `backend-workstream/STATUS.md`, not here.
 > The executor updates this file at the end of EVERY session. Statuses: `done` / `in-progress` / `blocked-on-Alicia (reason)` / `not-started`.
 
-**Last updated:** 2026-08-06 (session 3 close — handoff at `DevAssist/Aug6/HANDOFF-session3.md`)
+**Last updated:** 2026-08-07 (design review — approved redesign at `design/mockups/rework.html`; session 3 handoff at `DevAssist/Aug6/HANDOFF-session3.md`)
 **Gate status:** `npm run typecheck` clean · `npx jest` **635/635** · `npm run lint` 0 errors (2 pre-existing warnings) · all 4 CI grep guardrails clean · iOS bundle exports for both v1 studios
-**Next up:** **run it.** P2 is code-complete. What it has never had is a native rebuild and a
-signed-in session, and both are now unblocked — Alicia supplied the staging backend, the test
-login `alicia.ulin@gmail.com`, and its password. Point at **studio 88**, where that client holds
-two live passes:
+**Next up:** **rebuild the screens to the approved redesign** (`design/mockups/rework.html`, signed
+off 2026-08-07 — see "Design decisions made"). P2's data layer, domain rules and endpoints all
+stand; what changes is the presentation. Order: Home → the drawer → Schedule → Account.
+
+Then run it, which is finally unblocked — Alicia supplied the staging backend, the test login
+`alicia.ulin@gmail.com` and its password. Point at **studio 88**, where that client holds two live
+passes:
 
 ```bash
 EXPO_PUBLIC_API_URL=https://dibs-api-staging-production.up.railway.app/api/v2 \
@@ -66,7 +69,7 @@ Four commits, local and unpushed. All of P2 except the card write paths.
 
 | Item | Status |
 |---|---|
-| Account hub | **done, unverified on device** — `/account` |
+| Account hub | **built, needs rebuilding to the 2026-08-07 redesign** — `/account` |
 | Wallet: passes | **done, unverified.** Cannot be verified locally at all: zero `passes` rows |
 | Wallet: credit | **done, unverified on device.** Endpoint exercised live (userid 10 @ 210 → `900`) |
 | Wallet: saved cards | **done, unverified on device.** Endpoint exercised live; the merge is unit-tested against the five-copies-of-4242 case the sandbox actually holds |
@@ -75,7 +78,7 @@ Four commits, local and unpushed. All of P2 except the card write paths.
 | Remove card / set default | **done.** `set-default-card` exercised live on staging (success AND the `invalid_payment_method_id` refusal). `remove-card` is wired and unit-tested but **deliberately not fired against staging** — it detaches from both Stripe accounts and there was no reason to destroy a real test card to prove a request shape |
 | Communication preferences | **not-started.** `/user/update-communication-preferences` exists; no design for it yet, and P8's notification work is its natural home |
 | Delete account | **not-started — RELEASE GATE.** Apple requires it for any app with sign-up. Backend item 7.7. Not stubbed, because a delete-account row that does not delete the account is the worst version of it |
-| Tab bar | **still not-started, still deliberate.** Account now exists, so three of the mock's four tabs do — but adding one restructures Home's approved app-open sequence (the panel's travel is computed from the full screen height). Worth doing once Packages lands in P4, as one change rather than two |
+| Tab bar | **RETIRED as a concept, 2026-08-07.** There is no tab bar in the approved design. Home's three choices push a screen with a back chevron; the hamburger drawer is how you move sideways |
 
 ## Session 2 (2026-08-06) — what landed
 
@@ -102,8 +105,8 @@ Four commits, local and unpushed.
 
 | Item | Status |
 |---|---|
-| Home | **done** — live config + schedule + next booking |
-| Schedule screen | **done** — day strip, one shared query with Home, `/schedule` |
+| Home | **built, needs rebuilding to the 2026-08-07 redesign.** The hero band cut the photograph in half; the approved design is full-bleed photo + three choices |
+| Schedule screen | **built, needs rebuilding to the 2026-08-07 redesign** — accent header, month label, top-aligned rows, per-row Book. The ~400px void under the day strip is already fixed |
 | Class detail | **done** — `/class/[eventId]`, resolves from the schedule cache |
 | Appointment browsing | **out of v1** (§0.1-B) |
 | Tab bar | **not-started, deliberately.** The approved mock has four tabs; two of them (Packages, Account) have no screens, and a tab that leads nowhere is a dead end. Add it when P2/P4 land. Navigation today is Home → Schedule → Detail with a real back affordance. |
@@ -226,6 +229,46 @@ claim is "it compiles and the logic is tested", not "I saw it".
     discovered during review rather than before it.
 
 ## Design decisions made
+
+### ⚠️ APPROVED REDESIGN, 2026-08-07 — supersedes "Home composition: Option A" below
+
+Reviewed on a device and reworked with Alicia across three passes. **Approved mock:
+`design/mockups/rework.html`.** The screens currently in `src/` are the OLD design and must be
+rebuilt to this before P2 can be called visually done.
+
+**Home = a photograph and three choices. Nothing else.**
+- The studio's photo is the WHOLE screen, never a band. The old 360px hero band cut the subject in
+  half — Everyday Ballet's dancer was sliced through the arm and face.
+- One flat wash (~40%) over the entire frame plus a soft foot under the words. **Never a gradient
+  that reaches full strength and stops** — that terminating edge is what read as a grey smudge.
+- Greeting sits low and small: "Hi Alicia!" / "Welcome to Everyday Ballet". Signed out, the
+  greeting is the studio's name and the third choice becomes "Sign In".
+- **Three choices — Book · My Calendar · Account** — joined by hairlines so they read as ONE menu,
+  not a strip of buttons. Roughly three quarters of the screen stays untouched photograph.
+- **Nothing else on Home.** No schedule, no upcoming classes, no CTA, no banner (Alicia, 2026-08-07:
+  "users usually know what they're looking for… showing them the full schedule for the day is extra
+  info"). A previous pass put seven elements on the photo and they competed with it.
+
+**No tab bar anywhere.** One navigation model: the three choices push a screen with a back chevron,
+and the hamburger drawer is how you move sideways. A bar that is absent on Home and present
+elsewhere announces itself at the first tap. Accepted trade: Packages and My Calendar are two taps
+from Home rather than one.
+
+**Schedule: the studio's accent owns the header block**, holding the month label and the day strip;
+selected day is a filled white circle. The month label is load-bearing — without it the strip reads
+`…18 · 19 · 2 · 8` across a month boundary and looks broken when it is not. Empty days stay in the
+strip, dimmed, so dates never skip. Rows are **top-aligned** (Alicia: the time must sit level with
+the first line of the class name) with a per-row **Book** button.
+
+**Account: money first** — credit balance and passes above navigation. Passes move up here from the
+wallet; the wallet keeps cards and history.
+
+**Icons are Lucide at 1.5px stroke. Never unicode glyphs** (`▤ ◇ ○ ⌂` render as striped rectangles
+and bare circles — a hard no from Alicia, 2026-08-07). `lucide-react-native` is already installed.
+**Packages uses the widget's own `shopping-bag`** so the two products agree; the cart is a
+`shopping-cart` trolley so the two are never confused.
+
+### Superseded
 
 **Home composition: Option A, "The Cover"** — chosen by Alicia 2026-08-05, with a request that
 the app feel dynamic on open. Built at `src/features/home/HomeScreen.tsx` and live at `/`.

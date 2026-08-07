@@ -100,12 +100,6 @@ section{margin-top:64px;padding-top:36px;border-top:1px solid #E8E4DF;}
 .book.covered{background:#fff;color:var(--sc);border:1px solid var(--sc);}
 .book.full{background:#F1EEEA;color:#8A9099;}
 
-/* solid tab bar for the white screens */
-.tabs{display:flex;background:#fff;border-top:1px solid #E8E4DF;padding:9px 0 20px;color:#A8A29C;}
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:9.5px;font-weight:600;
-  letter-spacing:.09em;text-transform:uppercase;}
-.tab.on{color:var(--sc);}
-
 /* ── ACCOUNT / DRAWER ──────────────────────────────────────────────── */
 .acct{flex:1;padding:46px 20px 0;overflow:hidden;}
 .acct-name{font-family:'Fraunces',Georgia,serif;font-size:25px;font-weight:500;letter-spacing:-.02em;}
@@ -144,12 +138,15 @@ section{margin-top:64px;padding-top:36px;border-top:1px solid #E8E4DF;}
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
     <g id="ic-menu"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></g>
+    <!-- PACKAGES = shopping-bag, matching the widget's own tab exactly. -->
     <g id="ic-bag"><path d="M16 10a4 4 0 0 1-8 0"/><path d="M3.1 6h17.8"/><path d="M3.4 5.5a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.7a2 2 0 0 0-.4-1.2l-2-2.7A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z"/></g>
-    <g id="ic-calendar"><path d="M8 2v4"/><path d="M16 2v4"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></g>
+    <!-- The CART is a trolley, so it can never be mistaken for Packages. -->
+    <g id="ic-cart"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2 3h2.3a1 1 0 0 1 1 .8l2.5 11.6a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 2-1.6l1.5-6.9H6"/></g>
+    <!-- Plain calendar with two rules, the way the widget draws its Schedule tab. -->
+    <g id="ic-calendar"><path d="M8 2v4"/><path d="M16 2v4"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/><path d="M7.5 14h9"/><path d="M7.5 17.5h5"/></g>
     <g id="ic-calendar-check"><path d="M8 2v4"/><path d="M16 2v4"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></g>
     <g id="ic-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></g>
     <g id="ic-home"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .7-1.5l7-6a2 2 0 0 1 2.6 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></g>
-    <g id="ic-box"><path d="M21 8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></g>
     <g id="ic-card"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></g>
     <g id="ic-mail"><path d="m22 7-9 5.7a2 2 0 0 1-2 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></g>
     <g id="ic-gift"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C10 3 12 5.5 12 8c0-2.5 2-5 4.5-5a2.5 2.5 0 0 1 0 5"/></g>
@@ -175,6 +172,8 @@ section{margin-top:64px;padding-top:36px;border-top:1px solid #E8E4DF;}
     <li><b>Today's schedule is gone from Home.</b> Someone opening a booking app already knows what they came for; a day's classes on the way in is a second schedule to scroll past.</li>
     <li><b>The icons were unicode glyphs</b> — <code>▤ ◇ ○ ⌂</code>. They rendered as striped rectangles and bare circles because that is what those characters are. Replaced with Lucide paths.</li>
     <li><b>Schedule rows were centre-aligned</b>, so a time drifted down beside a name that wrapped to three lines. Now top-aligned, and the time no longer breaks across two lines.</li>
+    <li><b>Packages is the widget's shopping-bag</b>, so the two products agree. The cart became a trolley, since the bag was doing both jobs and they are not the same thing.</li>
+    <li><b>The tab bar is gone.</b> One navigation model — three choices on Home, a back chevron on inner screens, the drawer for everything else.</li>
   </ul>
 </div>
 
@@ -198,7 +197,7 @@ section{margin-top:64px;padding-top:36px;border-top:1px solid #E8E4DF;}
           <div class="photo"></div><div class="veil"></div><div class="foot"></div>
           <div class="chrome">
             <svg class="i"><use href="#ic-menu"/></svg>
-            <svg class="i"><use href="#ic-bag"/></svg>
+            <svg class="i"><use href="#ic-cart"/></svg>
           </div>
           <div class="body">
             <div class="greet">Hi Alicia!</div>
@@ -222,7 +221,7 @@ section{margin-top:64px;padding-top:36px;border-top:1px solid #E8E4DF;}
           <div class="photo"></div><div class="veil"></div><div class="foot"></div>
           <div class="chrome">
             <svg class="i"><use href="#ic-menu"/></svg>
-            <svg class="i"><use href="#ic-bag"/></svg>
+            <svg class="i"><use href="#ic-cart"/></svg>
           </div>
           <div class="body">
             <div class="greet">Welcome</div>
@@ -265,7 +264,7 @@ section{margin-top:64px;padding-top:36px;border-top:1px solid #E8E4DF;}
           <div class="navlist" style="margin-top:20px;">
             <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-calendar"/></svg></span>Book<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
             <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-calendar-check"/></svg></span>My calendar<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
-            <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-box"/></svg></span>Packages<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
+            <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-bag"/></svg></span>Packages<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
             <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-user"/></svg></span>Account<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
             <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-gift"/></svg></span>Refer a friend<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
             <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-mail"/></svg></span>Contact the studio<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
@@ -313,7 +312,7 @@ section{margin-top:64px;padding-top:36px;border-top:1px solid #E8E4DF;}
           <div class="sched-top">
             <svg class="i sm"><use href="#ic-chev-l"/></svg>
             <div class="sched-month">August 2026</div>
-            <svg class="i sm"><use href="#ic-bag"/></svg>
+            <svg class="i sm"><use href="#ic-cart"/></svg>
           </div>
           <div class="strip">
             <div class="day on"><span class="dow">FRI</span><span class="dnum">7</span></div>
@@ -363,12 +362,6 @@ section{margin-top:64px;padding-top:36px;border-top:1px solid #E8E4DF;}
             <button class="book full">Waitlist</button>
           </div>
         </div>
-        <div class="tabs">
-          <div class="tab"><svg class="i sm"><use href="#ic-home"/></svg>Home</div>
-          <div class="tab on"><svg class="i sm"><use href="#ic-calendar"/></svg>Book</div>
-          <div class="tab"><svg class="i sm"><use href="#ic-calendar-check"/></svg>Calendar</div>
-          <div class="tab"><svg class="i sm"><use href="#ic-user"/></svg>Account</div>
-        </div>
       </div>
       <p class="caption">Times on one line. Days with nothing on them stay in the strip, dimmed, so the dates never skip.</p>
     </div>
@@ -381,7 +374,7 @@ section{margin-top:64px;padding-top:36px;border-top:1px solid #E8E4DF;}
           <div class="sched-top">
             <svg class="i sm"><use href="#ic-chev-l"/></svg>
             <div class="sched-month">August 2026</div>
-            <svg class="i sm"><use href="#ic-bag"/></svg>
+            <svg class="i sm"><use href="#ic-cart"/></svg>
           </div>
           <div class="strip">
             <div class="day"><span class="dow">THU</span><span class="dnum">6</span></div>
@@ -431,30 +424,27 @@ section{margin-top:64px;padding-top:36px;border-top:1px solid #E8E4DF;}
             <button class="book">Book</button>
           </div>
         </div>
-        <div class="tabs">
-          <div class="tab"><svg class="i sm"><use href="#ic-home"/></svg>Home</div>
-          <div class="tab on"><svg class="i sm"><use href="#ic-calendar"/></svg>Book</div>
-          <div class="tab"><svg class="i sm"><use href="#ic-calendar-check"/></svg>Calendar</div>
-          <div class="tab"><svg class="i sm"><use href="#ic-user"/></svg>Account</div>
-        </div>
       </div>
       <p class="caption">One codebase. The only thing that changed is <code>accentColor</code>.</p>
     </div>
 
     <div class="note">
-      <h3>Open question on the tab bar</h3>
+      <h3>No tab bar anywhere — settled</h3>
       <p>
-        Home has three choices and no tab bar. These inner screens show four tabs, which is <b>one navigation
-        model too many.</b> Two ways to resolve it, and I would take the second:
+        <b>One navigation model, not two.</b> Home's three choices push a screen with a back chevron, and the
+        hamburger drawer is how you move sideways. That is what the old app did, and it is the reason Home
+        felt uncluttered: nothing persistent competes for the bottom of the screen, so the photograph keeps
+        the space a tab bar would have taken.
       </p>
-      <ul>
-        <li><b>Keep both</b> — Home is a launcher, inner screens get tabs. Familiar, but the bar appearing
-          after Home is a seam.</li>
-        <li><b>No tab bar anywhere.</b> Home's three choices push a screen with a back chevron, and the
-          hamburger drawer is the way to jump sideways. This is exactly what the old app did, and it is why
-          Home felt uncluttered — nothing persistent competing for the bottom of the screen.</li>
-      </ul>
-      <p>Say which and I will make the inner screens match.</p>
+      <p>
+        It also removes a seam. A bar that is absent on Home and present everywhere else announces itself at
+        the first tap; this way the chrome is the same shape on every screen.
+      </p>
+      <p>
+        <b>The trade to watch:</b> Packages and My Calendar are now two taps from Home rather than one
+        (open the drawer, then choose). For the surfaces people reach for daily — Book, and their own
+        classes — the three choices still make it one tap, so the cost falls on the pages visited least.
+      </p>
     </div>
   </div>
 </section>
@@ -473,6 +463,10 @@ section{margin-top:64px;padding-top:36px;border-top:1px solid #E8E4DF;}
       <div class="frame" style="--sc:#F986A5;">
         <div class="statusbar"><span>9:41</span><span>▪ ▪ ▮</span></div>
         <div class="acct">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+            <svg class="i sm" style="color:#8A9099;"><use href="#ic-chev-l"/></svg>
+            <svg class="i sm" style="color:#8A9099;"><use href="#ic-cart"/></svg>
+          </div>
           <div class="acct-name">Alicia Ulin</div>
           <div class="acct-mail">alicia.ulin@gmail.com</div>
 
@@ -493,17 +487,11 @@ section{margin-top:64px;padding-top:36px;border-top:1px solid #E8E4DF;}
 
           <div class="navlist">
             <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-calendar-check"/></svg></span>My classes<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
-            <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-box"/></svg></span>Packages<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
+            <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-bag"/></svg></span>Packages<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
             <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-card"/></svg></span>Payment methods<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
             <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-user"/></svg></span>Profile<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
             <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-mail"/></svg></span>Contact the studio<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
           </div>
-        </div>
-        <div class="tabs">
-          <div class="tab"><svg class="i sm"><use href="#ic-home"/></svg>Home</div>
-          <div class="tab"><svg class="i sm"><use href="#ic-calendar"/></svg>Book</div>
-          <div class="tab"><svg class="i sm"><use href="#ic-calendar-check"/></svg>Calendar</div>
-          <div class="tab on"><svg class="i sm"><use href="#ic-user"/></svg>Account</div>
         </div>
       </div>
       <p class="caption">Real data — what userid 2502 actually holds at studio 88 on staging.</p>
