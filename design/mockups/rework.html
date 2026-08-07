@@ -17,18 +17,24 @@ body{
 .page{max-width:1400px;margin:0 auto;}
 
 h1{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:38px;letter-spacing:-.02em;margin-bottom:10px;}
-.lede{font-size:16px;line-height:1.6;color:#5D6469;max-width:720px;margin-bottom:8px;}
+.lede{font-size:16px;line-height:1.6;color:#5D6469;max-width:720px;}
 .lede b{color:#2D3436;font-weight:600;}
 
 h2{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:26px;letter-spacing:-.02em;margin-bottom:6px;}
-.sub{font-size:14px;line-height:1.6;color:#5D6469;max-width:760px;margin-bottom:22px;}
+.sub{font-size:14px;line-height:1.6;color:#5D6469;max-width:780px;margin-bottom:22px;}
+.sub b{color:#2D3436;font-weight:600;}
 
 section{margin-top:64px;padding-top:36px;border-top:1px solid #E8E4DF;}
-section:first-of-type{border-top:none;}
 
 .rail{display:flex;gap:36px;flex-wrap:wrap;align-items:flex-start;}
 .framewrap{display:flex;flex-direction:column;gap:10px;}
 .framelabel{font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:#8A9099;}
+
+/* Lucide — 1.5px stroke, inherits colour. Never a unicode glyph. */
+.i{width:22px;height:22px;stroke:currentColor;stroke-width:1.5;fill:none;
+   stroke-linecap:round;stroke-linejoin:round;display:block;}
+.i.sm{width:19px;height:19px;}
+.i.xs{width:17px;height:17px;}
 
 /* ── phone ─────────────────────────────────────────────────────────── */
 .frame{
@@ -41,60 +47,32 @@ section:first-of-type{border-top:none;}
   display:flex;align-items:center;justify-content:space-between;
   padding:0 20px;font-size:12px;font-weight:600;
 }
-.statusbar.on-photo{color:#fff;}
-.statusbar.on-accent{color:#fff;}
+.statusbar.light{color:#fff;}
 
-/* ── HOME: the photo is the whole screen ───────────────────────────── */
+/* ── HOME ──────────────────────────────────────────────────────────── */
 .home{position:absolute;inset:0;display:flex;flex-direction:column;}
 .home .photo{position:absolute;inset:0;background-size:cover;background-position:center;}
 .home.eb .photo{background-image:var(--hero-eb);}
 .home.cvy .photo{background-image:var(--hero-cvy);}
-/* One even wash across the WHOLE frame, plus a deeper foot so type stays legible.
-   No ramp that terminates mid-picture — that edge is what read as a smudge. */
-.home .veil{position:absolute;inset:0;background:rgba(20,18,17,.34);}
-.home .foot{position:absolute;left:0;right:0;bottom:0;height:62%;
-  background:linear-gradient(to bottom,rgba(20,18,17,0) 0%,rgba(20,18,17,.55) 55%,rgba(20,18,17,.82) 100%);}
+.home .veil{position:absolute;inset:0;background:rgba(22,20,19,.40);}
+.home .foot{position:absolute;left:0;right:0;bottom:0;height:46%;
+  background:linear-gradient(to bottom,rgba(22,20,19,0) 0%,rgba(22,20,19,.38) 60%,rgba(22,20,19,.62) 100%);}
 
 .home .chrome{position:relative;z-index:20;display:flex;align-items:center;justify-content:space-between;
   padding:46px 18px 0;color:#fff;}
-.glyph{width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:17px;opacity:.94;}
 
-.home .body{position:relative;z-index:20;margin-top:auto;padding:0 20px 14px;color:#fff;}
-.greet{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:31px;letter-spacing:-.02em;line-height:1.1;}
-.greet-sub{font-size:13.5px;opacity:.9;margin-top:5px;}
+.home .body{position:relative;z-index:20;margin-top:auto;padding:0 22px 22px;color:#fff;}
+.greet{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:29px;letter-spacing:-.02em;line-height:1.12;}
+.greet-sub{font-size:13.5px;opacity:.88;margin-top:6px;}
 
-/* upcoming, over the photo */
-.upcoming{margin-top:20px;display:flex;flex-direction:column;gap:8px;}
-.up-label{font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;opacity:.78;margin-bottom:2px;}
-.up-card{
-  background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.24);
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  border-radius:10px;padding:11px 13px;display:flex;justify-content:space-between;align-items:center;gap:10px;
-}
-.up-when{font-family:'Fraunces',Georgia,serif;font-size:14px;font-weight:500;}
-.up-name{font-size:13px;font-weight:600;margin-top:2px;}
-.up-meta{font-size:11.5px;opacity:.82;margin-top:1px;}
-.up-tag{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;
-  border:1px solid rgba(255,255,255,.45);border-radius:99px;padding:3px 8px;white-space:nowrap;}
+/* THE MENU — three choices joined by hairlines, so they read as one object. */
+.menu{position:relative;z-index:20;display:flex;border-top:1px solid rgba(255,255,255,.28);
+  padding:15px 0 24px;color:#fff;}
+.choice{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;
+  font-size:10px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;}
+.choice + .choice{border-left:1px solid rgba(255,255,255,.22);}
 
-.cta{display:block;text-align:center;border-radius:8px;padding:13px;font-size:14.5px;font-weight:600;margin-top:18px;}
-.cta.solid{color:#fff;}
-.cta.ghost{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.4);color:#fff;
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
-
-/* tab bar over the photo */
-.tabs{position:relative;z-index:20;display:flex;border-top:1px solid rgba(255,255,255,.22);
-  padding:9px 0 20px;color:#fff;}
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:9.5px;font-weight:600;
-  letter-spacing:.09em;text-transform:uppercase;opacity:.62;}
-.tab.on{opacity:1;}
-.tab .ico{font-size:17px;}
-
-/* solid tab bar, for white screens */
-.tabs.solid{background:#fff;border-top:1px solid #E8E4DF;color:#8A9099;}
-.tabs.solid .tab.on{color:var(--sc);opacity:1;}
-
-/* ── SCHEDULE: the studio's colour owns the header ─────────────────── */
+/* ── SCHEDULE ──────────────────────────────────────────────────────── */
 .sched-head{background:var(--sc);color:#fff;padding:44px 0 0;flex-shrink:0;}
 .sched-top{display:flex;align-items:center;justify-content:space-between;padding:0 18px 12px;}
 .sched-month{font-family:'Fraunces',Georgia,serif;font-size:16px;font-weight:500;}
@@ -107,23 +85,28 @@ section:first-of-type{border-top:none;}
 .day.none{opacity:.38;}
 
 .list{flex:1;overflow:hidden;background:#fff;}
-.row{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid #EEEAE5;}
-.row .when{width:66px;flex-shrink:0;}
-.row .t{font-family:'Fraunces',Georgia,serif;font-size:15px;font-weight:500;line-height:1.15;}
-.row .dur{font-size:10.5px;color:#8A9099;margin-top:2px;}
+
+/* TOP-ALIGNED. The time's cap-height sits on the class name's, whatever the name does below. */
+.row{display:flex;align-items:flex-start;gap:11px;padding:14px 16px;border-bottom:1px solid #EEEAE5;}
+.row .when{width:74px;flex-shrink:0;}
+.row .t{font-family:'Fraunces',Georgia,serif;font-size:15px;font-weight:500;line-height:1.25;white-space:nowrap;}
+.row .dur{font-size:10.5px;color:#8A9099;margin-top:3px;}
 .row .mid{flex:1;min-width:0;}
 .row .nm{font-size:13.5px;font-weight:600;line-height:1.25;}
-.row .who{font-size:11.5px;color:#8A9099;margin-top:2px;}
-.row .price{font-size:12px;color:#5D6469;margin-top:3px;}
-.book{border:none;border-radius:7px;padding:9px 15px;font-family:'DM Sans',sans-serif;
+.row .who{font-size:11.5px;color:#8A9099;margin-top:3px;}
+.row .price{font-size:12px;color:#5D6469;margin-top:2px;}
+.book{border:none;border-radius:7px;padding:8px 14px;font-family:'DM Sans',sans-serif;
   font-size:12.5px;font-weight:600;color:#fff;background:var(--sc);flex-shrink:0;}
 .book.covered{background:#fff;color:var(--sc);border:1px solid var(--sc);}
 .book.full{background:#F1EEEA;color:#8A9099;}
 
-.daylabel{font-size:10.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
-  color:#8A9099;padding:14px 18px 7px;background:#FAF8F6;border-bottom:1px solid #EEEAE5;}
+/* solid tab bar for the white screens */
+.tabs{display:flex;background:#fff;border-top:1px solid #E8E4DF;padding:9px 0 20px;color:#A8A29C;}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:9.5px;font-weight:600;
+  letter-spacing:.09em;text-transform:uppercase;}
+.tab.on{color:var(--sc);}
 
-/* ── ACCOUNT ───────────────────────────────────────────────────────── */
+/* ── ACCOUNT / DRAWER ──────────────────────────────────────────────── */
 .acct{flex:1;padding:46px 20px 0;overflow:hidden;}
 .acct-name{font-family:'Fraunces',Georgia,serif;font-size:25px;font-weight:500;letter-spacing:-.02em;}
 .acct-mail{font-size:12.5px;color:#8A9099;margin-top:3px;}
@@ -134,14 +117,13 @@ section:first-of-type{border-top:none;}
 .money-v{font-family:'Fraunces',Georgia,serif;font-size:19px;font-weight:500;color:var(--sc);}
 .money-v.sm{font-size:14px;}
 .navlist{margin-top:22px;}
-.navrow{display:flex;align-items:center;gap:13px;padding:13px 2px;border-bottom:1px solid #EEEAE5;font-size:14.5px;}
-.navrow .ico{width:20px;text-align:center;font-size:15px;color:var(--sc);}
-.navrow .chev{margin-left:auto;color:#C9C4BE;font-size:15px;}
+.navrow{display:flex;align-items:center;gap:14px;padding:13px 2px;border-bottom:1px solid #EEEAE5;font-size:14.5px;}
+.navrow .ic{color:#8A9099;display:flex;}
+.navrow .chev{margin-left:auto;color:#C9C4BE;display:flex;}
 
 .caption{font-size:12.5px;line-height:1.65;color:#5D6469;max-width:300px;margin-top:6px;}
 .caption b{color:#2D3436;font-weight:600;}
 
-/* notes */
 .note{max-width:380px;font-size:13.5px;line-height:1.7;color:#5D6469;}
 .note h3{font-family:'Fraunces',Georgia,serif;font-size:17px;font-weight:500;color:#2D3436;margin-bottom:8px;}
 .note p{margin-bottom:12px;}
@@ -149,7 +131,7 @@ section:first-of-type{border-top:none;}
 .note ul{padding-left:17px;margin-bottom:12px;}
 .note li{margin-bottom:8px;}
 
-.was{background:#FAF8F6;border:1px solid #E8E4DF;border-radius:10px;padding:18px 20px;max-width:820px;margin-bottom:26px;}
+.was{background:#FAF8F6;border:1px solid #E8E4DF;border-radius:10px;padding:18px 20px;max-width:860px;margin-top:26px;}
 .was h3{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#C0675A;margin-bottom:9px;}
 .was ul{padding-left:18px;font-size:13.5px;line-height:1.7;color:#5D6469;}
 .was li{margin-bottom:6px;}
@@ -157,33 +139,53 @@ section:first-of-type{border-top:none;}
 </style>
 </head>
 <body>
+
+<!-- Lucide 24×24, stroke 1.5. Defined once, referenced everywhere. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="ic-menu"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></g>
+    <g id="ic-bag"><path d="M16 10a4 4 0 0 1-8 0"/><path d="M3.1 6h17.8"/><path d="M3.4 5.5a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.7a2 2 0 0 0-.4-1.2l-2-2.7A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z"/></g>
+    <g id="ic-calendar"><path d="M8 2v4"/><path d="M16 2v4"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></g>
+    <g id="ic-calendar-check"><path d="M8 2v4"/><path d="M16 2v4"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></g>
+    <g id="ic-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></g>
+    <g id="ic-home"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .7-1.5l7-6a2 2 0 0 1 2.6 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></g>
+    <g id="ic-box"><path d="M21 8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></g>
+    <g id="ic-card"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></g>
+    <g id="ic-mail"><path d="m22 7-9 5.7a2 2 0 0 1-2 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></g>
+    <g id="ic-gift"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C10 3 12 5.5 12 8c0-2.5 2-5 4.5-5a2.5 2.5 0 0 1 0 5"/></g>
+    <g id="ic-chev-r"><path d="m9 18 6-6-6-6"/></g>
+    <g id="ic-chev-l"><path d="m15 18-6-6 6-6"/></g>
+    <g id="ic-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></g>
+  </defs>
+</svg>
+
 <div class="page">
 
 <h1>The studio's app, not Dibs's</h1>
 <p class="lede">
-  A revision after seeing it on a device. The old app got two big things right that this one lost:
-  <b>the photograph was the whole screen</b>, and <b>the studio's colour was structural</b> rather than
-  a garnish. Everything below follows from putting those back.
+  Second pass. Home is stripped back to <b>a photograph and three choices</b> — the thing the old app got
+  right and this one had buried under seven. Icons are real <b>Lucide</b> at 1.5px stroke, and schedule rows
+  align to the top so a time never floats beside a two-line class name.
 </p>
 
-<div class="was" style="margin-top:26px;">
-  <h3>What went wrong</h3>
+<div class="was">
+  <h3>Fixed since the last pass</h3>
   <ul>
-    <li><b>The hero band cut the picture in half.</b> A 360px band over a full-screen crop sliced the dancer through the arm and face. The old app never had this problem because the photo <em>was</em> the screen.</li>
-    <li><b>The scrim read as a grey smudge.</b> A gradient that ramps to full strength and stops mid-photograph draws a line across it. On a high-key image it is the first thing you see.</li>
-    <li><b>Two real layout bugs on Schedule</b> — a ~400px void (a horizontal scroller with no height constraint expands to fill a column), and a day strip that runs <code>…18 · 19 · 2 · 8…</code> across a month boundary with no month label.</li>
-    <li><b>No tab bar</b>, so the only way in was a small "SIGN IN" over the photo. The old app's three tabs are why it was easy to navigate.</li>
-    <li><b>"Welcome"</b> where the old app said "Hi Alicia! Welcome to Everyday Ballet."</li>
+    <li><b>Home was doing too much.</b> Greeting, subtitle, section label, two bordered cards, a CTA and four tabs — seven things on one photograph, all competing with it. Now: greeting, subtitle, three choices.</li>
+    <li><b>Today's schedule is gone from Home.</b> Someone opening a booking app already knows what they came for; a day's classes on the way in is a second schedule to scroll past.</li>
+    <li><b>The icons were unicode glyphs</b> — <code>▤ ◇ ○ ⌂</code>. They rendered as striped rectangles and bare circles because that is what those characters are. Replaced with Lucide paths.</li>
+    <li><b>Schedule rows were centre-aligned</b>, so a time drifted down beside a name that wrapped to three lines. Now top-aligned, and the time no longer breaks across two lines.</li>
   </ul>
 </div>
 
 <!-- ══════════════ HOME ══════════════ -->
 <section>
-  <h2>Home — the photograph is the screen</h2>
+  <h2>Home — a photograph and three choices</h2>
   <p class="sub">
-    Full bleed, edge to edge, nothing cropping it. An even wash across the whole frame carries white type
-    without ever drawing an edge, and the foot deepens only where words sit. The client's own classes come
-    forward — that is what they open the app for.
+    Nothing else. Roughly <b>three quarters of the screen is untouched photograph</b>, which is what lets the
+    picture and the menu read as one object rather than two competing ones. The three choices are joined by
+    hairlines so they are a single menu, not a strip of buttons — and there is no "Home" among them, because
+    the photograph <em>is</em> home.
   </p>
 
   <div class="rail">
@@ -191,105 +193,102 @@ section:first-of-type{border-top:none;}
     <div class="framewrap">
       <div class="framelabel">Everyday Ballet · signed in</div>
       <div class="frame dark" style="--sc:#F986A5;">
-        <div class="statusbar on-photo"><span>9:41</span><span>▪ ▪ ▮</span></div>
+        <div class="statusbar light"><span>9:41</span><span>▪ ▪ ▮</span></div>
         <div class="home eb">
           <div class="photo"></div><div class="veil"></div><div class="foot"></div>
           <div class="chrome">
-            <div class="glyph">☰</div>
-            <div class="glyph">⌕</div>
+            <svg class="i"><use href="#ic-menu"/></svg>
+            <svg class="i"><use href="#ic-bag"/></svg>
           </div>
           <div class="body">
             <div class="greet">Hi Alicia!</div>
             <div class="greet-sub">Welcome to Everyday Ballet</div>
-
-            <div class="upcoming">
-              <div class="up-label">Your next class</div>
-              <div class="up-card">
-                <div>
-                  <div class="up-when">Tomorrow · 12:00 PM</div>
-                  <div class="up-name">STUDIO Beginner BASIC Ballet</div>
-                  <div class="up-meta">tiekka tellier · 60 min</div>
-                </div>
-                <div class="up-tag">Booked</div>
-              </div>
-              <div class="up-card">
-                <div>
-                  <div class="up-when">Mon 10 · 6:30 PM</div>
-                  <div class="up-name">STUDIO Mixed Intermediate</div>
-                  <div class="up-meta">tiekka tellier · 90 min</div>
-                </div>
-                <div class="up-tag">Booked</div>
-              </div>
-            </div>
           </div>
-          <div class="tabs">
-            <div class="tab on"><span class="ico">⌂</span>Home</div>
-            <div class="tab"><span class="ico">▤</span>Book</div>
-            <div class="tab"><span class="ico">◇</span>Packages</div>
-            <div class="tab"><span class="ico">○</span>Account</div>
+          <div class="menu">
+            <div class="choice"><svg class="i"><use href="#ic-calendar"/></svg>Book</div>
+            <div class="choice"><svg class="i"><use href="#ic-calendar-check"/></svg>My Calendar</div>
+            <div class="choice"><svg class="i"><use href="#ic-user"/></svg>Account</div>
           </div>
         </div>
       </div>
-      <p class="caption">The dancer's arm and face are <b>whole</b>. Nothing is competing with her.</p>
+      <p class="caption">Her arm, her face and the whole arch of her back are <b>uninterrupted</b>.</p>
     </div>
 
     <div class="framewrap">
       <div class="framelabel">Carlsbad Village Yoga · signed out</div>
       <div class="frame dark" style="--sc:#356280;">
-        <div class="statusbar on-photo"><span>9:41</span><span>▪ ▪ ▮</span></div>
+        <div class="statusbar light"><span>9:41</span><span>▪ ▪ ▮</span></div>
         <div class="home cvy">
           <div class="photo"></div><div class="veil"></div><div class="foot"></div>
           <div class="chrome">
-            <div class="glyph">☰</div>
-            <div class="glyph">⌕</div>
+            <svg class="i"><use href="#ic-menu"/></svg>
+            <svg class="i"><use href="#ic-bag"/></svg>
           </div>
           <div class="body">
-            <div class="greet">Carlsbad Village Yoga</div>
-            <div class="greet-sub">Friday, August 7</div>
-
-            <div class="upcoming">
-              <div class="up-label">Today at the studio</div>
-              <div class="up-card">
-                <div>
-                  <div class="up-when">4:30 PM</div>
-                  <div class="up-name">Vinyasa Flow</div>
-                  <div class="up-meta">Emma Burke · 60 min</div>
-                </div>
-                <div class="up-tag">3 left</div>
-              </div>
-            </div>
-
-            <a class="cta ghost">Sign in</a>
+            <div class="greet">Welcome</div>
+            <div class="greet-sub">Carlsbad Village Yoga</div>
           </div>
-          <div class="tabs">
-            <div class="tab on"><span class="ico">⌂</span>Home</div>
-            <div class="tab"><span class="ico">▤</span>Book</div>
-            <div class="tab"><span class="ico">◇</span>Packages</div>
-            <div class="tab"><span class="ico">○</span>Account</div>
+          <div class="menu">
+            <div class="choice"><svg class="i"><use href="#ic-calendar"/></svg>Book</div>
+            <div class="choice"><svg class="i"><use href="#ic-calendar-check"/></svg>My Calendar</div>
+            <div class="choice"><svg class="i"><use href="#ic-user"/></svg>Sign In</div>
           </div>
         </div>
       </div>
-      <p class="caption">A guest gets the studio's name and today's classes — never an empty personal panel.</p>
+      <p class="caption">Signed out, one word changes. Browsing still works; the third choice becomes the way in.</p>
+    </div>
+
+    <div class="framewrap">
+      <div class="framelabel">The drawer — everything else</div>
+      <div class="frame" style="--sc:#F986A5;">
+        <div class="statusbar"><span>9:41</span><span>▪ ▪ ▮</span></div>
+        <div class="acct" style="padding-top:44px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div>
+              <div class="acct-name" style="font-size:22px;">Alicia Ulin</div>
+              <div class="acct-mail">Everyday Ballet</div>
+            </div>
+            <svg class="i sm" style="color:#8A9099;"><use href="#ic-x"/></svg>
+          </div>
+
+          <div class="money" style="margin-top:18px;">
+            <div class="money-row">
+              <span class="money-k">Credit balance</span>
+              <span class="money-v">$0.00</span>
+            </div>
+            <div class="money-row">
+              <span class="money-k">10-class package</span>
+              <span class="money-v sm">9 left</span>
+            </div>
+          </div>
+
+          <div class="navlist" style="margin-top:20px;">
+            <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-calendar"/></svg></span>Book<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
+            <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-calendar-check"/></svg></span>My calendar<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
+            <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-box"/></svg></span>Packages<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
+            <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-user"/></svg></span>Account<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
+            <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-gift"/></svg></span>Refer a friend<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
+            <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-mail"/></svg></span>Contact the studio<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
+          </div>
+        </div>
+      </div>
+      <p class="caption">The hamburger. Everything the three choices leave out lives here.</p>
     </div>
 
     <div class="note">
-      <h3>Why this fixes it</h3>
+      <h3>What I removed, and why</h3>
       <p>
-        <b>The photo is never resized or cropped by a panel.</b> The single reason the old app's home always
-        looked right is that nothing sat on top of the image except type. Whatever the studio supplies, it is
-        shown whole.
+        <b>Today's schedule.</b> Your call, and the right one — it was a second schedule in front of the real
+        one.
       </p>
       <p>
-        <b>One even wash, not a ramp.</b> A gradient that reaches full strength partway down draws a horizontal
-        edge across the picture. A flat 34% veil over the entire frame plus a deeper foot has no edge to see.
+        <b>The upcoming-class cards.</b> The idea was sound, the execution was not: bordered boxes on a
+        photograph always fight it. "My Calendar" answers "when am I next in?" one tap away, which is where
+        that question belongs.
       </p>
       <p>
-        <b>The upcoming classes are the point.</b> A member opens this app to answer "when am I next in?" —
-        so that is what is on screen, in glass cards that sit on the photograph without hiding it.
-      </p>
-      <p>
-        <b>Four tabs, always there.</b> Packages is greyed until P4 ships rather than absent, so the bar
-        does not change shape later.
+        <b>The Home tab.</b> Three choices, joined by hairlines. A four-tab bar makes the photo a backdrop
+        behind an app; a menu makes it the surface the app sits on.
       </p>
     </div>
   </div>
@@ -299,9 +298,9 @@ section:first-of-type{border-top:none;}
 <section>
   <h2>Schedule — the studio's colour, structurally</h2>
   <p class="sub">
-    The old app's coloured header block is the move worth keeping: it tells you whose app you are in without
-    a logo, and it gives the day strip somewhere to live. The month label is not decoration — it is what
-    stops <code>19 · 2</code> reading as a bug.
+    The coloured header block is the move worth keeping from the old app: it says whose app you are in
+    without a logo, and it gives the day strip somewhere to live. <b>Rows align to the top</b> — the time's
+    cap-height sits level with the class name's, whatever the name does below it.
   </p>
 
   <div class="rail">
@@ -309,12 +308,12 @@ section:first-of-type{border-top:none;}
     <div class="framewrap">
       <div class="framelabel">Everyday Ballet</div>
       <div class="frame" style="--sc:#F986A5;">
-        <div class="statusbar on-accent"><span>9:41</span><span>▪ ▪ ▮</span></div>
+        <div class="statusbar light"><span>9:41</span><span>▪ ▪ ▮</span></div>
         <div class="sched-head">
           <div class="sched-top">
-            <div class="glyph">‹</div>
+            <svg class="i sm"><use href="#ic-chev-l"/></svg>
             <div class="sched-month">August 2026</div>
-            <div class="glyph">⌕</div>
+            <svg class="i sm"><use href="#ic-bag"/></svg>
           </div>
           <div class="strip">
             <div class="day on"><span class="dow">FRI</span><span class="dnum">7</span></div>
@@ -328,7 +327,7 @@ section:first-of-type{border-top:none;}
         </div>
         <div class="list">
           <div class="row">
-            <div class="when"><div class="t">12:00<br>PM</div><div class="dur">60 min</div></div>
+            <div class="when"><div class="t">12:00 PM</div><div class="dur">60 min</div></div>
             <div class="mid">
               <div class="nm">STUDIO Beginner BASIC Ballet</div>
               <div class="who">tiekka tellier</div>
@@ -337,7 +336,7 @@ section:first-of-type{border-top:none;}
             <button class="book">Book</button>
           </div>
           <div class="row">
-            <div class="when"><div class="t">12:05<br>PM</div><div class="dur">55 min</div></div>
+            <div class="when"><div class="t">12:05 PM</div><div class="dur">55 min</div></div>
             <div class="mid">
               <div class="nm">VIRTUAL Beginner BASIC Ballet</div>
               <div class="who">tiekka tellier</div>
@@ -346,7 +345,7 @@ section:first-of-type{border-top:none;}
             <button class="book">Book</button>
           </div>
           <div class="row">
-            <div class="when"><div class="t">6:30<br>PM</div><div class="dur">90 min</div></div>
+            <div class="when"><div class="t">6:30 PM</div><div class="dur">90 min</div></div>
             <div class="mid">
               <div class="nm">STUDIO Mixed Intermediate</div>
               <div class="who">tiekka tellier</div>
@@ -355,7 +354,7 @@ section:first-of-type{border-top:none;}
             <button class="book covered">Book</button>
           </div>
           <div class="row">
-            <div class="when"><div class="t">7:00<br>PM</div><div class="dur">60 min</div></div>
+            <div class="when"><div class="t">7:00 PM</div><div class="dur">60 min</div></div>
             <div class="mid">
               <div class="nm">STUDIO Advanced Ballet</div>
               <div class="who">Shoshana Mozlin</div>
@@ -364,25 +363,25 @@ section:first-of-type{border-top:none;}
             <button class="book full">Waitlist</button>
           </div>
         </div>
-        <div class="tabs solid">
-          <div class="tab"><span class="ico">⌂</span>Home</div>
-          <div class="tab on"><span class="ico">▤</span>Book</div>
-          <div class="tab"><span class="ico">◇</span>Packages</div>
-          <div class="tab"><span class="ico">○</span>Account</div>
+        <div class="tabs">
+          <div class="tab"><svg class="i sm"><use href="#ic-home"/></svg>Home</div>
+          <div class="tab on"><svg class="i sm"><use href="#ic-calendar"/></svg>Book</div>
+          <div class="tab"><svg class="i sm"><use href="#ic-calendar-check"/></svg>Calendar</div>
+          <div class="tab"><svg class="i sm"><use href="#ic-user"/></svg>Account</div>
         </div>
       </div>
-      <p class="caption">A <b>Book</b> button per row — one tap, not two. Days with nothing on them stay in the strip, dimmed, so the dates never skip.</p>
+      <p class="caption">Times on one line. Days with nothing on them stay in the strip, dimmed, so the dates never skip.</p>
     </div>
 
     <div class="framewrap">
       <div class="framelabel">Carlsbad Village Yoga · same code</div>
       <div class="frame" style="--sc:#356280;">
-        <div class="statusbar on-accent"><span>9:41</span><span>▪ ▪ ▮</span></div>
+        <div class="statusbar light"><span>9:41</span><span>▪ ▪ ▮</span></div>
         <div class="sched-head">
           <div class="sched-top">
-            <div class="glyph">‹</div>
+            <svg class="i sm"><use href="#ic-chev-l"/></svg>
             <div class="sched-month">August 2026</div>
-            <div class="glyph">⌕</div>
+            <svg class="i sm"><use href="#ic-bag"/></svg>
           </div>
           <div class="strip">
             <div class="day"><span class="dow">THU</span><span class="dnum">6</span></div>
@@ -396,7 +395,7 @@ section:first-of-type{border-top:none;}
         </div>
         <div class="list">
           <div class="row">
-            <div class="when"><div class="t">9:00<br>AM</div><div class="dur">60 min</div></div>
+            <div class="when"><div class="t">9:00 AM</div><div class="dur">60 min</div></div>
             <div class="mid">
               <div class="nm">Sculpt Yoga</div>
               <div class="who">Fiona Serebriany</div>
@@ -405,7 +404,7 @@ section:first-of-type{border-top:none;}
             <button class="book">Book</button>
           </div>
           <div class="row">
-            <div class="when"><div class="t">10:30<br>AM</div><div class="dur">60 min</div></div>
+            <div class="when"><div class="t">10:30 AM</div><div class="dur">60 min</div></div>
             <div class="mid">
               <div class="nm">Gentle Yoga Flow</div>
               <div class="who">Machel Shull</div>
@@ -414,7 +413,7 @@ section:first-of-type{border-top:none;}
             <button class="book">Book</button>
           </div>
           <div class="row">
-            <div class="when"><div class="t">12:00<br>PM</div><div class="dur">60 min</div></div>
+            <div class="when"><div class="t">12:00 PM</div><div class="dur">60 min</div></div>
             <div class="mid">
               <div class="nm">Level 1 &amp; 2 Vinyasa</div>
               <div class="who">Jennifer Oehlert</div>
@@ -423,7 +422,7 @@ section:first-of-type{border-top:none;}
             <button class="book">Book</button>
           </div>
           <div class="row">
-            <div class="when"><div class="t">4:30<br>PM</div><div class="dur">60 min</div></div>
+            <div class="when"><div class="t">4:30 PM</div><div class="dur">60 min</div></div>
             <div class="mid">
               <div class="nm">Vinyasa Yoga, Open Level</div>
               <div class="who">Emma Burke</div>
@@ -432,36 +431,30 @@ section:first-of-type{border-top:none;}
             <button class="book">Book</button>
           </div>
         </div>
-        <div class="tabs solid">
-          <div class="tab"><span class="ico">⌂</span>Home</div>
-          <div class="tab on"><span class="ico">▤</span>Book</div>
-          <div class="tab"><span class="ico">◇</span>Packages</div>
-          <div class="tab"><span class="ico">○</span>Account</div>
+        <div class="tabs">
+          <div class="tab"><svg class="i sm"><use href="#ic-home"/></svg>Home</div>
+          <div class="tab on"><svg class="i sm"><use href="#ic-calendar"/></svg>Book</div>
+          <div class="tab"><svg class="i sm"><use href="#ic-calendar-check"/></svg>Calendar</div>
+          <div class="tab"><svg class="i sm"><use href="#ic-user"/></svg>Account</div>
         </div>
       </div>
       <p class="caption">One codebase. The only thing that changed is <code>accentColor</code>.</p>
     </div>
 
     <div class="note">
-      <h3>What the header earns</h3>
+      <h3>Open question on the tab bar</h3>
       <p>
-        <b>It says whose app this is</b> without a logo lockup taking up room. A pink header and a
-        slate-blue header are unmistakably two different studios running the same software — which is the
-        whole promise of a white-label build.
+        Home has three choices and no tab bar. These inner screens show four tabs, which is <b>one navigation
+        model too many.</b> Two ways to resolve it, and I would take the second:
       </p>
-      <p>
-        <b>The month label fixes the strip.</b> On device it currently reads
-        <code>…18 · 19 · 2 · 8 · 9</code>, which looks broken and is not — those are September dates.
-        Naming the month, and keeping empty days present but dimmed, makes the sequence legible.
-      </p>
-      <p>
-        <b>The list is dense on purpose.</b> A schedule is scanned, not read. Time on the left as a fixed
-        rail, name bold, everything else quiet, and the action always in the same place on the right.
-      </p>
-      <p>
-        <b>"Included" replaces a price</b> when a pass covers the class — but only once P2's pass data and
-        the coverage rule agree, which they now do. That label is the thing the widget got wrong for months.
-      </p>
+      <ul>
+        <li><b>Keep both</b> — Home is a launcher, inner screens get tabs. Familiar, but the bar appearing
+          after Home is a seam.</li>
+        <li><b>No tab bar anywhere.</b> Home's three choices push a screen with a back chevron, and the
+          hamburger drawer is the way to jump sideways. This is exactly what the old app did, and it is why
+          Home felt uncluttered — nothing persistent competing for the bottom of the screen.</li>
+      </ul>
+      <p>Say which and I will make the inner screens match.</p>
     </div>
   </div>
 </section>
@@ -470,8 +463,8 @@ section:first-of-type{border-top:none;}
 <section>
   <h2>Account — money first</h2>
   <p class="sub">
-    The old app put Credit Balance and Current Package at the very top, above navigation. That is right:
-    it is what people open the account for, and it answers "can I book?" before they have to go looking.
+    Credit balance and passes above navigation, the way the old app had it. It is what people open the
+    account for, and it answers "can I book?" before they go looking.
   </p>
 
   <div class="rail">
@@ -499,51 +492,38 @@ section:first-of-type{border-top:none;}
           </div>
 
           <div class="navlist">
-            <div class="navrow"><span class="ico">▤</span>My classes<span class="chev">›</span></div>
-            <div class="navrow"><span class="ico">◇</span>Packages<span class="chev">›</span></div>
-            <div class="navrow"><span class="ico">▭</span>Payment methods<span class="chev">›</span></div>
-            <div class="navrow"><span class="ico">○</span>Profile<span class="chev">›</span></div>
-            <div class="navrow"><span class="ico">✉</span>Contact the studio<span class="chev">›</span></div>
+            <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-calendar-check"/></svg></span>My classes<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
+            <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-box"/></svg></span>Packages<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
+            <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-card"/></svg></span>Payment methods<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
+            <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-user"/></svg></span>Profile<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
+            <div class="navrow"><span class="ic"><svg class="i sm"><use href="#ic-mail"/></svg></span>Contact the studio<span class="chev"><svg class="i xs"><use href="#ic-chev-r"/></svg></span></div>
           </div>
         </div>
-        <div class="tabs solid">
-          <div class="tab"><span class="ico">⌂</span>Home</div>
-          <div class="tab"><span class="ico">▤</span>Book</div>
-          <div class="tab"><span class="ico">◇</span>Packages</div>
-          <div class="tab on"><span class="ico">○</span>Account</div>
+        <div class="tabs">
+          <div class="tab"><svg class="i sm"><use href="#ic-home"/></svg>Home</div>
+          <div class="tab"><svg class="i sm"><use href="#ic-calendar"/></svg>Book</div>
+          <div class="tab"><svg class="i sm"><use href="#ic-calendar-check"/></svg>Calendar</div>
+          <div class="tab on"><svg class="i sm"><use href="#ic-user"/></svg>Account</div>
         </div>
       </div>
-      <p class="caption">Real data — this is what userid 2502 actually holds at studio 88 on staging.</p>
+      <p class="caption">Real data — what userid 2502 actually holds at studio 88 on staging.</p>
     </div>
 
     <div class="note">
       <h3>Changes from what is built</h3>
       <p>
-        <b>Passes move up here from a separate wallet.</b> Two taps to see whether you have a class left is
-        one tap too many. The wallet screen stays for cards and history; the balances live where you land.
+        <b>Passes move up here from the wallet.</b> Two taps to see whether you have a class left is one too
+        many. The wallet keeps cards and history; the balances live where you land.
       </p>
       <p>
-        <b>The numerals are the studio's colour.</b> In an app whose whole personality is one colour,
-        the money is the right place to spend it.
+        <b>The numerals are the studio's colour.</b> In an app whose personality is one colour, the money is
+        the right place to spend it.
       </p>
       <p>
-        <b>Still deliberately absent:</b> the journey card (needs a lifetime class count nothing returns
-        yet), referrals, and Delete account — which Apple requires before submission and which backend 7.7
-        has to build first.
+        <b>Still absent:</b> the journey card (needs a lifetime class count nothing returns yet), referrals,
+        and Delete account — which Apple requires before submission and backend 7.7 has to build first.
       </p>
     </div>
-  </div>
-</section>
-
-<section>
-  <h2>What I would change from the old app, not copy</h2>
-  <div class="note" style="max-width:820px;">
-    <ul>
-      <li><b>"Credit back +$0.00" on every row.</b> It appeared on all of them and was $0.00 every time — a column of noise that trains people to ignore the money area. Show it only when there is credit back.</li>
-      <li><b>The truncated class names</b> ("Replay BALLET DAN…", "Carlsbad Village Yoga…"). Repeating the studio's name on every row of that studio's own app costs the width the class name needed.</li>
-      <li><b>The flat colour block was heavier than it needs to be.</b> Same idea, less height, no drop shadow, and the day strip inside it rather than stacked below.</li>
-      <li><b>Fraunces for times and numerals.</b> The old app was all system sans. Keeping the serif for numbers is what stops this reading like a generic booking template — it is the one piece of the Dibs design DNA a studio app should keep.</li>
-    </ul>
   </div>
 </section>
 
