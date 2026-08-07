@@ -5,6 +5,7 @@
 export { Button, type ButtonProps, type ButtonVariant } from './Button';
 export { Card, type CardProps } from './Card';
 export { Chip, type ChipProps, StatusTag, type StatusTone } from './Chip';
+export { Icon, ICON_STROKE, type IconName, type IconProps } from './icons';
 export { Input, type InputProps } from './Input';
 export { Sheet, type SheetProps } from './Sheet';
 export {

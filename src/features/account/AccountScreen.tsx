@@ -1,163 +1,221 @@
 /**
- * The account hub. Reference mock: `design/mockups/booking-and-account.html` § "The client's
- * account", left-hand frame.
+ * The account. Approved 2026-08-07; reference mock: `design/mockups/rework.html`.
  *
- * Where a client goes to find something — so what it must never do is offer a way to somewhere
- * that does not exist. Every row here goes somewhere real; rows whose destination has not been
- * built are absent, not disabled, for the same reason the tab bar waited for its fourth tab.
+ * ── Money first ─────────────────────────────────────────────────────────────────────────────
+ * Credit balance and passes sit ABOVE the navigation, the way the old app had them. It is what
+ * people open the account for, and it answers "can I book?" before they go looking for it. The
+ * accent lands on the numerals: in an app whose whole personality is one colour, the money is the
+ * right place to spend it.
  *
- * ── What the mock has that this does not, and why ───────────────────────────────────────────
- *  • **The "Your journey" card** (23 classes, 2 to go, member since March 2024) is the emotional
- *    object on the screen and it is deliberately missing. Nothing in P2 returns a lifetime class
- *    count or a milestone, the milestones backend is unverified (§7.6 carries a STATUS UNVERIFIED
- *    banner in the shared CLAUDE.md), and a proud number that is wrong is worse than no number.
- *    It arrives with P6.
- *  • **"Give $10, get $10"** needs the referral endpoints — also later.
- *  • **"Your classes"** needs a bookings list screen; Home shows the next one today.
- *  • **"Delete account"** is REQUIRED by Apple for any app with sign-up and is backend item 7.7.
- *    It is a release gate, recorded in EXECUTION_STATE.md. It is not stubbed here because a
- *    delete-account row that does not delete the account is the worst possible version of it.
+ * Passes moved up here from the wallet. Two taps to see whether you have a class left is one too
+ * many; the wallet keeps cards and history.
  *
- * Presentational: every action is a prop.
+ * A row that leads nowhere is worse than a row that is absent, so the caller passes only the rows
+ * whose destinations exist. There is no tab bar — a back chevron returns, the drawer moves
+ * sideways.
  */
 import { Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Text } from '@/components';
+import { Icon, Skeleton, Text, type IconName } from '@/components';
 import { useTheme } from '@/theme/ThemeProvider';
 
 export interface AccountRow {
   label: string;
-  /** Rendered under the label. Use it to say what the row holds, not to explain the obvious. */
+  icon: IconName;
+  /** Rendered under the label. Says what the row holds, never what the label already says. */
   detail?: string;
   onPress: () => void;
   tone?: 'default' | 'danger';
 }
 
-function Row({ row, isLast }: { row: AccountRow; isLast: boolean }) {
-  const theme = useTheme();
-  return (
-    <>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={row.detail ? `${row.label}. ${row.detail}` : row.label}
-        onPress={row.onPress}
-        style={({ pressed }) => ({
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: theme.spacing.md,
-          minHeight: theme.minTapTarget,
-          paddingVertical: theme.spacing.md,
-          opacity: pressed ? 0.6 : 1,
-        })}
-      >
-        <View style={{ gap: 2, flexShrink: 1 }}>
-          <Text variant="body" color={row.tone === 'danger' ? 'danger' : 'primary'}>
-            {row.label}
-          </Text>
-          {row.detail ? (
-            <Text variant="caption" color="tertiary">
-              {row.detail}
-            </Text>
-          ) : null}
-        </View>
-        <Text variant="secondary" color="tertiary">
-          ›
-        </Text>
-      </Pressable>
-      {/* Hairlines between rows, not a card around each one. A settings list is neither
-          interactive-as-a-block nor in need of a boundary. */}
-      {isLast ? null : <View style={{ height: 1, backgroundColor: theme.colors.border }} />}
-    </>
-  );
+export interface AccountBalance {
+  label: string;
+  /** Already formatted — this screen never does money arithmetic. */
+  value: string;
 }
 
-function RowGroup({ title, rows }: { title: string; rows: AccountRow[] }) {
+function Row({ row }: { row: AccountRow }) {
   const theme = useTheme();
-  if (rows.length === 0) return null;
   return (
-    <View>
-      <Text variant="label" color="tertiary" uppercase style={{ marginBottom: theme.spacing.sm }}>
-        {title}
-      </Text>
-      <View>
-        {rows.map((row, index) => (
-          <Row key={row.label} row={row} isLast={index === rows.length - 1} />
-        ))}
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={row.detail ? `${row.label}. ${row.detail}` : row.label}
+      onPress={row.onPress}
+      style={({ pressed }) => ({
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: theme.spacing.base,
+        minHeight: theme.minTapTarget,
+        paddingVertical: theme.spacing.md,
+        borderBottomWidth: 1,
+        borderBottomColor: theme.colors.divider,
+        opacity: pressed ? 0.55 : 1,
+      })}
+    >
+      <Icon
+        name={row.icon}
+        size={19}
+        color={row.tone === 'danger' ? theme.colors.danger : theme.colors.textTertiary}
+      />
+      <View style={{ flexShrink: 1, gap: 2 }}>
+        <Text variant="body" color={row.tone === 'danger' ? 'danger' : 'primary'}>
+          {row.label}
+        </Text>
+        {row.detail ? (
+          <Text variant="caption" color="tertiary">
+            {row.detail}
+          </Text>
+        ) : null}
       </View>
-    </View>
+      <View style={{ marginLeft: 'auto' }}>
+        <Icon name="forward" size={17} color={theme.colors.border} />
+      </View>
+    </Pressable>
   );
 }
 
 export interface AccountScreenProps {
-  /** The client's own name. Null while the Dibs identity is still resolving. */
   name: string | null;
   email: string | null;
   studioName: string;
-  accountRows: AccountRow[];
-  supportRows: AccountRow[];
+  /** Null while the wallet resolves; `[]` when there is genuinely nothing to show. */
+  balances: AccountBalance[] | null;
+  rows: AccountRow[];
   onSignOut: () => void;
   onBack: () => void;
-  /** Shown while the session is real but the Dibs identity has not landed. */
-  isResolving?: boolean;
+  onOpenMenu?: () => void;
 }
 
 export function AccountScreen({
   name,
   email,
   studioName,
-  accountRows,
-  supportRows,
+  balances,
+  rows,
   onSignOut,
   onBack,
-  isResolving = false,
+  onOpenMenu,
 }: AccountScreenProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background, paddingTop: insets.top }}>
-      <View style={{ paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.sm }}>
-        <Text
-          variant="caption"
-          color="accent"
-          onPress={onBack}
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingHorizontal: theme.spacing.base,
+          paddingTop: theme.spacing.sm,
+        }}
+      >
+        <Pressable
           accessibilityRole="button"
-          style={{ paddingVertical: theme.spacing.md }}
+          accessibilityLabel={`Back to ${studioName}`}
+          onPress={onBack}
+          hitSlop={12}
+          style={({ pressed }) => ({ padding: theme.spacing.xs, opacity: pressed ? 0.55 : 1 })}
         >
-          ← {studioName}
-        </Text>
+          <Icon name="back" size={20} color={theme.colors.textSecondary} />
+        </Pressable>
+
+        {onOpenMenu ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Menu"
+            onPress={onOpenMenu}
+            hitSlop={12}
+            style={({ pressed }) => ({ padding: theme.spacing.xs, opacity: pressed ? 0.55 : 1 })}
+          >
+            <Icon name="menu" size={20} color={theme.colors.textSecondary} />
+          </Pressable>
+        ) : null}
       </View>
 
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: theme.spacing.lg,
+          paddingTop: theme.spacing.sm,
           paddingBottom: insets.bottom + theme.spacing.xxl,
-          gap: theme.spacing.xl,
         }}
       >
-        {/* The client's own name, set as the screen title. It is the one thing on an
-            administrative screen that belongs to them. */}
-        <View style={{ gap: theme.spacing.xs }}>
-          <Text variant="display">{name ?? (isResolving ? ' ' : 'Your account')}</Text>
-          {email ? (
-            <Text variant="secondary" color="secondary">
-              {email}
-            </Text>
-          ) : null}
+        <Text variant="display">{name ?? 'Your account'}</Text>
+        {email ? (
+          <Text variant="secondary" color="tertiary" style={{ marginTop: theme.spacing.xs }}>
+            {email}
+          </Text>
+        ) : null}
+
+        {/* Null is "still asking", `[]` is "you have none" — and rendering "$0.00" for a client
+            whose balance simply has not loaded is the failure this keeps apart. */}
+        {balances === null ? (
+          <View style={{ gap: theme.spacing.sm, marginTop: theme.spacing.lg }}>
+            <Skeleton height={20} width="55%" />
+            <Skeleton height={20} width="40%" />
+          </View>
+        ) : balances.length > 0 ? (
+          <View
+            style={{
+              marginTop: theme.spacing.lg,
+              borderWidth: 1,
+              borderColor: theme.colors.border,
+              borderRadius: theme.radii.card,
+              overflow: 'hidden',
+            }}
+          >
+            {balances.map((balance, index) => (
+              <View
+                key={balance.label}
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'baseline',
+                  gap: theme.spacing.sm,
+                  padding: theme.spacing.md,
+                  borderTopWidth: index === 0 ? 0 : 1,
+                  borderTopColor: theme.colors.divider,
+                }}
+              >
+                <Text variant="caption" color="secondary" style={{ flexShrink: 1 }}>
+                  {balance.label}
+                </Text>
+                <Text variant="numeral" color="accent">
+                  {balance.value}
+                </Text>
+              </View>
+            ))}
+          </View>
+        ) : null}
+
+        <View style={{ marginTop: theme.spacing.xl }}>
+          {rows.map((row) => (
+            <Row key={row.label} row={row} />
+          ))}
         </View>
 
-        <RowGroup title="Account" rows={accountRows} />
-        <RowGroup title="Support" rows={supportRows} />
+        <View style={{ marginTop: theme.spacing.lg }}>
+          {/* Sign out is a row, not a button: it is one navigation action among others, and a
+              full-width control would carry more weight than the thing it undoes. */}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Sign out"
+            onPress={onSignOut}
+            style={({ pressed }) => ({
+              minHeight: theme.minTapTarget,
+              justifyContent: 'center',
+              paddingVertical: theme.spacing.md,
+              borderBottomWidth: 1,
+              borderBottomColor: theme.colors.divider,
+              opacity: pressed ? 0.55 : 1,
+            })}
+          >
+            <Text variant="body">Sign out</Text>
+          </Pressable>
 
-        <View>
-          {/* Sign out is a row, not a button: it is a navigation action among others, and a
-              full-width control here would carry more weight than the thing it undoes. */}
-          <Row row={{ label: 'Sign out', onPress: onSignOut }} isLast />
-          <View style={{ height: 1, backgroundColor: theme.colors.border }} />
+          {/* The only Dibs mark anywhere in a studio's app. */}
           <Text variant="caption" color="tertiary" style={{ paddingTop: theme.spacing.base }}>
-            {/* The only Dibs mark anywhere in a studio's app. */}
             Powered by Dibs
           </Text>
         </View>

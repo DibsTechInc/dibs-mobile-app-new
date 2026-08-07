@@ -1,450 +1,274 @@
 /**
- * Home — Option A, "The Cover" (approved by Alicia, 2026-08-05).
+ * Home — a photograph and three choices. Approved 2026-08-07.
+ * Reference mock: `design/mockups/rework.html`.
  *
- * The studio's photograph occupies the top ~43% of the screen with the greeting set over it in
- * Fraunces; underneath, the client's next class, then today's schedule. Reference mock:
- * `design/mockups/home-options.html#option-a`.
+ * ── What this screen is ─────────────────────────────────────────────────────────────────────
+ * The studio's photograph, full bleed, with a greeting low on the left and three ways in. That is
+ * the entire screen. It replaces a version that carried a greeting, a subtitle, a section label,
+ * two bordered cards, a CTA and a four-tab bar — seven things, all competing with the picture they
+ * sat on.
  *
- * ── The app-open sequence (Alicia, 2026-08-06) ───────────────────────────────────────────────
- * The photograph is FULL SCREEN first. Nothing else — no scrim, no greeting, no chrome. Then the
- * white panel carrying the schedule travels up from entirely below the bottom edge and comes to
- * rest at the hero band, and the composed screen assembles as it lands.
+ * Four rules hold it together. Break any and it stops being a photograph with an app on it, and
+ * becomes an app with a photograph behind it:
  *
- * The point is that the client sees the whole picture before the app arrives on top of it. This
- * is the splash resolving into Home rather than a screen fading in, and it is why the photo layer
- * is full-height and stationary while only the panel moves — resizing the photograph mid-flight
- * would make its crop crawl, which is the one thing that would give the trick away.
+ * 1. **The photo is never cropped by a panel.** No hero band, no rising white sheet. The previous
+ *    design showed the top 43% of a full-screen crop, which cut Everyday Ballet's dancer through
+ *    the arm and face. Whatever the studio supplies is shown whole.
+ * 2. **The wash is FLAT, not a ramp.** One even veil across the entire frame, plus a soft foot
+ *    under the words. A gradient that reaches full strength and then stops draws a horizontal edge
+ *    across the picture — on a high-key photograph that edge is the first thing you see, and it is
+ *    what read as a grey smudge on device.
+ * 3. **Roughly three quarters of the screen stays untouched photograph.** The greeting sits low and
+ *    small. Content creeping up the frame is what made the last version feel cluttered.
+ * 4. **The three choices are ONE menu**, joined by hairlines — not a tab bar. There is no "Home"
+ *    among them because the photograph is home.
  *
- *   t=0     full-screen photograph, settling 1.08 → 1.0. Held.
- *   t=620   the panel begins its travel; scrim, greeting and account action begin to fade in
- *   t=1180  everything at rest; the hero drifts 1.0 ↔ 1.045 on a 14s cycle from here on
- *
- * Runs ONCE PER LAUNCH, not per mount (`useAppOpenEntrance`) — Home rebuilds every time you come
- * back to it, and an entrance that replays reads as lag rather than arrival. All of it collapses
- * to nothing under the OS reduce-motion setting.
+ * Deliberately NOT here: today's classes, upcoming bookings, any CTA. Someone opening a booking
+ * app knows what they came for; a schedule on the way in is a second schedule in front of the real
+ * one (Alicia, 2026-08-07). "My Calendar" answers "when am I next in?" one tap away.
  */
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { RefreshControl, ScrollView, useWindowDimensions, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ApiError, describeApiError } from '@/api/errors';
-import {
-  BookingUnavailableNotice,
-  Card,
-  EmptyState,
-  ErrorState,
-  SkeletonList,
-  StatusTag,
-  Text,
-} from '@/components';
-import {
-  COVER_HOLD,
-  FadeRise,
-  HeroSettle,
-  SlideUp,
-  useAppOpenEntrance,
-} from '@/components/motion';
+import { ErrorState, Icon, Text, type IconName } from '@/components';
+import { FadeRise, HeroSettle, useAppOpenEntrance } from '@/components/motion';
 import { bundledHero } from '@/config/studio-assets';
-import type { HomeData } from '@/domain/home/build-home-data';
-import type { ScheduleEntry } from '@/domain/schedule/types';
-import { formatStoredTime } from '@/domain/time/studio-now';
 import { useTheme } from '@/theme/ThemeProvider';
 import { motion } from '@/theme/tokens';
 
-const HERO_HEIGHT = 360;
-
 /**
- * How much of the hero band the bottom scrim ramps across before reaching full strength.
+ * How long after mount the greeting and menu arrive.
  *
- * It reaches that strength exactly at the band's bottom edge and then HOLDS it to the foot of the
- * screen — see the note on the gradient itself.
+ * The photograph needs no entrance — it is already on screen, because the native splash shows the
+ * same file at the same crop. So the app "opening" is the words appearing on a picture that was
+ * always there, which is a quieter and more convincing arrival than anything that moves.
  */
-const SCRIM_RAMP = 0.62;
+const CHROME_DELAY = 260;
 
-/**
- * The chrome over the photo appears slightly after the panel starts moving.
- *
- * It reads as the panel bringing the composition with it. Fading it in during the held
- * full-screen moment would put a scrim and a greeting in the middle of a picture that is not yet
- * a header, which looks like a mistake rather than a layout.
- */
-const CHROME_DELAY = COVER_HOLD + 140;
-
-/** Capacity only becomes news at three or fewer. Above that, silence is more honest. */
-const SPOTS_LEFT_THRESHOLD = 3;
-
-function capacityTag(entry: ScheduleEntry) {
-  if (entry.isFull) {
-    return <StatusTag label={entry.hasWaitlist ? 'Waitlist' : 'Full'} tone="danger" />;
-  }
-  if (entry.spotsLeft !== null && entry.spotsLeft <= SPOTS_LEFT_THRESHOLD) {
-    return <StatusTag label={`${entry.spotsLeft} spot${entry.spotsLeft === 1 ? '' : 's'} left`} tone="accent" />;
-  }
-  return <StatusTag label="Open" />;
-}
-
-function ClassRow({ entry, onPress }: { entry: ScheduleEntry; onPress: () => void }) {
-  const theme = useTheme();
-  return (
-    <Card onPress={onPress} accessibilityLabel={`${formatStoredTime(entry.startsAt)} ${entry.name}`}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: theme.spacing.md }}>
-        <View style={{ gap: theme.spacing.xs, flexShrink: 1 }}>
-          {/* Stored wall-clock, printed verbatim — never device-converted. */}
-          <Text variant="numeral">{formatStoredTime(entry.startsAt)}</Text>
-          <Text variant="heading">{entry.name}</Text>
-          <Text variant="secondary" color="secondary">
-            {[entry.instructor && `with ${entry.instructor}`, entry.durationMinutes && `${entry.durationMinutes} min`]
-              .filter(Boolean)
-              .join(' · ')}
-          </Text>
-        </View>
-        <View style={{ alignItems: 'flex-end', gap: theme.spacing.xs }}>
-          {capacityTag(entry)}
-          {/* The price answers "what will this cost me" before the row is ever tapped. */}
-          {entry.price.kind === 'covered' ? (
-            <Text variant="caption" color="tertiary">
-              {entry.price.label}
-            </Text>
-          ) : entry.price.kind === 'amount' ? (
-            <Text variant="caption" color="tertiary">
-              {entry.price.amountLabel}
-            </Text>
-          ) : null}
-        </View>
-      </View>
-    </Card>
-  );
+export interface HomeChoice {
+  label: string;
+  icon: IconName;
+  onPress: () => void;
 }
 
 export interface HomeScreenProps {
-  data: HomeData | null;
-  /**
-   * The studio's name from the BUILD config.
-   *
-   * Used before — or instead of — the live one. A branded app whose first launch has no
-   * connection should still say whose app it is; it shipped knowing.
-   */
-  studioName: string;
-  isLoading?: boolean;
-  /** Set when the screen has nothing to show BECAUSE something failed, not merely no data. */
+  /** "Hi Alicia!" signed in; the studio's name for a guest. */
+  greeting: string;
+  /** "Welcome to Everyday Ballet" signed in; the date, or nothing, for a guest. */
+  subtitle?: string | null;
+  /** Exactly three. More would stop being a menu and start being a tab bar. */
+  choices: [HomeChoice, HomeChoice, HomeChoice];
+  onOpenMenu: () => void;
+  onOpenCart?: () => void;
+  /** Live hero from `get-basic-config`, used only when the build opts out of the bundled one. */
+  remoteHeroUri?: string | null;
+  /** Set when even the studio's config failed — the one case this screen cannot render. */
   error?: unknown;
-  isRefreshing?: boolean;
-  onRefresh?: () => void;
-  onOpenClass: (eventId: number) => void;
-  onSeeFullSchedule: () => void;
-  /**
-   * The one persistent affordance over the photo. Labelled "Sign in" for a guest and with the
-   * client's own name once there is a session — an unlabelled avatar circle would be a quiz, and
-   * an entry point that only exists when signed out leaves a signed-in client no way to sign out.
-   */
-  accountAction?: { label: string; onPress: () => void };
+  onRetry?: () => void;
+}
+
+function Choice({ choice, onPhoto }: { choice: HomeChoice; onPhoto: boolean }) {
+  const theme = useTheme();
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={choice.label}
+      onPress={choice.onPress}
+      style={({ pressed }) => ({
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: theme.spacing.sm,
+        paddingVertical: theme.spacing.md,
+        minHeight: theme.minTapTarget,
+        opacity: pressed ? 0.55 : 1,
+      })}
+    >
+      <Icon
+        name={choice.icon}
+        size={22}
+        color={onPhoto ? theme.colors.textInverse : theme.colors.text}
+      />
+      <Text variant="label" color={onPhoto ? 'inverse' : 'primary'} uppercase>
+        {choice.label}
+      </Text>
+    </Pressable>
+  );
 }
 
 export function HomeScreen({
-  data,
-  studioName,
-  isLoading,
+  greeting,
+  subtitle,
+  choices,
+  onOpenMenu,
+  onOpenCart,
+  remoteHeroUri,
   error,
-  isRefreshing = false,
-  onRefresh,
-  onOpenClass,
-  onSeeFullSchedule,
-  accountAction,
+  onRetry,
 }: HomeScreenProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
-  const { height: screenHeight } = useWindowDimensions();
 
   /**
-   * No photograph means no photograph TREATMENT — and no full-screen hold either.
+   * The bundled file wins over the live URL.
    *
-   * The scrim and the inverse text exist to hold white type on an image. Applied to the empty
-   * surface wash they produce a grey smear with invisible white text on it. And holding a blank
-   * rectangle for 620ms before revealing the app is not a cover, it is a stall — so with no photo
-   * the panel is simply already in place.
+   * It is the same image the native splash shows, so it is already drawn when Home's first frame
+   * lands and the handoff between them is invisible. A remote URL has to be requested, so a studio
+   * on `heroSource: 'remote'` accepts a visible cut in exchange for changing their photo without a
+   * release. See `src/config/studio-assets.ts`.
    */
-  /**
-   * The bundled hero wins over the live URL.
-   *
-   * It is the same file the native splash shows, so it is already on screen when Home's first
-   * frame draws and the handoff between them is invisible. A remote URL cannot do that — it has
-   * to be requested — so a studio on `heroSource: 'remote'` gets the live photograph and a
-   * visible cut, which is the trade they opted into. See `src/config/studio-assets.ts`.
-   */
-  const heroSource = bundledHero ?? data?.heroUri ?? null;
+  const heroSource = bundledHero ?? remoteHeroUri ?? null;
   const hasPhoto = heroSource !== null;
-  const overPhoto = hasPhoto ? ('inverse' as const) : ('secondary' as const);
 
   /**
-   * False on every mount after the first of this launch.
-   *
-   * Home remounts each time you come back from another screen, and pull-to-refresh re-renders it.
-   * An entrance that replays on return stops reading as the app arriving and starts reading as
-   * the app being slow.
+   * Runs once per LAUNCH, not per mount. Home rebuilds every time you come back to it, and an
+   * entrance that replays reads as lag rather than arrival.
    */
-  const playEntrance = useAppOpenEntrance() && hasPhoto;
+  const playEntrance = useAppOpenEntrance();
 
-  /** How far the panel has to travel: from entirely below the bottom edge to its resting place. */
-  const panelTravel = screenHeight - HERO_HEIGHT;
-
-  return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      {/*
-        THE PHOTO LAYER — full screen, and it never resizes.
-
-        Sized to the whole window rather than to the hero band so the held opening frame is the
-        entire picture. It stays exactly where it is for the rest of the session; the panel slides
-        up and covers everything below the band. Animating the photo's own height instead would
-        make its crop crawl during the reveal, which is precisely what would make the whole thing
-        look like an effect rather than like the app opening.
-
-        Consequence worth knowing: what remains visible at rest is the TOP 43% of a full-screen
-        crop. The hero photograph therefore has to be composed for the full frame, with its
-        subject in the upper portion. Another reason the landscape web banners currently coming
-        back from get-basic-config are the wrong asset.
-      */}
-      {hasPhoto ? (
-        <View
-          style={{ position: 'absolute', top: 0, left: 0, right: 0, height: screenHeight, overflow: 'hidden' }}
-          pointerEvents="none"
-        >
-          <HeroSettle animate={playEntrance} style={{ flex: 1 }}>
-            <Image
-              source={heroSource}
-              style={{ flex: 1, backgroundColor: theme.colors.surface }}
-              // Must match the splash's `resizeMode: 'cover'` in app.config.ts, or the
-              // photograph jumps at the handoff.
-              contentFit="cover"
-              contentPosition="center"
-              // No fade for a bundled image: it is already decoded and already on screen from
-              // the splash, so transitioning it in would fade the photo against itself.
-              transition={bundledHero ? 0 : motion.slow}
-              accessible={false}
-            />
-          </HeroSettle>
-
-          {/*
-            THE SCRIMS LIVE HERE, NOT IN THE BAND — and they run the FULL height of the screen.
-
-            They sit outside HeroSettle deliberately: a gradient that scales with the photograph
-            makes its edge crawl across the frame as the hero drifts.
-
-            The full height is what removes the line. Confined to the 360px band, the bottom ramp
-            reached its darkest value at y=360 and then simply stopped — a hard horizontal edge
-            where 55% black met untouched photograph. At rest that edge is hidden under the panel,
-            which is why it was invisible until the panel started travelling from below it. Now
-            the ramp holds its final value all the way to the bottom of the screen, so there is no
-            edge anywhere for the rising panel to expose; it just slides up over an evenly
-            darkened photo and covers it.
-
-            The `locations` are computed rather than fixed so the ramp lands on the band's bottom
-            edge whatever the device height.
-          */}
-          <FadeRise
-            animate={playEntrance}
-            delay={CHROME_DELAY}
-            distance={0}
-            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-          >
-            <LinearGradient
-              colors={[theme.heroScrim.topFrom, theme.heroScrim.topTo]}
-              style={{
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                top: 0,
-                height: insets.top + theme.spacing.xxl + theme.spacing.lg,
-              }}
-            />
-            <LinearGradient
-              colors={[theme.heroScrim.from, theme.heroScrim.to, theme.heroScrim.to]}
-              locations={[
-                (HERO_HEIGHT * (1 - SCRIM_RAMP)) / screenHeight,
-                HERO_HEIGHT / screenHeight,
-                1,
-              ]}
-              style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
-            />
-          </FadeRise>
-        </View>
-      ) : null}
-
-      {/*
-        THE HERO BAND — transparent. It holds the chrome at the right height and nothing else; the
-        photograph behind it belongs to the layer above.
-      */}
+  // No photograph is the only state this screen cannot carry: the white type, the veil and the
+  // hairline menu all exist to sit on an image. Without one there is nothing to sit on.
+  if (!hasPhoto) {
+    return (
       <View
         style={{
-          height: HERO_HEIGHT,
-          justifyContent: 'flex-end',
-          backgroundColor: hasPhoto ? 'transparent' : theme.colors.surface,
+          flex: 1,
+          backgroundColor: theme.colors.background,
+          justifyContent: 'center',
+          paddingTop: insets.top,
         }}
       >
-        {/* Sits in the safe area at the top right, over the photo — the only thing above the
-            greeting, and quiet enough not to compete with it. */}
-        {accountAction ? (
-          <FadeRise
-            animate={playEntrance}
-            delay={CHROME_DELAY}
-            distance={0}
-            style={{ position: 'absolute', top: insets.top + theme.spacing.sm, right: theme.spacing.lg }}
-          >
-            <Text
-              variant="label"
-              color={overPhoto}
-              uppercase
-              onPress={accountAction.onPress}
-              accessibilityRole="button"
-              // Padded well past the label's own box: 44pt of tappable area, per the template's
-              // minimum, without a visible control fighting the photograph.
-              style={{
-                opacity: hasPhoto ? 0.9 : 1,
-                paddingVertical: theme.spacing.md,
-                paddingLeft: theme.spacing.base,
-              }}
-            >
-              {accountAction.label}
-            </Text>
-          </FadeRise>
-        ) : null}
+        <ErrorState
+          message={describeApiError(error)}
+          retriable={!(error instanceof ApiError) || error.retriable}
+          onRetry={onRetry}
+        />
+      </View>
+    );
+  }
 
-        {/* Pure fade, no rise: the greeting sits directly above the panel's landing edge, and
-            anything moving there would fight the panel arriving. */}
-        <FadeRise
-          animate={playEntrance}
-          delay={CHROME_DELAY}
-          distance={0}
-          style={{ paddingHorizontal: theme.spacing.lg, paddingBottom: theme.spacing.lg }}
-        >
-          <Text
-            variant="label"
-            color={hasPhoto ? 'inverse' : 'tertiary'}
-            uppercase
-            style={{ opacity: hasPhoto ? 0.85 : 1, marginBottom: theme.spacing.xs }}
-          >
-            {/* The build knows the studio's name even when the network does not, so a first
-                launch with no connection is still recognisably their app rather than anonymous. */}
-            {data ? `${data.studioName} · ${data.todayLabel}` : studioName}
-          </Text>
-          <Text variant="display" color={hasPhoto ? 'inverse' : 'primary'}>
-            {data?.greeting ?? 'Welcome'}
-          </Text>
-        </FadeRise>
+  const dividerColor = theme.heroScrim.hairlineSoft;
+
+  return (
+    <View style={{ flex: 1, backgroundColor: theme.colors.text }}>
+      {/* THE PHOTOGRAPH — the whole screen, and nothing resizes it. */}
+      <View style={{ position: 'absolute', inset: 0, overflow: 'hidden' }} pointerEvents="none">
+        <HeroSettle animate={playEntrance} style={{ flex: 1 }}>
+          <Image
+            source={heroSource}
+            style={{ flex: 1 }}
+            // Must match the splash's `resizeMode: 'cover'` in app.config.ts, or the photograph
+            // jumps at the handoff.
+            contentFit="cover"
+            contentPosition="center"
+            // No fade for the bundled file: it is already decoded and already on screen from the
+            // splash, so transitioning it in would fade the photo against itself.
+            transition={bundledHero ? 0 : motion.slow}
+            accessible={false}
+          />
+        </HeroSettle>
+
+        {/* The veil is a flat fill, NOT a gradient. See rule 2 in the header. It sits outside
+            HeroSettle so it never scales with the photograph — a wash that scales makes its own
+            edge crawl across the frame. */}
+        <View style={{ position: 'absolute', inset: 0, backgroundColor: theme.heroScrim.veil }} />
+        <LinearGradient
+          colors={[theme.heroScrim.footFrom, theme.heroScrim.footMid, theme.heroScrim.footTo]}
+          locations={[0, 0.6, 1]}
+          style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '46%' }}
+        />
       </View>
 
-      {/*
-        THE PANEL — opaque, and it starts entirely below the bottom edge of the screen.
-
-        Opaque rather than fading, and square-edged rather than rounded: it comes to rest as the
-        page itself, not as a sheet sitting on top of one. Rounded top corners would promise it
-        can be dismissed.
-      */}
-      <SlideUp
-        animate={playEntrance}
-        distance={panelTravel}
-        delay={COVER_HOLD}
-        style={{ flex: 1, backgroundColor: theme.colors.background }}
+      {/* Top chrome: the drawer, and the cart when there is one. */}
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingTop: insets.top + theme.spacing.sm,
+          paddingHorizontal: theme.spacing.base,
+        }}
       >
-        <ScrollView
-          contentContainerStyle={{
-            paddingHorizontal: theme.spacing.lg,
-            paddingTop: theme.spacing.lg,
-            paddingBottom: insets.bottom + theme.spacing.xxl,
-            gap: theme.spacing.lg,
-          }}
-          refreshControl={
-            onRefresh ? (
-              <RefreshControl
-                refreshing={isRefreshing}
-                onRefresh={onRefresh}
-                tintColor={theme.colors.textSecondary}
-              />
-            ) : undefined
-          }
-        >
-          {isLoading ? (
-            <SkeletonList count={3} />
-          ) : !data ? (
-            // No data AND not loading means the request failed. Distinguishing this from an empty
-            // schedule matters: "the studio has no classes" and "we could not reach the studio"
-            // call for different words and, crucially, a retry.
-            <ErrorState
-              message={describeApiError(error)}
-              retriable={!(error instanceof ApiError) || error.retriable}
-              onRetry={onRefresh}
-            />
-          ) : (
-            <>
-              {!data.acceptingBookings ? <BookingUnavailableNotice studioName={data.studioName} /> : null}
+        <FadeRise animate={playEntrance} delay={CHROME_DELAY} distance={0}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Menu"
+            onPress={onOpenMenu}
+            hitSlop={12}
+            style={({ pressed }) => ({ padding: theme.spacing.sm, opacity: pressed ? 0.55 : 1 })}
+          >
+            <Icon name="menu" color={theme.colors.textInverse} />
+          </Pressable>
+        </FadeRise>
 
-              {data.nextBooking ? (
-                <View>
-                  <Text variant="label" color="tertiary" uppercase style={{ marginBottom: theme.spacing.md }}>
-                    Your next class
-                  </Text>
-                  <Card
-                    emphasis="accent"
-                    onPress={() => onOpenClass(data.nextBooking!.eventId)}
-                    accessibilityLabel={`Your next class, ${data.nextBooking.name}`}
-                  >
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: theme.spacing.md }}>
-                      <View style={{ gap: theme.spacing.xs, flexShrink: 1 }}>
-                        {/* The day comes from the data, not from an assumption that the next
-                            booking is always today — it very often is not. */}
-                        <Text variant="numeral">
-                          {data.nextBooking.whenLabel} · {formatStoredTime(data.nextBooking.startsAt)}
-                        </Text>
-                        <Text variant="heading">{data.nextBooking.name}</Text>
-                        <Text variant="secondary" color="secondary">
-                          {[data.nextBooking.instructor && `with ${data.nextBooking.instructor}`, data.nextBooking.locationLabel]
-                            .filter(Boolean)
-                            .join(' · ')}
-                        </Text>
-                      </View>
-                      <StatusTag label="Booked" tone="accent" />
-                    </View>
-                  </Card>
-                </View>
-              ) : null}
+        {onOpenCart ? (
+          <FadeRise animate={playEntrance} delay={CHROME_DELAY} distance={0}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Cart"
+              onPress={onOpenCart}
+              hitSlop={12}
+              style={({ pressed }) => ({ padding: theme.spacing.sm, opacity: pressed ? 0.55 : 1 })}
+            >
+              <Icon name="cart" color={theme.colors.textInverse} />
+            </Pressable>
+          </FadeRise>
+        ) : null}
+      </View>
 
-              <View>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: theme.spacing.md,
-                  }}
-                >
-                  {/* The heading tells the truth about what the list IS. When today is over the
-                      screen shows the next few sessions instead of an empty state whose only
-                      action is a screen that does not exist yet. */}
-                  <Text variant="label" color="tertiary" uppercase>
-                    {data.classesLabel === 'today' ? 'Today at the studio' : 'Coming up'}
-                  </Text>
-                  <Text variant="caption" color="accent" onPress={onSeeFullSchedule}>
-                    See all
-                  </Text>
-                </View>
+      {/* `marginTop: auto` is what keeps the greeting low and the photograph clear above it. */}
+      <FadeRise
+        animate={playEntrance}
+        delay={CHROME_DELAY}
+        distance={0}
+        style={{
+          marginTop: 'auto',
+          paddingHorizontal: theme.spacing.lg,
+          paddingBottom: theme.spacing.lg,
+        }}
+      >
+        <Text variant="display" color="inverse">
+          {greeting}
+        </Text>
+        {subtitle ? (
+          <Text variant="secondary" color="inverse" style={{ opacity: 0.88, marginTop: theme.spacing.xs }}>
+            {subtitle}
+          </Text>
+        ) : null}
+      </FadeRise>
 
-                {data.classes.length === 0 ? (
-                  <EmptyState
-                    title="Nothing on the schedule."
-                    body={`${data.studioName} has not posted its next sessions yet.`}
-                  />
-                ) : (
-                  <View style={{ gap: theme.spacing.md }}>
-                    {data.classes.map((entry) => (
-                      <ClassRow key={entry.eventId} entry={entry} onPress={() => onOpenClass(entry.eventId)} />
-                    ))}
-                  </View>
-                )}
-              </View>
-            </>
-          )}
-        </ScrollView>
-      </SlideUp>
+      {/* THE MENU — hairline-joined, so it reads as one object rather than three buttons. */}
+      <FadeRise
+        animate={playEntrance}
+        delay={CHROME_DELAY}
+        distance={0}
+        style={{
+          flexDirection: 'row',
+          borderTopWidth: 1,
+          borderTopColor: theme.heroScrim.hairline,
+          paddingTop: theme.spacing.sm,
+          paddingBottom: insets.bottom + theme.spacing.base,
+        }}
+      >
+        {choices.map((choice, index) => (
+          <View
+            key={choice.label}
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              // The divider belongs BETWEEN choices, so the first one does not get a stray rule
+              // down its left edge.
+              borderLeftWidth: index === 0 ? 0 : 1,
+              borderLeftColor: dividerColor,
+            }}
+          >
+            <Choice choice={choice} onPhoto />
+          </View>
+        ))}
+      </FadeRise>
     </View>
   );
 }

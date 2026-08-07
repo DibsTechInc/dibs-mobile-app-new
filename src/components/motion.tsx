@@ -59,18 +59,25 @@ const EASE_OUT = Easing.bezier(0.22, 1, 0.36, 1);
 const EASE_OUT_DEEP = Easing.bezier(0.16, 1, 0.3, 1);
 
 /**
- * How long the studio's photograph holds the WHOLE screen before the content slides up over it.
+ * ⚠️ **UNUSED since the 2026-08-07 redesign. Kept, not deleted — pending a decision.**
  *
- * This is the app opening: the picture is all there is, and then the app arrives on top of it.
- * Long enough to register as a held image rather than a flicker, short enough that nobody taps
- * the screen wondering whether it is stuck.
+ * `COVER_HOLD`, `PANEL_RISE` and `SlideUp` below belonged to the old app-open sequence: the
+ * photograph held the whole screen, then a white panel carrying the schedule travelled up from
+ * below the bottom edge. Timing "B" was chosen by Alicia on 2026-08-06.
  *
- * It costs nothing on a return visit — the entrance runs once per launch — and on a real launch
- * it is standing in for splash time rather than adding to it.
+ * The redesign removed the panel. Home is now the photograph with nothing over it but type, so
+ * there is nothing to slide — the entrance is the greeting and menu fading in on a picture that
+ * the splash already put on screen.
+ *
+ * They stay because removing them is a deletion, and because a future surface (a booking
+ * confirmation, a sheet that owns its screen) may genuinely want a panel that arrives. If nothing
+ * has claimed them by the time P3 lands, delete them then.
+ *
+ * How long the photograph holds the WHOLE screen before content slides up over it.
  */
 export const COVER_HOLD = 620;
 
-/** How long the panel takes to travel the height of the screen. */
+/** How long the panel takes to travel the height of the screen. Unused — see above. */
 export const PANEL_RISE = 560;
 
 /**

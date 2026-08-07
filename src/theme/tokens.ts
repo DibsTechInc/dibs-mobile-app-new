@@ -56,26 +56,32 @@ export const palette = {
 } as const;
 
 /**
- * Bottom-up darkening gradient applied to every hero photo so text stays legible.
+ * The photograph treatment on Home. **A flat veil, plus a soft foot — never a ramp that stops.**
  *
- * Note for the Home composition: this works on a mid-tone photo (Carlsbad's studio shot) and
- * fights a high-key one (Everyday Ballet's dancer floats on near-white — darkening it reads as
- * a mistake). Where the photo is high-key, place text BELOW the image rather than over it.
+ * The previous version was a bottom-up gradient that reached full strength partway up the frame
+ * and ended there. That draws a horizontal EDGE across the picture, and on a high-key photograph
+ * (Everyday Ballet's dancer floats on near-white) the edge is the first thing you see — it read as
+ * a grey smudge on device, 2026-08-06/07.
+ *
+ * What replaced it:
+ *
+ * - **`veil`** — one even fill over the ENTIRE frame. Even coverage has no edge anywhere, which is
+ *   what lets white type sit at any height on any photograph, high-key or dark.
+ * - **`footFrom` → `footMid` → `footTo`** — a soft deepening under the words only. It never
+ *   reaches full strength before the bottom of the screen, so it has no terminating edge either.
+ *
+ * The old note said "where the photo is high-key, place text BELOW the image" — that advice is
+ * retired along with the ramp. The flat veil handles both kinds of photograph, which is what let
+ * Home become full-bleed rather than a band with a panel under it.
  */
 export const heroScrim = {
-  from: 'rgba(20, 18, 16, 0)',
-  to: 'rgba(20, 18, 16, 0.55)',
-  /**
-   * A second, much lighter ramp at the TOP of the hero.
-   *
-   * The bottom-up scrim protects the greeting and nothing else, so anything placed in the safe
-   * area — the account action, the status bar itself — sits on unmodified photo. On a bright sky
-   * or Everyday Ballet's high-key dancer that is white text on white. Half the strength of the
-   * bottom ramp and a third of the height: enough to hold a 12px label, not enough to read as a
-   * band across the top of the picture.
-   */
-  topFrom: 'rgba(20, 18, 16, 0.32)',
-  topTo: 'rgba(20, 18, 16, 0)',
+  veil: 'rgba(22, 20, 19, 0.40)',
+  footFrom: 'rgba(22, 20, 19, 0)',
+  footMid: 'rgba(22, 20, 19, 0.38)',
+  footTo: 'rgba(22, 20, 19, 0.62)',
+  /** Hairlines over a photograph. The menu's rules and the divider above it. */
+  hairline: 'rgba(255, 255, 255, 0.28)',
+  hairlineSoft: 'rgba(255, 255, 255, 0.22)',
 } as const;
 
 /** 8px base. Values exist to be chosen deliberately — not everything is 16. */

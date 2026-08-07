@@ -19,6 +19,8 @@ export interface ScheduleDay {
   dayOfMonth: string;
   /** 'Tuesday, August 5' — the heading and the class-detail back link. */
   longLabel: string;
+  /** 'August 2026' — the strip's own heading. See `monthLabelFor` for why it is load-bearing. */
+  monthLabel: string;
   isToday: boolean;
   events: ScheduleEvent[];
 }
@@ -39,7 +41,23 @@ function labelsFor(date: string) {
     weekdayLabel: formatStoredTime(midday, { weekday: 'short' }).toUpperCase(),
     dayOfMonth: formatStoredTime(midday, { day: 'numeric' }),
     longLabel: formatStoredTime(midday, { weekday: 'long', month: 'long', day: 'numeric' }),
+    monthLabel: formatStoredTime(midday, { month: 'long', year: 'numeric' }),
   };
+}
+
+/**
+ * Which month the strip is showing — and it is not decoration.
+ *
+ * The strip runs past the end of a month, so without this it reads `… 18 · 19 · 2 · 8 · 9`, which
+ * looks like a broken sort. Those are September dates; naming the month is what makes the sequence
+ * legible. Reported on device 2026-08-07.
+ *
+ * Derived from the SELECTED day rather than the first, so scrolling into September relabels the
+ * header instead of leaving it stuck on August.
+ */
+export function monthLabelFor(days: ScheduleDay[], selectedDate: string | null): string {
+  const active = days.find((day) => day.date === selectedDate) ?? days[0];
+  return active?.monthLabel ?? '';
 }
 
 /**
@@ -76,6 +94,46 @@ export function groupByStudioDay(
       isToday: date === today,
       events: dayEvents.sort((a, b) => a.start_date.localeCompare(b.start_date)),
     }));
+}
+
+/**
+ * Fill the gaps between the days that have classes, so the strip shows a real calendar.
+ *
+ * `groupByStudioDay` returns only days with something on them, which is right for a LIST — there
+ * is nothing to render for an empty day. It is wrong for the day STRIP: dropping Sunday makes the
+ * numerals jump `8 · 10`, and a strip that skips looks broken rather than empty. So the strip gets
+ * every day in the range and renders the empty ones dimmed.
+ *
+ * They stay tappable on purpose. A dimmed day that refuses the tap is a dead control; one that
+ * opens onto "nothing scheduled" has answered the question the client asked.
+ *
+ * Capped at `maxDays` so a studio publishing months ahead cannot generate an unbounded strip.
+ */
+export function fillEmptyDays(days: ScheduleDay[], maxDays = 60): ScheduleDay[] {
+  if (days.length === 0) return days;
+
+  const byDate = new Map(days.map((day) => [day.date, day]));
+  const filled: ScheduleDay[] = [];
+  // Midday, so adding whole days can never trip over a DST boundary into the previous date.
+  const cursor = new Date(`${days[0].date}T12:00:00.000Z`);
+  const last = new Date(`${days[days.length - 1].date}T12:00:00.000Z`);
+
+  while (cursor.getTime() <= last.getTime() && filled.length < maxDays) {
+    const date = cursor.toISOString().slice(0, 10);
+    filled.push(
+      byDate.get(date) ?? {
+        date,
+        ...labelsFor(date),
+        // An invented day is never "today" in any sense that matters — if today had classes it
+        // came from the real list, and if it did not, nothing should be highlighted.
+        isToday: false,
+        events: [],
+      },
+    );
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+  }
+
+  return filled;
 }
 
 /** Find one event across the whole window. Class detail is routed by id, not by day. */

@@ -196,9 +196,18 @@ export function AuthScreen({
                 accessible={false}
               />
             </HeroSettle>
+            {/* Same treatment as Home: a FLAT veil over the whole band, then a soft foot under
+                the words. The bottom-up ramp this replaces reached full strength partway up and
+                stopped, which draws an edge across the picture — and on a high-key photograph
+                that edge is the first thing you see. */}
+            <View
+              style={{ position: 'absolute', inset: 0, backgroundColor: theme.heroScrim.veil }}
+              pointerEvents="none"
+            />
             <LinearGradient
-              colors={[theme.heroScrim.from, theme.heroScrim.to]}
-              style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: HERO_HEIGHT * 0.7 }}
+              colors={[theme.heroScrim.footFrom, theme.heroScrim.footMid, theme.heroScrim.footTo]}
+              locations={[0, 0.6, 1]}
+              style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: HERO_HEIGHT * 0.55 }}
               pointerEvents="none"
             />
           </>

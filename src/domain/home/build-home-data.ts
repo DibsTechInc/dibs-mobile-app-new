@@ -97,6 +97,49 @@ export function greetingFor(hour: number): string {
   return 'Good evening';
 }
 
+export interface Greeting {
+  /** The large line: "Hi Alicia!" or the studio's name. */
+  title: string;
+  /** The quiet line under it. Null when the title already said everything. */
+  subtitle: string | null;
+}
+
+/**
+ * The two lines on Home, and the only thing a session changes about that screen.
+ *
+ * **Signed in it is a person's name, not a time of day.** "Hi Alicia! / Welcome to Everyday
+ * Ballet" — which is what the old app said and what Alicia asked to come back (2026-08-07). A
+ * time-of-day greeting is a small thing that goes stale: the client who opens the app at 11:58
+ * and again at 12:02 is greeted differently for no reason they can see.
+ *
+ * **Signed out it is the studio's name**, with the date beneath. Naming nobody beats guessing, and
+ * a guest opening a branded app should be met by the brand.
+ *
+ * `greetingFor` is kept because the date line still reads in the studio's clock, and because
+ * nothing about it was wrong — it is simply not what Home says any more.
+ */
+export function buildGreeting({
+  firstName,
+  studioName,
+  timeZone,
+  now = new Date(),
+}: {
+  firstName: string | null;
+  studioName: string;
+  timeZone: string;
+  now?: Date;
+}): Greeting {
+  if (firstName) {
+    return { title: `Hi ${firstName}!`, subtitle: `Welcome to ${studioName}` };
+  }
+
+  const nowInStudio = studioNow(timeZone, now);
+  return {
+    title: studioName,
+    subtitle: formatStoredTime(nowInStudio, { weekday: 'long', month: 'long', day: 'numeric' }),
+  };
+}
+
 export function buildHomeData({
   config,
   events,

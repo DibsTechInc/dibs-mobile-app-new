@@ -6,7 +6,14 @@
  */
 import type { ScheduleEvent } from '@/api/schemas/schedule';
 
-import { findEvent, groupByStudioDay, longDayLabel, storedDate } from '../days';
+import {
+  fillEmptyDays,
+  findEvent,
+  groupByStudioDay,
+  longDayLabel,
+  monthLabelFor,
+  storedDate,
+} from '../days';
 
 function event(startsAt: string, overrides: Partial<ScheduleEvent> = {}): ScheduleEvent {
   return {
@@ -128,5 +135,77 @@ describe('storedDate / longDayLabel / findEvent', () => {
     const events = [event('2026-08-05T18:00:00.000Z', { eventid: 42 })];
     expect(findEvent(events, 42)?.eventid).toBe(42);
     expect(findEvent(events, 99)).toBeNull();
+  });
+});
+
+describe('fillEmptyDays', () => {
+  // The month label is DERIVED, not hardcoded: a fixture that stamps 'August' on a September date
+  // makes the month-boundary test pass or fail for reasons that have nothing to do with the code.
+  const day = (date: string, events: unknown[] = [{}]) =>
+    ({
+      date,
+      weekdayLabel: 'X',
+      dayOfMonth: date.slice(-2),
+      longLabel: date,
+      monthLabel: new Intl.DateTimeFormat('en-US', {
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'UTC',
+      }).format(new Date(`${date}T12:00:00.000Z`)),
+      isToday: false,
+      events,
+    }) as never;
+
+  it('returns an empty list unchanged', () => {
+    expect(fillEmptyDays([])).toEqual([]);
+  });
+
+  it('inserts the days that have nothing on them', () => {
+    // Without this the strip runs 8 · 10 and looks like a broken sort rather than an empty Sunday.
+    const filled = fillEmptyDays([day('2026-08-08'), day('2026-08-10')]);
+    expect(filled.map((d) => d.date)).toEqual(['2026-08-08', '2026-08-09', '2026-08-10']);
+    expect(filled[1].events).toEqual([]);
+  });
+
+  it('labels an invented day the same way a real one is labelled', () => {
+    const filled = fillEmptyDays([day('2026-08-08'), day('2026-08-10')]);
+    expect(filled[1]).toMatchObject({ weekdayLabel: 'SUN', dayOfMonth: '9', monthLabel: 'August 2026' });
+  });
+
+  it('crosses a month boundary without losing a day', () => {
+    // The case that made the strip read 19 · 2 on device.
+    const filled = fillEmptyDays([day('2026-08-31'), day('2026-09-02')]);
+    expect(filled.map((d) => d.date)).toEqual(['2026-08-31', '2026-09-01', '2026-09-02']);
+    // The INVENTED day is the one this function labels, and it must land in the right month.
+    expect(filled[1]).toMatchObject({ date: '2026-09-01', monthLabel: 'September 2026' });
+  });
+
+  it('never marks an invented day as today', () => {
+    const filled = fillEmptyDays([day('2026-08-08'), day('2026-08-12')]);
+    expect(filled.filter((d) => d.isToday)).toHaveLength(0);
+  });
+
+  it('caps the run so a far-future class cannot generate an unbounded strip', () => {
+    const filled = fillEmptyDays([day('2026-08-01'), day('2027-08-01')], 30);
+    expect(filled).toHaveLength(30);
+  });
+});
+
+describe('monthLabelFor', () => {
+  const day = (date: string, monthLabel: string) =>
+    ({ date, weekdayLabel: 'X', dayOfMonth: '1', longLabel: date, monthLabel, isToday: false, events: [] }) as never;
+
+  it('follows the SELECTED day, so scrolling into September relabels the header', () => {
+    const days = [day('2026-08-31', 'August 2026'), day('2026-09-02', 'September 2026')];
+    expect(monthLabelFor(days, '2026-09-02')).toBe('September 2026');
+  });
+
+  it('falls back to the first day when nothing is selected yet', () => {
+    const days = [day('2026-08-31', 'August 2026')];
+    expect(monthLabelFor(days, null)).toBe('August 2026');
+  });
+
+  it('is empty rather than undefined when there are no days', () => {
+    expect(monthLabelFor([], null)).toBe('');
   });
 });

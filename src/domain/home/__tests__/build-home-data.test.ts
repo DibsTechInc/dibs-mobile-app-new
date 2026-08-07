@@ -8,7 +8,7 @@
 import type { BasicConfig } from '@/api/schemas/basic-config';
 import type { ScheduleEvent } from '@/api/schemas/schedule';
 
-import { buildHomeData, describeBookingDay, greetingFor } from '../build-home-data';
+import { buildGreeting, buildHomeData, describeBookingDay, greetingFor } from '../build-home-data';
 
 function config(overrides: Partial<BasicConfig> = {}): BasicConfig {
   // Trimmed from the real studio 210 response, 2026-08-06.
@@ -198,5 +198,48 @@ describe('describeBookingDay', () => {
     expect(describeBookingDay('2026-08-08T09:00:00.000Z', 'America/Los_Angeles', afternoon)).toBe(
       'Sat, Aug 8',
     );
+  });
+});
+
+describe('buildGreeting', () => {
+  const TZ = 'America/New_York';
+  const NOON_ET = new Date('2026-08-07T16:00:00.000Z');
+
+  it('greets a signed-in client by name, not by time of day', () => {
+    // "Hi Alicia! / Welcome to Everyday Ballet" — what the old app said, restored 2026-08-07. A
+    // time-of-day greeting goes stale within minutes: 11:58 and 12:02 are greeted differently for
+    // no reason the client can see.
+    expect(buildGreeting({ firstName: 'Alicia', studioName: 'Everyday Ballet', timeZone: TZ, now: NOON_ET }))
+      .toEqual({ title: 'Hi Alicia!', subtitle: 'Welcome to Everyday Ballet' });
+  });
+
+  it('is identical morning and evening for the same client', () => {
+    const morning = buildGreeting({
+      firstName: 'Alicia', studioName: 'Everyday Ballet', timeZone: TZ,
+      now: new Date('2026-08-07T13:00:00.000Z'),
+    });
+    const evening = buildGreeting({
+      firstName: 'Alicia', studioName: 'Everyday Ballet', timeZone: TZ,
+      now: new Date('2026-08-08T01:00:00.000Z'),
+    });
+    expect(morning).toEqual(evening);
+  });
+
+  it('names the studio for a guest rather than guessing at a person', () => {
+    const greeting = buildGreeting({
+      firstName: null, studioName: 'Carlsbad Village Yoga', timeZone: 'America/Los_Angeles', now: NOON_ET,
+    });
+    expect(greeting.title).toBe('Carlsbad Village Yoga');
+    expect(greeting.subtitle).toBe('Friday, August 7');
+  });
+
+  it("dates the guest line in the STUDIO's clock, not the device's", () => {
+    // 03:00 UTC on the 8th is still the evening of the 7th in Los Angeles. A device-clock date
+    // would tell a west-coast client it is already tomorrow.
+    const greeting = buildGreeting({
+      firstName: null, studioName: 'Carlsbad Village Yoga', timeZone: 'America/Los_Angeles',
+      now: new Date('2026-08-08T03:00:00.000Z'),
+    });
+    expect(greeting.subtitle).toBe('Friday, August 7');
   });
 });
