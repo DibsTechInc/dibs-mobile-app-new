@@ -5,9 +5,18 @@
 > The executor updates this file at the end of EVERY session. Statuses: `done` / `in-progress` / `blocked-on-Alicia (reason)` / `not-started`.
 
 **Last updated:** 2026-08-06 (session 3 close — handoff at `DevAssist/Aug6/HANDOFF-session3.md`)
-**Gate status:** `npm run typecheck` clean · `npx jest` **616/616** · `npm run lint` 0 errors (2 pre-existing warnings) · all 4 CI grep guardrails clean · iOS bundle exports
-**Next up:** the P2 card paths (add / remove / set default) — **needs Alicia's go-ahead**, see
-"Open questions" 13. Everything else in P2 is built.
+**Gate status:** `npm run typecheck` clean · `npx jest` **635/635** · `npm run lint` 0 errors (2 pre-existing warnings) · all 4 CI grep guardrails clean · iOS bundle exports for both v1 studios
+**Next up:** **run it.** P2 is code-complete. What it has never had is a native rebuild and a
+signed-in session, and both are now unblocked — Alicia supplied the staging backend, the test
+login `alicia.ulin@gmail.com`, and its password. Point at **studio 88**, where that client holds
+two live passes:
+
+```bash
+EXPO_PUBLIC_API_URL=https://dibs-api-staging-production.up.railway.app/api/v2 \
+  STUDIO_SLUG=everyday-ballet npx expo run:ios --device "iPhone 17 Pro"
+```
+
+After that: P3 checkout (classes only, card path last, per §0.1-B and the build order in §4).
 
 ✅ **The two `get-passes` defects reported last session are FIXED** in dibs-api (`90dc7fcc` on
 `staging`): unlimited passes come back and placeholder ones do not. Verified by reading the
@@ -22,14 +31,19 @@ its deployed build carries the `get-passes` fix. Test client `alicia.ulin@gmail.
 the run command: `docs/environments.md`. It is HTTPS, so it also answers open question 9
 (off-laptop device testing).
 
-⚠️ **Still missing: the Firebase password for the test login**, so no signed-in run has happened.
-The unauthenticated endpoints were probed directly with curl and their real responses validated
-against the app's schemas end to end — which caught two bugs (below) — but **no screen has been
-rendered by a signed-in client.**
+✅ **§0.5-D is CLOSED.** Test login `alicia.ulin@gmail.com` (userid 2502), password supplied by
+Alicia 2026-08-06 and held out of this repo. Use **studio 88** — two live passes there, none at 210.
 
-⚠️ **A native rebuild is still owed** (`npx expo run:ios`) — the splash image changed in
-`app.config.ts` two sessions ago and that is baked into the binary — **and Metro must be
-restarted**, whose config also changed. Neither happened this session; no simulator was run.
+⚠️ **No screen has yet been rendered by a signed-in client.** Every endpoint was exercised
+directly with curl and its real response validated against the app's schemas end to end — which
+caught two bugs (below) — but the app itself has not been run this session. **A native rebuild is
+owed** (`npx expo run:ios`): the splash image changed in `app.config.ts` two sessions ago, and
+`@stripe/stripe-react-native` is now mounted, so the PaymentSheet needs native code that a Metro
+reload cannot deliver. Restart Metro too — `metro.config.js` changed.
+
+⚠️ **`POST /update-profile` is being hardened by another agent** (Alicia, 2026-08-06) — see
+finding 1 below. Do not touch that route from this workstream; the app already sends its token, so
+it keeps working the moment an auth mount lands.
 
 ## Session 3 (2026-08-06) — what landed
 
@@ -57,8 +71,8 @@ Four commits, local and unpushed. All of P2 except the card write paths.
 | Wallet: credit | **done, unverified on device.** Endpoint exercised live (userid 10 @ 210 → `900`) |
 | Wallet: saved cards | **done, unverified on device.** Endpoint exercised live; the merge is unit-tested against the five-copies-of-4242 case the sandbox actually holds |
 | Profile edit | **done, unverified.** Name + phone. Email is deliberately NOT editable — see the findings below |
-| Add a card (PaymentSheet) | **not-started — needs Alicia** (open question 13). Stripe write path, and `create-setup-intent` has a known env-blind write |
-| Remove card / set default | **not-started — same gate.** `toRemoveCardPayload` is built and tested against the endpoint's attribute-matching contract |
+| Add a card (PaymentSheet) | **done, needs a device.** Approved by Alicia 2026-08-06. `create-setup-intent` verified against staging returning a real `seti_…`, **with the `stripeid` columns confirmed untouched** because the existing customer id was passed. The PaymentSheet itself is the one step curl cannot reach — it needs a native rebuild |
+| Remove card / set default | **done.** `set-default-card` exercised live on staging (success AND the `invalid_payment_method_id` refusal). `remove-card` is wired and unit-tested but **deliberately not fired against staging** — it detaches from both Stripe accounts and there was no reason to destroy a real test card to prove a request shape |
 | Communication preferences | **not-started.** `/user/update-communication-preferences` exists; no design for it yet, and P8's notification work is its natural home |
 | Delete account | **not-started — RELEASE GATE.** Apple requires it for any app with sign-up. Backend item 7.7. Not stubbed, because a delete-account row that does not delete the account is the worst version of it |
 | Tab bar | **still not-started, still deliberate.** Account now exists, so three of the mock's four tabs do — but adding one restructures Home's approved app-open sequence (the panel's travel is computed from the full screen height). Worth doing once Packages lands in P4, as one change rather than two |
@@ -201,15 +215,11 @@ claim is "it compiles and the logic is tested", not "I saw it".
     catch-all rewrite. Nothing 404s, so a status-code check cannot detect this. The release gate
     therefore requires `legal.privacyPolicyLive: true`, flipped by hand after someone loads the
     URL and sees a policy.
-13. **May I build the card paths — add via PaymentSheet, remove, set default? (NEW, 2026-08-06.)**
-    They are P2 scope and the widget's exact sequence is traced in
-    `docs/verified-widget-sequences.md`, so there is no guesswork in the shape. What makes it an
-    ask rather than a build: they are Stripe writes, they cannot be verified without a test login
-    (§0.5-D) **and** a native rebuild, and `create-setup-intent` carries the env-blind
-    `dibs_users.stripeid` write above — the mobile app would become a new caller of a path that
-    can plant a sandbox customer id in a production column. Passing the client's existing
-    `stripeIdAtDibs` avoids that branch entirely, which is what the widget does; I would do the
-    same. Say the word and it is roughly a session's work.
+13. ~~May I build the card paths?~~ **APPROVED and BUILT 2026-08-06.** Everything except the
+    PaymentSheet step was exercised against staging. The env-blind write is sidestepped by always
+    passing the client's existing platform customer id, verified by confirming the `stripeid`
+    columns were untouched after a live `create-setup-intent` call. **The underlying dibs-api bug
+    is NOT fixed** — it is simply never triggered by this caller — so it stays on the backend list.
 14. **Delete account is an App Store release gate, not a nice-to-have (NEW, 2026-08-06.)** Apple
     requires it for any app that offers sign-up, backend item 7.7 is what would implement it, and
     nothing on either side exists yet. Flagging it here because it is the kind of item that gets
@@ -295,8 +305,10 @@ Ordered by how much damage each can do. None are the app's to fix.
    `email`.** Anyone can rewrite any client's name, phone AND email address. Pointing a
    stranger's Dibs row at your own email address associates their booking history, passes and
    credit with your Firebase session, because `get-user-account` resolves the Dibs identity by
-   email. **This is the most serious auth gap this workstream has found** and belongs at the top
-   of the 7.3 list. (`services/shared/update-client-profile.js`, `routes/routers.js:419`.)
+   email. **This is the most serious auth gap this workstream has found.**
+   (`services/shared/update-client-profile.js`, `routes/routers.js:419`.)
+   **→ ASSIGNED to another agent, 2026-08-06.** Not this workstream's to fix. When the auth mount
+   lands, the mobile app needs no change — it already sends its Firebase token on this call.
 2. **Editing an email in Dibs silently locks the client out.** The Dibs row and the Firebase
    credential are separate systems and `update-profile` moves only one of them; `get-user-account`
    then matches them case-sensitively. The widget's profile form makes this reachable without any
