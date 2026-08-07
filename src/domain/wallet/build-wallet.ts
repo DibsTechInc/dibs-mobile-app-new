@@ -109,9 +109,15 @@ export function buildWalletData({
     expiresLabel: pass.expiresAt
       ? `Expires ${formatInstantInStudioZone(pass.expiresAt, timeZone)}`
       : null,
-    // `autopay` on the row, `autopayStatus` on the package: a membership issues a fresh pass each
-    // cycle, so either can carry the truth depending on which write path created it.
-    isMembership: pass.autopay === true || pass.studioPackage?.autopayStatus === true,
+    /**
+     * The ROW's `autopay` boolean, and only that.
+     *
+     * The package's `autopayStatus` is an ENUM — `'NONE' | 'ALLOW' | 'FORCE'` — describing what
+     * the package permits, not what this pass is. They disagree in both directions in live data
+     * (24 live passes are `autopay = true` on a `NONE` package; 5 are `false` on a `FORCE` one),
+     * so reading the package would call a one-off purchase a membership and miss real ones.
+     */
+    isMembership: pass.autopay === true,
   }));
 
   const creditAmount = credit.data;

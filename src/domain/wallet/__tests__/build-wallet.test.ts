@@ -117,6 +117,26 @@ describe('passes', () => {
     });
   });
 
+  it('reads membership off the pass row, never off the package enum', () => {
+    // `studioPackage.autopayStatus` is 'NONE' | 'ALLOW' | 'FORCE' — what the PACKAGE permits, not
+    // what this pass is. Live data disagrees in both directions, so reading it would call a
+    // one-off purchase a membership and miss real ones. Shape captured from staging 2026-08-06.
+    const wallet = buildWalletData(
+      input({
+        passes: {
+          data: [
+            pass({ id: 1, autopay: true, studioPackage: { packageName: 'A', autopayStatus: 'NONE' } }),
+            pass({ id: 2, autopay: false, studioPackage: { packageName: 'B', autopayStatus: 'FORCE' } }),
+          ],
+          isPending: false,
+          error: null,
+        },
+      }),
+    );
+
+    expect(wallet.passes.items.map((item) => item.isMembership)).toEqual([true, false]);
+  });
+
   it('treats the 999 sentinel as unlimited too', () => {
     const wallet = buildWalletData(
       input({ passes: { data: [pass({ totalUses: 999 })], isPending: false, error: null } }),

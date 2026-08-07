@@ -106,12 +106,7 @@ function brandLabel(brand: string): string {
     .join(' ');
 }
 
-function toSavedCard(
-  method: StripePaymentMethod,
-  platform: CardPlatform,
-  defaultFingerprint: string | null,
-  defaultPaymentMethodId: string | null,
-): SavedCard | null {
+function toSavedCard(method: StripePaymentMethod, platform: CardPlatform): SavedCard | null {
   const card = method.card;
   // The id prefix is NOT what makes a row safe to render — the presence of card details is. A
   // half-formed object with a valid-looking id would otherwise render as "undefined ending null",
@@ -126,10 +121,8 @@ function toSavedCard(
   }
 
   const fingerprint = card.fingerprint ?? null;
-  const isDefault =
-    method.is_default === true ||
-    (defaultFingerprint !== null && fingerprint === defaultFingerprint) ||
-    (defaultPaymentMethodId !== null && method.id === defaultPaymentMethodId);
+  // Assigned once, over the whole list, by `markDefault` — never per-card. See the note there.
+  const isDefault = false;
 
   const year = fullYear(card.exp_year);
 
@@ -176,6 +169,47 @@ export interface MergedCards {
   hadExpiredCards: boolean;
 }
 
+/**
+ * Exactly ONE card is the default. Flag it, and only it.
+ *
+ * The backend flags `is_default` by FINGERPRINT, which is right for its purpose — the platform
+ * copy and the connected copy of one card are the same card, and either might survive the merge,
+ * so both need the flag for the merged row to carry it. It is wrong as a per-row answer, because
+ * a fingerprint identifies a card NUMBER: any client who re-saved the same card after an expiry
+ * update has several rows sharing one, and every one of them comes back flagged.
+ *
+ * Observed live on staging 2026-08-06 — five saved cards, one fingerprint, and the wallet
+ * rendered "Default" on all five. Which is worse than useless: the badge exists to answer "which
+ * card gets charged", and five answers is no answer.
+ *
+ * So: an exact id match wins, because `invoice_settings.default_payment_method` names one
+ * PaymentMethod. The fingerprint is the fallback for the case it exists to serve — the named
+ * method is not in this list, but its twin on the other account is — and even then only the first
+ * match, in merge order, so the connected-account copy wins.
+ */
+function markDefault(
+  cards: SavedCard[],
+  defaultPaymentMethodId: string | null,
+  defaultFingerprint: string | null,
+  backendFlagged: Set<string>,
+): void {
+  const exact = defaultPaymentMethodId
+    ? cards.find((card) => card.id === defaultPaymentMethodId)
+    : undefined;
+
+  const byFingerprint = defaultFingerprint
+    ? cards.find((card) => card.fingerprint === defaultFingerprint)
+    : undefined;
+
+  // The backend's own flag, but only when it named exactly one card — otherwise it is the
+  // fingerprint over-match above wearing a different hat.
+  const flagged =
+    backendFlagged.size === 1 ? cards.find((card) => backendFlagged.has(card.id)) : undefined;
+
+  const chosen = exact ?? flagged ?? byFingerprint;
+  if (chosen) chosen.isDefault = true;
+}
+
 export function mergeSavedCards({
   platformCards,
   connectedCards,
@@ -185,11 +219,13 @@ export function mergeSavedCards({
 }: MergeCardsInput): MergedCards {
   const seen = new Set<string>();
   const merged: SavedCard[] = [];
+  const backendFlagged = new Set<string>();
 
   const add = (methods: StripePaymentMethod[], platform: CardPlatform) => {
     for (const method of methods) {
-      const card = toSavedCard(method, platform, defaultFingerprint, defaultPaymentMethodId);
+      const card = toSavedCard(method, platform);
       if (!card) continue;
+      if (method.is_default === true) backendFlagged.add(card.id);
       const key = `${card.brand}|${card.last4}|${card.expMonth}|${card.expYear}|${card.fingerprint ?? ''}`;
       if (seen.has(key)) continue;
       seen.add(key);
@@ -207,6 +243,10 @@ export function mergeSavedCards({
   const valid = merged.filter(
     (card) => card.expYear > currentYear || (card.expYear === currentYear && card.expMonth >= currentMonth),
   );
+
+  // Only the surviving cards are candidates: flagging one that was then dropped for being expired
+  // would leave a list with no default at all.
+  markDefault(valid, defaultPaymentMethodId, defaultFingerprint, backendFlagged);
 
   // Ordering — the one place this deliberately differs from the widget, which sorts on platform
   // alone. The default card goes first because it is the one that will actually be charged, and

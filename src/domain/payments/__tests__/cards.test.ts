@@ -113,20 +113,67 @@ describe('mergeSavedCards', () => {
     expect(cards[0]).toMatchObject({ expYear: 2029, expiryLabel: 'Expires 04/29' });
   });
 
-  it('flags the default by fingerprint, so either copy of the card carries it', () => {
+  it('falls back to the fingerprint when the named method is not in the list', () => {
+    // What the fingerprint fallback exists for: the connected customer's default is a
+    // PaymentMethod we did not get back, but its twin on the other account is here.
     const { cards } = mergeSavedCards({
       connectedCards: [],
       platformCards: [
         pm({ id: 'pm_other', fingerprint: 'fp_other', last4: '1111' }),
-        pm({ id: 'pm_default', fingerprint: 'fp_default', last4: '2222' }),
+        pm({ id: 'pm_twin', fingerprint: 'fp_default', last4: '2222' }),
       ],
       defaultFingerprint: 'fp_default',
       now: NOW,
     });
 
     // Default first — it is the card that will be charged, so it is the one being looked for.
-    expect(cards[0]).toMatchObject({ id: 'pm_default', isDefault: true });
+    expect(cards[0]).toMatchObject({ id: 'pm_twin', isDefault: true });
     expect(cards[1]).toMatchObject({ id: 'pm_other', isDefault: false });
+  });
+
+  it('marks exactly ONE card default when several share a fingerprint', () => {
+    // Live on staging 2026-08-06: five saved cards, all test 4242, all one fingerprint — and the
+    // wallet rendered "Default" on every one of them. The badge answers "which card gets
+    // charged", and five answers is no answer. An exact id match is the real answer.
+    const { cards } = mergeSavedCards({
+      connectedCards: [],
+      platformCards: [
+        pm({ id: 'pm_a', exp_month: 2, exp_year: 2029, is_default: true }),
+        pm({ id: 'pm_b', exp_month: 5, exp_year: 2039, is_default: true }),
+        pm({ id: 'pm_c', exp_month: 7, exp_year: 2029, is_default: true }),
+      ],
+      defaultPaymentMethodId: 'pm_b',
+      defaultFingerprint: 'fp_abc',
+      now: NOW,
+    });
+
+    expect(cards.filter((card) => card.isDefault).map((card) => card.id)).toEqual(['pm_b']);
+  });
+
+  it('marks no card default when nothing identifies one', () => {
+    const { cards } = mergeSavedCards({
+      connectedCards: [],
+      platformCards: [pm({ id: 'pm_a' })],
+      now: NOW,
+    });
+    // No `invoice_settings.default_payment_method` is a real state — the studio never set one.
+    expect(cards.every((card) => !card.isDefault)).toBe(true);
+  });
+
+  it('never flags a default that was dropped for being expired', () => {
+    const { cards } = mergeSavedCards({
+      connectedCards: [],
+      platformCards: [
+        pm({ id: 'pm_dead', exp_month: 7, exp_year: 2026, fingerprint: 'fp_dead' }),
+        pm({ id: 'pm_live', exp_month: 9, exp_year: 2026, fingerprint: 'fp_live' }),
+      ],
+      defaultPaymentMethodId: 'pm_dead',
+      now: NOW,
+    });
+
+    // A list whose only default is not in it has no default, which is a worse answer than none.
+    expect(cards.map((card) => card.id)).toEqual(['pm_live']);
+    expect(cards[0].isDefault).toBe(false);
   });
 
   it('refuses a method with no card details, whatever its id looks like', () => {

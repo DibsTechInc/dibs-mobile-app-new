@@ -41,7 +41,19 @@ export const studioPackageSchema = z
     customDescription: z.string().nullable().optional(),
     isPrivate: z.boolean().nullable().optional(),
     unlimited: z.boolean().nullable().optional(),
-    autopayStatus: z.boolean().nullable().optional(),
+    /**
+     * ⚠️ A STRING, not a boolean. `studio_packages.autopay` is a Postgres ENUM —
+     * `'NONE' | 'ALLOW' | 'FORCE'` — aliased to `autopayStatus` by the include. Observed live on
+     * staging 2026-08-06 (7,996 NONE / 2,428 ALLOW / 192 FORCE platform-wide).
+     *
+     * It describes what the PACKAGE permits, NOT whether this pass is on autopay, and the two
+     * genuinely disagree: among live passes there are 24 with `passes.autopay = true` on a `NONE`
+     * package and 5 with `false` on a `FORCE` one. **The row's own `autopay` boolean is the
+     * membership signal.** Typed loosely because it was previously typed `boolean`, which is
+     * wrong in both directions — a boolean here fails the schema, and `'ALLOW' === true` is a
+     * dead comparison that reads as a working check.
+     */
+    autopayStatus: z.union([z.string(), z.boolean()]).nullable().optional(),
     commitment_period: z.number().nullable().optional(),
     on_demand_access: z.boolean().nullable().optional(),
   })

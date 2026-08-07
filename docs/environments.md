@@ -1,10 +1,53 @@
 # Environments — where the app points, and what is actually alive
 
-Verified empirically 2026-08-04. Supersedes guesses in `MOBILE_MASTER_PLAN.md` §0.5-B.
-Re-verify before trusting: hosts move (the Railway/Crunchy cutover of 2026-07-21/22 invalidated
-everything written before it).
+Verified empirically 2026-08-04, **amended 2026-08-06 — a remote staging backend DOES exist.**
+Supersedes guesses in `MOBILE_MASTER_PLAN.md` §0.5-B. Re-verify before trusting: hosts move (the
+Railway/Crunchy cutover of 2026-07-21/22 invalidated everything written before it).
 
-## Probe results (2026-08-04)
+## ✅ Remote staging — `https://dibs-api-staging-production.up.railway.app` (added 2026-08-06)
+
+Named by Alicia; probed the same day. **This is the dev target from now on**, and it closes
+§0.5-B. The 2026-08-04 conclusion below ("there is no remote staging backend today") was wrong —
+the Heroku staging app is dead, but dibs-api staging moved to Railway with the rest of the stack.
+
+| Probe | Result |
+|---|---|
+| `GET /api/v2/widget/is-live/210` | `{"live":true,"widgetOpenStyle":"full-page"}` |
+| `POST /api/v2/widget/get-basic-config {88}` | real config, `America/New_York`, USD |
+| `POST /api/v2/get-stripe-publishable-key` | `pk_test_51Rqmyf…` — **SANDBOX** ✅ |
+| `POST /api/v2/get-passes {88, 2502}` | **two real passes**, `is_placeholder` present |
+| `POST /api/v2/stripe/get-all-payments {210, 2502}` | 5 cards, `livemode: false`, `lookupFailed: false` |
+
+**Why this matters more than "a URL that works":**
+
+- **It has the data the local restore does not.** Staging DB (`STAGING_DATABASE_URL` in dibs-api's
+  `.env`, Crunchy `p.ojgirkbmfnchhlgw24wwbhuxae…`) holds **87,222 `passes` and 594,231
+  `dibs_transactions`**, against **0 and 0** locally. The pass list and everything downstream of it
+  are exercisable here and nowhere else.
+- **It is a DIFFERENT database from the local restore.** Same user, different numbers — userid 2502
+  has $862 credit at studio 210 on staging and $786 locally. Never reason across the two.
+- **It runs in dev mode.** `isDevelopment` is true there (it resolved `stripeid_test`, not
+  `stripeid_prod`), so it reads the `*_test` Stripe columns AND uses a sandbox key — the pair is
+  consistent, which is what makes card work safe. Do not assume; re-check after any redeploy, since
+  a test key with prod account ids is the exact trap in `.claude/CLAUDE.md` § "Stripe IDs — Dev vs
+  Prod".
+- **The deployed build carries the `get-passes` fix** (`is_placeholder` is in the response).
+
+**Test client:** `alicia.ulin@gmail.com` = **userid 2502**. Best studio to point at is **88
+(everyday-ballet)** — she holds two live passes there (a 1-use `[Admin] Comp Session` and a
+10-class package with 9 left) and none at 210.
+
+```bash
+# Point the app at staging
+EXPO_PUBLIC_API_URL=https://dibs-api-staging-production.up.railway.app/api/v2 \
+  STUDIO_SLUG=everyday-ballet npx expo start
+```
+
+`EXPO_PUBLIC_API_URL` wins over `studio.json`'s `api.url` in development (`app.config.ts:209`), and
+being HTTPS it needs no ATS exception — so unlike the local API it is reachable from a physical
+device off the LAN. That also answers open question 9 (off-laptop backend for device testing).
+
+## Probe results (2026-08-04) — the local/production half still holds
 
 | Host | `POST /api/v2/widget/get-basic-config {dibsStudioId:226}` | Verdict |
 |---|---|---|
@@ -13,14 +56,14 @@ everything written before it).
 | `https://dibs-api-staging.herokuapp.com` | 503 Heroku "Application Error" | **DEAD** |
 | `https://dibs-api-v2.herokuapp.com` | 503 Heroku "Offline for Maintenance" | **DEAD** (legacy prod, retired at cutover) |
 
-**There is no remote staging backend today.** The Heroku staging app that §0.5-B assumed still
-exists does not respond. Two consequences:
+~~**There is no remote staging backend today.**~~ **Wrong — corrected 2026-08-06, see above.** The
+*Heroku* staging app is dead, but dibs-api staging exists on Railway. The lesson worth keeping:
+probing the hosts named in an old doc and concluding "none of these answer" is not the same as
+establishing that a thing does not exist. Ask.
 
-1. The mobile dev loop targets **local dibs-api** (`http://localhost:3001/api/v2`) — the same thing
-   the widget's own dev `.env` does (`REACT_APP_BASE_URL='http://localhost:3001/api/v2'`).
-2. Anything that needs a backend reachable from a device that is not this laptop (P7 push testing
-   from a phone off the LAN, TestFlight betas in P10) needs a decision from Alicia: stand up a
-   Railway staging service, or accept LAN-only device testing until launch.
+Local dibs-api (`http://localhost:3001/api/v2`) remains a valid target — it is what the widget's
+own dev `.env` uses — but it is now the *second* choice, because its database has no passes and no
+transactions.
 
 ## Stripe key environment — verified, works as the plan assumed
 
