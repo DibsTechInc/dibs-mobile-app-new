@@ -5,12 +5,10 @@
 > The executor updates this file at the end of EVERY session. Statuses: `done` / `in-progress` / `blocked-on-Alicia (reason)` / `not-started`.
 
 **Last updated:** 2026-08-07 (design review — approved redesign at `design/mockups/rework.html`; session 3 handoff at `DevAssist/Aug6/HANDOFF-session3.md`)
-**Gate status:** `npm run typecheck` clean · `npx jest` **635/635** · `npm run lint` 0 errors (2 pre-existing warnings) · all 4 CI grep guardrails clean · iOS bundle exports for both v1 studios
-**Next up:** **rebuild the screens to the approved redesign** (`design/mockups/rework.html`, signed
-off 2026-08-07 — see "Design decisions made"). P2's data layer, domain rules and endpoints all
-stand; what changes is the presentation. Order: Home → the drawer → Schedule → Account.
-
-Then run it, which is finally unblocked — Alicia supplied the staging backend, the test login
+**Gate status:** `npm run typecheck` clean · `npx jest` **648/648** · `npm run lint` 0 errors (2 pre-existing warnings) · all 4 CI grep guardrails clean · iOS bundle exports for both v1 studios, each with only its own hero
+**Next up:** **run it on a device.** The redesign is BUILT (`design/mockups/rework.html`, signed off
+2026-08-07) — Home, the drawer, Schedule and Account are all on it. Nothing has been seen on a
+screen yet. — Alicia supplied the staging backend, the test login
 `alicia.ulin@gmail.com` and its password. Point at **studio 88**, where that client holds two live
 passes:
 
@@ -69,7 +67,7 @@ Four commits, local and unpushed. All of P2 except the card write paths.
 
 | Item | Status |
 |---|---|
-| Account hub | **built, needs rebuilding to the 2026-08-07 redesign** — `/account` |
+| Account hub | **rebuilt 2026-08-07** — money first (credit + passes above navigation), Lucide rows, back chevron, drawer. Unverified on device |
 | Wallet: passes | **done, unverified.** Cannot be verified locally at all: zero `passes` rows |
 | Wallet: credit | **done, unverified on device.** Endpoint exercised live (userid 10 @ 210 → `900`) |
 | Wallet: saved cards | **done, unverified on device.** Endpoint exercised live; the merge is unit-tested against the five-copies-of-4242 case the sandbox actually holds |
@@ -105,8 +103,8 @@ Four commits, local and unpushed.
 
 | Item | Status |
 |---|---|
-| Home | **built, needs rebuilding to the 2026-08-07 redesign.** The hero band cut the photograph in half; the approved design is full-bleed photo + three choices |
-| Schedule screen | **built, needs rebuilding to the 2026-08-07 redesign** — accent header, month label, top-aligned rows, per-row Book. The ~400px void under the day strip is already fixed |
+| Home | **rebuilt to the approved design 2026-08-07** — full-bleed photograph, greeting, three choices. Unverified on device |
+| Schedule screen | **rebuilt 2026-08-07** — accent header block, month label, dimmed-but-tappable empty days, top-aligned rows. The Book button waits for P3. Unverified on device |
 | Class detail | **done** — `/class/[eventId]`, resolves from the schedule cache |
 | Appointment browsing | **out of v1** (§0.1-B) |
 | Tab bar | **not-started, deliberately.** The approved mock has four tabs; two of them (Packages, Account) have no screens, and a tab that leads nowhere is a dead end. Add it when P2/P4 land. Navigation today is Home → Schedule → Detail with a real back affordance. |
