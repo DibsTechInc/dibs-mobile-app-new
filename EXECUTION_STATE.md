@@ -13,10 +13,19 @@
 `staging`): unlimited passes come back and placeholder ones do not. Verified by reading the
 source and calling the local endpoint.
 
-⚠️ **Still true: the local DB has ZERO rows in `passes` and `dibs_transactions`.** Credits are
-real (272 rows at studio 88, 355 at 210, with balances up to $900), so the credit path is
-exercisable and the pass path is not. Combined with §0.5-D, **nothing built this session has been
-run by a signed-in client.**
+✅ **§0.5-B is CLOSED and the data half of §0.5-D with it (2026-08-06, Alicia).** A remote staging
+backend does exist — **`https://dibs-api-staging-production.up.railway.app`** — the 2026-08-04
+probe only tried the dead Heroku hosts and concluded wrongly. It holds **87,222 `passes` and
+594,231 `dibs_transactions`** (local restore: 0 and 0), runs **sandbox** Stripe consistently, and
+its deployed build carries the `get-passes` fix. Test client `alicia.ulin@gmail.com` = **userid
+2502**, with two live passes at **studio 88** and none at 210 — so point dev at 88. Full detail and
+the run command: `docs/environments.md`. It is HTTPS, so it also answers open question 9
+(off-laptop device testing).
+
+⚠️ **Still missing: the Firebase password for the test login**, so no signed-in run has happened.
+The unauthenticated endpoints were probed directly with curl and their real responses validated
+against the app's schemas end to end — which caught two bugs (below) — but **no screen has been
+rendered by a signed-in client.**
 
 ⚠️ **A native rebuild is still owed** (`npx expo run:ios`) — the splash image changed in
 `app.config.ts` two sessions ago and that is baked into the binary — **and Metro must be
@@ -101,9 +110,9 @@ Four commits, local and unpushed.
 | # | Item | Status |
 |---|---|---|
 | A | Canonical prod API URL = `https://api.dibsonline.com` | **done** — probed live 2026-08-04, returns real config |
-| B | Staging URL | **resolved with a finding.** No remote staging exists — both Heroku hosts are dead (503). Dev targets **local dibs-api :3001**. `docs/environments.md`. **Still needs Alicia** for off-laptop device testing (P7/P10) |
+| B | Staging URL | **done 2026-08-06** — `https://dibs-api-staging-production.up.railway.app` (named by Alicia, probed the same day). The 2026-08-04 "no remote staging exists" finding was WRONG: it only tried the dead Heroku hosts. HTTPS, sandbox Stripe, and its DB has real passes. Also answers off-laptop device testing (open question 9). `docs/environments.md` |
 | C | Firebase client config | **done** — lifted into gitignored `.env`, names in `.env.example`. Project `dibs-studio-clients` |
-| D | Staging test user + studio state | **blocked-on-Alicia.** Shape has changed: the local DB is a prod restore, so real users exist, but Firebase passwords are live and `stripeid_test` may be empty. Name one test login |
+| D | Staging test user + studio state | **half done 2026-08-06.** Alicia named `alicia.ulin@gmail.com` = **userid 2502**, and staging has the data: two live passes at **studio 88** (a 1-use comp session and a 10-class package with 9 left), 5 sandbox cards, $862 credit at 210. **Still needed: the Firebase password**, without which nothing can be signed into |
 | E | Sandbox Stripe key path | **done** — local returns `pk_test_…`, prod returns `pk_live_…`. All pilots have `stripe_account_id_test` |
 | F | Local toolchain | **iOS done** (Xcode 26.2, CocoaPods 1.16.2). **Android absent** — no SDK, no `ANDROID_HOME`, no Java. **No longer blocking:** v1 is iOS-only, so Android verification is deferred with the platform |
 | G | Expo/EAS org + `eas init` | **done 2026-08-04.** Account: **`dibs-tech`** (the Organization, chosen over the personal account). Projects created — `@dibs-tech/carlsbad-village-yoga` (`3de21050-…`) and `@dibs-tech/everyday-ballet` (`10359ad8-…`), one per studio. Ids recorded in each studio.json; `eas.json` has development/preview/production profiles |
@@ -252,6 +261,31 @@ reduce-motion setting. Primitives in `src/components/motion.tsx` (Reanimated).
   even with a login, because the local database holds zero `passes` rows — it needs a data source
   that has them, which is the "at a studio with real pass data" half of §0.5-D.
 - 2026-08-06 (session 3) · P2's card write paths **held pending Alicia** (open question 13).
+
+## Two bugs that only real staging data could show (2026-08-06)
+
+Both were in code that typechecked, passed its own tests, and was wrong. Recorded because the
+mechanism repeats: a fixture written from a schema agrees with the schema.
+
+1. **`studio_packages.autopay` is a Postgres ENUM — `'NONE' | 'ALLOW' | 'FORCE'` — not a boolean.**
+   Aliased to `autopayStatus` by the `get-passes` include. Typed as `boolean` in
+   `src/api/schemas/passes.ts`, which would have thrown on every pass in development
+   (`strictSchemas: __DEV__`). The membership check read it too, and `'ALLOW' === true` is a dead
+   comparison that reads like a working one. **The membership signal is `passes.autopay`, the
+   row's own boolean** — the two disagree in live data (24 live passes flagged `true` on a `NONE`
+   package, 5 `false` on a `FORCE` one), so the package field would call a one-off purchase a
+   membership and miss real ones.
+2. **Every saved card rendered as "Default".** The backend flags `is_default` by FINGERPRINT,
+   which is correct for its purpose — the platform and connected copies of one card are the same
+   card, and either may survive the merge — but a fingerprint identifies a card NUMBER, so any
+   client who re-saved a card after an expiry update has several rows sharing one. Five cards on
+   staging, five Default badges, and the badge exists to answer *which card gets charged*. Now an
+   exact `defaultPaymentMethodId` match wins, with the fingerprint as the fallback it was meant to
+   be, and the flag is assigned once over the surviving list rather than per card.
+
+Also **confirmed correct** by the same data: pass 88912 expires `2027-07-17T03:59:59.999Z` at a
+`America/New_York` studio and renders **"Expires Jul 16"** — the day the client actually has.
+Verbatim-UTC would have said Jul 17. See the `passes.expiresAt` note in the shared `CLAUDE.md`.
 
 ## Backend findings — session 3 (2026-08-06, verified by reading the source)
 
