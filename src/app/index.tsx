@@ -72,14 +72,16 @@ export default function HomeRoute() {
       onSeeFullSchedule={() => router.push('/schedule')}
       // Hidden only while Firebase is still resolving, so the label never flips from "Sign in"
       // to a name in front of somebody. Once resolved there is always an action: signed-out
-      // clients get in, signed-in clients get a way back out.
+      // clients get in, signed-in clients reach their account — and, through it, the way out.
       accountAction={
         status === 'initializing'
           ? undefined
-          : {
-              label: status === 'signedIn' ? (account?.firstName ?? 'Account') : 'Sign in',
-              onPress: () => router.push('/sign-in'),
-            }
+          : status === 'signedIn'
+            ? {
+                label: account?.firstName ?? 'Account',
+                onPress: () => router.push('/account'),
+              }
+            : { label: 'Sign in', onPress: () => router.push('/sign-in') }
       }
     />
   );
