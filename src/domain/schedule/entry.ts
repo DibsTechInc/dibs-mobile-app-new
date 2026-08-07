@@ -7,6 +7,7 @@
  * label drifted from its cart price (shared CLAUDE.md, 2026-07-28).
  */
 import type { ScheduleEvent } from '@/api/schemas/schedule';
+import { formatPrice } from '@/domain/money/format';
 import { parseStoredTime } from '@/domain/time/studio-now';
 
 import type { ScheduleEntry } from './types';
@@ -27,18 +28,12 @@ const MS_PER_MINUTE = 60_000;
 /**
  * "$22" / "$16.50" — trailing `.00` dropped, because a schedule is scanned, not audited.
  *
- * `price_dibs` is DOLLARS (studio 210 charges `22`), unlike almost everything else in the money
- * layer, which is cents. Do not divide by 100 here.
+ * Re-exported from `@/domain/money/format`, which is the one implementation. Kept exported here
+ * because several callers already import it from this module, and because the note below belongs
+ * with the schedule: `price_dibs` is DOLLARS (studio 210 charges `22`), unlike almost everything
+ * else in the money layer, which is cents. Do not divide by 100 here.
  */
-export function formatPrice(amount: number, currency = 'USD'): string {
-  const whole = Number.isInteger(amount);
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
-    minimumFractionDigits: whole ? 0 : 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
-}
+export { formatPrice };
 
 /**
  * Join a first and last name defensively.

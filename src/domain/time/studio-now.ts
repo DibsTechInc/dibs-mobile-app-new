@@ -191,6 +191,33 @@ export function formatStoredTime(
 }
 
 /**
+ * Format a REAL INSTANT as the studio would read it off its own wall.
+ *
+ * ⚠️ Not for stored class times. Those are wall-clock readings wearing a Z and are printed
+ * verbatim by `formatStoredTime`. This is for the handful of values that are genuine instants —
+ * `passes.expiresAt` above all.
+ *
+ * A pass expiry is written as `moment().tz(studio.mainTZ).endOf('day').add(…)` (dibs-api
+ * `database/models/passes.js`), which is a true UTC instant: end of day in Los Angeles is
+ * `07:59:59Z` the FOLLOWING day. So both of the app's usual habits are wrong here —
+ *
+ *   • verbatim-UTC would print **Dec 1** for a pass the client's studio says expires Nov 30;
+ *   • device-local would print Nov 30 at home and Dec 1 from a phone in London.
+ *
+ * Reading it back in the studio's zone is the only rendering that says the same thing the studio
+ * says, from anywhere on earth.
+ */
+export function formatInstantInStudioZone(
+  instant: string | Date,
+  timeZone: string,
+  options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' },
+  locale = 'en-US',
+): string {
+  const date = typeof instant === 'string' ? new Date(instant) : instant;
+  return new Intl.DateTimeFormat(locale, { ...options, timeZone }).format(date);
+}
+
+/**
  * "in 2 hours" / "in 3 days" / "started 20 minutes ago", computed in the studio's frame.
  * Returns null past a week out, where a relative phrase stops being useful.
  */
