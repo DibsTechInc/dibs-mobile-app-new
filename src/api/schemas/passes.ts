@@ -4,25 +4,34 @@
  * Request: `{ dibsStudioId, userid }`. Response: `{ msg, passes: [...] }`, raw Sequelize rows
  * with a `studioPackage` include.
  *
- * ⚠️ TWO BACKEND DEFECTS make this endpoint unsafe to render as-is. Both are in
- * `dibs-api/services/shared/get-passes.js` and both are recorded in EXECUTION_STATE.md; neither
- * is the app's to fix.
+ * ── Two defects, both reported by this workstream and both now FIXED ─────────────────────────
+ * Verified 2026-08-06 by reading `dibs-api/services/shared/get-passes.js` at commit `90dc7fcc`
+ * ("fix(passes): return unlimited passes, exclude placeholders in get-passes", branch `staging`).
+ * Recorded here rather than deleted, because both are load-bearing reasons the app still filters
+ * client-side and must keep doing so.
  *
- *  1. **Unlimited passes never come back.** The `where` clause is
- *     `[Op.or]: { totalUses: {[Op.eq]: null}, totalUses: {[Op.gt]: ...} }` — a JavaScript object
- *     literal with a DUPLICATE KEY, so the null branch is discarded before Sequelize ever sees
- *     it. What survives is `totalUses > usesCount`, and in SQL that is NULL (not true) for an
- *     unlimited pass. Every membership is silently filtered out. This is the seventh surface the
- *     `totalUses === null` trap has hit.
+ *  1. **Unlimited passes used to be dropped.** The `where` built `[Op.or]` as an OBJECT with a
+ *     duplicate `totalUses` key, so JS kept only the last one and the `null` (unlimited) branch
+ *     was discarded before Sequelize saw it. What survived was `totalUses > usesCount`, and in
+ *     SQL that is NULL — not true — for an unlimited pass, so every membership was silently
+ *     filtered out. `[Op.or]` is now an ARRAY. This was the SEVENTH surface the
+ *     `totalUses === null` trap has hit; `src/domain/passes/uses.ts` treats null as unlimited on
+ *     our side regardless of what any endpoint does.
  *
- *  2. **Placeholder passes come back, and cannot be filtered.** `is_placeholder` is neither in
- *     the `where` nor in the `attributes` list, so hold passes for unpaid reservations are
- *     included AND the app has no field to exclude them by. Platform invariant: a placeholder
- *     pass must never appear in any client-facing list — it is a marker for an outstanding
- *     charge, not an entitlement.
+ *  2. **Placeholder passes used to come back with no field to filter them by.** `is_placeholder`
+ *     was in neither the `where` nor the `attributes`. It is now filtered server-side on BOTH the
+ *     pass row and the `$studioPackage.is_placeholder$` join — the join matters because the
+ *     single-appointment unpaid hold historically stamped the flag only on the package — and it
+ *     is returned in `attributes`.
  *
- * `isPlaceholder` is typed optional below so the app filters correctly the day the backend starts
- * returning it, without needing a client release.
+ * **The client-side filter stays.** `domain/passes` still refuses `is_placeholder`, because the
+ * flag was written inconsistently across the three hold-creation paths and pre-backfill rows
+ * exist; a defence that costs nothing must not be removed on the strength of one fixed endpoint.
+ *
+ * The endpoint ALSO filters `expiresAt >= now`, which means a pass with a NULL `expiresAt` never
+ * comes back at all (`NULL >= now` is NULL, not true). Nothing the app can do about that, and no
+ * pass observed at either pilot studio has a null expiry — noted so the next reader does not
+ * spend an hour on a missing row.
  */
 import { z } from 'zod';
 
@@ -51,7 +60,7 @@ export const passSchema = z
     passValue: z.number().nullable().optional(),
     private_status: z.boolean().nullable().optional(),
     private_pass: z.boolean().nullable().optional(),
-    /** NOT currently returned — see defect 2 above. Typed so the filter works when it is. */
+    /** Returned since the 2026-08-06 fix. Still optional: an older API build must not fail the schema. */
     is_placeholder: z.boolean().nullable().optional(),
     studioPackage: studioPackageSchema.nullable().optional(),
   })

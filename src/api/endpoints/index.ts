@@ -14,3 +14,10 @@ export { fetchBasicConfig } from './basic-config';
 export { fetchSchedule } from './schedule';
 export { fetchUpcomingBookings } from './upcoming';
 export { createDibsUser, fetchUserAccount } from './user-account';
+export {
+  fetchCredit,
+  fetchPasses,
+  fetchPaymentMethods,
+  type PaymentMethodsResult,
+  type WalletReadArgs,
+} from './wallet';
