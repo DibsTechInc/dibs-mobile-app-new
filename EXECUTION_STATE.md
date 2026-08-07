@@ -4,16 +4,55 @@
 > Backend (dibs-api) items are tracked in `backend-workstream/STATUS.md`, not here.
 > The executor updates this file at the end of EVERY session. Statuses: `done` / `in-progress` / `blocked-on-Alicia (reason)` / `not-started`.
 
-**Last updated:** 2026-08-06 (session 2 close — handoff at `DevAssist/Aug6/HANDOFF.md`)
-**Gate status:** `npm run typecheck` clean · `npx jest` 579/579 · `npm run lint` 0 errors (2 pre-existing warnings) · all 4 CI grep guardrails clean
-**Next up:** P2 — account hub + wallet. ⚠️ **Read `DevAssist/Aug6/HANDOFF.md` §4 first.**
-`get-passes` never returns unlimited passes (backend bug), returns placeholder passes with no
-field to filter them by, and the local DB has **zero** rows in `passes` and `dibs_transactions`.
-`domain/passes` is built and tested; wiring it to a screen cannot be *verified* until one of
-those is resolved.
+**Last updated:** 2026-08-06 (session 3 close — handoff at `DevAssist/Aug6/HANDOFF-session3.md`)
+**Gate status:** `npm run typecheck` clean · `npx jest` **616/616** · `npm run lint` 0 errors (2 pre-existing warnings) · all 4 CI grep guardrails clean · iOS bundle exports
+**Next up:** the P2 card paths (add / remove / set default) — **needs Alicia's go-ahead**, see
+"Open questions" 13. Everything else in P2 is built.
 
-⚠️ **The next session must rebuild natively** (`npx expo run:ios`) — the splash image changed in
-`app.config.ts` and that is baked into the binary — **and restart Metro**, whose config changed.
+✅ **The two `get-passes` defects reported last session are FIXED** in dibs-api (`90dc7fcc` on
+`staging`): unlimited passes come back and placeholder ones do not. Verified by reading the
+source and calling the local endpoint.
+
+⚠️ **Still true: the local DB has ZERO rows in `passes` and `dibs_transactions`.** Credits are
+real (272 rows at studio 88, 355 at 210, with balances up to $900), so the credit path is
+exercisable and the pass path is not. Combined with §0.5-D, **nothing built this session has been
+run by a signed-in client.**
+
+⚠️ **A native rebuild is still owed** (`npx expo run:ios`) — the splash image changed in
+`app.config.ts` two sessions ago and that is baked into the binary — **and Metro must be
+restarted**, whose config also changed. Neither happened this session; no simulator was run.
+
+## Session 3 (2026-08-06) — what landed
+
+Four commits, local and unpushed. All of P2 except the card write paths.
+
+1. **The three wallet reads** — `get-passes`, `get-credit`, `stripe/get-all-payments`, each
+   validating that what arrived is the success shape. All three answer HTTP 200 on failure and
+   `get-credit` answers with a bare number, so a caller trusting the status code renders an
+   outage as an empty wallet.
+2. **`domain/payments`** — the widget's card merge, ported. A saved card exists twice in Stripe
+   (platform + connected customer) and the client has one card. `card_` ids are chargeable
+   alongside `pm_`, with a test that says so.
+3. **`domain/wallet`** — every section carries a status instead of inferring one from its own
+   length, so "you have none" and "we could not ask" never look alike.
+4. **Account hub + wallet screens**, to the approved mock, at `/account` and `/account/wallet`.
+   Home's account action now goes to the account rather than back to sign-in.
+5. **Profile editing** at `/account/profile` — name and mobile number.
+
+## P2 — Account core & billing info
+
+| Item | Status |
+|---|---|
+| Account hub | **done, unverified on device** — `/account` |
+| Wallet: passes | **done, unverified.** Cannot be verified locally at all: zero `passes` rows |
+| Wallet: credit | **done, unverified on device.** Endpoint exercised live (userid 10 @ 210 → `900`) |
+| Wallet: saved cards | **done, unverified on device.** Endpoint exercised live; the merge is unit-tested against the five-copies-of-4242 case the sandbox actually holds |
+| Profile edit | **done, unverified.** Name + phone. Email is deliberately NOT editable — see the findings below |
+| Add a card (PaymentSheet) | **not-started — needs Alicia** (open question 13). Stripe write path, and `create-setup-intent` has a known env-blind write |
+| Remove card / set default | **not-started — same gate.** `toRemoveCardPayload` is built and tested against the endpoint's attribute-matching contract |
+| Communication preferences | **not-started.** `/user/update-communication-preferences` exists; no design for it yet, and P8's notification work is its natural home |
+| Delete account | **not-started — RELEASE GATE.** Apple requires it for any app with sign-up. Backend item 7.7. Not stubbed, because a delete-account row that does not delete the account is the worst version of it |
+| Tab bar | **still not-started, still deliberate.** Account now exists, so three of the mock's four tabs do — but adding one restructures Home's approved app-open sequence (the panel's travel is computed from the full screen height). Worth doing once Packages lands in P4, as one change rather than two |
 
 ## Session 2 (2026-08-06) — what landed
 
@@ -153,6 +192,19 @@ claim is "it compiles and the logic is tested", not "I saw it".
     catch-all rewrite. Nothing 404s, so a status-code check cannot detect this. The release gate
     therefore requires `legal.privacyPolicyLive: true`, flipped by hand after someone loads the
     URL and sees a policy.
+13. **May I build the card paths — add via PaymentSheet, remove, set default? (NEW, 2026-08-06.)**
+    They are P2 scope and the widget's exact sequence is traced in
+    `docs/verified-widget-sequences.md`, so there is no guesswork in the shape. What makes it an
+    ask rather than a build: they are Stripe writes, they cannot be verified without a test login
+    (§0.5-D) **and** a native rebuild, and `create-setup-intent` carries the env-blind
+    `dibs_users.stripeid` write above — the mobile app would become a new caller of a path that
+    can plant a sandbox customer id in a production column. Passing the client's existing
+    `stripeIdAtDibs` avoids that branch entirely, which is what the widget does; I would do the
+    same. Say the word and it is roughly a session's work.
+14. **Delete account is an App Store release gate, not a nice-to-have (NEW, 2026-08-06.)** Apple
+    requires it for any app that offers sign-up, backend item 7.7 is what would implement it, and
+    nothing on either side exists yet. Flagging it here because it is the kind of item that gets
+    discovered during review rather than before it.
 
 ## Design decisions made
 
@@ -193,6 +245,44 @@ reduce-motion setting. Primitives in `src/components/motion.tsx` (Reanimated).
   plus their real Firebase password would work — name one, or approve creating a test account
   through the app's own sign-up (which writes a real `dibs_user` row and a real Firebase
   credential in `dibs-studio-clients`, since Firebase is hosted and shared with the widget).
+- 2026-08-06 (session 3) · The two `get-passes` defects — **CLOSED.** Fixed in dibs-api
+  `90dc7fcc`, verified against the running local API.
+- 2026-08-06 (session 3) · §0.5-D is now blocking a SECOND phase. Everything in P2 is written and
+  none of it has been seen by a signed-in client. The pass list additionally cannot be verified
+  even with a login, because the local database holds zero `passes` rows — it needs a data source
+  that has them, which is the "at a studio with real pass data" half of §0.5-D.
+- 2026-08-06 (session 3) · P2's card write paths **held pending Alicia** (open question 13).
+
+## Backend findings — session 3 (2026-08-06, verified by reading the source)
+
+Ordered by how much damage each can do. None are the app's to fix.
+
+1. **`POST /update-profile` is unauthenticated and takes `userid` from the body — and it writes
+   `email`.** Anyone can rewrite any client's name, phone AND email address. Pointing a
+   stranger's Dibs row at your own email address associates their booking history, passes and
+   credit with your Firebase session, because `get-user-account` resolves the Dibs identity by
+   email. **This is the most serious auth gap this workstream has found** and belongs at the top
+   of the 7.3 list. (`services/shared/update-client-profile.js`, `routes/routers.js:419`.)
+2. **Editing an email in Dibs silently locks the client out.** The Dibs row and the Firebase
+   credential are separate systems and `update-profile` moves only one of them; `get-user-account`
+   then matches them case-sensitively. The widget's profile form makes this reachable without any
+   deliberate edit, because it **lowercases the address on save** — so any client whose Firebase
+   email has a capital letter can lock themselves out by saving their profile. The mobile app
+   does not offer email editing and writes the address back unchanged.
+3. **`update-profile` throws mid-write when `phone` is absent.** It reads `phone.length` with no
+   guard, *after* the name and email have already been written. The catch only `console.log`s, so
+   the controller sends `undefined` as an empty HTTP 200 — the write happened, the client is told
+   nothing, and a retry looks like the first attempt failed. The app always sends a string.
+4. **`create-setup-intent` writes `dibs_users.stripeid` with no env branch** when called without a
+   `customerid` — planting a sandbox `cus_` in the column the production charge paths read raw.
+   Already catalogued in the shared `CLAUDE.md`; recorded here because **the mobile app's
+   add-a-card flow would be a new caller of it**, which is part of open question 13.
+5. **`update-communication-preferences`'s catch block references an undefined `user`**, so any
+   failure there throws a `ReferenceError` out of the catch instead of answering.
+   (`services/users/update-communication-preferences.js`.)
+6. **`get-passes` filters `expiresAt >= now`**, which means a pass with a NULL expiry never comes
+   back at all (`NULL >= now` is NULL, not true). Not observed at either pilot studio; recorded so
+   the next person does not spend an hour hunting a missing row.
 
 ## Backend findings worth recording (2026-08-06, verified by reading the source)
 
