@@ -58,12 +58,18 @@ export type UserAccountInfo = z.infer<typeof userAccountInfoSchema>;
  *
  * Narrow on purpose. The response carries Stripe ids, a referral code, and emergency contacts;
  * a session does not need any of them, and what a session does not hold cannot leak out of it.
+ *
+ * `phone` is here because the profile form edits it and needs the current value to compare
+ * against. It is the client's own contact detail, not a pointer into another system — the test
+ * for admitting a field is whether the app would be wrong to act on it, not whether it is
+ * personal.
  */
 export interface AccountIdentity {
   userid: number;
   email: string | null;
   firstName: string | null;
   lastName: string | null;
+  phone: string | null;
 }
 
 export function toAccountIdentity(response: UserAccountResponse): AccountIdentity | null {
@@ -74,6 +80,7 @@ export function toAccountIdentity(response: UserAccountResponse): AccountIdentit
     email: info.email ?? null,
     firstName: info.firstName?.trim() || null,
     lastName: info.lastName?.trim() || null,
+    phone: info.mobilephone?.trim() || null,
   };
 }
 

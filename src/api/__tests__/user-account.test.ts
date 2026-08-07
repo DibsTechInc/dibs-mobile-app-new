@@ -37,14 +37,25 @@ const REAL_ACCOUNT = {
 describe('toAccountIdentity', () => {
   it('keeps only what a session needs', () => {
     const identity = toAccountIdentity(REAL_ACCOUNT);
-    // Deliberately narrow: the response carries Stripe ids and emergency contacts, and what a
-    // session does not hold cannot leak out of it.
+    // Deliberately narrow: the response carries Stripe ids, a referral code and emergency
+    // contacts, and what a session does not hold cannot leak out of it. The phone number is in
+    // because the profile form edits it and needs the current value to compare against.
     expect(identity).toEqual({
       userid: 2502,
       email: 'Client@Example.com',
       firstName: 'Elan',
       lastName: 'Marsh',
+      phone: '3104037905',
     });
+  });
+
+  it('carries no phone rather than an empty string when the client has none', () => {
+    // `''` would make the profile form look dirty the moment it seeded itself.
+    const identity = toAccountIdentity({
+      ...REAL_ACCOUNT,
+      info: { ...REAL_ACCOUNT.info, mobilephone: '  ' },
+    });
+    expect(identity?.phone).toBeNull();
   });
 
   it('is null when there is no account', () => {

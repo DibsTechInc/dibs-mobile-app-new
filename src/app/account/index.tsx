@@ -11,6 +11,7 @@ import { useCallback } from 'react';
 import { Alert, Linking } from 'react-native';
 
 import { studio } from '@/config/studio';
+import { formatPhoneForDisplay } from '@/domain/profile/validate';
 import { AccountScreen, type AccountRow } from '@/features/account/AccountScreen';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
@@ -48,16 +49,35 @@ export default function AccountRoute() {
       detail: 'Passes, credit and saved cards',
       onPress: () => router.push('/account/wallet'),
     },
+    {
+      label: 'Profile',
+      detail: 'Your name and mobile number',
+      onPress: () => router.push('/account/profile'),
+    },
   ];
+
+  // The studio's own configured address wins over the build's copy: a studio that changes where
+  // its mail goes should not need a store release for their clients to reach them. The build
+  // value is the seed, for a first launch with no connection.
+  const contactEmail = config?.customerServiceEmail?.trim() || studio.supportEmail;
 
   const supportRows: AccountRow[] = [
     {
       label: `Contact ${studioName}`,
-      detail: studio.supportEmail,
-      onPress: () =>
-        void open(`mailto:${studio.supportEmail}`, `Email ${studio.supportEmail} to reach the studio.`),
+      detail: contactEmail,
+      onPress: () => void open(`mailto:${contactEmail}`, `Email ${contactEmail} to reach the studio.`),
     },
   ];
+
+  // Only when the studio published one. A phone row that dials nothing is worse than no row.
+  if (config?.customerServicePhone?.trim()) {
+    const phone = config.customerServicePhone.trim();
+    supportRows.push({
+      label: 'Call the studio',
+      detail: formatPhoneForDisplay(phone),
+      onPress: () => void open(`tel:${phone.replace(/\D/g, '')}`, `Call ${formatPhoneForDisplay(phone)}.`),
+    });
+  }
 
   // Only when there is something to open. The URL is recorded in every studio config but does not
   // resolve to a policy yet (`legal.privacyPolicyLive`), and a row leading to the widget's shell

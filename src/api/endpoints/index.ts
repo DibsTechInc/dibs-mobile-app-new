@@ -13,6 +13,7 @@
 export { fetchBasicConfig } from './basic-config';
 export { fetchSchedule } from './schedule';
 export { fetchUpcomingBookings } from './upcoming';
+export { updateProfile, type UpdateProfileArgs } from './profile';
 export { createDibsUser, fetchUserAccount } from './user-account';
 export {
   fetchCredit,
