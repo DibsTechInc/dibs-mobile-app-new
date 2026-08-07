@@ -150,6 +150,10 @@ export function ScheduleScreen({
           ref={stripRef}
           horizontal
           showsHorizontalScrollIndicator={false}
+          // A horizontal ScrollView inside a flex COLUMN has no intrinsic height, so it stretches
+          // to fill whatever is left — on device that was a ~400px void between the day strip and
+          // the first class. `flexGrow: 0` makes it take only its content's height.
+          style={{ flexGrow: 0, flexShrink: 0 }}
           contentContainerStyle={{
             paddingHorizontal: theme.spacing.lg,
             gap: theme.spacing.sm,
