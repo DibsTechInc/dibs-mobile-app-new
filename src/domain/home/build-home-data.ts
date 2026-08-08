@@ -121,23 +121,25 @@ export interface Greeting {
 export function buildGreeting({
   firstName,
   studioName,
-  timeZone,
-  now = new Date(),
 }: {
   firstName: string | null;
   studioName: string;
-  timeZone: string;
-  now?: Date;
 }): Greeting {
   if (firstName) {
     return { title: `Hi ${firstName}!`, subtitle: `Welcome to ${studioName}` };
   }
 
-  const nowInStudio = studioNow(timeZone, now);
-  return {
-    title: studioName,
-    subtitle: formatStoredTime(nowInStudio, { weekday: 'long', month: 'long', day: 'numeric' }),
-  };
+  // "Welcome" over the studio's name — the approved mock, `design/mockups/rework.html`, second
+  // phone. The display line stays a greeting in both states and only the second line changes,
+  // so signing in reads as the same screen learning your name rather than a different screen.
+  //
+  // It used to put the studio's NAME on the display line over today's date. Both were wrong on
+  // this surface: the name is already the app's icon, its title and the word under the greeting,
+  // so setting it in 34px Fraunces spends the largest type on the least new information; and the
+  // date answers a question nobody opening a booking app is asking — the schedule screen is one
+  // tap away and dates every row. `timeZone` and `now` are gone with it, since neither state
+  // depends on the clock any more.
+  return { title: 'Welcome', subtitle: studioName };
 }
 
 export function buildHomeData({

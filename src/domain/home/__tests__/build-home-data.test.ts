@@ -202,44 +202,39 @@ describe('describeBookingDay', () => {
 });
 
 describe('buildGreeting', () => {
-  const TZ = 'America/New_York';
-  const NOON_ET = new Date('2026-08-07T16:00:00.000Z');
-
   it('greets a signed-in client by name, not by time of day', () => {
     // "Hi Alicia! / Welcome to Everyday Ballet" — what the old app said, restored 2026-08-07. A
     // time-of-day greeting goes stale within minutes: 11:58 and 12:02 are greeted differently for
     // no reason the client can see.
-    expect(buildGreeting({ firstName: 'Alicia', studioName: 'Everyday Ballet', timeZone: TZ, now: NOON_ET }))
+    expect(buildGreeting({ firstName: 'Alicia', studioName: 'Everyday Ballet' }))
       .toEqual({ title: 'Hi Alicia!', subtitle: 'Welcome to Everyday Ballet' });
   });
 
-  it('is identical morning and evening for the same client', () => {
-    const morning = buildGreeting({
-      firstName: 'Alicia', studioName: 'Everyday Ballet', timeZone: TZ,
-      now: new Date('2026-08-07T13:00:00.000Z'),
-    });
-    const evening = buildGreeting({
-      firstName: 'Alicia', studioName: 'Everyday Ballet', timeZone: TZ,
-      now: new Date('2026-08-08T01:00:00.000Z'),
-    });
-    expect(morning).toEqual(evening);
+  it('welcomes a guest over the studio name, per the approved mock', () => {
+    // rework.html, second phone. Not the studio name in display type over today's date: the name
+    // is already the icon, the title and the subtitle, and the date answers nothing on this screen.
+    expect(buildGreeting({ firstName: null, studioName: 'Carlsbad Village Yoga' }))
+      .toEqual({ title: 'Welcome', subtitle: 'Carlsbad Village Yoga' });
   });
 
-  it('names the studio for a guest rather than guessing at a person', () => {
-    const greeting = buildGreeting({
-      firstName: null, studioName: 'Carlsbad Village Yoga', timeZone: 'America/Los_Angeles', now: NOON_ET,
-    });
-    expect(greeting.title).toBe('Carlsbad Village Yoga');
-    expect(greeting.subtitle).toBe('Friday, August 7');
+  it('changes only the second line when a guest signs in', () => {
+    // The two states are the same screen, so the display line must stay a greeting in both. If
+    // this ever fails, signing in has started to look like a navigation.
+    const guest = buildGreeting({ firstName: null, studioName: 'Everyday Ballet' });
+    const member = buildGreeting({ firstName: 'Alicia', studioName: 'Everyday Ballet' });
+
+    expect(guest.title).toBe('Welcome');
+    expect(member.title).toBe('Hi Alicia!');
+    expect(guest.subtitle).toBe('Everyday Ballet');
+    expect(member.subtitle).toBe('Welcome to Everyday Ballet');
   });
 
-  it("dates the guest line in the STUDIO's clock, not the device's", () => {
-    // 03:00 UTC on the 8th is still the evening of the 7th in Los Angeles. A device-clock date
-    // would tell a west-coast client it is already tomorrow.
-    const greeting = buildGreeting({
-      firstName: null, studioName: 'Carlsbad Village Yoga', timeZone: 'America/Los_Angeles',
-      now: new Date('2026-08-08T03:00:00.000Z'),
-    });
-    expect(greeting.subtitle).toBe('Friday, August 7');
+  it('does not depend on the clock in either state', () => {
+    // The greeting used to carry a date, which made it the one thing on Home that could go stale
+    // while the screen sat open. Nothing here reads a clock now; this pins that.
+    expect(buildGreeting({ firstName: null, studioName: 'Everyday Ballet' }))
+      .toEqual(buildGreeting({ firstName: null, studioName: 'Everyday Ballet' }));
+    expect(buildGreeting({ firstName: 'Alicia', studioName: 'Everyday Ballet' }))
+      .toEqual(buildGreeting({ firstName: 'Alicia', studioName: 'Everyday Ballet' }));
   });
 });

@@ -18,7 +18,7 @@ import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
 import { useAppDrawer } from '@/features/nav/useAppDrawer';
 
 export default function HomeRoute() {
-  const { config, error: configError, refetch: refetchConfig, timeZone } = useStudioConfig();
+  const { config, error: configError, refetch: refetchConfig } = useStudioConfig();
   const { status, account } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const drawer = useAppDrawer({ visible: menuOpen, onClose: () => setMenuOpen(false) });
@@ -27,8 +27,8 @@ export default function HomeRoute() {
   const isSignedIn = status === 'signedIn';
 
   const greeting = useMemo(
-    () => buildGreeting({ firstName: account?.firstName ?? null, studioName, timeZone }),
-    [account?.firstName, studioName, timeZone],
+    () => buildGreeting({ firstName: account?.firstName ?? null, studioName }),
+    [account?.firstName, studioName],
   );
 
   const choices = useMemo<[HomeChoice, HomeChoice, HomeChoice]>(

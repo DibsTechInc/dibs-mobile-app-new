@@ -14,6 +14,11 @@
 import type { ConfigContext, ExpoConfig } from 'expo/config';
 
 import { loadStudioConfig } from './whitelabel/load.ts';
+import {
+  assertNativeProjectsMatchStudio,
+  expectedAndroidPackage,
+  expectedIosBundleId,
+} from './whitelabel/native-identity.ts';
 import { validateStudioForRelease } from './whitelabel/schema.ts';
 
 /** The studio a bare `npx expo run:ios` builds when nothing says otherwise. */
@@ -54,6 +59,21 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   const hasStoreReadyIcon = studio.assets.iconSource !== studio.assets.logo;
 
   if (isReleaseBuild()) validateStudioForRelease(studio);
+
+  const iosBundleId = expectedIosBundleId(studio.slug, studio.ios.bundleId);
+  const androidPackage = expectedAndroidPackage(studio.slug, studio.android.package);
+
+  /**
+   * Checked HERE because this file is the one thing every path evaluates — prebuild, run:ios,
+   * run:android, expo start and EAS alike — so the guard fires whatever command was typed,
+   * including a bare `npx expo run:ios` that never touches an npm script.
+   */
+  assertNativeProjectsMatchStudio({
+    slug: studio.slug,
+    projectRoot: __dirname,
+    iosBundleId,
+    androidPackage,
+  });
 
   /**
    * Dev builds talk to a local dibs-api over plain HTTP, which iOS blocks by default. The
@@ -112,7 +132,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
     ios: {
       supportsTablet: false,
-      bundleIdentifier: studio.ios.bundleId ?? `com.ondibs.dev.${studio.slug.replace(/-/g, '')}`,
+      // Same value the stale-project guard above checks against. Deliberately not re-derived
+      // here: two copies of "what is this studio's bundle id" is how they drift apart.
+      bundleIdentifier: iosBundleId,
       infoPlist: {
         CFBundleDisplayName: studio.shortName,
         ...(allowsLocalHttp
@@ -129,7 +151,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
 
     android: {
-      package: studio.android.package ?? `com.ondibs.dev.${studio.slug.replace(/-/g, '')}`,
+      package: androidPackage,
       adaptiveIcon: {
         backgroundColor: '#FFFFFF',
         foregroundImage: './assets/images/android-icon-foreground.png',
