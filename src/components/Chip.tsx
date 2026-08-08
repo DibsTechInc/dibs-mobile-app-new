@@ -30,7 +30,7 @@ export function Chip({ label, selected = false, onPress, disabled }: ChipProps) 
       // Chips sit below the 44pt minimum visually, so the hit area is extended instead of the
       // pill being made ungainly. A missed filter tap on a moving bus is a real failure.
       hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
-      style={({ pressed }) => ({
+      style={({ pressed }) => [{
         paddingHorizontal: theme.spacing.md,
         paddingVertical: theme.spacing.sm,
         borderRadius: theme.radii.pill,
@@ -42,7 +42,7 @@ export function Chip({ label, selected = false, onPress, disabled }: ChipProps) 
             ? theme.colors.surface
             : theme.colors.background,
         opacity: disabled ? 0.45 : 1,
-      })}
+      }]}
     >
       <Text variant="label" color={selected ? 'accent' : 'secondary'}>
         {label}

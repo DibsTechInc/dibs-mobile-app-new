@@ -31,6 +31,8 @@ export interface AccountRow {
 
 export interface AccountBalance {
   label: string;
+  /** A second, quieter line under the label — an expiry date, never a restatement. */
+  detail?: string;
   /** Already formatted — this screen never does money arithmetic. */
   value: string;
 }
@@ -42,7 +44,7 @@ function Row({ row }: { row: AccountRow }) {
       accessibilityRole="button"
       accessibilityLabel={row.detail ? `${row.label}. ${row.detail}` : row.label}
       onPress={row.onPress}
-      style={({ pressed }) => ({
+      style={({ pressed }) => [{
         flexDirection: 'row',
         alignItems: 'center',
         gap: theme.spacing.base,
@@ -51,7 +53,7 @@ function Row({ row }: { row: AccountRow }) {
         borderBottomWidth: 1,
         borderBottomColor: theme.colors.divider,
         opacity: pressed ? 0.55 : 1,
-      })}
+      }]}
     >
       <Icon
         name={row.icon}
@@ -116,7 +118,7 @@ export function AccountScreen({
           accessibilityLabel={`Back to ${studioName}`}
           onPress={onBack}
           hitSlop={12}
-          style={({ pressed }) => ({ padding: theme.spacing.xs, opacity: pressed ? 0.55 : 1 })}
+          style={({ pressed }) => [{ padding: theme.spacing.xs, opacity: pressed ? 0.55 : 1 }]}
         >
           <Icon name="back" size={20} color={theme.colors.textSecondary} />
         </Pressable>
@@ -127,7 +129,7 @@ export function AccountScreen({
             accessibilityLabel="Menu"
             onPress={onOpenMenu}
             hitSlop={12}
-            style={({ pressed }) => ({ padding: theme.spacing.xs, opacity: pressed ? 0.55 : 1 })}
+            style={({ pressed }) => [{ padding: theme.spacing.xs, opacity: pressed ? 0.55 : 1 }]}
           >
             <Icon name="menu" size={20} color={theme.colors.textSecondary} />
           </Pressable>
@@ -171,17 +173,26 @@ export function AccountScreen({
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'space-between',
-                  alignItems: 'baseline',
-                  gap: theme.spacing.sm,
+                  alignItems: 'center',
+                  gap: theme.spacing.md,
                   padding: theme.spacing.md,
                   borderTopWidth: index === 0 ? 0 : 1,
                   borderTopColor: theme.colors.divider,
                 }}
               >
-                <Text variant="caption" color="secondary" style={{ flexShrink: 1 }}>
-                  {balance.label}
-                </Text>
-                <Text variant="numeral" color="accent">
+                <View style={{ flexShrink: 1, gap: 2 }}>
+                  <Text variant="caption" color="secondary">
+                    {balance.label}
+                  </Text>
+                  {balance.detail ? (
+                    <Text variant="caption" color="tertiary">
+                      {balance.detail}
+                    </Text>
+                  ) : null}
+                </View>
+                {/* `numberOfLines` because "9 classes left" beside a long pass name is what made
+                    these rows wrap into each other on device. */}
+                <Text variant="numeral" color="accent" numberOfLines={1}>
                   {balance.value}
                 </Text>
               </View>
@@ -202,14 +213,14 @@ export function AccountScreen({
             accessibilityRole="button"
             accessibilityLabel="Sign out"
             onPress={onSignOut}
-            style={({ pressed }) => ({
+            style={({ pressed }) => [{
               minHeight: theme.minTapTarget,
               justifyContent: 'center',
               paddingVertical: theme.spacing.md,
               borderBottomWidth: 1,
               borderBottomColor: theme.colors.divider,
               opacity: pressed ? 0.55 : 1,
-            })}
+            }]}
           >
             <Text variant="body">Sign out</Text>
           </Pressable>

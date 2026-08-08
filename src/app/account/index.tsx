@@ -55,7 +55,8 @@ export default function AccountRoute() {
     if (credit.label) rows.push({ label: 'Credit balance', value: credit.label });
     for (const pass of passes.items) {
       rows.push({
-        label: pass.expiresLabel ? `${pass.name} · ${pass.expiresLabel}` : pass.name,
+        label: pass.name,
+        detail: pass.expiresLabel ?? undefined,
         value: pass.remainingLabel,
       });
     }
@@ -94,7 +95,7 @@ export default function AccountRoute() {
   if (phone) {
     rows.push({
       label: 'Call the studio',
-      icon: 'contact',
+      icon: 'phone',
       detail: formatPhoneForDisplay(phone),
       onPress: () => void open(`tel:${phone.replace(/\D/g, '')}`, `Call ${formatPhoneForDisplay(phone)}.`),
     });
@@ -105,7 +106,7 @@ export default function AccountRoute() {
   if (studio.privacyPolicyUrl) {
     rows.push({
       label: 'Privacy policy',
-      icon: 'contact',
+      icon: 'document',
       onPress: () =>
         void open(studio.privacyPolicyUrl!, 'Visit dibsonline.com to read the privacy policy.'),
     });

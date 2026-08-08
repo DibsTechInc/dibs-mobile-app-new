@@ -126,7 +126,7 @@ export function DrawerMenu({
             accessibilityLabel="Close menu"
             onPress={onClose}
             hitSlop={12}
-            style={({ pressed }) => ({ padding: theme.spacing.xs, opacity: pressed ? 0.55 : 1 })}
+            style={({ pressed }) => [{ padding: theme.spacing.xs, opacity: pressed ? 0.55 : 1 }]}
           >
             <Icon name="close" size={20} color={theme.colors.textTertiary} />
           </Pressable>
@@ -203,7 +203,7 @@ function Row({ item }: { item: DrawerItem }) {
       accessibilityRole="button"
       accessibilityLabel={item.label}
       onPress={item.onPress}
-      style={({ pressed }) => ({
+      style={({ pressed }) => [{
         flexDirection: 'row',
         alignItems: 'center',
         gap: theme.spacing.base,
@@ -212,7 +212,7 @@ function Row({ item }: { item: DrawerItem }) {
         borderBottomWidth: 1,
         borderBottomColor: theme.colors.divider,
         opacity: pressed ? 0.55 : 1,
-      })}
+      }]}
     >
       <Icon name={item.icon} size={19} color={theme.colors.textTertiary} />
       <Text variant="body">{item.label}</Text>

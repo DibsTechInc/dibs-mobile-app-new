@@ -77,7 +77,7 @@ function Choice({ choice, onPhoto }: { choice: HomeChoice; onPhoto: boolean }) {
       accessibilityRole="button"
       accessibilityLabel={choice.label}
       onPress={choice.onPress}
-      style={({ pressed }) => ({
+      style={({ pressed }) => [{
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
@@ -85,7 +85,7 @@ function Choice({ choice, onPhoto }: { choice: HomeChoice; onPhoto: boolean }) {
         paddingVertical: theme.spacing.md,
         minHeight: theme.minTapTarget,
         opacity: pressed ? 0.55 : 1,
-      })}
+      }]}
     >
       <Icon
         name={choice.icon}
@@ -198,7 +198,7 @@ export function HomeScreen({
             accessibilityLabel="Menu"
             onPress={onOpenMenu}
             hitSlop={12}
-            style={({ pressed }) => ({ padding: theme.spacing.sm, opacity: pressed ? 0.55 : 1 })}
+            style={({ pressed }) => [{ padding: theme.spacing.sm, opacity: pressed ? 0.55 : 1 }]}
           >
             <Icon name="menu" color={theme.colors.textInverse} />
           </Pressable>
@@ -211,7 +211,7 @@ export function HomeScreen({
               accessibilityLabel="Cart"
               onPress={onOpenCart}
               hitSlop={12}
-              style={({ pressed }) => ({ padding: theme.spacing.sm, opacity: pressed ? 0.55 : 1 })}
+              style={({ pressed }) => [{ padding: theme.spacing.sm, opacity: pressed ? 0.55 : 1 }]}
             >
               <Icon name="cart" color={theme.colors.textInverse} />
             </Pressable>
@@ -249,8 +249,10 @@ export function HomeScreen({
           flexDirection: 'row',
           borderTopWidth: 1,
           borderTopColor: theme.heroScrim.hairline,
-          paddingTop: theme.spacing.sm,
-          paddingBottom: insets.bottom + theme.spacing.base,
+          paddingTop: theme.spacing.md,
+          // The home indicator eats the last few points, and a label resting on it reads as
+          // clipped. Measured against a device, not assumed.
+          paddingBottom: insets.bottom + theme.spacing.md,
         }}
       >
         {choices.map((choice, index) => (

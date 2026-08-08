@@ -35,8 +35,16 @@ import { useTheme } from '@/theme/ThemeProvider';
 /** Capacity only becomes news at three or fewer. Above that, silence is more honest. */
 const SPOTS_LEFT_THRESHOLD = 3;
 
-/** Width of the time rail. Wide enough that "12:00 PM" never breaks across two lines. */
-const TIME_RAIL = 76;
+/**
+ * The time rail, and the size the time is set at.
+ *
+ * Measured, not guessed: "12:00 PM" at the `numeral` role (20px Fraunces) needs ~86pt, so a 76pt
+ * rail truncated it to "12:00 …" on device. Rather than widen the rail — which takes width from
+ * the class name, the thing people are actually reading — the time drops to 17px, which fits 84pt
+ * with room to spare and still reads as the numeral moment it is.
+ */
+const TIME_RAIL = 84;
+const TIME_SIZE = 17;
 
 function DayChip({
   day,
@@ -56,7 +64,7 @@ function DayChip({
       accessibilityState={{ selected }}
       accessibilityLabel={empty ? `${day.longLabel}, no classes` : day.longLabel}
       onPress={onPress}
-      style={({ pressed }) => ({
+      style={({ pressed }) => [{
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
@@ -66,7 +74,7 @@ function DayChip({
         backgroundColor: selected ? theme.colors.background : 'transparent',
         // Dimmed, not hidden. The strip is a calendar and must not skip dates.
         opacity: empty && !selected ? 0.42 : pressed ? 0.7 : 1,
-      })}
+      }]}
     >
       <Text
         variant="label"
@@ -112,7 +120,7 @@ function ClassRow({
       accessibilityRole="button"
       accessibilityLabel={`${formatStoredTime(entry.startsAt)} ${entry.name}`}
       onPress={onPress}
-      style={({ pressed }) => ({
+      style={({ pressed }) => [{
         // TOP-aligned. See rule 3 in the header.
         flexDirection: 'row',
         alignItems: 'flex-start',
@@ -122,11 +130,11 @@ function ClassRow({
         borderBottomWidth: 1,
         borderBottomColor: theme.colors.divider,
         backgroundColor: pressed ? theme.colors.surface : theme.colors.background,
-      })}
+      }]}
     >
       <View style={{ width: TIME_RAIL }}>
         {/* Stored wall-clock, printed verbatim — never device-converted. */}
-        <Text variant="numeral" numberOfLines={1}>
+        <Text variant="numeral" numberOfLines={1} style={{ fontSize: TIME_SIZE, lineHeight: 22 }}>
           {formatStoredTime(entry.startsAt)}
         </Text>
         {entry.durationMinutes ? (
@@ -222,7 +230,7 @@ export function ScheduleScreen({
   // Keep the selected chip in view when the screen opens on a day that is not the first.
   const activeIndex = active ? days.indexOf(active) : 0;
   useEffect(() => {
-    if (activeIndex > 3) stripRef.current?.scrollTo({ x: (activeIndex - 3) * 46, animated: false });
+    if (activeIndex > 3) stripRef.current?.scrollTo({ x: (activeIndex - 3) * 52, animated: false });
   }, [activeIndex]);
 
   return (
@@ -243,7 +251,7 @@ export function ScheduleScreen({
             accessibilityLabel={`Back to ${studioName}`}
             onPress={onBack}
             hitSlop={12}
-            style={({ pressed }) => ({ padding: theme.spacing.xs, opacity: pressed ? 0.55 : 1 })}
+            style={({ pressed }) => [{ padding: theme.spacing.xs, opacity: pressed ? 0.55 : 1 }]}
           >
             <Icon name="back" size={20} color={theme.colors.onAccent} />
           </Pressable>
@@ -260,7 +268,7 @@ export function ScheduleScreen({
               accessibilityLabel="Cart"
               onPress={onOpenCart}
               hitSlop={12}
-              style={({ pressed }) => ({ padding: theme.spacing.xs, opacity: pressed ? 0.55 : 1 })}
+              style={({ pressed }) => [{ padding: theme.spacing.xs, opacity: pressed ? 0.55 : 1 }]}
             >
               <Icon name="cart" size={20} color={theme.colors.onAccent} />
             </Pressable>
@@ -283,7 +291,7 @@ export function ScheduleScreen({
             }}
           >
             {days.map((day) => (
-              <View key={day.date} style={{ width: 46 }}>
+              <View key={day.date} style={{ width: 52 }}>
                 <DayChip
                   day={day}
                   selected={day.date === active?.date}
