@@ -83,20 +83,6 @@ jobs:
             exit 1
           fi
 
-      - name: Pressable style functions must return an ARRAY
-        run: |
-          # NativeWind's JSX transform is active (babel.config.js sets jsxImportSource), and its
-          # Pressable interop only honours a style function that returns an array. A function
-          # returning a bare object is DROPPED ENTIRELY — silently. On 2026-08-07 that shipped a
-          # build where every flexDirection:'row' was ignored: schedule rows, account rows and the
-          # Home menu all stacked vertically, and day chips lost their selected pill. Nothing threw,
-          # nothing failed a test, and typecheck was clean.
-          if grep -rnE "style=\{\(\{ ?pressed ?\}\) => \(\{" src/ \
-               --include='*.tsx'; then
-            echo "::error::Pressable style functions must return an array: => [{ ... }], not => ({ ... })."
-            exit 1
-          fi
-
       - name: source must be 'dibs', never the dead 'zf' value
         run: |
           if grep -rnE "source:\s*'zf'" src/ --include='*.ts' --include='*.tsx'; then

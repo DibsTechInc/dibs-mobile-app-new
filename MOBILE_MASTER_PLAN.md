@@ -149,7 +149,16 @@ Plus delight features already cheap because the backend exists (§7.6): mileston
 
 ## 2. Current State (verified 2026-07-06)
 
-- **Scaffold:** Expo SDK 56, React 19.2, RN 0.85, New Architecture enabled, TypeScript 6 strict, Expo Router (typed routes), NativeWind 4, TanStack Query 5, Zustand 5, zod, decimal.js, expo-secure-store. `npx tsc --noEmit` → clean. `npx jest` → 280/280 pass.
+- **Scaffold:** Expo SDK 56, React 19.2, RN 0.85, New Architecture enabled, TypeScript 6 strict, Expo Router (typed routes), TanStack Query 5, Zustand 5, zod, decimal.js, expo-secure-store. `npx tsc --noEmit` → clean. `npx jest` → 280/280 pass.
+- **NativeWind was REMOVED 2026-08-07 and must not be re-added casually.** Its JSX transform
+  (`jsxImportSource: 'nativewind'`) silently DISCARDS a `style` prop that is a function, so every
+  `style={({ pressed }) => …}` on a `Pressable` was dropped whole — layout, padding and background
+  together. That shipped four broken builds: schedule rows, account rows and the Home menu all
+  stacked vertically, and the selected day chip lost its pill. Nothing threw, nothing failed a test,
+  typecheck was clean. Proven by a four-variant on-device probe: a style function was the only
+  variant that failed, and it failed whether it returned an object OR an array. The app had **zero**
+  `className` usages, so the transform was pure cost. Styling is plain RN `StyleSheet`/inline objects
+  driven by `useTheme()`.
 - **Done:** pricing waterfall ported to `src/domain/pricing/` with golden-master tests. Router shell (`src/app/_layout.tsx`, `index.tsx`). Query client (`src/api/query-client.ts`).
 - **Empty:** `src/api` (beyond query-client), `src/stores`, `src/components`, `src/theme`, `src/lib` — everything else in this plan.
 - **Not yet installed (add in P0):** `@stripe/stripe-react-native`, `firebase` (JS SDK), `expo-notifications`, `expo-calendar`, `expo-local-authentication`, `@react-native-async-storage/async-storage`, `expo-haptics`, `date-fns`, `date-fns-tz`.
@@ -481,7 +490,7 @@ See §6 for the full build system. This phase productionizes it:
 - `heroImage` — the vertical brand photo: splash treatment, Home cover, auth backdrop.
 - App name, icon (generated), support email.
 
-Implementation: `src/theme/tokens.ts` (DNA) + `src/theme/studio.ts` (personality, loaded from white-label config) → merged in a ThemeProvider → consumed via NativeWind CSS variables + a `useTheme()` hook. **No component ever references a raw hex.**
+Implementation: `src/theme/tokens.ts` (DNA) + `src/theme/studio.ts` (personality, loaded from white-label config) → merged in a ThemeProvider → consumed via a `useTheme()` hook. **No component ever references a raw hex.**
 
 ### 5.2 Guardrails on studio inputs
 

@@ -65,7 +65,10 @@ function DayChip({
       accessibilityLabel={empty ? `${day.longLabel}, no classes` : day.longLabel}
       onPress={onPress}
       style={({ pressed }) => [{
-        flex: 1,
+        // NOT `flex: 1`. The parent cell is `width: 52` with no definite HEIGHT, so a flex child
+        // gets `flexBasis: 0` with no free space to grow into and collapses to its padding —
+        // clipping both labels to nothing. Height comes from the content; width already
+        // stretches to the cell.
         alignItems: 'center',
         justifyContent: 'center',
         gap: 2,
