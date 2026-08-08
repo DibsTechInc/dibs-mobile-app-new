@@ -201,7 +201,7 @@ export function AuthScreen({
                 stopped, which draws an edge across the picture — and on a high-key photograph
                 that edge is the first thing you see. */}
             <View
-              style={{ position: 'absolute', inset: 0, backgroundColor: theme.heroScrim.veil }}
+              style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: theme.heroScrim.veil }}
               pointerEvents="none"
             />
             <LinearGradient

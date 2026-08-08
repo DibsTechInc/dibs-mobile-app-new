@@ -47,11 +47,23 @@ function resolveHeroPath() {
 
 const HERO_PATH = resolveHeroPath();
 
+/**
+ * Stripe is native-only, so the WEB bundle cannot build with it — and the web bundle is the only
+ * way to look at a screen without a device. Two builds shipped broken on 2026-08-07 because there
+ * was no way to see them; this makes `expo start --web` a working design loop.
+ *
+ * Scoped to `platform === 'web'`, so iOS and Android are untouched and still get the real SDK.
+ */
+const STRIPE_WEB_STUB = path.resolve(__dirname, 'web-preview/stripe-stub.js');
+
 const defaultResolveRequest = config.resolver.resolveRequest;
 
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   if (moduleName === '@studio/hero') {
     return { type: 'sourceFile', filePath: HERO_PATH };
+  }
+  if (platform === 'web' && moduleName.startsWith('@stripe/stripe-react-native')) {
+    return { type: 'sourceFile', filePath: STRIPE_WEB_STUB };
   }
   return (defaultResolveRequest ?? context.resolveRequest)(context, moduleName, platform);
 };

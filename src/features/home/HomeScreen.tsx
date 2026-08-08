@@ -29,7 +29,7 @@
  */
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Pressable, View } from 'react-native';
+import { Pressable, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ApiError, describeApiError } from '@/api/errors';
@@ -70,7 +70,24 @@ export interface HomeScreenProps {
   onRetry?: () => void;
 }
 
-function Choice({ choice, onPhoto }: { choice: HomeChoice; onPhoto: boolean }) {
+function Choice({
+  choice,
+  divided,
+  width,
+}: {
+  choice: HomeChoice;
+  /** Hairline on the leading edge. Never on the first, or it reads as a stray rule. */
+  divided: boolean;
+  /**
+   * An EXPLICIT width, not `flex: 1`.
+   *
+   * Three rounds of flex tuning — minWidth 0, width 100%, a plain View instead of the animated
+   * one — all still produced a row about 495pt wide on a 393pt screen, with the third choice off
+   * the right edge. Whatever is refusing to shrink these cells, a measured third of the window
+   * cannot be argued with. Verified in the web preview.
+   */
+  width: number;
+}) {
   const theme = useTheme();
   return (
     <Pressable
@@ -78,21 +95,27 @@ function Choice({ choice, onPhoto }: { choice: HomeChoice; onPhoto: boolean }) {
       accessibilityLabel={choice.label}
       onPress={choice.onPress}
       style={({ pressed }) => [{
-        flex: 1,
+        width,
         alignItems: 'center',
         justifyContent: 'center',
         gap: theme.spacing.sm,
-        paddingVertical: theme.spacing.md,
+        paddingVertical: theme.spacing.sm,
         minHeight: theme.minTapTarget,
+        borderLeftWidth: divided ? 1 : 0,
+        borderLeftColor: theme.heroScrim.hairlineSoft,
         opacity: pressed ? 0.55 : 1,
       }]}
     >
-      <Icon
-        name={choice.icon}
-        size={22}
-        color={onPhoto ? theme.colors.textInverse : theme.colors.text}
-      />
-      <Text variant="label" color={onPhoto ? 'inverse' : 'primary'} uppercase>
+      <Icon name={choice.icon} size={21} color={theme.colors.textInverse} />
+      {/* One line, always. "MY CALENDAR" is the longest label and it must not wrap a third of
+          the way across the screen. */}
+      <Text
+        variant="label"
+        color="inverse"
+        uppercase
+        numberOfLines={1}
+        style={{ fontSize: 10.5, letterSpacing: 0.6 }}
+      >
         {choice.label}
       </Text>
     </Pressable>
@@ -111,6 +134,7 @@ export function HomeScreen({
 }: HomeScreenProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const { width: windowWidth } = useWindowDimensions();
 
   /**
    * The bundled file wins over the live URL.
@@ -150,12 +174,18 @@ export function HomeScreen({
     );
   }
 
-  const dividerColor = theme.heroScrim.hairlineSoft;
-
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.text }}>
-      {/* THE PHOTOGRAPH — the whole screen, and nothing resizes it. */}
-      <View style={{ position: 'absolute', inset: 0, overflow: 'hidden' }} pointerEvents="none">
+      {/*
+        THE PHOTOGRAPH — the whole screen, and nothing resizes it.
+
+        Edges written out individually. `inset: 0` is a CSS shorthand React Native does NOT
+        support: it is silently ignored, so this absolutely-positioned layer had no bounds at all,
+        sized itself to the photograph, and stretched the root to ~495pt on a 393pt screen — which
+        is what pushed the third menu choice off the right edge. Four rounds of flex tuning could
+        not fix it because flex was never the problem. Never use `inset` in this codebase.
+      */}
+      <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, overflow: 'hidden' }} pointerEvents="none">
         <HeroSettle animate={playEntrance} style={{ flex: 1 }}>
           <Image
             source={heroSource}
@@ -174,7 +204,7 @@ export function HomeScreen({
         {/* The veil is a flat fill, NOT a gradient. See rule 2 in the header. It sits outside
             HeroSettle so it never scales with the photograph — a wash that scales makes its own
             edge crawl across the frame. */}
-        <View style={{ position: 'absolute', inset: 0, backgroundColor: theme.heroScrim.veil }} />
+        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: theme.heroScrim.veil }} />
         <LinearGradient
           colors={[theme.heroScrim.footFrom, theme.heroScrim.footMid, theme.heroScrim.footTo]}
           locations={[0, 0.6, 1]}
@@ -240,36 +270,34 @@ export function HomeScreen({
         ) : null}
       </FadeRise>
 
-      {/* THE MENU — hairline-joined, so it reads as one object rather than three buttons. */}
-      <FadeRise
-        animate={playEntrance}
-        delay={CHROME_DELAY}
-        distance={0}
-        style={{
-          flexDirection: 'row',
-          borderTopWidth: 1,
-          borderTopColor: theme.heroScrim.hairline,
-          paddingTop: theme.spacing.md,
-          // The home indicator eats the last few points, and a label resting on it reads as
-          // clipped. Measured against a device, not assumed.
-          paddingBottom: insets.bottom + theme.spacing.md,
-        }}
-      >
-        {choices.map((choice, index) => (
-          <View
-            key={choice.label}
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              // The divider belongs BETWEEN choices, so the first one does not get a stray rule
-              // down its left edge.
-              borderLeftWidth: index === 0 ? 0 : 1,
-              borderLeftColor: dividerColor,
-            }}
-          >
-            <Choice choice={choice} onPhoto />
-          </View>
-        ))}
+      {/*
+        THE MENU — hairline-joined, so it reads as one object rather than three buttons.
+
+        The row is a PLAIN View inside FadeRise, not FadeRise itself. Layout must not depend on an
+        animated wrapper: when it did, the row sized itself to its content (~492pt on a 393pt
+        screen) and `flex: 1` divided that wrong total, pushing the third choice off the right
+        edge. FadeRise now only fades; the View owns the geometry.
+      */}
+      <FadeRise animate={playEntrance} delay={CHROME_DELAY} distance={0}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'stretch',
+            borderTopWidth: 1,
+            borderTopColor: theme.heroScrim.hairline,
+            paddingTop: theme.spacing.md,
+            paddingBottom: insets.bottom + theme.spacing.md,
+          }}
+        >
+          {choices.map((choice, index) => (
+            <Choice
+              key={choice.label}
+              choice={choice}
+              divided={index > 0}
+              width={windowWidth / choices.length}
+            />
+          ))}
+        </View>
       </FadeRise>
     </View>
   );
