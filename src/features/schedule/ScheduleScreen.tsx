@@ -46,6 +46,22 @@ const SPOTS_LEFT_THRESHOLD = 3;
 const TIME_RAIL = 84;
 const TIME_SIZE = 17;
 
+/**
+ * The day strip, revised on device 2026-08-10 (Alicia) against the booking widget.
+ *
+ * The approved mock draws this strip at ~52pt per day with the numerals in Fraunces, and the app
+ * matched it. On a real 393pt screen that puts EIGHT dates on screen at once with barely a hair
+ * between them, and the serif numerals — set beside a sans weekday label, in a row of eight — read
+ * as decoration rather than as dates. Alicia's words: "too close together", "the font looks meh,
+ * like it's trying too hard". The widget's own strip shows FOUR dates in sans and is legible at a
+ * glance, which is the bar. This is a deliberate revision OF the mock, not a drift from it.
+ *
+ * 68 rather than a width that divides the screen evenly: at 393pt it leaves a partial cell at the
+ * right edge, which is the only thing on screen that says the strip scrolls. A whole number of
+ * cells looks like the whole week and hides the rest of the month.
+ */
+const DAY_CELL = 68;
+
 function DayChip({
   day,
   selected,
@@ -71,9 +87,16 @@ function DayChip({
         // stretches to the cell.
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 2,
+        gap: 3,
         paddingVertical: theme.spacing.sm,
-        borderRadius: theme.radii.pill,
+        // Insets the highlight inside its cell, so the selected day is a tab with air around it
+        // rather than a white slab butting against its neighbours. The cell keeps its full 68 for
+        // hit area; only the painted surface shrinks.
+        marginHorizontal: theme.spacing.xs,
+        // A rounded tab, not a circle. `pill` was drawn against a ~52pt square cell, where a full
+        // radius rounds all the way to a disc that crops its own label; at 68pt it would stretch
+        // to a lozenge instead. A fixed radius reads the same at any cell width.
+        borderRadius: theme.radii.card,
         backgroundColor: selected ? theme.colors.background : 'transparent',
         // Dimmed, not hidden. The strip is a calendar and must not skip dates.
         opacity: empty && !selected ? 0.42 : pressed ? 0.7 : 1,
@@ -85,8 +108,11 @@ function DayChip({
       >
         {day.weekdayLabel}
       </Text>
+      {/* DM Sans, not the `numeral` role's Fraunces — see DAY_CELL. A date in a strip is a label
+          you scan, not a figure you read; the serif is kept for the month above, where it is one
+          phrase and does the editorial work on its own. */}
       <Text
-        variant="numeral"
+        variant="heading"
         style={{ color: selected ? theme.colors.accentInk : theme.colors.textInverse }}
       >
         {day.dayOfMonth}
@@ -230,10 +256,12 @@ export function ScheduleScreen({
 
   const monthLabel = useMemo(() => monthLabelFor(days, active?.date ?? null), [days, active?.date]);
 
-  // Keep the selected chip in view when the screen opens on a day that is not the first.
+  // Keep the selected chip in view when the screen opens on a day that is not the first. Measured
+  // in DAY_CELL, not a repeated literal — a second copy of the cell width silently mis-scrolls the
+  // strip the moment the first one changes, which is exactly what happened at 52.
   const activeIndex = active ? days.indexOf(active) : 0;
   useEffect(() => {
-    if (activeIndex > 3) stripRef.current?.scrollTo({ x: (activeIndex - 3) * 52, animated: false });
+    if (activeIndex > 2) stripRef.current?.scrollTo({ x: (activeIndex - 2) * DAY_CELL, animated: false });
   }, [activeIndex]);
 
   return (
@@ -289,12 +317,14 @@ export function ScheduleScreen({
             // to fill whatever is left — on device that was a ~400px void under the strip.
             style={{ flexGrow: 0, flexShrink: 0 }}
             contentContainerStyle={{
-              paddingHorizontal: theme.spacing.sm,
-              paddingBottom: theme.spacing.md,
+              // Aligns the first day with the back chevron above it, and keeps the selected tab
+              // off the screen edge — at 8 it read as clipped rather than as the first item.
+              paddingHorizontal: theme.spacing.md,
+              paddingBottom: theme.spacing.base,
             }}
           >
             {days.map((day) => (
-              <View key={day.date} style={{ width: 52 }}>
+              <View key={day.date} style={{ width: DAY_CELL }}>
                 <DayChip
                   day={day}
                   selected={day.date === active?.date}
