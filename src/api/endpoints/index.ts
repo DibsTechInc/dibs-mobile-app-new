@@ -20,7 +20,7 @@ export {
   type CreateSetupIntentArgs,
 } from './cards';
 export { fetchSchedule } from './schedule';
-export { fetchUpcomingBookings } from './upcoming';
+export { fetchClientBookings, type ClientBookings } from './upcoming';
 export { updateProfile, type UpdateProfileArgs } from './profile';
 export { createDibsUser, fetchUserAccount } from './user-account';
 export {

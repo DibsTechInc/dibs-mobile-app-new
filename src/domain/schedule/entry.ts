@@ -36,6 +36,26 @@ const MS_PER_MINUTE = 60_000;
 export { formatPrice };
 
 /**
+ * Capitalise a name that was typed entirely in lower case, and ONLY then.
+ *
+ * Studio 88 holds the same instructor as both "Aimee Ozeki" and "aimee ozeki", so one schedule
+ * screen shows one person's name two different ways — which reads as nobody minding the app.
+ *
+ * The narrow rule is the whole point. Unconditional title-casing is a classic way to mangle real
+ * names: it turns McDonald into Mcdonald, O'Brien into O'brien and Estellés into estellés-adjacent
+ * nonsense the moment anyone "normalises" harder. A name containing ANY capital was styled by a
+ * human and is left exactly as typed. Only an all-lowercase name — which no one writes on purpose —
+ * is touched, and then just at the letter after each space, hyphen or apostrophe, so "o'brien"
+ * becomes "O'Brien" and "mary-kate" becomes "Mary-Kate".
+ */
+function capitaliseIfAllLower(name: string): string {
+  if (/\p{Lu}/u.test(name)) return name;
+  return name.replace(/(^|[\s'’-])(\p{Ll})/gu, (_, boundary: string, letter: string) =>
+    `${boundary}${letter.toUpperCase()}`,
+  );
+}
+
+/**
  * Join a first and last name defensively.
  *
  * Live data carries leading spaces in `lastname` (studio 210 has `" Estellés"`), so a naive
@@ -46,7 +66,7 @@ export function formatInstructorName(
   last: string | null | undefined,
 ): string | null {
   const joined = `${first ?? ''} ${last ?? ''}`.replace(/\s+/g, ' ').trim();
-  return joined || null;
+  return joined ? capitaliseIfAllLower(joined) : null;
 }
 
 /** Whole minutes between two stored wall-clock times, or null when we cannot tell. */

@@ -62,6 +62,9 @@ export function useAppDrawer({ visible, onClose }: AppDrawerArgs) {
     // Only rows whose destinations exist. Packages is P4, referrals are later — and a drawer row
     // that leads nowhere is the dead end this codebase keeps refusing to ship.
     if (isSignedIn) {
+      // Directly under Book, as in the approved mock's drawer: the two are a pair — what is on
+      // offer, and what you have taken up.
+      rows.push({ label: 'My calendar', icon: 'myCalendar', onPress: go('/my-calendar') });
       rows.push({ label: 'Account', icon: 'account', onPress: go('/account') });
       rows.push({
         label: 'Payment methods',

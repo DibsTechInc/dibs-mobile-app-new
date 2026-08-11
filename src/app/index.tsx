@@ -39,7 +39,7 @@ export default function HomeRoute() {
         icon: 'myCalendar',
         // Signed out there is no calendar to show, so the tap goes where it can become one
         // rather than to an empty screen that explains itself.
-        onPress: () => router.push(isSignedIn ? '/account' : '/sign-in'),
+        onPress: () => router.push(isSignedIn ? '/my-calendar' : '/sign-in'),
       },
       isSignedIn
         ? { label: 'Account', icon: 'account', onPress: () => router.push('/account') }

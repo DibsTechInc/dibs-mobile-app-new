@@ -7,18 +7,30 @@ export interface FetchUpcomingBookingsArgs {
   dibsStudioId: number;
 }
 
+export interface ClientBookings {
+  /**
+   * NOT "what is still to come" — the endpoint returns from the start of the studio's TODAY, so
+   * this morning's class is in here all evening. Splitting it properly is
+   * `domain/bookings/group-bookings.ts`'s job, against the studio's clock.
+   */
+  upcoming: UpcomingBookingRow[];
+  previous: UpcomingBookingRow[];
+}
+
 /**
- * The client's own upcoming bookings at this studio.
+ * Both halves of the client's booking record at this studio, in one request.
  *
- * Returns the rows only. `previousAppts` comes back in the same response and is dropped here —
- * a screen that wants booking history should ask for it deliberately rather than inherit it as
- * a side effect of asking what is coming up.
+ * Named for what it returns. It used to be `fetchUpcomingBookings` and discarded `previousAppts`
+ * on the grounds that history should be asked for deliberately — but the two arrive in the SAME
+ * response, so a second deliberate fetch would be a second identical round trip and a second
+ * cache entry that could disagree with the first. Both are returned as named fields instead,
+ * which is the deliberate part; a caller that only wants one destructures one.
  */
-export async function fetchUpcomingBookings(
+export async function fetchClientBookings(
   client: ApiClient,
   { userid, dibsStudioId }: FetchUpcomingBookingsArgs,
   signal?: AbortSignal,
-): Promise<UpcomingBookingRow[]> {
+): Promise<ClientBookings> {
   const response = await client.post(
     'get-upcoming-appts',
     { userid, dibsStudioId },
@@ -39,5 +51,10 @@ export async function fetchUpcomingBookings(
     });
   }
 
-  return response.upcomingAppts;
+  // Only `upcomingAppts` proves the response is real. A studio can legitimately return no history
+  // at all for a new client, so an absent `previousAppts` is an empty list, not a failure.
+  return {
+    upcoming: response.upcomingAppts,
+    previous: Array.isArray(response.previousAppts) ? response.previousAppts : [],
+  };
 }

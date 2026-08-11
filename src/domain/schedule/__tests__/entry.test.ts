@@ -170,3 +170,29 @@ describe('toScheduleEntry — the rest', () => {
     expect(toScheduleEntry(realEvent(), OPTIONS).startsAt).toBe('2026-08-05T18:00:00.000Z');
   });
 });
+
+describe('formatInstructorName casing', () => {
+  it('capitalises a name typed entirely in lower case', () => {
+    // Studio 88 holds this same person both ways, so one list showed both.
+    expect(formatInstructorName('aimee', 'ozeki')).toBe('Aimee Ozeki');
+  });
+
+  it('leaves a name containing ANY capital exactly as a human typed it', () => {
+    // The reason the rule is narrow: these are the names blind title-casing destroys.
+    expect(formatInstructorName('Ronan', 'McDonald')).toBe('Ronan McDonald');
+    expect(formatInstructorName('Siobhan', "O'Brien")).toBe("Siobhan O'Brien");
+    expect(formatInstructorName('Marta', ' Estellés')).toBe('Marta Estellés');
+    expect(formatInstructorName('Ludwig', 'van Beethoven')).toBe('Ludwig van Beethoven');
+  });
+
+  it('capitalises after apostrophes and hyphens, not just spaces', () => {
+    expect(formatInstructorName("siobhan", "o'brien")).toBe("Siobhan O'Brien");
+    expect(formatInstructorName('mary-kate', 'olsen')).toBe('Mary-Kate Olsen');
+  });
+
+  it('still trims, still returns null for nothing', () => {
+    expect(formatInstructorName('marta', ' estellés')).toBe('Marta Estellés');
+    expect(formatInstructorName(null, undefined)).toBeNull();
+    expect(formatInstructorName('  ', '')).toBeNull();
+  });
+});
