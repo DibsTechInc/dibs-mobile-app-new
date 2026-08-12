@@ -56,16 +56,29 @@ update spots → notify). Do not reimplement any of it.
 
 Mounted with `requireWidgetAuth` (client Firebase project — `dibs-studio-clients`).
 
-Request `{ dibsStudioId, eventId, promoCode? }`. **`userid` comes from the verified token, never
-the body** — the same rule the `POST /update-profile` hardening just established.
+Request `{ dibsStudioId, eventId, displayedTotalCents }`. **`userid` comes from the verified token,
+never the body** — the same rule the `POST /update-profile` hardening just established.
+
+**Promo codes are OUT of v1** (Alicia, 2026-08-11): get card booking working first. With no promo
+the price is just the event's, so client and server can hardly disagree — which is precisely why
+this is the cheapest possible moment to establish that the server prices the booking. Adding a
+`promoCode` parameter later changes one function, not the contract.
 
 Server:
 
 1. Load the event. Reject cancelled, deleted, already-started, and full.
 2. Reject if this client already has a live attendee row for the event — a double booking is a
    double charge.
-3. **Compute the price server-side.** The client sends a promo *code*, never a total — see the
-   promo note at the bottom for the live hole this is avoiding.
+3. **Price it server-side.** Not because the client should be kept in the dark — the opposite. The
+   app MUST show what is about to be charged before the sheet opens, and it computes and displays
+   that itself (Alicia, 2026-08-11). Those are two different jobs: the client computes to *show*,
+   the server computes to *charge*, and the number that reaches Stripe is the server's own.
+   Nothing about that changes what the client sees, because in agreement they are the same figure.
+   The point is only that `charge-card.js`'s `amount: req.body?.total` lets a caller name its own
+   price; an endpoint that starts from an event id cannot be asked to.
+
+   The app sends the total it displayed. The server compares, charges its own, and logs any
+   mismatch loudly — a disagreement is a pricing bug worth knowing about on the first occurrence.
 4. Resolve the connected-account customer via `create-user-connected-stripeid.js`.
 5. Create an **ephemeral key** for that customer, on the connected account. Nothing in dibs-api
    creates ephemeral keys today — this is genuinely new.
@@ -80,67 +93,54 @@ breakdown }`.
 
 Request `{ dibsStudioId, eventId, paymentIntentId }`; `userid` from the token.
 
-1. Retrieve the PI from Stripe **on the connected account**. Require `status === 'succeeded'`.
-   Never trust the client's word that it paid.
+1. Retrieve the PI from Stripe **on the connected account**. Require **`status ===
+   'requires_capture'`** — authorized, not yet charged. Never trust the client's word that it paid.
+   (`'succeeded'` here would mean something already captured it; treat that as the idempotent
+   replay in step 2, not as a fresh booking.)
 2. **Idempotency keyed on the PaymentIntent id**, not on status — the same lesson as the
    `paid_transaction_id` fix in the invoice pipeline. A retry after a dropped response must return
    the existing booking, not book twice.
-3. Record the Scenario 5 rows above, then send the client confirmation and the ops notification.
+3. Take the seat atomically, then `capture()` — or `cancel()` and report the class full. See the
+   capacity section below; this ordering is the whole reason there is never a refund.
+4. Record the Scenario 5 rows above, then send the client confirmation and the ops notification.
 
 Returns the booking summary the app shows on success.
 
-### Capacity: hold the seat BEFORE charging (Alicia, 2026-08-11)
+### Capacity: authorize first, capture once the seat is secured
 
-The seat is reserved when the client taps Book, not when the money lands. Charge against a held
-seat, then convert the hold into a real booking. This is the right instinct and it removes almost
-all of the exposure — a client cannot pay for a class that filled while they were typing a card.
+The gap is real — money must not move for a class that filled while the client was paying — but
+Stripe already solves it, so Dibs should not.
 
-**Holds are rows, not a counter.** The proposal was a `events.temp_held_spots` column, incremented
-on Book and decremented on success. The arithmetic is right; a bare counter is the part to avoid,
-because a counter cannot expire. Every way a checkout dies — force-quit, dead battery, lost signal,
-a 3DS challenge abandoned in a banking app — leaves it incremented with nothing left running to
-decrement it. That seat is then gone **permanently**, the class shows full with an empty spot, and
-there is no way to work out which increment was the orphan because a number records neither who
-took it nor when.
+Create the PaymentIntent with **`capture_method: 'manual'`** (scoped to cards via
+`payment_method_options[card][capture_method]`, so a payment method that cannot authorize
+separately is not blocked). Confirming it in the sheet then AUTHORIZES the card rather than
+charging it: the status becomes `requires_capture`, the funds are held by the issuer, and 3D Secure
+runs during that authorization exactly as it would otherwise.
 
-Rows fix that by construction:
+Then, and only then, take the seat:
 
-```
-class_spot_holds
-  id, event_id, userid, dibs_studio_id
-  payment_intent_id      -- so confirm-booking finds exactly the right hold
-  expires_at             -- created_at + HOLD_MINUTES
-  released_at            -- set on conversion, cancellation, or expiry sweep
-```
+- **Seat secured** → `paymentIntents.capture()`. The money moves and the booking is recorded.
+- **Class filled first** → `paymentIntents.cancel()`. The authorization is released. **No charge
+  ever happened, so there is nothing to refund.**
 
-Held count is `COUNT(*) WHERE event_id = ? AND released_at IS NULL AND expires_at > now()`. An
-abandoned hold stops counting the moment it expires, with nothing needing to run — the leak is
-self-healing rather than permanent. A sweeper to stamp `released_at` on dead rows is then tidying,
-not correctness. Indexed on `(event_id, expires_at)` the count is cheap; do not denormalise it back
-onto `events` until something measured says to, because a cached count is a second source of truth
-free to drift from the first.
+Verified against the live Stripe docs 2026-08-11: online card authorizations are valid for ~7 days,
+which is an eternity against the seconds this needs.
 
-Rows also buy things a counter cannot: showing the client their own hold and its countdown,
-refusing a second hold on the same class by the same person, and seeing abandoned checkouts.
+**This replaces the `class_spot_holds` design, which was built and then deleted (2026-08-11).**
+That approach reserved the seat in a new table with its own expiry, sweeper and conversion logic —
+Alicia's push-back was that it was a lot of machinery for an MVP, and she was right. Manual capture
+gets the same guarantee with no new table, no migration, no expiry, no sweeper, and — the part that
+actually mattered — no refunds. The seat claim is just the atomic `spots_booked` update the
+platform already performs. **Do not reintroduce a holds table without first explaining what manual
+capture cannot do.**
 
-**Creating the hold must itself be atomic.** `spots_booked + held >= seats` is the full test, and
-two people tapping Book at the same instant must not both get the last seat — the insert is
-conditional on the count, in one statement, the same shape as the ClassPass reservation claim.
+One honest caveat: a released authorization can sit as a *pending* line on some bank statements
+briefly before it disappears. No money moves and it is not a charge, but a client may glimpse it.
+That is the same trade every hotel and car rental makes, and it is far better than taking money and
+giving it back.
 
-**`HOLD_MINUTES = 5`** as proposed, with one caveat: a 3DS challenge that bounces through a banking
-app can outlast it. So the hold makes the bad case *rare*; it does not make it impossible, and
-**the refund path is still required** as the backstop. At confirm time: hold alive → convert it;
-hold expired but the seat is still free → take it and carry on; hold expired and the class filled →
-refund immediately and say so plainly.
-
-**Only the card path needs holds.** Pass, credit and free bookings record in one atomic step with no
-gap to protect.
-
-**The widget will not know about holds** — it reads `spots_booked`/`isFull` from `events`, so it
-will not show a held seat as full. That is acceptable: holds are enforced server-side at claim
-time, so the widget cannot overbook. The worst case is a web client tapping a class that has just
-been held and being told it is full.
-
+Only the card path needs any of this. Pass, credit and free bookings record in one atomic step with
+no gap to protect.
 ---
 
 ## App side
@@ -181,8 +181,11 @@ already does for card entry.
   one booking exists and one charge was made.
 - Sandbox studio 88 is `acct_1U1fXzQTOTKua6cH` (`stripe_account_id_test`), and userid 2502 holds
   two live passes there — so both the pass path and the card path are testable on the same account.
-- Tap Book, then force-quit before paying. The seat must free itself within `HOLD_MINUTES` with
-  nothing having run in between.
+- Fill the last seat from a second device while the first is mid-payment. The loser must see "just
+  filled", and Stripe must show that PaymentIntent **canceled with zero captured** — no refund
+  object anywhere.
+- Force-quit between authorizing and confirming. The authorization lapses on its own; nothing is
+  captured and no seat is consumed.
 
 ---
 
