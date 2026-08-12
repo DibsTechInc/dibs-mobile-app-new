@@ -77,8 +77,9 @@ Server:
    The point is only that `charge-card.js`'s `amount: req.body?.total` lets a caller name its own
    price; an endpoint that starts from an event id cannot be asked to.
 
-   The app sends the total it displayed. The server compares, charges its own, and logs any
-   mismatch loudly — a disagreement is a pricing bug worth knowing about on the first occurrence.
+   The app sends the total it displayed. The server compares, charges its own, and raises a
+   mismatch alert — see below. A disagreement is a pricing bug worth knowing about on its first
+   occurrence, not its hundredth.
 4. Resolve the connected-account customer via `create-user-connected-stripeid.js`.
 5. Create an **ephemeral key** for that customer, on the connected account. Nothing in dibs-api
    creates ephemeral keys today — this is genuinely new.
@@ -141,6 +142,45 @@ giving it back.
 
 Only the card path needs any of this. Pass, credit and free bookings record in one atomic step with
 no gap to protect.
+
+---
+
+## Price-mismatch alert (Alicia, 2026-08-11)
+
+When the total the app displayed differs from the total the server priced, email `ops@ondibs.com`
+with enough to trace the money:
+
+| Field | Where it comes from |
+|---|---|
+| Amount shown to the customer | `displayedTotalCents` on the request |
+| Amount charged | the server's own figure, which is what Stripe captured |
+| Difference, and which way | computed — the sign is the first thing you want to see |
+| `dibs_transactions.id` | the PURCHASE row (`type='pack'`), the one carrying `amount_charged` |
+| `attendees.id` | the booking row |
+| Promo id | `null` until promo lands. The field ships now so the template never has to change |
+| PaymentIntent id, event id, userid, studio | context — enough to find it in Stripe and in the DB |
+
+**The timing problem, and the answer.** The mismatch is detectable at endpoint 1, but the
+transaction and attendee ids do not exist until endpoint 2 has recorded the booking. So:
+
+1. **Endpoint 1 detects it**, stamps `price_mismatch` into the PaymentIntent metadata, and logs a
+   greppable `[PRICE-MISMATCH id=<uuid>]` line immediately. The alert survives here even if
+   everything after it fails.
+2. **Endpoint 2 sends the email**, once the ids exist, carrying the whole picture.
+
+**A client who abandons after the mismatch therefore gets no email** — the booking never happened,
+so there are no ids to report. That case is still recorded: the log line is written, and the Stripe
+metadata flags the intent, so an abandoned mismatch is findable rather than invisible. If that
+turns out to matter, the fix is to send the email at step 1 too and accept two for a completed
+booking; it is deliberately not built that way yet because the completed case is the one where
+money actually moved.
+
+**Do not send it through the routine ops mailer alone.** `opsMailService.sendOpsNotification` is
+the same channel every "Invoice paid" notice uses, and this platform already has one documented
+case of a CRITICAL email sitting unread for three days inside that traffic (July 2026, see the
+shared `CLAUDE.md`). Route it through `services/shared/notifications/webhook-alert.js`'s pattern
+instead: a distinct subject, SMS to `ESCALATION_PHONE`, and per-event dedupe so a systematic
+pricing bug alerts once rather than on every booking that night.
 ---
 
 ## App side
