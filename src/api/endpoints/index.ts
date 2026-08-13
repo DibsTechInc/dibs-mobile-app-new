@@ -12,6 +12,12 @@
  */
 export { fetchBasicConfig } from './basic-config';
 export {
+  BookingRefusedError,
+  confirmClassBooking,
+  createClassPaymentIntent,
+  type CreateClassPaymentIntentArgs,
+} from './class-booking';
+export {
   createSetupIntent,
   ensureConnectedCustomer,
   fetchPublishableKey,

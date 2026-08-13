@@ -30,6 +30,16 @@ export interface StripeReadiness {
   isLoading: boolean;
   error: unknown;
   retry: () => void;
+  /**
+   * The key this session fetched, or null while it is still on its way.
+   *
+   * Exposed for ONE reason: booking has to re-point the SDK at the studio's connected account and
+   * then put it back (`features/payments/stripeSession.ts`), and both configurations must use the
+   * same key. Re-fetching it there could hand a build two different keys — which is how a sandbox
+   * build half-switches to live. Never persist it and never write it into `src/`; it is fetched at
+   * runtime precisely so no key exists in the bundle.
+   */
+  publishableKey: string | null;
 }
 
 const StripeReadinessContext = createContext<StripeReadiness | null>(null);
@@ -56,6 +66,7 @@ export function StripeSdkProvider({ children }: { children: ReactElement }) {
       isLoading: isPending,
       error,
       retry: () => void refetch(),
+      publishableKey: data ?? null,
     }),
     [data, isPending, error, refetch],
   );

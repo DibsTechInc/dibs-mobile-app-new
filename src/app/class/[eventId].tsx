@@ -20,8 +20,10 @@ import { EmptyState, ErrorState, SkeletonList } from '@/components';
 import { studio } from '@/config/studio';
 import { isAcceptingBookings } from '@/api/schemas/basic-config';
 import { describeCancelWindow } from '@/domain/cancellation/cancel-window';
+import { resolveClassCharge } from '@/domain/pricing/class-charge';
 import { findEvent, longDayLabel } from '@/domain/schedule/days';
 import { toScheduleEntry } from '@/domain/schedule/entry';
+import { useBookClass } from '@/features/bookings/useBookClass';
 import { ClassDetailScreen } from '@/features/schedule/ClassDetailScreen';
 import { useSchedule } from '@/features/schedule/useSchedule';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
@@ -38,6 +40,20 @@ export default function ClassDetailRoute() {
     () => (schedule.data ? findEvent(schedule.data, Number(eventId)) : null),
     [schedule.data, eventId],
   );
+
+  /**
+   * What the card will be charged, tax included — the ONE client-side answer, and the figure sent
+   * as `displayedTotalCents` so the server can refuse to charge anything else.
+   *
+   * Resolved before the early returns because hooks cannot be conditional; the null event case
+   * yields a placeholder that the screen never renders.
+   */
+  const charge = useMemo(
+    () => (event ? resolveClassCharge(event, config?.currency) : null),
+    [event, config?.currency],
+  );
+
+  const booking = useBookClass({ eventId: Number(eventId), currency: config?.currency });
 
   const onBack = useCallback(() => {
     if (router.canGoBack()) router.back();
@@ -97,6 +113,9 @@ export default function ClassDetailRoute() {
         config?.defaultCancelTimeGroup ?? config?.cancelTime,
       )}
       acceptingBookings={config ? isAcceptingBookings(config) : true}
+      charge={charge}
+      bookingStatus={booking.status}
+      onBook={booking.book}
       onBack={onBack}
     />
   );

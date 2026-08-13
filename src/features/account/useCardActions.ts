@@ -21,6 +21,7 @@ import { ApiError } from '@/api/errors';
 import { studio } from '@/config/studio';
 import { toRemoveCardPayload, type SavedCard } from '@/domain/payments/cards';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { stripeRedirectUrl } from '@/features/payments/stripeSession';
 
 /** Raised when the client dismissed the PaymentSheet. Not an error to show them. */
 export class CardEntryCancelled extends Error {
@@ -70,7 +71,12 @@ export function useCardActions() {
         merchantDisplayName: studio.appName,
         // The client is saving a card to use later, not paying now. Stripe uses this to word the
         // sheet's own copy and to set up future off-session use.
-        returnURL: `${studio.slug}://stripe-redirect`,
+        //
+        // Built from the scheme Expo actually registered, NOT from the slug: `app.config.ts` sets
+        // `scheme: \`dibs-${slug}\``, so the old `${studio.slug}://stripe-redirect` produced
+        // `everyday-ballet://…` — a scheme nothing on the device handles. It never surfaced here
+        // because 3DS on a card SAVE is rare; it would have surfaced immediately on booking.
+        returnURL: stripeRedirectUrl(),
       });
       if (init.error) {
         throw new ApiError({
