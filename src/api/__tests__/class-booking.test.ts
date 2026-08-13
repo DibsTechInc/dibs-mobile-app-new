@@ -140,6 +140,30 @@ describe('createClassPaymentIntent', () => {
     expect(error.code).toBe('bad_request');
   });
 
+  it('lifts covered_by_pass so the screen can style it as good news', async () => {
+    // A member on an unlimited membership must never be able to pay by card for a class their
+    // membership covers, and the sentence that says so is not an error message.
+    const { client } = clientReturning(
+      {
+        ok: false,
+        code: 'covered_by_pass',
+        message:
+          'Your Month Unlimited covers this class. Booking with a pass is coming to the app shortly — ask the studio to book you in for now.',
+        coveringPassCount: 1,
+      },
+      409,
+    );
+
+    const error = (await createClassPaymentIntent(client, {
+      dibsStudioId: 88,
+      eventId: 1,
+      displayedTotalCents: 2382,
+    }).catch((e: unknown) => e)) as BookingRefusedError;
+
+    expect(error.refusalCode).toBe('covered_by_pass');
+    expect(error.message).toContain('Month Unlimited');
+  });
+
   it('leaves a genuine failure as an ordinary ApiError', async () => {
     const { client } = clientReturning({ error: 'upstream exploded' }, 500);
 

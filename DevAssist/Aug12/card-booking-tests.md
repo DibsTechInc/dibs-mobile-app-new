@@ -135,7 +135,19 @@ disconnect).
 - [ ] **An ET studio's 6:30 PM class is still bookable at 6:00 PM ET after 8 PM UTC**
       (the `getStudioWallClock` test — the trap that empties Upcoming Sessions every evening)
 
-### 11. Stripe global state — the Account tab must survive booking
+### 11. You already own this — the `covered_by_pass` refusal
+
+userid 2502 holds two live passes at studio 88, so this is testable on the same account.
+
+- [ ] A client holding a **public** pass with uses left taps Book on a class → refused with a
+      calm, non-red sentence naming the package, the CTA comes down, and **no PaymentIntent is
+      created in Stripe**
+- [ ] The same client on a class with `can_apply_pass = false` → the card booking proceeds normally
+- [ ] A client whose ONLY pass is a **private** appointment pack → the card booking proceeds
+      normally (this is the check that the refusal is not a dead end)
+- [ ] An unlimited membership holder → refused, message names the membership
+
+### 12. Stripe global state — the Account tab must survive booking
 
 - [ ] Book a class, then immediately add a card in Account → the SetupIntent still works
       (the platform configuration was restored)
@@ -166,9 +178,11 @@ platform account.
 
 ## Known gaps, stated rather than hidden
 
-- **Pass- and credit-covered bookings are not wired in the app** (P3 items 1–3). The card CTA is
-  offered for any class with a real price; a client holding a membership that covers the class is
-  not stopped from paying by card. See the open decision in the session summary.
+- **Pass- and credit-covered bookings are not wired in the app** (P3 items 1–3). Until they are,
+  endpoint 1 REFUSES with `covered_by_pass` when the client holds a pass that would cover the class
+  (Alicia, 2026-08-13), so nobody can be charged for something they already own. **Retire that gate
+  when the pass path ships.** Credit is not covered by it: a client with partial credit pays the
+  full amount by card and keeps the credit, which is the documented v1 decision.
 - **Trial soft-lockout has no server-side predicate** (checked 2026-08-13). The studio gate keys on
   `dibs_studio.live` alone, with a named TODO in `gates.js` tied to
   `.planning/STUDIO_SUBSCRIPTION_PHASE1_PLAN.md`.

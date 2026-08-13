@@ -261,6 +261,12 @@ export function ClassDetailScreen({
           <Text variant="heading" align="center">
             You’re booked. See you {dayLabel.split(',')[0]}.
           </Text>
+        ) : bookingStatus.kind === 'coveredByPass' ? (
+          // Good news, so it is not styled as an error, and the CTA comes down: there is nothing
+          // to do here by card. The server's sentence names the package and the way forward.
+          <Text variant="secondary" color="secondary" align="center">
+            {bookingStatus.message}
+          </Text>
         ) : !acceptingBookings ? (
           <Text variant="secondary" color="secondary" align="center">
             Booking is temporarily unavailable. Contact the studio to book this class.

@@ -59,6 +59,13 @@ export type BookingStatus =
    * PaymentIntent was even created.
    */
   | { kind: 'priceChanged'; charge: ClassCharge; message: string }
+  /**
+   * The client already holds a pass that covers this class, so the server refused to take a card.
+   * Good news, not a failure — it is styled and worded as such, and the CTA comes down because
+   * there is nothing to do here by card. Pass booking is P3 items 1–2; until it lands the message
+   * names the package and points at the studio.
+   */
+  | { kind: 'coveredByPass'; message: string }
   | { kind: 'booked'; booking: ConfirmClassBookingResponse }
   | {
       kind: 'error';
@@ -172,6 +179,10 @@ export function useBookClass({ eventId, currency }: UseBookClassArgs) {
       }
 
       if (error instanceof BookingRefusedError) {
+        if (error.refusalCode === 'covered_by_pass') {
+          setStatus({ kind: 'coveredByPass', message: error.message });
+          return;
+        }
         if (error.refusalCode === 'price_changed' && error.breakdown) {
           setStatus({
             kind: 'priceChanged',
