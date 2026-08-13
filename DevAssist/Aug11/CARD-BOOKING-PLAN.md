@@ -143,6 +143,21 @@ giving it back.
 Only the card path needs any of this. Pass, credit and free bookings record in one atomic step with
 no gap to protect.
 
+### The seat claim is the ATTENDEE insert, not a spots_booked increment (checked 2026-08-13)
+
+`services/shared/events/checkout/update-event-spots-booked-new.js` does not do what its name
+suggests. It **recounts** — `SELECT` every non-dropped attendee, set `spots_booked` to that count,
+set `isFull` from it. It is a reconciliation, and it neither checks capacity nor reserves anything.
+Calling it to "take a seat" would happily write `spots_booked` past `seats`.
+
+So the atomic claim has to be the **conditional insert of the attendee row**: insert only where
+`(count of non-dropped attendees for this event) < seats`, evaluated in the same statement. Then
+call `updateEventsSpotsBookedNew` afterwards to reconcile `spots_booked`/`isFull`, which is exactly
+what it is for and what every other booking path already does.
+
+That also means `attendees` is the real source of truth for capacity and `spots_booked` is a
+derived cache — worth knowing before trusting `spots_booked` in any capacity decision.
+
 ---
 
 ## Price-mismatch alert (Alicia, 2026-08-11)
