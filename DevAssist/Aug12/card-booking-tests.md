@@ -56,7 +56,7 @@ already selected → pay.
 - [ ] Stripe: ONE PaymentIntent, `succeeded`, amount 2382, metadata carries
       `dibs_mobile_booking=1` + the right event/user/studio
 - [ ] DB: pass (`totalUses` 1, `usesCount` 1, `passValue` **22.00** — the PRE-tax figure),
-      purchase transaction (`type='pack'`, `amount_charged` **23.82**, `purchasePlace='mobile app'`),
+      purchase transaction (`type='pack'`, `amount_charged` **23.82**, `purchasePlace='mobile-app'`),
       redemption transaction (`type='class'`, `with_passid`, `amount_charged` **0**), attendee whose
       `attendeeID` = the **redemption** transaction id, `source='dibs'`
 - [ ] `events.spots_booked` incremented by exactly one
