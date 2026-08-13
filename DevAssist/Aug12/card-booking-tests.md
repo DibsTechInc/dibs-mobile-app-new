@@ -163,7 +163,7 @@ platform account.
 ## Deploy checklist
 
 1. Deploy dibs-api.
-2. **Create the `dibs-payment-intent` destination** — Stripe Dashboard → Webhooks → **Connect**
+2. **Create the `dibs-payment-intent-success` destination** — Stripe Dashboard → Webhooks → **Connect**
    tab (NOT the platform tab) → `https://api.dibsonline.com/api/v2/stripe/webhooks/payment-intent`,
    subscribed to **`payment_intent.succeeded` ONLY**.
 3. Set `STRIPE_PAYMENT_INTENT_WEBHOOK_SECRET` on the dibs-api service.
