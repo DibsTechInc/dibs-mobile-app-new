@@ -38,18 +38,38 @@ describe('toAccountIdentity', () => {
   it('keeps only what a session needs', () => {
     const identity = toAccountIdentity(REAL_ACCOUNT);
     // Deliberately narrow: the response carries a referral code and emergency contacts, and what a
-    // session does not hold cannot leak out of it. Two fields earn their place — the phone,
-    // because the profile form edits it; and the PLATFORM Stripe customer, because passing it to
-    // create-setup-intent is what stops that endpoint minting a new one and writing it to the
-    // production column with no environment branch.
+    // session does not hold cannot leak out of it. Three fields earn their place — the phone and
+    // the birthday, because the profile form edits both; and the PLATFORM Stripe customer, because
+    // passing it to create-setup-intent is what stops that endpoint minting a new one and writing
+    // it to the production column with no environment branch.
     expect(identity).toEqual({
       userid: 2502,
       email: 'Client@Example.com',
       firstName: 'Elan',
       lastName: 'Marsh',
       phone: '3104037905',
+      birthday: null,
       platformStripeCustomerId: 'cus_dibs456',
     });
+  });
+
+  it('reads the MM/DD placeholder back as no birthday', () => {
+    // The widget's profile form submits its own placeholder verbatim when nobody fills the field
+    // in, so `'MM/DD'` is a real stored value on live rows. Rendering it would put the literal
+    // string "MM/DD" on screen as though it were somebody's birthday.
+    expect(
+      toAccountIdentity({
+        ...REAL_ACCOUNT,
+        info: { ...REAL_ACCOUNT.info, birthday: 'MM/DD' },
+      })?.birthday,
+    ).toBeNull();
+
+    expect(
+      toAccountIdentity({
+        ...REAL_ACCOUNT,
+        info: { ...REAL_ACCOUNT.info, birthday: ' 03/14 ' },
+      })?.birthday,
+    ).toBe('03/14');
   });
 
   it('does NOT carry the connected-account customer', () => {

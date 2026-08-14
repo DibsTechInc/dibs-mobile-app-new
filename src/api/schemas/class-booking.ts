@@ -75,6 +75,14 @@ export const bookingRefusalSchema = z
     breakdown: classPriceBreakdownSchema.optional(),
     /** Set when the refusal happened before any money moved, so the copy can say so. */
     nothingCharged: z.boolean().optional(),
+    /**
+     * On `already_booked`: how many live spots the client already holds in this class.
+     *
+     * Carried so the refusal can be an OFFER — "you have 1 spot; book another?" — instead of a
+     * wall. Optional because an older backend does not send it; the app must still be able to say
+     * something useful without it.
+     */
+    existingBookingCount: z.number().optional(),
   })
   .passthrough();
 

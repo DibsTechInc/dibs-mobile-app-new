@@ -23,11 +23,13 @@ import { isAcceptingBookings } from '@/api/schemas/basic-config';
 import { studio } from '@/config/studio';
 import { cancelWindowSentence, describeCancelWindow } from '@/domain/cancellation/cancel-window';
 import { formatBalance } from '@/domain/money/format';
+import { describeCheckoutPayment } from '@/domain/payments/checkout-method';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { CheckoutScreen, type CheckoutLineView } from '@/features/cart/CheckoutScreen';
 import { useCartStore } from '@/features/cart/cartStore';
 import { useCart } from '@/features/cart/useCart';
 import { useCartCheckout, type BookableItem, type LineOutcome } from '@/features/cart/useCartCheckout';
+import { useSavedCards } from '@/features/payments/useSavedCards';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
 
 const PENDING: LineOutcome = { kind: 'pending' };
@@ -50,6 +52,8 @@ export default function CheckoutRoute() {
   const cart = useCart();
   const removeFromCart = useCartStore((state) => state.remove);
   const checkout = useCartCheckout({ currency: config?.currency });
+  // The SAME owner the wallet reads, so the card named here is the card the wallet calls default.
+  const cards = useSavedCards();
 
   const studioName = config?.studioName ?? studio.appName;
 
@@ -73,12 +77,22 @@ export default function CheckoutRoute() {
     [cart.lines, checkout.outcomes, timeZone, config],
   );
 
-  /** Lines still to book — booked ones have stopped counting. */
+  /**
+   * Lines still to book — booked ones have stopped counting.
+   *
+   * `alreadyBooked` stops counting too, and that is the load-bearing half. It is the one refusal
+   * the CTA cannot resolve: the server counts attendee rows, so re-running the same line produces
+   * the same refusal forever. Leaving it in would keep it in the total and on the button, which is
+   * how "Try again · $40.76" came to sit under "You're already booked into this class". Booking a
+   * second spot is a per-line decision with its own button — see `onBookAnother`.
+   */
   const outstanding = useMemo(
     () =>
       lines.filter(
         (line) =>
-          (line.state === 'ready' || line.state === 'covered') && line.outcome.kind !== 'booked',
+          (line.state === 'ready' || line.state === 'covered') &&
+          line.outcome.kind !== 'booked' &&
+          line.outcome.kind !== 'alreadyBooked',
       ),
     [lines],
   );
@@ -138,6 +152,48 @@ export default function CheckoutRoute() {
   });
   useEffect(() => () => clearBooked.current(), []);
 
+  /**
+   * Book a SECOND spot in one class.
+   *
+   * Reachable only from a line the server has already refused with `already_booked`, and it runs
+   * that ONE line — the permission is minted by this tap and travels no further than the item it
+   * was granted for. Running the whole cart here would hand a duplicate booking to every other
+   * line in it, which is the difference between answering a question and being taken at your word
+   * about something you never said.
+   */
+  const onBookAnother = useCallback(
+    (eventId: number) => {
+      const line = lines.find((candidate) => candidate.eventId === eventId);
+      if (!line || line.outcome.kind !== 'alreadyBooked') return;
+      checkout.run([{ line, totalCents: effectiveTotalCents(line), allowDuplicate: true }]);
+    },
+    [checkout, lines],
+  );
+
+  /**
+   * What is about to pay, resolved once and handed down.
+   *
+   * The pass names are de-duplicated because two classes covered by one pack is one pass being
+   * spent twice, not two passes — and the summary is a sentence, not an inventory.
+   */
+  const payment = useMemo(
+    () =>
+      describeCheckoutPayment({
+        chargeableCount: outstandingChargeable.length,
+        coveredCount: outstandingCovered.length,
+        passNames: [
+          ...new Set(
+            outstandingCovered
+              .map((line) => line.passName)
+              .filter((name): name is string => Boolean(name)),
+          ),
+        ],
+        card: cards.defaultCard,
+        status: cards.status,
+      }),
+    [outstandingChargeable, outstandingCovered, cards.defaultCard, cards.status],
+  );
+
   const onBack = useCallback(() => {
     if (router.canGoBack()) router.back();
     else router.replace('/schedule');
@@ -158,8 +214,10 @@ export default function CheckoutRoute() {
       acceptingBookings={config ? isAcceptingBookings(config) : true}
       studioName={studioName}
       phase={checkout.phase}
+      payment={payment}
       onRemove={removeFromCart}
       onConfirm={() => checkout.run(bookableItems)}
+      onBookAnother={onBookAnother}
       onBack={onBack}
       onViewCalendar={() => router.replace('/my-calendar')}
       onBrowseClasses={() => router.replace('/schedule')}

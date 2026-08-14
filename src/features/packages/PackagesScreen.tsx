@@ -35,12 +35,39 @@ import type { SectionStatus, WalletPass } from '@/domain/wallet/build-wallet';
 import type { PurchaseStatus } from '@/features/packages/usePurchasePackage';
 import { useTheme } from '@/theme/ThemeProvider';
 
-function SectionLabel({ children }: { children: string }) {
+/**
+ * A section heading with real weight.
+ *
+ * ── Why this is not the tiny uppercase eyebrow it used to be ──────────────────────────────────
+ * "YOUR PASSES" and "BUY MORE" were both 11pt letter-spaced labels above visually identical
+ * cards, so the two halves of this screen read as one continuous list and a client could not tell
+ * which of the two "10-class Package" cards was already theirs (Alicia, 2026-08-14). The label was
+ * carrying the entire distinction between *what you own* and *what is for sale*, in the smallest
+ * type on the page.
+ *
+ * A serif heading with a supporting line and a rule beneath it says the same thing at a glance,
+ * and — more importantly — makes the two sections look like two sections before anybody reads a
+ * word. The card treatment below carries the rest of the load.
+ */
+function SectionHeading({ title, subtitle }: { title: string; subtitle?: string }) {
   const theme = useTheme();
   return (
-    <Text variant="label" color="tertiary" uppercase style={{ marginBottom: theme.spacing.md }}>
-      {children}
-    </Text>
+    <View
+      style={{
+        gap: 2,
+        paddingBottom: theme.spacing.sm,
+        marginBottom: theme.spacing.base,
+        borderBottomWidth: 1,
+        borderBottomColor: theme.colors.border,
+      }}
+    >
+      <Text variant="title">{title}</Text>
+      {subtitle ? (
+        <Text variant="caption" color="tertiary">
+          {subtitle}
+        </Text>
+      ) : null}
+    </View>
   );
 }
 
@@ -50,11 +77,20 @@ function SectionLabel({ children }: { children: string }) {
  * The count leads, large — it is the fact somebody opens this screen to check. An unlimited
  * membership has no number, and inventing one is the single most-repeated bug on this platform, so
  * it gets the word instead, set as a tag so it reads as a STATE rather than as a missing figure.
+ *
+ * ── The accent field is the point ─────────────────────────────────────────────────────────────
+ * These carry `emphasis="accent"` while the storefront cards stay neutral. That is the same
+ * language My Calendar uses for the booking that is YOURS, and it does the work the section label
+ * alone could not: an owned pass and a purchasable package are different materials, so a client
+ * scanning the screen sees which is which before reading either.
+ *
+ * The accent stays scarce overall — this section is short by nature, and the storefront below,
+ * which is the long one, keeps neutral cards with outline buttons.
  */
 function OwnedPassRow({ pass }: { pass: WalletPass }) {
   const theme = useTheme();
   return (
-    <Card>
+    <Card emphasis="accent">
       <View
         style={{
           flexDirection: 'row',
@@ -357,7 +393,7 @@ export function PackagesScreen({
           // A guest. One line and the way to fix it — never "you have no passes", which is a
           // statement about an account we have not looked at.
           <View>
-            <SectionLabel>Your passes</SectionLabel>
+            <SectionHeading title="Your passes" subtitle="Already in your account." />
             <Card emphasis="flat">
               <Text variant="secondary" color="secondary">
                 Sign in to see the passes and memberships on your account.
@@ -377,7 +413,7 @@ export function PackagesScreen({
           </View>
         ) : ownedStatus === 'loading' ? (
           <View>
-            <SectionLabel>Your passes</SectionLabel>
+            <SectionHeading title="Your passes" subtitle="Already in your account." />
             <View style={{ gap: theme.spacing.sm }}>
               <Skeleton height={22} width="55%" />
               <Skeleton height={16} width="35%" />
@@ -385,7 +421,7 @@ export function PackagesScreen({
           </View>
         ) : ownedStatus === 'error' ? (
           <View>
-            <SectionLabel>Your passes</SectionLabel>
+            <SectionHeading title="Your passes" subtitle="Already in your account." />
             <ErrorState
               message={`We could not load your passes just now. ${studioName} still has them — pull down to try again.`}
               onRetry={onRefresh}
@@ -393,7 +429,7 @@ export function PackagesScreen({
           </View>
         ) : ownedPasses.length > 0 ? (
           <View>
-            <SectionLabel>Your passes</SectionLabel>
+            <SectionHeading title="Your passes" subtitle="Already in your account." />
             <View style={{ gap: theme.spacing.md }}>
               {ownedPasses.map((pass) => (
                 <OwnedPassRow key={pass.id} pass={pass} />
@@ -407,7 +443,10 @@ export function PackagesScreen({
 
         {/* ── What the studio sells ──────────────────────────────────────────────────────── */}
         <View>
-          <SectionLabel>{ownedPasses && ownedPasses.length > 0 ? 'Buy more' : 'Available'}</SectionLabel>
+          <SectionHeading
+            title={ownedPasses && ownedPasses.length > 0 ? 'Buy more' : 'Available'}
+            subtitle={`What ${studioName} sells.`}
+          />
 
           {isLoadingPackages ? (
             <View style={{ gap: theme.spacing.md }}>

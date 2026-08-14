@@ -436,3 +436,69 @@ action deleted 2026-05-16) — deleting it per its in-file TODO beats sweeping i
 - **When creating the two missing webhook destinations** (`dibs-connect-subscription`,
   `dibs-payment-intent-success`): set their API version explicitly at creation. A Dashboard-created
   endpoint inherits the account default — which is 2017-04-06.
+
+---
+
+## Progress 2026-08-13 (late) — Steps 1, 2, 4, 5 DONE; merged into local staging
+
+Branch `chore/stripe-sdk22-arg-shape` (based on staging, worktree
+`/Users/aliciaulin/Desktop/dibs/worktrees/stripe-sdk22-prep/dibs-api`), merged into **local**
+staging as `8f1b89f8`. Not pushed. Four commits + a cherry-pick of `2a1f5c5f` (the
+confirm-booking fixes, so the eventual feature/mobile-card-booking merge auto-resolves).
+
+- **Step 1** — `test-support/stripe-account-header-observer.js` + the tripwire suite
+  `services/shared/stripe/__tests__/stripe-account-header.test.js` (20 tests, runs offline via a
+  black-hole localhost port). Empirically verified on BOTH 11.18.0 and 22.5.0: the three-argument
+  form sends the Stripe-Account header identically on both generations, so the sweep is safe to
+  merge anywhere.
+- **Step 2** — 51 sites fixed (the 42-list minus dead/list-leave sites, PLUS a second enumeration
+  pass for options passed as an IDENTIFIER — `stripeOptions`/`accountOpts`/`opts`, the
+  `forAccount()` family — which the original regex structurally missed: extract-charge-id ×4,
+  finalize-invoice ×2, handle-membership-renewal-paid, hydrate-refund-amount ×2, get-card-on-file
+  ×2, delete-draft-invoice-263, retry-charge, void-invoice-263, get-invoice-pay-link, plus
+  retrieve-checkout-session's fused params+options object and lib/stripe/client.js getPayout /
+  cancelSubscriptionPlan). Three codemod over-matches caught in review and reverted — the
+  already-correct 3-arg `subscriptions.resume` and two `listPaymentMethods(id, {type:'card'}, …)`
+  params shapes. 8 test expectations updated.
+- **Step 4** — the 11 dead files deleted (zero-importer re-verified on the staging tree; the only
+  require of any of them was from another file in the same set). `lib/portal/helpers/` is now
+  orphaned — flag for the next cleanup approval. `reactivate-membership.js` NOT deleted (route +
+  controller still mounted — retiring it means unmounting an endpoint; per its own TODO, next
+  release cycle).
+- **Step 5** — `.eslintrc.cjs` no-restricted-syntax pair (verified firing with eslint 8; note
+  eslint is NOT a repo devDependency — editors/CI run it) + `npm run lint:stripe-args`
+  (`scripts/check-stripe-account-args.js`, exits non-zero on hits, comment-aware).
+- Full suite vs staging baseline: **zero new failures** (staging's 23 pre-existing failing suites
+  are environmental/pre-existing; also true before this work).
+- package.json aligned to `^22.5.0` (the 88cffeea "testing update" had set `^22.1.0` while the
+  committed lock said `^22.5.0`).
+
+**Remaining:** Step 3 (dahlia standardization — read the clover→dahlia changelog first; it
+postdates model training cutoffs, fetch it live) and Step 6 (staging burn-in per money surface +
+Railway log check for `parameter_unknown`). The two live unpinned clients named in the addendum
+(`create-recurring-appointment-enhanced.js`, `add-client-to-recurring-subscription.js`) get their
+pins as part of Step 3.
+
+**Update (same night):** the 2017-04-06 account-default riders are now ALL explicitly pinned to
+dahlia — the three service clients (`create-recurring-appointment-enhanced`,
+`add-client-to-recurring-subscription`, `update-account-field`, commit `11977e1d`) and the seven
+operator scripts after a per-script read audit (`6a587c55`; find-missed-renewals'
+`invoices.list({subscription})` filter verified live at dahlia). Zero unpinned Stripe client
+constructions remain anywhere in the repo. Step 3's remaining scope is now ONLY the deliberate
+moves of already-pinned clients (globals clover→dahlia, lib-new 2024-04-10→dahlia, the basil
+fleet) — each with its changelog check. Note the latest_charge finding: on prod (v11, account
+default 2017) the two recurring-booking services read `paymentIntent.latest_charge`, which does
+not exist on 2017-04-06 — a card charge through them succeeds without the purchase transaction
+being recorded. Cherry-picking `11977e1d` onto main fixes that on the v11 stack immediately;
+whether the branch has ever actually fired on prod is unverified (check Workbench:
+api_version=2017-04-06 + POST /v1/payment_intents, long window).
+
+**Update 2 (same night):** the `2024-04-10` trio is also moved to dahlia after per-file audit
+(`aabcc337`): lib-new/stripe/client.js (only consumer = the orphaned payouts page; payout +
+external-account fields verified on dahlia), lib-new/stripe/refunds.js (create-only; consumer
+reads only refund.id), scripts/diagnose-refund-596197.js (charge fields + expandable refunds
+verified). **The old warning that list-recurring-subscriptions works BECAUSE of lib-new's pin is
+stale** — it uses global.stripe and subscription-period.js since its 2026-08-13 rework; the shared
+CLAUDE.md paragraph was amended. Final inventory on staging: basil ×21, dahlia ×12, clover ×3,
+zero unpinned, zero pre-2025 (`lib/shopify`'s `2023-07` is the SHOPIFY API version, not Stripe —
+leave it). Step 3 remaining = the deliberate basil/clover → dahlia moves only.

@@ -23,6 +23,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button, EmptyState, Icon, SkeletonList, StatusTag, Text } from '@/components';
 import type { CartLine } from '@/domain/cart/build-cart';
+import type { CheckoutPaymentSummary } from '@/domain/payments/checkout-method';
 import { formatStoredTime } from '@/domain/time/studio-now';
 import { useTheme } from '@/theme/ThemeProvider';
 
@@ -48,8 +49,17 @@ export interface CheckoutScreenProps {
   acceptingBookings: boolean;
   studioName: string;
   phase: CheckoutPhase;
+  /**
+   * What is about to pay for this, resolved by `describeCheckoutPayment`.
+   *
+   * Never computed here — the label above the button and the money leaving the account have to
+   * come from one resolution, which is the whole lesson of the widget's payment-method work.
+   */
+  payment: CheckoutPaymentSummary;
   onRemove: (eventId: number) => void;
   onConfirm: () => void;
+  /** Book a SECOND spot in one class. Only ever reachable from an `alreadyBooked` line. */
+  onBookAnother: (eventId: number) => void;
   onBack: () => void;
   /** Where a client goes once something is booked. */
   onViewCalendar: () => void;
@@ -63,7 +73,14 @@ const priceRow = {
   alignItems: 'center' as const,
 };
 
-function OutcomeNote({ outcome }: { outcome: LineOutcome }) {
+function OutcomeNote({
+  outcome,
+  onBookAnother,
+}: {
+  outcome: LineOutcome;
+  /** Absent while a run is in flight, so a second tap cannot open a second sheet. */
+  onBookAnother?: () => void;
+}) {
   const theme = useTheme();
 
   switch (outcome.kind) {
@@ -71,6 +88,40 @@ function OutcomeNote({ outcome }: { outcome: LineOutcome }) {
       return (
         <View style={{ marginTop: theme.spacing.md }}>
           <StatusTag label="Booked" tone="success" />
+        </View>
+      );
+    /*
+     * The client is already in this class.
+     *
+     * This used to render as a red failure under a button reading "Try again · $40.76" — and
+     * trying again could only ever produce the same refusal, because the server counts attendee
+     * rows and nothing about tapping changes that. A wall dressed as a retry.
+     *
+     * It is a question instead. Booking a second spot is legitimate and common (a friend, a
+     * partner, a child), so the line states the fact in a neutral voice and offers the one action
+     * that actually moves: book another. Nothing is assumed — the duplicate permission is minted
+     * by this tap and nothing else.
+     */
+    case 'alreadyBooked':
+      return (
+        <View style={{ marginTop: theme.spacing.md, gap: theme.spacing.md }}>
+          <Text variant="secondary" color="secondary">
+            {outcome.existingCount && outcome.existingCount > 1
+              ? `You already have ${outcome.existingCount} spots in this class.`
+              : 'You’re already booked into this class.'}{' '}
+            Booking again adds another spot — useful if you’re bringing someone.
+          </Text>
+          {onBookAnother ? (
+            <View style={{ alignSelf: 'flex-start' }}>
+              <Button
+                label="Book another spot"
+                variant="secondary"
+                size="compact"
+                fullWidth={false}
+                onPress={onBookAnother}
+              />
+            </View>
+          ) : null}
         </View>
       );
     case 'working':
@@ -112,10 +163,12 @@ function LineCard({
   line,
   onRemove,
   removable,
+  onBookAnother,
 }: {
   line: CheckoutLineView;
   onRemove: () => void;
   removable: boolean;
+  onBookAnother?: () => void;
 }) {
   const theme = useTheme();
 
@@ -247,7 +300,104 @@ function LineCard({
         </Text>
       ) : null}
 
-      <OutcomeNote outcome={line.outcome} />
+      <OutcomeNote outcome={line.outcome} onBookAnother={onBookAnother} />
+    </View>
+  );
+}
+
+/**
+ * The end of the flow, given the room it earns.
+ *
+ * ── Why this is a screen and not a footer line ────────────────────────────────────────────────
+ * It used to be the word "Booked" in the header and "You're booked." in six-point-something type
+ * above a secondary button, over a cart line that still looked like a cart line. Alicia's note,
+ * 2026-08-14: *"it just says that you're booked at the bottom — this screen needs more
+ * personality."* She is right, and the reason is structural rather than decorative: the moment a
+ * client commits money is the one moment the app has their full attention, and it was answering
+ * with the visual weight of a form validation message.
+ *
+ * So the confirmation becomes the subject. The accent field, the serif at hero size, the class
+ * named with the day and time somebody will actually need to remember — and then the two things a
+ * person wants next, in the order they want them: see it in my calendar, or book another.
+ *
+ * ── What it does NOT do ───────────────────────────────────────────────────────────────────────
+ * It does not claim more than happened. The count is the count of lines that actually booked, and
+ * a partial run never reaches this screen at all — the list stays up with the remaining lines and
+ * their own actions, because "2 classes booked" printed above a class that filled up would be the
+ * screen contradicting itself two inches apart.
+ */
+function BookedConfirmation({
+  lines,
+  studioName,
+  onViewCalendar,
+  onBrowseClasses,
+}: {
+  /** Only the lines that actually booked. */
+  lines: CheckoutLineView[];
+  studioName: string;
+  onViewCalendar: () => void;
+  onBrowseClasses: () => void;
+}) {
+  const theme = useTheme();
+  const first = lines[0];
+  const more = lines.length - 1;
+
+  return (
+    <View style={{ gap: theme.spacing.lg }}>
+      <View
+        style={{
+          borderRadius: theme.radii.card,
+          borderWidth: 1,
+          borderColor: theme.colors.accentBorder,
+          backgroundColor: theme.colors.accentWash,
+          padding: theme.spacing.lg,
+        }}
+      >
+        <Text variant="label" color="accent" uppercase>
+          {lines.length === 1 ? 'Confirmed' : `${lines.length} confirmed`}
+        </Text>
+
+        {/* The one place on this flow the type scale is allowed to shout. */}
+        <Text variant="hero" style={{ marginTop: theme.spacing.sm }}>
+          {lines.length === 1 ? 'You’re in.' : 'You’re all set.'}
+        </Text>
+
+        {first?.entry ? (
+          <View style={{ marginTop: theme.spacing.base, gap: 3 }}>
+            <Text variant="title">{first.entry.name}</Text>
+            <Text variant="secondary" color="secondary">
+              {/* Stored wall-clock, printed verbatim — never device-converted. */}
+              {[first.dayLabel, formatStoredTime(first.entry.startsAt)].filter(Boolean).join(' · ')}
+            </Text>
+            {first.entry.instructor ? (
+              <Text variant="caption" color="tertiary">
+                with {first.entry.instructor}
+              </Text>
+            ) : null}
+            {/* Plural carts name the first and count the rest rather than listing four cards. The
+                calendar is one tap away and is the right place for a list. */}
+            {more > 0 ? (
+              <Text variant="caption" color="tertiary" style={{ marginTop: theme.spacing.xs }}>
+                and {more} more {more === 1 ? 'class' : 'classes'}
+              </Text>
+            ) : null}
+          </View>
+        ) : null}
+      </View>
+
+      {/* Said once, quietly, because it is the question people ask next and the answer is boring:
+          yes, something arrived. Not promised as a channel — the studio decides whether that is an
+          email, a text, or both, and naming the wrong one is worse than naming none. */}
+      <Text variant="secondary" color="secondary">
+        {studioName} has your booking, and a confirmation is on its way.
+      </Text>
+
+      <View style={{ gap: theme.spacing.md }}>
+        <Button label="See my calendar" onPress={onViewCalendar} />
+        {/* The second action matters as much as the first. A confirmation with one way out sends
+            everybody to the same place; a lot of people finish booking one class wanting another. */}
+        <Button label="Book another class" variant="secondary" onPress={onBrowseClasses} />
+      </View>
     </View>
   );
 }
@@ -262,8 +412,10 @@ export function CheckoutScreen({
   acceptingBookings,
   studioName,
   phase,
+  payment,
   onRemove,
   onConfirm,
+  onBookAnother,
   onBack,
   onViewCalendar,
   onBrowseClasses,
@@ -272,7 +424,16 @@ export function CheckoutScreen({
   const insets = useSafeAreaInsets();
 
   const isWorking = phase.kind === 'working';
-  const bookedCount = lines.filter((line) => line.outcome.kind === 'booked').length;
+  const bookedLines = lines.filter((line) => line.outcome.kind === 'booked');
+  const bookedCount = bookedLines.length;
+  /*
+   * `alreadyBooked` is deliberately NOT retryable.
+   *
+   * It is the one refusal a retry cannot change: the server counts attendee rows, and pressing a
+   * button labelled "Try again" does not remove one. That is what put "Try again · $40.76" under
+   * "You're already booked into this class" — a primary CTA that could only ever reproduce the
+   * refusal it was offered in response to. The line carries its own action instead.
+   */
   const anyRetryable = lines.some(
     (line) =>
       (line.state === 'ready' || line.state === 'covered') &&
@@ -314,7 +475,9 @@ export function CheckoutScreen({
         >
           ← Back to the schedule
         </Text>
-        <Text variant="display">{isComplete ? 'Booked' : 'Checkout'}</Text>
+        {/* No "Booked" title over the confirmation — the confirmation says it, at hero size, and
+            a display heading repeating it would be the same word twice in two sizes. */}
+        {isComplete ? null : <Text variant="display">Checkout</Text>}
       </View>
 
       <ScrollView
@@ -326,7 +489,14 @@ export function CheckoutScreen({
           flexGrow: 1,
         }}
       >
-        {isResolving && lines.length > 0 ? (
+        {isComplete ? (
+          <BookedConfirmation
+            lines={bookedLines}
+            studioName={studioName}
+            onViewCalendar={onViewCalendar}
+            onBrowseClasses={onBrowseClasses}
+          />
+        ) : isResolving && lines.length > 0 ? (
           // Before the schedule lands every line would resolve to "no longer on the schedule".
           // Telling a client their class was cancelled because their connection was slow is the
           // "empty list means you have none" mistake in a new costume.
@@ -353,6 +523,9 @@ export function CheckoutScreen({
                 line={line}
                 removable={line.outcome.kind !== 'booked' && !isWorking}
                 onRemove={() => onRemove(line.eventId)}
+                // Withheld while a run is in flight — the runner guards against a second run, but
+                // a live-looking button that does nothing is its own small lie.
+                onBookAnother={isWorking ? undefined : () => onBookAnother(line.eventId)}
               />
             ))}
 
@@ -374,7 +547,9 @@ export function CheckoutScreen({
         )}
       </ScrollView>
 
-      {lines.length > 0 ? (
+      {/* The confirmation owns the whole screen and carries its own actions, so the footer comes
+          down entirely rather than sitting under it with a Total for a cart that is settled. */}
+      {lines.length > 0 && !isComplete ? (
         <View
           style={{
             paddingHorizontal: theme.spacing.lg,
@@ -401,27 +576,39 @@ export function CheckoutScreen({
             </Text>
           ) : null}
 
+          {/*
+            WHAT is about to pay for it, immediately above the button that agrees to it.
+
+            Checkout showed a total and a CTA and said nothing about the source of the money, so
+            the only way to find out which card was about to be charged was to press the button
+            (Alicia, 2026-08-14). `payment.label` is null whenever there is nothing true to say —
+            before Stripe answers, silence rather than a guess. See `describeCheckoutPayment`.
+          */}
+          {payment.label && bookableCount > 0 ? (
+            <View style={{ gap: 2 }}>
+              <Text variant="secondary" color="secondary">
+                {payment.label}
+              </Text>
+              {payment.caption ? (
+                <Text variant="caption" color="tertiary">
+                  {payment.caption}
+                </Text>
+              ) : null}
+            </View>
+          ) : null}
+
           {!acceptingBookings ? (
             <Text variant="secondary" color="secondary" align="center">
               Booking is temporarily unavailable. Contact {studioName} to book these classes.
             </Text>
-          ) : bookedCount > 0 && bookableCount === 0 ? (
-            // The end of the flow, and it must not be a dead end. A confirmation with no way
-            // onward leaves somebody who just paid hunting for a back chevron.
-            <>
-              {/* Counts what booked, and claims nothing about the lines that did not. "All N
-                  booked" beside a class that filled up would be the screen contradicting itself
-                  two inches apart. */}
-              <Text variant="heading" align="center">
-                {bookedCount === 1 ? 'You’re booked.' : `${bookedCount} classes booked.`}
-              </Text>
-              <Button label="See my calendar" variant="secondary" onPress={onViewCalendar} />
-            </>
           ) : bookableCount === 0 ? (
-            // Every line is blocked and nothing booked. There is nothing to do, so there is no
-            // primary button — the lines above each say why, and Remove is still on all of them.
+            // Nothing left the button could act on. Each line above says why and keeps its own
+            // action — an already-booked line has "Book another spot", the rest have Remove — so
+            // there is deliberately no primary button here to give them a false one.
             <Text variant="secondary" color="secondary" align="center">
-              None of these can be booked right now.
+              {lines.some((line) => line.outcome.kind === 'alreadyBooked')
+                ? 'Nothing more to book — you’re already in these classes.'
+                : 'None of these can be booked right now.'}
             </Text>
           ) : (
             <Button

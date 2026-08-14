@@ -15,11 +15,13 @@ import {
   formatPhoneForDisplay,
   hasProfileErrors,
   isProfileDirty,
+  normalizeBirthday,
   normalizePhone,
   validateProfile,
   type ProfileDraft,
 } from '@/domain/profile/validate';
 import { ProfileScreen } from '@/features/account/ProfileScreen';
+import { useChangePassword } from '@/features/account/useChangePassword';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
 
@@ -30,14 +32,18 @@ export default function ProfileRoute() {
   const { status, account, session } = useAuth();
   const { config } = useStudioConfig();
   const queryClient = useQueryClient();
+  // Its own state machine, deliberately separate from the profile mutation: Firebase owns the
+  // password and the two saves must never share a button. See `useChangePassword`.
+  const password = useChangePassword();
 
   const original = useMemo<ProfileDraft>(
     () => ({
       firstName: account?.firstName ?? '',
       lastName: account?.lastName ?? '',
       phone: formatPhoneForDisplay(account?.phone),
+      birthday: account?.birthday ?? '',
     }),
-    [account?.firstName, account?.lastName, account?.phone],
+    [account?.firstName, account?.lastName, account?.phone, account?.birthday],
   );
 
   /**
@@ -67,6 +73,9 @@ export default function ProfileRoute() {
         firstName: draft.firstName,
         lastName: draft.lastName,
         phone: normalizePhone(draft.phone),
+        // Normalized on the way out, so `3/14` is stored in the same shape the widget writes and
+        // the two surfaces never show one client's birthday two different ways.
+        birthday: normalizeBirthday(draft.birthday),
       }),
     onSuccess: async () => {
       // Drop the edits and let the refetched account become the form again. If the server
@@ -126,6 +135,9 @@ export default function ProfileRoute() {
       onChange={onChange}
       onSave={() => mutation.mutate()}
       onBack={onBack}
+      passwordStatus={password.status}
+      onChangePassword={password.change}
+      onResetPassword={password.reset}
     />
   );
 }

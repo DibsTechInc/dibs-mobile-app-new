@@ -80,6 +80,14 @@ export type LineOutcome =
   | { kind: 'priceChanged'; charge: ClassCharge; message: string }
   /** A pass already covers it, so the server refused to take a card. Good news. */
   | { kind: 'coveredByPass'; message: string }
+  /**
+   * The client is ALREADY in this class, and nothing was charged.
+   *
+   * Not a failure — a question. Booking a second spot for a friend or a partner is a real thing
+   * people do, and the roster has no guest concept, so a second attendee row under their own name
+   * is how the platform represents it. The line offers that explicitly; it is never assumed.
+   */
+  | { kind: 'alreadyBooked'; message: string; existingCount: number | null }
   | { kind: 'failed'; message: string; nothingCharged: boolean };
 
 export type CheckoutPhase =
@@ -99,6 +107,14 @@ export type CheckoutPhase =
 export interface BookableItem {
   line: CartLine;
   totalCents: number;
+  /**
+   * Book a SECOND spot in a class the client already holds one in.
+   *
+   * True ONLY on a run the client started by tapping "Book another spot" on a line that had come
+   * back `already_booked`. It is deliberately per-item rather than per-run: a cart of three where
+   * one line is a duplicate must not silently license duplicates on the other two.
+   */
+  allowDuplicate?: boolean;
 }
 
 export interface CartCheckoutState {
@@ -147,7 +163,7 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
    * reason to abandon the other two.
    */
   const bookOneWithPass = useCallback(
-    async (line: CartLine): Promise<boolean> => {
+    async (line: CartLine, allowDuplicate = false): Promise<boolean> => {
       setOutcome(line.eventId, { kind: 'working' });
 
       try {
@@ -157,6 +173,7 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
           // A REQUEST, not an instruction — the server verifies it against the client's own
           // covering passes. Sent so the pass the screen named is the pass that gets spent.
           passId: line.passId,
+          allowDuplicate,
         });
 
         setOutcome(line.eventId, { kind: 'booked' });
@@ -164,6 +181,17 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
         return true;
       } catch (error) {
         if (error instanceof BookingRefusedError) {
+          if (error.refusalCode === 'already_booked') {
+            // A question, not a failure. Spending a pass use on a second spot is money too, so it
+            // waits for an explicit tap — but the line must OFFER that tap rather than dead-end.
+            setOutcome(line.eventId, {
+              kind: 'alreadyBooked',
+              message: error.message,
+              existingCount: error.existingBookingCount,
+            });
+            return false;
+          }
+
           setOutcome(line.eventId, {
             kind: 'failed',
             message: error.message,
@@ -190,7 +218,7 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
 
   /** Book ONE class. Throws only `SheetDismissed`; every other failure becomes an outcome. */
   const bookOne = useCallback(
-    async ({ line, totalCents }: BookableItem): Promise<boolean> => {
+    async ({ line, totalCents, allowDuplicate = false }: BookableItem): Promise<boolean> => {
       setOutcome(line.eventId, { kind: 'working' });
 
       try {
@@ -204,6 +232,7 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
           dibsStudioId: studio.dibsStudioId,
           eventId: line.eventId,
           displayedTotalCents: totalCents,
+          allowDuplicate,
         });
 
         await withConnectedStripeAccount(
@@ -262,7 +291,18 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
              * PaymentIntent was created), so this is a free retry down the correct path, and the
              * alternative is a line the client cannot act on for a class they already own.
              */
-            return bookOneWithPass(line);
+            // The duplicate permission travels with the retry. Without it, tapping "Book another
+            // spot" on a class a pass turns out to cover would be refused all over again — the
+            // client's explicit answer dropped on the way down the correct path.
+            return bookOneWithPass(line, allowDuplicate);
+          }
+          if (error.refusalCode === 'already_booked') {
+            setOutcome(line.eventId, {
+              kind: 'alreadyBooked',
+              message: error.message,
+              existingCount: error.existingBookingCount,
+            });
+            return false;
           }
           if (error.refusalCode === 'price_changed' && error.breakdown) {
             setOutcome(line.eventId, {
@@ -327,7 +367,7 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
             // the CALLER, which puts them first — see `bookableItems` in the checkout route.
             const succeeded =
               item.line.state === 'covered'
-                ? await bookOneWithPass(item.line)
+                ? await bookOneWithPass(item.line, item.allowDuplicate === true)
                 : await bookOne(item);
             if (succeeded) booked += 1;
           } catch {

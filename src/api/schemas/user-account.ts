@@ -81,6 +81,15 @@ export interface AccountIdentity {
   firstName: string | null;
   lastName: string | null;
   phone: string | null;
+  /**
+   * `MM/DD` — month and day, never a year.
+   *
+   * That is the platform's format, not a choice made here: the widget's own profile form writes
+   * it (`components/account/profile/info.jsx`, placeholder "MM/DD") and `update-client-profile.js`
+   * treats the literal string `'MM/DD'` as an unfilled placeholder and nulls it. Studios use it
+   * for birthday shout-outs and perks, which is why it never carries a year.
+   */
+  birthday: string | null;
   /** The client's customer on the Dibs PLATFORM account, for this environment. Never charged. */
   platformStripeCustomerId: string | null;
 }
@@ -94,6 +103,9 @@ export function toAccountIdentity(response: UserAccountResponse): AccountIdentit
     firstName: info.firstName?.trim() || null,
     lastName: info.lastName?.trim() || null,
     phone: info.mobilephone?.trim() || null,
+    // The placeholder is a real stored value on some rows — the widget's form submits it verbatim
+    // when nobody filled the field in — so it is read back as "no birthday", never rendered.
+    birthday: info.birthday?.trim() && info.birthday.trim() !== 'MM/DD' ? info.birthday.trim() : null,
     platformStripeCustomerId: response.stripeIdAtDibs?.trim() || null,
   };
 }

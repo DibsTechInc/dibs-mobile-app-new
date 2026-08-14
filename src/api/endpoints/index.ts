@@ -34,6 +34,7 @@ export {
   type CreateSetupIntentArgs,
 } from './cards';
 export { fetchPackages } from './packages';
+export { confirmPasswordSet } from './password';
 export { fetchSchedule } from './schedule';
 export { fetchClientBookings, type ClientBookings } from './upcoming';
 export { updateProfile, type UpdateProfileArgs } from './profile';

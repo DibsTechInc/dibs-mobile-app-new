@@ -20,8 +20,10 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { isAcceptingBookings } from '@/api/schemas/basic-config';
 import { studio } from '@/config/studio';
+import { buildBookedCounts } from '@/domain/bookings/booked-counts';
 import { fillEmptyDays, groupByStudioDay } from '@/domain/schedule/days';
 import { useClientPasses } from '@/features/account/useClientPasses';
+import { useUpcomingBookings } from '@/features/bookings/useUpcomingBookings';
 import { useCartStore } from '@/features/cart/cartStore';
 import { useCart } from '@/features/cart/useCart';
 import { useAppDrawer } from '@/features/nav/useAppDrawer';
@@ -36,6 +38,9 @@ export default function ScheduleRoute() {
   // Rows a pass covers read "Included · {pass}" instead of a price, and land in the cart as $0
   // lines that book through `book-with-pass`. One coverage decision, shared by both.
   const { passes } = useClientPasses();
+  // Which of these classes the client is already in. The same query My Calendar reads, so a row
+  // badged "Booked" and the calendar listing it are the same fact from the same cache entry.
+  const bookings = useUpcomingBookings();
   const cartEventIds = useCartStore((state) => state.eventIds);
   const toggleInCart = useCartStore((state) => state.toggle);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -48,6 +53,18 @@ export default function ScheduleRoute() {
     // numerals jump `8 · 10` and read as broken rather than empty.
     return fillEmptyDays(groupByStudioDay(schedule.data, timeZone));
   }, [schedule.data, timeZone]);
+
+  /**
+   * Undefined until the bookings query has actually answered.
+   *
+   * An empty map would claim "you are in none of these", which is a statement about an account we
+   * have not read yet — and it is the claim that matters here, because its absence is what removes
+   * the badge. Same rule as `passes`.
+   */
+  const bookedCounts = useMemo(
+    () => (bookings.data ? buildBookedCounts(bookings.data.upcoming) : undefined),
+    [bookings.data],
+  );
 
   const onBack = useCallback(() => {
     // `replace` rather than `back`: opened from a notification or a link there is nothing behind
@@ -77,6 +94,7 @@ export default function ScheduleRoute() {
         onOpenClass={(eventId) => router.push(`/class/${eventId}`)}
         onBookClass={canBook ? toggleInCart : undefined}
         cartEventIds={cartEventIds}
+        bookedCounts={bookedCounts}
         onBack={onBack}
         onOpenCart={canBook ? () => router.push('/checkout') : undefined}
         cartSummary={{

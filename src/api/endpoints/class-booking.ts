@@ -25,6 +25,11 @@ export class BookingRefusedError extends ApiError {
   readonly breakdown: ClassPriceBreakdown | null;
   /** True when the server confirmed no money moved. */
   readonly nothingCharged: boolean;
+  /**
+   * On `already_booked`: live spots the client holds in this class. Null when the server did not
+   * say — an older build, or a different refusal entirely.
+   */
+  readonly existingBookingCount: number | null;
 
   constructor(args: {
     status: number;
@@ -32,6 +37,7 @@ export class BookingRefusedError extends ApiError {
     message: string;
     breakdown?: ClassPriceBreakdown | null;
     nothingCharged?: boolean;
+    existingBookingCount?: number | null;
     body: unknown;
   }) {
     super({
@@ -47,6 +53,7 @@ export class BookingRefusedError extends ApiError {
     this.refusalCode = args.refusalCode;
     this.breakdown = args.breakdown ?? null;
     this.nothingCharged = args.nothingCharged ?? false;
+    this.existingBookingCount = args.existingBookingCount ?? null;
   }
 }
 
@@ -64,6 +71,7 @@ function asRefusal(error: unknown): never {
         message: parsed.data.message,
         breakdown: parsed.data.breakdown ?? null,
         nothingCharged: parsed.data.nothingCharged ?? false,
+        existingBookingCount: parsed.data.existingBookingCount ?? null,
         body: error.body,
       });
     }
@@ -81,11 +89,20 @@ export interface CreateClassPaymentIntentArgs {
    * see.
    */
   displayedTotalCents: number;
+  /**
+   * Book a SECOND spot in a class the client is already in.
+   *
+   * Sent only after the server has refused with `already_booked` and the client has explicitly
+   * tapped through that refusal. The server takes a strict `=== true`, and this must never be
+   * derived from anything other than that tap — an `allowDuplicate` that rides along on an
+   * unrelated retry is a silent second charge.
+   */
+  allowDuplicate?: boolean;
 }
 
 export async function createClassPaymentIntent(
   client: ApiClient,
-  { dibsStudioId, eventId, displayedTotalCents }: CreateClassPaymentIntentArgs,
+  { dibsStudioId, eventId, displayedTotalCents, allowDuplicate }: CreateClassPaymentIntentArgs,
   signal?: AbortSignal,
 ) {
   try {
@@ -93,7 +110,14 @@ export async function createClassPaymentIntent(
     // server's auth gate.
     return await client.post(
       'checkout/class/create-payment-intent',
-      { dibsStudioId, eventId, displayedTotalCents },
+      {
+        dibsStudioId,
+        eventId,
+        displayedTotalCents,
+        // Omitted entirely unless asked for, so the request carries no duplicate-booking field at
+        // all on the ordinary path.
+        ...(allowDuplicate === true ? { allowDuplicate: true } : {}),
+      },
       createClassPaymentIntentResponseSchema,
       { authenticated: true, signal },
     );
@@ -114,6 +138,11 @@ export interface BookClassWithPassArgs {
    * somebody spend an expired pass, a placeholder hold, or another client's pass.
    */
   passId?: number | null;
+  /**
+   * Spend a pass use on a SECOND spot in a class the client is already in. Same contract and same
+   * caution as the card path — a pass use is money too.
+   */
+  allowDuplicate?: boolean;
 }
 
 /**
@@ -125,14 +154,19 @@ export interface BookClassWithPassArgs {
  */
 export async function bookClassWithPass(
   client: ApiClient,
-  { dibsStudioId, eventId, passId }: BookClassWithPassArgs,
+  { dibsStudioId, eventId, passId, allowDuplicate }: BookClassWithPassArgs,
   signal?: AbortSignal,
 ): Promise<BookWithPassResponse> {
   try {
     // NOTE: no `userid`. Same auth trap as the card endpoints.
     return await client.post(
       'checkout/class/book-with-pass',
-      { dibsStudioId, eventId, ...(passId ? { passId } : {}) },
+      {
+        dibsStudioId,
+        eventId,
+        ...(passId ? { passId } : {}),
+        ...(allowDuplicate === true ? { allowDuplicate: true } : {}),
+      },
       bookWithPassResponseSchema,
       { authenticated: true, signal },
     );
