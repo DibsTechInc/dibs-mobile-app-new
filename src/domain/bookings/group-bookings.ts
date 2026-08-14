@@ -19,6 +19,14 @@ import { formatStoredTime, hoursUntilStoredTime } from '@/domain/time/studio-now
 
 export interface BookingListItem {
   eventId: number;
+  /**
+   * The booking's transaction id — the key the drop endpoint takes.
+   *
+   * Never null in practice: `add-data-to-appts.js` returns null for the whole row when it cannot
+   * resolve one, so a booking without it does not reach the app at all. Typed nullable anyway,
+   * because "no id" must render as "no cancel button" rather than as a request with `NaN` in it.
+   */
+  dibsTransactionId: number | null;
   /** Stored wall-clock, carried verbatim so the screen never re-derives a time. */
   startsAt: string;
   name: string;
@@ -67,6 +75,7 @@ function toItem(
 ): BookingListItem {
   return {
     eventId: row.eventid,
+    dibsTransactionId: typeof row.dibsTransactionId === 'number' ? row.dibsTransactionId : null,
     startsAt: row.start_date,
     name: (row.name ?? row.classtitle ?? 'Your booking').trim(),
     instructor: showInstructor

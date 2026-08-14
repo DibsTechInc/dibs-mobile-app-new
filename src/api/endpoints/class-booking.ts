@@ -13,9 +13,11 @@ import {
   bookWithPassResponseSchema,
   createClassPaymentIntentResponseSchema,
   confirmClassBookingResponseSchema,
+  dropClassResponseSchema,
   type BookWithPassResponse,
   type ClassPriceBreakdown,
   type ConfirmClassBookingResponse,
+  type DropClassResponse,
 } from '../schemas/class-booking';
 
 /** A named refusal from either endpoint. `code` is an OPEN enum — never assume it is exhaustive. */
@@ -187,6 +189,30 @@ export async function confirmClassBooking(
       'checkout/class/confirm-booking',
       { dibsStudioId, paymentIntentId },
       confirmClassBookingResponseSchema,
+      { authenticated: true, signal },
+    );
+  } catch (error) {
+    return asRefusal(error);
+  }
+}
+
+/**
+ * Cancel a booking.
+ *
+ * Body is lookup keys ONLY and the server refuses anything else with `unexpected_field` — do not
+ * add `earlyDrop` here to "help" it. Whether the drop is early, and therefore whether the class
+ * comes back, is the server's decision read from the studio's clock and its cancel window.
+ */
+export async function dropClass(
+  client: ApiClient,
+  { dibsTransactionId, eventId }: { dibsTransactionId: number; eventId: number },
+  signal?: AbortSignal,
+): Promise<DropClassResponse> {
+  try {
+    return await client.post(
+      'checkout/class/drop',
+      { dibsTransactionId, eventId },
+      dropClassResponseSchema,
       { authenticated: true, signal },
     );
   } catch (error) {

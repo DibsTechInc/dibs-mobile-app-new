@@ -123,7 +123,52 @@ function Segments({
  * accent field on the screen and the one place the type scale is allowed to shout — everything
  * below is a list, and a list with a hero above it is legible in a way a list alone is not.
  */
-function NextUpCard({ booking }: { booking: BookingListItem }) {
+/**
+ * The cancel affordance on a booking row.
+ *
+ * Labelled, never a bare icon — the foolproof-by-default rule. Absent entirely when the row has no
+ * transaction id to cancel against, because a button that cannot work is worse than no button.
+ */
+function CancelAction({
+  booking,
+  onCancel,
+  compact,
+}: {
+  booking: BookingListItem;
+  onCancel?: (booking: BookingListItem) => void;
+  compact?: boolean;
+}) {
+  const theme = useTheme();
+  if (!onCancel || booking.dibsTransactionId === null) return null;
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`Cancel ${booking.name}`}
+      onPress={() => onCancel(booking)}
+      hitSlop={8}
+      style={({ pressed }) => [{
+        alignSelf: 'flex-start',
+        marginTop: compact ? theme.spacing.xs : theme.spacing.sm,
+        paddingVertical: theme.spacing.xs,
+        paddingRight: theme.spacing.sm,
+        opacity: pressed ? 0.55 : 1,
+      }]}
+    >
+      <Text variant="label" color="secondary">
+        Cancel booking
+      </Text>
+    </Pressable>
+  );
+}
+
+function NextUpCard({
+  booking,
+  onCancel,
+}: {
+  booking: BookingListItem;
+  onCancel?: (booking: BookingListItem) => void;
+}) {
   const theme = useTheme();
 
   // "6:00" and "PM", split so the meridiem can be set smaller. Split from ONE formatted string:
@@ -185,6 +230,8 @@ function NextUpCard({ booking }: { booking: BookingListItem }) {
           {booking.paidWithLabel}
         </Text>
       ) : null}
+
+      <CancelAction booking={booking} onCancel={onCancel} />
     </View>
   );
 }
@@ -229,7 +276,13 @@ function DayHeader({ section }: { section: BookingDaySection }) {
   );
 }
 
-function UpcomingRow({ booking }: { booking: BookingListItem }) {
+function UpcomingRow({
+  booking,
+  onCancel,
+}: {
+  booking: BookingListItem;
+  onCancel?: (booking: BookingListItem) => void;
+}) {
   const theme = useTheme();
 
   return (
@@ -268,6 +321,8 @@ function UpcomingRow({ booking }: { booking: BookingListItem }) {
             {[booking.locationLabel, booking.paidWithLabel].filter(Boolean).join(' · ')}
           </Text>
         ) : null}
+
+        <CancelAction booking={booking} onCancel={onCancel} compact />
       </View>
     </View>
   );
@@ -340,6 +395,8 @@ export interface MyCalendarScreenProps {
   /** The way out of an empty calendar. Without it the empty state is a dead end. */
   onBrowseClasses?: () => void;
   onOpenMenu?: () => void;
+  /** Opens the confirm sheet. Omitted → no cancel affordance renders anywhere. */
+  onCancelBooking?: (booking: BookingListItem) => void;
 }
 
 export function MyCalendarScreen({
@@ -358,6 +415,7 @@ export function MyCalendarScreen({
   onBack,
   onBrowseClasses,
   onOpenMenu,
+  onCancelBooking,
 }: MyCalendarScreenProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
@@ -505,7 +563,7 @@ export function MyCalendarScreen({
           <>
             {nextUp ? (
               <View style={{ paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.lg }}>
-                <NextUpCard booking={nextUp} />
+                <NextUpCard booking={nextUp} onCancel={onCancelBooking} />
               </View>
             ) : null}
 
@@ -513,7 +571,11 @@ export function MyCalendarScreen({
               <View key={`${section.label}-${section.bookings[0].startsAt}`}>
                 <DayHeader section={section} />
                 {section.bookings.map((booking) => (
-                  <UpcomingRow key={`${booking.eventId}@${booking.startsAt}`} booking={booking} />
+                  <UpcomingRow
+                    key={`${booking.eventId}@${booking.startsAt}`}
+                    booking={booking}
+                    onCancel={onCancelBooking}
+                  />
                 ))}
               </View>
             ))}

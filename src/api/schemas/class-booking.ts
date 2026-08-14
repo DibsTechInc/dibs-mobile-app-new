@@ -131,3 +131,29 @@ export const bookWithPassResponseSchema = z
   .passthrough();
 
 export type BookWithPassResponse = z.infer<typeof bookWithPassResponseSchema>;
+
+/**
+ * `POST checkout/class/drop` — cancelling a booking.
+ *
+ * `returned` is the server's account of what actually went back, and it is the ONLY thing the
+ * screen may report. The app predicts early-vs-late for the confirm copy, but a clock skew or a
+ * boundary crossed mid-session makes the prediction wrong, and a screen that says "your class is
+ * back" over a `returned: 'none'` contradicts the wallet the client checks next.
+ *
+ * `'none'` is a legitimate success: a late drop, an unlimited membership, an unpaid hold, and a
+ * pass worth $0 all free the spot and return nothing.
+ */
+export const dropClassResponseSchema = z
+  .object({
+    ok: z.literal(true),
+    dropped: z.literal(true),
+    returned: z.enum(['pass', 'credit', 'none']),
+    wasEarly: z.boolean(),
+    /** Only meaningful when `returned === 'credit'`. */
+    creditAmountCents: z.number().nullable().optional(),
+    eventId: z.number().nullable().optional(),
+    eventName: z.string().nullable().optional(),
+  })
+  .passthrough();
+
+export type DropClassResponse = z.infer<typeof dropClassResponseSchema>;

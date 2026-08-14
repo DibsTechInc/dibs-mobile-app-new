@@ -16,6 +16,7 @@ export {
   bookClassWithPass,
   confirmClassBooking,
   createClassPaymentIntent,
+  dropClass,
   type BookClassWithPassArgs,
   type CreateClassPaymentIntentArgs,
 } from './class-booking';

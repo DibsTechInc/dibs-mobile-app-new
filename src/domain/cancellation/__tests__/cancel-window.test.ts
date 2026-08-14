@@ -5,7 +5,7 @@
  * the session, late otherwise, boundary counts as early. Every case here is really a check that
  * the subtraction happened in the studio's frame rather than the device's.
  */
-import { cancelWindowSentence, describeCancelWindow } from '../cancel-window';
+import { cancelWindowSentence, describeCancelWindow, resolveClassNoticeHours } from '../cancel-window';
 
 const LA = 'America/Los_Angeles';
 const NY = 'America/New_York';
@@ -113,5 +113,23 @@ describe('cancelWindowSentence', () => {
 
   it('says nothing when there is no policy', () => {
     expect(cancelWindowSentence(null)).toBeNull();
+  });
+});
+
+describe('resolveClassNoticeHours', () => {
+  it('prefers the group window over the studio-level cancel time', () => {
+    // Mirrors the server's resolveNoticeHours and the widget's indiClass.jsx. If these two
+    // disagree, the sheet names a deadline the backend will not honour.
+    expect(resolveClassNoticeHours({ defaultCancelTimeGroup: 12, cancelTime: 24 })).toBe(12);
+  });
+
+  it('falls through to cancelTime when the group window is 0', () => {
+    // `||` not `??`, deliberately: 0 means "not configured" here, as it does in both mirrors.
+    expect(resolveClassNoticeHours({ defaultCancelTimeGroup: 0, cancelTime: 24 })).toBe(24);
+  });
+
+  it('defaults to 12 — the column default — when the studio publishes neither', () => {
+    expect(resolveClassNoticeHours({})).toBe(12);
+    expect(resolveClassNoticeHours(null)).toBe(12);
   });
 });

@@ -13,9 +13,13 @@ import { router } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 
 import { studio } from '@/config/studio';
+import type { BookingListItem } from '@/domain/bookings/group-bookings';
 import { groupBookings, splitNextUp, toDaySections } from '@/domain/bookings/group-bookings';
+import { describeCancelWindow, resolveClassNoticeHours } from '@/domain/cancellation/cancel-window';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { CancelBookingSheet } from '@/features/bookings/CancelBookingSheet';
 import { MyCalendarScreen, type CalendarTab } from '@/features/bookings/MyCalendarScreen';
+import { useDropClass } from '@/features/bookings/useDropClass';
 import { useUpcomingBookings } from '@/features/bookings/useUpcomingBookings';
 import { useAppDrawer } from '@/features/nav/useAppDrawer';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
@@ -26,6 +30,8 @@ export default function MyCalendarRoute() {
   const bookings = useUpcomingBookings();
   const [menuOpen, setMenuOpen] = useState(false);
   const [tab, setTab] = useState<CalendarTab>('upcoming');
+  const [cancelling, setCancelling] = useState<BookingListItem | null>(null);
+  const drop = useDropClass();
   const drawer = useAppDrawer({ visible: menuOpen, onClose: () => setMenuOpen(false) });
 
   const studioName = config?.studioName ?? studio.appName;
@@ -47,6 +53,14 @@ export default function MyCalendarRoute() {
       past: grouped.past,
     };
   }, [bookings.data, timeZone]);
+
+  const closeCancelSheet = useCallback(() => {
+    setCancelling(null);
+    // Reset AFTER closing so the sheet does not flash back to the question on its way out.
+    drop.reset();
+    // A completed drop leaves this list stale until the invalidated query lands.
+    void bookings.refetch();
+  }, [bookings, drop]);
 
   const onBack = useCallback(() => {
     // `replace` rather than `back`: arriving from a link there is nothing behind this screen, and
@@ -77,6 +91,31 @@ export default function MyCalendarRoute() {
           status === 'signedIn' ? () => router.push('/schedule') : () => router.push('/sign-in')
         }
         onOpenMenu={() => setMenuOpen(true)}
+        onCancelBooking={status === 'signedIn' ? setCancelling : undefined}
+      />
+      <CancelBookingSheet
+        booking={cancelling}
+        window={
+          cancelling
+            ? describeCancelWindow(
+                cancelling.startsAt,
+                timeZone,
+                resolveClassNoticeHours(config),
+              )
+            : null
+        }
+        status={drop.status}
+        currency={config?.currency}
+        onConfirm={() => {
+          // Guarded by the affordance — CancelAction does not render without an id — and again
+          // here, because a null would post `NaN` and 400.
+          if (cancelling?.dibsTransactionId == null) return;
+          drop.drop({
+            dibsTransactionId: cancelling.dibsTransactionId,
+            eventId: cancelling.eventId,
+          });
+        }}
+        onClose={closeCancelSheet}
       />
       {drawer}
     </>

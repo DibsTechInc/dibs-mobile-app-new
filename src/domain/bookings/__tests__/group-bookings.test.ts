@@ -39,6 +39,18 @@ describe('groupBookings', () => {
     });
   });
 
+  it('carries the transaction id through — it is the key the drop endpoint takes', () => {
+    const { upcoming } = groupBookings({ upcomingAppts: [row({ dibsTransactionId: 5150 })] }, OPTS);
+    expect(upcoming[0].dibsTransactionId).toBe(5150);
+  });
+
+  it('reports a missing transaction id as null, never undefined', () => {
+    // The cancel affordance keys off `=== null`. An `undefined` sneaking through would render a
+    // button that posts NaN.
+    const { upcoming } = groupBookings({ upcomingAppts: [row()] }, OPTS);
+    expect(upcoming[0].dibsTransactionId).toBeNull();
+  });
+
   it("puts THIS MORNING's class in the past, though the API still calls it upcoming", () => {
     // The endpoint returns from the start of the studio's today, so a 6am class is in
     // `upcomingAppts` at 6pm. "Upcoming" has to mean not-yet-started, or the list opens on
@@ -148,7 +160,7 @@ describe('groupBookings', () => {
 
 describe('toDaySections', () => {
   const item = (eventId: number, startsAt: string, whenLabel: string) => ({
-    eventId, startsAt, whenLabel,
+    eventId, startsAt, whenLabel, dibsTransactionId: eventId * 10,
     name: 'Class', instructor: null, locationLabel: null,
     timeLabel: '6:30 PM', paidWithLabel: null, isCancelled: false, didAttend: false,
   });
@@ -191,7 +203,7 @@ describe('toDaySections', () => {
 
 describe('splitNextUp', () => {
   const item = (eventId: number, startsAt: string, whenLabel: string) => ({
-    eventId, startsAt, whenLabel,
+    eventId, startsAt, whenLabel, dibsTransactionId: eventId * 10,
     name: 'Class', instructor: null, locationLabel: null,
     timeLabel: '6:30 PM', paidWithLabel: null, isCancelled: false, didAttend: false,
   });
