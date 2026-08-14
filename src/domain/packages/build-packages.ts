@@ -217,15 +217,24 @@ export function buildPackages(
     // what the server prices, and a membership never reaches the charge path anyway.
     const charge = chargeCentsFor(pkg, pkg.price ?? null);
 
-    // A membership is refused server-side (`membership_not_supported`) because enrolling means
-    // creating a Stripe subscription, not taking a one-off payment. Saying so on the card beats a
-    // button that leads to a refusal.
-    const notPurchasableReason =
-      kind === 'membership'
-        ? 'Memberships are set up with the studio directly.'
-        : charge.totalCents <= 0
-          ? 'Ask the studio about this one.'
-          : null;
+    /*
+     * Memberships became sellable from the app on 2026-08-14 — the server now creates the Stripe
+     * subscription after the cycle-1 charge, so the blanket "set up with the studio directly"
+     * refusal that used to sit here is gone.
+     *
+     * `front_desk_only` is what decides whether a membership appears in the app at all, and it is
+     * enforced SERVER-side in two places: `get-packages.js` keeps those rows off this list, and
+     * `resolvePurchasablePackage` refuses one that is named directly. There is deliberately no
+     * client-side copy — a third opinion about which packages exist is how the storefront and the
+     * charge path drift apart.
+     *
+     * What remains is the honest refusal: a package the app cannot compute a charge for. That
+     * covers a membership whose `price` is 0 or null as well as a pack's, which matters because
+     * `priceAutopay` and `price` DO disagree in live data (2 of 51 memberships, one with
+     * `priceAutopay = 0`) and the headline above quotes the recurring figure while the charge below
+     * uses the one the server prices from.
+     */
+    const notPurchasableReason = charge.totalCents <= 0 ? 'Ask the studio about this one.' : null;
 
     return {
       id: pkg.id,

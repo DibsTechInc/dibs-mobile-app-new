@@ -233,12 +233,22 @@ describe('buildPackages — what can be bought, and for how much', () => {
     expect(view.notPurchasableReason).toBeNull();
   });
 
-  it('refuses to offer a MEMBERSHIP for purchase, and says why', () => {
-    // Enrolling means creating a Stripe subscription, which the app cannot do and the server
-    // refuses (`membership_not_supported`). A Buy button here would lead straight to a refusal.
+  it('OFFERS a membership for purchase — the server enrols them after the cycle-1 charge', () => {
+    // Reversed 2026-08-14. The server creates the Stripe subscription in confirm-purchase, so the
+    // blanket "set up with the studio directly" refusal is gone. `front_desk_only` still decides
+    // whether a membership reaches the app at all, and that is enforced server-side in two places
+    // rather than copied here.
     const view = buildPackages([membership()])[0];
+    expect(view.isPurchasable).toBe(true);
+    expect(view.notPurchasableReason).toBeNull();
+  });
+
+  it('still refuses a membership the app cannot compute a charge for', () => {
+    // Live data has memberships whose `price` and `priceAutopay` disagree — including one with
+    // `priceAutopay = 0`. The card quotes the recurring figure; the CHARGE comes from `price`,
+    // which is what the server prices from, so an unpriced one must not get a Buy button.
+    const view = buildPackages([membership({ price: 0 })])[0];
     expect(view.isPurchasable).toBe(false);
-    expect(view.notPurchasableReason).toMatch(/studio/i);
     expect(view.totalCents).toBeNull();
   });
 
