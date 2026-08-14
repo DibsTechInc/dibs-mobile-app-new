@@ -25,6 +25,7 @@ export {
   setDefaultCard,
   type CreateSetupIntentArgs,
 } from './cards';
+export { fetchPackages } from './packages';
 export { fetchSchedule } from './schedule';
 export { fetchClientBookings, type ClientBookings } from './upcoming';
 export { updateProfile, type UpdateProfileArgs } from './profile';

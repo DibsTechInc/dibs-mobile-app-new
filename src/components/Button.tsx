@@ -1,8 +1,18 @@
 /**
- * The button. Four variants, and the accent appears on exactly one of them.
+ * The button. Five variants, and the accent is FILLED on exactly one of them.
  *
  * `primary` is the studio's colour, so a screen with two primaries has spent the scarcity that
  * makes the accent mean something. One per screen, at most.
+ *
+ * ── Why `accentOutline` exists ─────────────────────────────────────────────────────────────────
+ * The schedule shows a Book button on EVERY row, and the booking widget draws them outlined in the
+ * studio's colour rather than filled. That is not a stylistic copy — it is what makes the one
+ * filled button on the screen (the sticky Checkout bar) still read as the primary action. Twelve
+ * filled accent buttons stacked down a list is the scarcity rule broken twelve times over, and the
+ * thing you actually want pressed disappears among them.
+ *
+ * `secondary` is NOT a substitute: its border is the neutral `border` token, so a row of them reads
+ * as disabled chrome rather than as the studio inviting you to book.
  */
 import { ActivityIndicator, Pressable, type PressableProps, View } from 'react-native';
 
@@ -10,7 +20,7 @@ import { useTheme } from '@/theme/ThemeProvider';
 
 import { Text } from './Text';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive';
+export type ButtonVariant = 'primary' | 'accentOutline' | 'secondary' | 'ghost' | 'destructive';
 
 export interface ButtonProps extends Omit<PressableProps, 'style' | 'children'> {
   label: string;
@@ -42,6 +52,13 @@ export function Button({
       pressed: theme.colors.accentPressed,
       border: 'transparent',
       textColor: 'onAccent' as const,
+    },
+    // The studio's colour as a BORDER and as ink, never as a field. See the note at the top.
+    accentOutline: {
+      background: theme.colors.background,
+      pressed: theme.colors.accentWash,
+      border: theme.colors.accentBorder,
+      textColor: 'accent' as const,
     },
     secondary: {
       background: theme.colors.background,

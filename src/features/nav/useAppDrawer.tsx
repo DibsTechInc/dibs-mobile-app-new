@@ -59,12 +59,16 @@ export function useAppDrawer({ visible, onClose }: AppDrawerArgs) {
   const items = useMemo<DrawerItem[]>(() => {
     const rows: DrawerItem[] = [{ label: 'Book', icon: 'book', onPress: go('/schedule') }];
 
-    // Only rows whose destinations exist. Packages is P4, referrals are later — and a drawer row
-    // that leads nowhere is the dead end this codebase keeps refusing to ship.
+    // Only rows whose destinations exist. Referrals are later — and a drawer row that leads
+    // nowhere is the dead end this codebase keeps refusing to ship.
     if (isSignedIn) {
       // Directly under Book, as in the approved mock's drawer: the two are a pair — what is on
       // offer, and what you have taken up.
       rows.push({ label: 'My calendar', icon: 'myCalendar', onPress: go('/my-calendar') });
+      // Third, between what you have booked and your account: buying a pack is the thing you do
+      // BETWEEN booking and administration, and burying it under Account is how a client
+      // concludes the app has no way to buy one (Alicia, 2026-08-13).
+      rows.push({ label: 'Packages', icon: 'packages', onPress: go('/packages') });
       rows.push({ label: 'Account', icon: 'account', onPress: go('/account') });
       rows.push({
         label: 'Payment methods',
@@ -73,6 +77,9 @@ export function useAppDrawer({ visible, onClose }: AppDrawerArgs) {
       });
       rows.push({ label: 'Profile', icon: 'account', onPress: go('/account/profile') });
     } else {
+      // A guest gets Packages too: the price list is public, and "what would this cost me" is a
+      // reasonable question to answer before making an account.
+      rows.push({ label: 'Packages', icon: 'packages', onPress: go('/packages') });
       rows.push({ label: 'Sign in', icon: 'account', onPress: go('/sign-in') });
     }
 

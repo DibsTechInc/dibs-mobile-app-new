@@ -25,11 +25,12 @@ import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ApiError, describeApiError } from '@/api/errors';
-import { Button, EmptyState, ErrorState, Icon, SkeletonList, Text } from '@/components';
+import { Button, EmptyState, ErrorState, Icon, SkeletonList, StatusTag, Text } from '@/components';
 import { monthLabelFor, type ScheduleDay } from '@/domain/schedule/days';
 import { toScheduleEntry } from '@/domain/schedule/entry';
 import type { ScheduleEntry } from '@/domain/schedule/types';
 import { formatStoredTime } from '@/domain/time/studio-now';
+import { CartBar } from '@/features/cart/CartBar';
 import { useTheme } from '@/theme/ThemeProvider';
 
 /** Capacity only becomes news at three or fewer. Above that, silence is more honest. */
@@ -61,6 +62,15 @@ const TIME_SIZE = 17;
  * cells looks like the whole week and hides the rest of the month.
  */
 const DAY_CELL = 68;
+
+/**
+ * How much room the list leaves for the sticky cart bar.
+ *
+ * Measured against `CartBar`'s own anatomy: a ~52pt button plus its 12pt padding top and bottom
+ * plus the hairline, then a comfortable margin so the last row does not sit flush against it. The
+ * safe-area inset is added separately by the caller, because it varies by device.
+ */
+const CART_BAR_CLEARANCE = 108;
 
 function DayChip({
   day,
@@ -121,12 +131,31 @@ function DayChip({
   );
 }
 
+/**
+ * One class.
+ *
+ * ── Three tap targets, each labelled ───────────────────────────────────────────────────────────
+ * The row body and the "Details" link both open class detail — the same destination, so there is
+ * no mis-tap to make. **Book** is its own separated control on the right, and it is the only thing
+ * on the row that changes state. That separation is the platform's foolproof rule: two different
+ * actions must never share one hit area, especially on a phone held one-handed.
+ *
+ * "Details" is spelled out rather than left as a bare chevron. An unlabelled glyph is a quiz, and
+ * this row already earns its keep without one.
+ *
+ * ── Book is a toggle, and it says which way it is pointing ────────────────────────────────────
+ * Tapping Book adds the class to the cart; the button then reads **"Added"** and tapping it again
+ * takes it out. Every add has a visible undo in the place the add happened — no going to another
+ * screen to remove something you did not mean to put there.
+ */
 function ClassRow({
   entry,
+  inCart,
   onPress,
   onBook,
 }: {
   entry: ScheduleEntry;
+  inCart: boolean;
   onPress: () => void;
   onBook?: () => void;
 }) {
@@ -137,7 +166,7 @@ function ClassRow({
       ? `${entry.spotsLeft} spot${entry.spotsLeft === 1 ? '' : 's'} left`
       : null;
 
-  const priceNote =
+  const priceLabel =
     entry.price.kind === 'covered'
       ? entry.price.label
       : entry.price.kind === 'amount'
@@ -147,7 +176,7 @@ function ClassRow({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${formatStoredTime(entry.startsAt)} ${entry.name}`}
+      accessibilityLabel={`${formatStoredTime(entry.startsAt)} ${entry.name}. Details`}
       onPress={onPress}
       style={({ pressed }) => [{
         // TOP-aligned. See rule 3 in the header.
@@ -180,24 +209,62 @@ function ClassRow({
             {entry.instructor}
           </Text>
         ) : null}
-        {priceNote || capacityNote ? (
+        {capacityNote ? (
           <Text variant="caption" color="secondary" style={{ marginTop: 2 }}>
-            {[priceNote, capacityNote].filter(Boolean).join(' · ')}
+            {capacityNote}
           </Text>
         ) : null}
+
+        {/* Its own hit area, inset from the row's, so a thumb aiming here cannot land on Book. */}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`Details for ${entry.name}`}
+          onPress={onPress}
+          hitSlop={{ top: 6, bottom: 6, left: 4, right: 8 }}
+          style={({ pressed }) => [{
+            flexDirection: 'row',
+            alignItems: 'center',
+            alignSelf: 'flex-start',
+            gap: 2,
+            marginTop: theme.spacing.sm,
+            opacity: pressed ? 0.55 : 1,
+          }]}
+        >
+          <Text variant="caption" color="secondary">
+            Details
+          </Text>
+          <Icon name="forward" size={13} color={theme.colors.textTertiary} />
+        </Pressable>
       </View>
 
-      {/* One tap, not two. The action is always in the same place on every row. */}
-      {onBook ? (
-        <Button
-          label={entry.isFull ? (entry.hasWaitlist ? 'Waitlist' : 'Full') : 'Book'}
-          variant={entry.isFull ? 'secondary' : entry.price.kind === 'covered' ? 'secondary' : 'primary'}
-          size="compact"
-          fullWidth={false}
-          disabled={entry.isFull && !entry.hasWaitlist}
-          onPress={onBook}
-        />
-      ) : null}
+      {/* Price above the action, right-aligned — the widget's own composition, and the reason it
+          works is that the eye reads down the right edge: what it costs, then how to get it. */}
+      <View style={{ alignItems: 'flex-end', gap: theme.spacing.sm }}>
+        {priceLabel ? (
+          <Text variant="numeral" numberOfLines={1} style={{ fontSize: TIME_SIZE, lineHeight: 22 }}>
+            {priceLabel}
+          </Text>
+        ) : null}
+
+        {/* A full class gets a STATUS, never a button.
+            A disabled control labelled "Waitlist" implies a waitlist you could join if only you
+            tapped harder, and there is no waitlist flow in the app — so the row states the fact
+            and stops. Saying nothing at all would be worse: the client would be left wondering
+            why this row alone has no way to book. */}
+        {entry.isFull ? (
+          <StatusTag label={entry.hasWaitlist ? 'Waitlist only' : 'Full'} tone="neutral" />
+        ) : onBook ? (
+          <Button
+            label={inCart ? 'Added' : 'Book'}
+            // `secondary` once added: the neutral border retires the studio's colour from a row
+            // whose decision has already been made, so the accent stays on the rows still asking.
+            variant={inCart ? 'secondary' : 'accentOutline'}
+            size="compact"
+            fullWidth={false}
+            onPress={onBook}
+          />
+        ) : null}
+      </View>
     </Pressable>
   );
 }
@@ -215,10 +282,20 @@ export interface ScheduleScreenProps {
   isRefreshing?: boolean;
   onRefresh?: () => void;
   onOpenClass: (eventId: number) => void;
-  /** Absent until P3 — and while it is absent, no row shows a Book button that does nothing. */
+  /**
+   * Add this class to the cart, or take it back out — the row's button is a toggle.
+   *
+   * Absent only when booking is impossible at all (an offboarded studio), and while it is absent
+   * no row shows a Book button that does nothing.
+   */
   onBookClass?: (eventId: number) => void;
+  /** Which classes are already in the cart. Drives the Added state on each row. */
+  cartEventIds?: readonly number[];
   onBack: () => void;
+  /** The sticky bar's destination. Absent → no bar, whatever is in the cart. */
   onOpenCart?: () => void;
+  /** Rendered by the caller from `useCart`, so the bar and checkout quote the same figures. */
+  cartSummary?: { chargeableCount: number; blockedCount: number; totalLabel: string };
 }
 
 export function ScheduleScreen({
@@ -234,12 +311,21 @@ export function ScheduleScreen({
   onRefresh,
   onOpenClass,
   onBookClass,
+  cartEventIds,
   onBack,
   onOpenCart,
+  cartSummary,
 }: ScheduleScreenProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const stripRef = useRef<ScrollView>(null);
+
+  // A Set, so a 20-class day is 20 O(1) lookups rather than 20 array scans.
+  const inCart = useMemo(() => new Set(cartEventIds ?? []), [cartEventIds]);
+
+  const showCartBar = Boolean(
+    onOpenCart && cartSummary && cartSummary.chargeableCount + cartSummary.blockedCount > 0,
+  );
 
   // Fall back to the first day that HAS something rather than to a fixed index: the selected date
   // can be a day that has since emptied out, and an unmatched selection would render an empty list
@@ -291,21 +377,11 @@ export function ScheduleScreen({
             {monthLabel || 'Schedule'}
           </Text>
 
-          {/* A spacer of the same width when there is no cart, so the month stays optically
-              centred rather than drifting right. */}
-          {onOpenCart ? (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Cart"
-              onPress={onOpenCart}
-              hitSlop={12}
-              style={({ pressed }) => [{ padding: theme.spacing.xs, opacity: pressed ? 0.55 : 1 }]}
-            >
-              <Icon name="cart" size={20} color={theme.colors.onAccent} />
-            </Pressable>
-          ) : (
-            <View style={{ width: 20 + theme.spacing.xs * 2 }} />
-          )}
+          {/* A spacer, so the month stays optically centred rather than drifting right.
+              There is deliberately NO cart icon here: the sticky bar at the foot of the screen is
+              the cart's one affordance. Two ways into the same thing, one of them a bare glyph in
+              a corner, is how a client ends up unsure whether they are the same thing. */}
+          <View style={{ width: 20 + theme.spacing.xs * 2 }} />
         </View>
 
         {days.length > 0 ? (
@@ -337,7 +413,11 @@ export function ScheduleScreen({
       </View>
 
       <ScrollView
-        contentContainerStyle={{ paddingBottom: insets.bottom + theme.spacing.xxl }}
+        contentContainerStyle={{
+          // Clears the sticky bar when it is up. Without this the last class of the day sits
+          // underneath it and cannot be scrolled to — a row you can see but never reach.
+          paddingBottom: insets.bottom + (showCartBar ? CART_BAR_CLEARANCE : theme.spacing.xxl),
+        }}
         refreshControl={
           onRefresh ? (
             <RefreshControl
@@ -386,6 +466,7 @@ export function ScheduleScreen({
               <ClassRow
                 key={entry.eventId}
                 entry={entry}
+                inCart={inCart.has(entry.eventId)}
                 onPress={() => onOpenClass(entry.eventId)}
                 onBook={onBookClass ? () => onBookClass(entry.eventId) : undefined}
               />
@@ -393,6 +474,15 @@ export function ScheduleScreen({
           </>
         )}
       </ScrollView>
+
+      {showCartBar && cartSummary && onOpenCart ? (
+        <CartBar
+          chargeableCount={cartSummary.chargeableCount}
+          blockedCount={cartSummary.blockedCount}
+          totalLabel={cartSummary.totalLabel}
+          onPress={onOpenCart}
+        />
+      ) : null}
     </View>
   );
 }

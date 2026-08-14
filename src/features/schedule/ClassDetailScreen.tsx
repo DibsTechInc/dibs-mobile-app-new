@@ -1,5 +1,6 @@
 /**
- * One class. Reference mock: `design/mockups/booking-and-account.html` step 2.
+ * One class, in full — the screen behind "Details". Reference mock:
+ * `design/mockups/booking-and-account.html` step 2.
  *
  * The time is the headline — a Fraunces numeral, the largest thing on the screen. It is the fact
  * the client came here to confirm, and setting it as a display moment rather than as metadata is
@@ -8,6 +9,15 @@
  * The cancellation window is stated in plain time BEFORE booking, not as a policy in hours. A
  * client deciding at 9pm whether to commit to a 7am class deserves to know the window has already
  * closed on them before they tap, not afterwards.
+ *
+ * ── This screen is for READING. It does not take money ────────────────────────────────────────
+ * A client who knows what they want never comes here: they tap Book on the schedule row and go
+ * straight to checkout. This is the other path — the description, the location, the policy, room
+ * to decide — and its CTA does exactly what the row's does, which is add the class to the cart.
+ *
+ * That is deliberate, and it is the reason the booking state machine was taken OUT of here. Two
+ * screens that can each independently create a PaymentIntent are two places a price is decided,
+ * and the widget's history is a long argument for having exactly one. `/checkout` is that one.
  */
 import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -18,7 +28,6 @@ import { cancelWindowSentence } from '@/domain/cancellation/cancel-window';
 import type { ClassCharge } from '@/domain/pricing/class-charge';
 import type { ScheduleEntry } from '@/domain/schedule/types';
 import { formatStoredTime } from '@/domain/time/studio-now';
-import type { BookingStatus } from '@/features/bookings/useBookClass';
 import { useTheme } from '@/theme/ThemeProvider';
 
 export interface ClassDetailScreenProps {
@@ -39,13 +48,12 @@ export interface ClassDetailScreenProps {
    * no card-payable price at all.
    */
   charge: ClassCharge | null;
-  /** Where the booking flow currently is. Every value has a way out — see `useBookClass`. */
-  bookingStatus?: BookingStatus;
-  /**
-   * Start (or, after a price change, confirm) the booking. Receives the total the client is
-   * agreeing to, so a re-render after `price_changed` sends the number that is on screen NOW.
-   */
-  onBook?: (totalCents: number) => void;
+  /** Already in the cart. The CTA becomes the way to the cart rather than a second add. */
+  inCart: boolean;
+  /** Add this class to the cart. Absent when the studio cannot take bookings at all. */
+  onAddToCart?: () => void;
+  /** Go to checkout. Present whenever `onAddToCart` is — adding leads straight here. */
+  onOpenCart?: () => void;
   onBack: () => void;
 }
 
@@ -57,8 +65,9 @@ export function ClassDetailScreen({
   cancelWindow,
   acceptingBookings,
   charge,
-  bookingStatus = { kind: 'idle' },
-  onBook,
+  inCart,
+  onAddToCart,
+  onOpenCart,
   onBack,
 }: ClassDetailScreenProps) {
   const theme = useTheme();
@@ -85,18 +94,13 @@ export function ClassDetailScreen({
 
   const cancelSentence = cancelWindowSentence(cancelWindow);
 
-  // A price change is not an error — the number moved, and the client is being asked to confirm
-  // the true one. It replaces what the schedule row implied for the rest of this screen.
-  const priceChanged = bookingStatus.kind === 'priceChanged';
-  const effectiveCharge = priceChanged ? bookingStatus.charge : charge;
+  const effectiveCharge = charge;
   const chargeable = effectiveCharge?.status === 'chargeable';
 
   // The card path is the only one built. A free class, a pass-covered class or one priced
   // elsewhere books through paths that do not exist in the app yet, so the CTA is not offered for
   // them — an unpayable button is worse than an honest sentence.
-  const bookable = acceptingBookings && !entry.isFull && chargeable && Boolean(onBook);
-  const isWorking = bookingStatus.kind === 'working';
-  const booked = bookingStatus.kind === 'booked';
+  const bookable = acceptingBookings && !entry.isFull && chargeable && Boolean(onAddToCart);
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background, paddingTop: insets.top }}>
@@ -217,16 +221,6 @@ export function ClassDetailScreen({
           )}
         </Card>
 
-        {priceChanged ? (
-          // Deliberately worded as news, not as a failure. An off-peak window closing between the
-          // schedule render and the tap is the ordinary cause, and nothing was charged — no
-          // PaymentIntent was even created.
-          <Text variant="secondary" color="secondary" style={{ marginTop: theme.spacing.base }}>
-            The price for this class updated to {effectiveCharge?.totalLabel}. Tap book to confirm
-            at the new price.
-          </Text>
-        ) : null}
-
         {entry.isFull ? (
           <View style={{ marginTop: theme.spacing.base, alignSelf: 'flex-start' }}>
             <StatusTag label={entry.hasWaitlist ? 'Waitlist only' : 'Full'} tone="danger" />
@@ -255,61 +249,51 @@ export function ClassDetailScreen({
           backgroundColor: theme.colors.background,
         }}
       >
-        {booked ? (
-          // The end of the flow. Confirmation copy, not another button — a primary CTA still
-          // sitting there after a successful booking invites a second one.
-          <Text variant="heading" align="center">
-            You’re booked. See you {dayLabel.split(',')[0]}.
-          </Text>
-        ) : bookingStatus.kind === 'coveredByPass' ? (
-          // Good news, so it is not styled as an error, and the CTA comes down: there is nothing
-          // to do here by card. The server's sentence names the package and the way forward.
-          <Text variant="secondary" color="secondary" align="center">
-            {bookingStatus.message}
-          </Text>
-        ) : !acceptingBookings ? (
+        {!acceptingBookings ? (
           <Text variant="secondary" color="secondary" align="center">
             Booking is temporarily unavailable. Contact the studio to book this class.
           </Text>
+        ) : entry.isFull ? (
+          // No button. A control labelled "Join the waitlist" with no waitlist behind it is worse
+          // than a plain sentence, and the tag above already states the fact.
+          <Text variant="secondary" color="secondary" align="center">
+            {entry.hasWaitlist
+              ? 'This class is full. Contact the studio about the waitlist.'
+              : 'This class is full.'}
+          </Text>
+        ) : inCart && onOpenCart ? (
+          // Already added. The CTA becomes the way ONWARD rather than a second add that would
+          // silently do nothing — the shape of the widget's "Use this card" dead end.
+          <>
+            <Button label="Review your cart" onPress={onOpenCart} />
+            <Text
+              variant="caption"
+              color="tertiary"
+              align="center"
+              style={{ marginTop: theme.spacing.sm }}
+            >
+              This class is in your cart.
+            </Text>
+          </>
         ) : (
           <>
-            {bookingStatus.kind === 'error' ? (
-              <Text
-                variant="secondary"
-                color="danger"
-                align="center"
-                style={{ marginBottom: theme.spacing.md }}
-              >
-                {bookingStatus.message}
-                {/* Only ever said when the SERVER confirmed it. Claiming it on an unknown failure
-                    would be a guess about somebody's money. */}
-                {bookingStatus.nothingCharged ? ' Your card was not charged.' : ''}
-              </Text>
-            ) : null}
-
             <Button
+              // The total rides ON the button, because that is the thing being pressed to agree
+              // to it — tax included, which is the whole reason this screen quotes a total where
+              // the schedule row quotes a drop-in.
               label={
-                entry.isFull
-                  ? entry.hasWaitlist
-                    ? 'Join the waitlist'
-                    : 'Class is full'
-                  : // The total rides ON the button, because that is the thing being pressed to
-                    // agree to it.
-                    chargeable && effectiveCharge
-                    ? `${priceChanged ? 'Confirm' : 'Book'} · ${effectiveCharge.totalLabel}`
-                    : 'Book this class'
+                chargeable && effectiveCharge
+                  ? `Book · ${effectiveCharge.totalLabel}`
+                  : 'Book this class'
               }
-              loading={isWorking}
               // A CTA that no-ops against the state it appears to resolve is the shape of the
               // widget's "Use this card" dead end. When booking is not possible the button is
               // disabled AND the line below says why.
               disabled={!bookable}
-              onPress={
-                onBook && effectiveCharge ? () => onBook(effectiveCharge.totalCents) : undefined
-              }
+              onPress={onAddToCart}
             />
 
-            {!entry.isFull && !chargeable ? (
+            {!chargeable ? (
               <Text
                 variant="caption"
                 color="tertiary"

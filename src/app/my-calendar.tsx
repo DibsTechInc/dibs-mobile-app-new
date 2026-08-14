@@ -13,28 +13,39 @@ import { router } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 
 import { studio } from '@/config/studio';
+import { groupBookings, splitNextUp, toDaySections } from '@/domain/bookings/group-bookings';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { MyCalendarScreen } from '@/features/bookings/MyCalendarScreen';
+import { MyCalendarScreen, type CalendarTab } from '@/features/bookings/MyCalendarScreen';
 import { useUpcomingBookings } from '@/features/bookings/useUpcomingBookings';
 import { useAppDrawer } from '@/features/nav/useAppDrawer';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
-import { groupBookings, toDaySections } from '@/domain/bookings/group-bookings';
 
 export default function MyCalendarRoute() {
   const { config, timeZone } = useStudioConfig();
   const { status } = useAuth();
   const bookings = useUpcomingBookings();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [tab, setTab] = useState<CalendarTab>('upcoming');
   const drawer = useAppDrawer({ visible: menuOpen, onClose: () => setMenuOpen(false) });
 
   const studioName = config?.studioName ?? studio.appName;
 
-  const { sections, past } = useMemo(() => {
+  const { nextUp, sections, upcomingCount, past } = useMemo(() => {
     const grouped = groupBookings(
       { upcomingAppts: bookings.data?.upcoming, previousAppts: bookings.data?.previous },
       { timeZone, showInstructor: studio.display.showInstructor },
     );
-    return { sections: toDaySections(grouped.upcoming), past: grouped.past };
+    // `next` is lifted out of the sections so the hero and the list below cannot show the same
+    // booking twice — see `splitNextUp`.
+    const { next, rest } = splitNextUp(toDaySections(grouped.upcoming));
+    return {
+      nextUp: next,
+      sections: rest,
+      // The TOTAL, hero included. The tab count must say how many classes they have, not how many
+      // are left in the list under the hero.
+      upcomingCount: grouped.upcoming.length,
+      past: grouped.past,
+    };
   }, [bookings.data, timeZone]);
 
   const onBack = useCallback(() => {
@@ -47,7 +58,9 @@ export default function MyCalendarRoute() {
   return (
     <>
       <MyCalendarScreen
+        nextUp={nextUp}
         sections={sections}
+        upcomingCount={upcomingCount}
         past={past}
         studioName={studioName}
         isSignedIn={status === 'signedIn'}
@@ -57,6 +70,8 @@ export default function MyCalendarRoute() {
         error={bookings.error}
         isRefreshing={bookings.isRefetching}
         onRefresh={() => void bookings.refetch()}
+        tab={tab}
+        onSelectTab={setTab}
         onBack={onBack}
         onBrowseClasses={
           status === 'signedIn' ? () => router.push('/schedule') : () => router.push('/sign-in')

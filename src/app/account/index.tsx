@@ -71,6 +71,15 @@ export default function AccountRoute() {
 
   const rows: AccountRow[] = [
     {
+      // Above Payment methods on purpose: buying a pack is a thing a client wants to DO, and
+      // saved-card administration is a thing they occasionally have to. The balances block above
+      // already tells them what they hold; this is the way to get more of it.
+      label: 'Packages',
+      icon: 'packages',
+      detail: 'Class packs and memberships',
+      onPress: () => router.push('/packages'),
+    },
+    {
       label: 'Payment methods',
       icon: 'paymentMethods',
       detail: 'Saved cards',

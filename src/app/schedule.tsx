@@ -4,12 +4,25 @@
  * Reads the SAME query Home's data does — one cache entry for the studio's whole window — so no
  * two surfaces can show a client different versions of the same class. Slicing it into days
  * happens in `src/domain/schedule/days.ts`, never in a second request.
+ *
+ * ── Book adds to the cart; it does not charge ─────────────────────────────────────────────────
+ * Tapping Book on a row puts the class in the cart and raises the sticky bar. Money is only ever
+ * discussed on `/checkout`, which is the one screen that shows a total including tax and the one
+ * place a PaymentIntent is created. The row's button is a toggle, so the add has an undo exactly
+ * where it happened.
+ *
+ * A signed-out client can fill a cart — the studio's schedule is public and browsing is the point.
+ * Checkout is where the session is required, and it redirects there rather than gating the row,
+ * because a Book button that silently means "sign in first" is a button that lies.
  */
 import { router } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 
+import { isAcceptingBookings } from '@/api/schemas/basic-config';
 import { studio } from '@/config/studio';
 import { fillEmptyDays, groupByStudioDay } from '@/domain/schedule/days';
+import { useCartStore } from '@/features/cart/cartStore';
+import { useCart } from '@/features/cart/useCart';
 import { useAppDrawer } from '@/features/nav/useAppDrawer';
 import { ScheduleScreen } from '@/features/schedule/ScheduleScreen';
 import { useSchedule } from '@/features/schedule/useSchedule';
@@ -18,6 +31,9 @@ import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
 export default function ScheduleRoute() {
   const { config, timeZone } = useStudioConfig();
   const schedule = useSchedule();
+  const cart = useCart();
+  const cartEventIds = useCartStore((state) => state.eventIds);
+  const toggleInCart = useCartStore((state) => state.toggle);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const drawer = useAppDrawer({ visible: menuOpen, onClose: () => setMenuOpen(false) });
@@ -36,6 +52,10 @@ export default function ScheduleRoute() {
     else router.replace('/');
   }, []);
 
+  // No Book buttons at all when the studio cannot take bookings (offboarded, or in soft lockout).
+  // Read access stays; only the affordance that cannot succeed comes down.
+  const canBook = config ? isAcceptingBookings(config) : true;
+
   return (
     <>
       <ScheduleScreen
@@ -50,9 +70,15 @@ export default function ScheduleRoute() {
         isRefreshing={schedule.isRefetching}
         onRefresh={() => void schedule.refetch()}
         onOpenClass={(eventId) => router.push(`/class/${eventId}`)}
-        // No `onBookClass` until P3 exists. A Book button that does nothing is the dead end this
-        // codebase keeps refusing to ship — until then the row itself opens class detail.
+        onBookClass={canBook ? toggleInCart : undefined}
+        cartEventIds={cartEventIds}
         onBack={onBack}
+        onOpenCart={canBook ? () => router.push('/checkout') : undefined}
+        cartSummary={{
+          chargeableCount: cart.chargeableCount,
+          blockedCount: cart.blockedCount,
+          totalLabel: cart.totalLabel,
+        }}
       />
       {drawer}
     </>

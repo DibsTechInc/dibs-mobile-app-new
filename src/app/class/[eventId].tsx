@@ -23,7 +23,7 @@ import { describeCancelWindow } from '@/domain/cancellation/cancel-window';
 import { resolveClassCharge } from '@/domain/pricing/class-charge';
 import { findEvent, longDayLabel } from '@/domain/schedule/days';
 import { toScheduleEntry } from '@/domain/schedule/entry';
-import { useBookClass } from '@/features/bookings/useBookClass';
+import { useCartStore, useIsInCart } from '@/features/cart/cartStore';
 import { ClassDetailScreen } from '@/features/schedule/ClassDetailScreen';
 import { useSchedule } from '@/features/schedule/useSchedule';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
@@ -53,12 +53,28 @@ export default function ClassDetailRoute() {
     [event, config?.currency],
   );
 
-  const booking = useBookClass({ eventId: Number(eventId), currency: config?.currency });
+  /**
+   * Adding to the cart, not charging.
+   *
+   * This screen used to run its own booking state machine, which made it a SECOND place that could
+   * create a PaymentIntent and decide a price. There is one now — `/checkout` — and both entry
+   * points (the schedule row's Book button and this CTA) lead to it.
+   */
+  const addToCart = useCartStore((state) => state.add);
+  const inCart = useIsInCart(Number(eventId));
 
   const onBack = useCallback(() => {
     if (router.canGoBack()) router.back();
     else router.replace('/schedule');
   }, []);
+
+  const onAddToCart = useCallback(() => {
+    addToCart(Number(eventId));
+    // Straight to checkout: somebody who has read the whole page and pressed a button carrying a
+    // total has decided. Leaving them here to find the cart themselves would be the "to do X, go
+    // to Y" pattern the product principles rule out.
+    router.push('/checkout');
+  }, [addToCart, eventId]);
 
   if (schedule.isPending) {
     return (
@@ -99,6 +115,8 @@ export default function ClassDetailRoute() {
     currency: config?.currency,
   });
 
+  const acceptingBookings = config ? isAcceptingBookings(config) : true;
+
   return (
     <ClassDetailScreen
       entry={entry}
@@ -112,10 +130,11 @@ export default function ClassDetailRoute() {
         // `.claude/CANCELLATION.md` §3.
         config?.defaultCancelTimeGroup ?? config?.cancelTime,
       )}
-      acceptingBookings={config ? isAcceptingBookings(config) : true}
+      acceptingBookings={acceptingBookings}
       charge={charge}
-      bookingStatus={booking.status}
-      onBook={booking.book}
+      inCart={inCart}
+      onAddToCart={acceptingBookings ? onAddToCart : undefined}
+      onOpenCart={acceptingBookings ? () => router.push('/checkout') : undefined}
       onBack={onBack}
     />
   );

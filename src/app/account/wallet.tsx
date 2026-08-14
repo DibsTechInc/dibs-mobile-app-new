@@ -79,7 +79,7 @@ export default function WalletRoute() {
         isAddingCard={addCard.isPending}
         addCardError={addCardError}
         onManageCard={setManaging}
-        // `onBrowsePackages` stays absent until the storefront exists (P4).
+        onBrowsePackages={() => router.push('/packages')}
       />
 
       <ManageCardSheet

@@ -1,4 +1,18 @@
 /**
+ * ⚠️ NO CALLERS as of 2026-08-13 — superseded by `features/cart/useCartCheckout`, flagged for
+ * delete approval rather than deleted (deleting files is an approval item).
+ *
+ * Class detail used to run this booking flow itself, which made it a SECOND place that could
+ * create a PaymentIntent and decide a price. Both entry points — the schedule row's Book button
+ * and class detail's CTA — now add to the cart and lead to `/checkout`, which is the one screen
+ * that takes money. The logic below survives inside `useCartCheckout`, extended to book several
+ * classes in sequence and to report per-class outcomes.
+ *
+ * Delete this once the cart flow has been through a round of real testing. Until then it is a
+ * cheap rollback.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────────────────────
+ *
  * Booking a class with a card, from the app.
  *
  *   1. Create an UNCONFIRMED, manual-capture PaymentIntent (server prices the class itself).

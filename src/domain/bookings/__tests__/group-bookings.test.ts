@@ -2,7 +2,7 @@
  * The split the API does NOT draw for us. See `group-bookings.ts` for why neither returned array
  * means what its name says.
  */
-import { groupBookings, toDaySections } from '../group-bookings';
+import { groupBookings, splitNextUp, toDaySections } from '../group-bookings';
 
 const TZ = 'America/New_York';
 /** 6pm in New York on 2026-08-07. */
@@ -186,5 +186,68 @@ describe('toDaySections', () => {
 
   it('returns nothing for nothing', () => {
     expect(toDaySections([])).toEqual([]);
+  });
+});
+
+describe('splitNextUp', () => {
+  const item = (eventId: number, startsAt: string, whenLabel: string) => ({
+    eventId, startsAt, whenLabel,
+    name: 'Class', instructor: null, locationLabel: null,
+    timeLabel: '6:30 PM', paidWithLabel: null, isCancelled: false, didAttend: false,
+  });
+
+  it('lifts the next booking out and does NOT leave it in the list', () => {
+    // The whole reason this exists: My Calendar gives the next booking a hero treatment, and a
+    // hero above a list whose first row is the same booking reads as a rendering bug — and makes
+    // the client count their classes wrong.
+    const sections = toDaySections([
+      item(1, '2026-08-08T09:00:00.000Z', 'Tomorrow'),
+      item(2, '2026-08-08T18:30:00.000Z', 'Tomorrow'),
+      item(3, '2026-08-09T10:00:00.000Z', 'Sunday'),
+    ]);
+
+    const { next, rest } = splitNextUp(sections);
+
+    expect(next?.eventId).toBe(1);
+    expect(rest.flatMap((section) => section.bookings.map((b) => b.eventId))).toEqual([2, 3]);
+  });
+
+  it('keeps the rest of the hero’s own day', () => {
+    const { rest } = splitNextUp(
+      toDaySections([
+        item(1, '2026-08-08T09:00:00.000Z', 'Tomorrow'),
+        item(2, '2026-08-08T18:30:00.000Z', 'Tomorrow'),
+      ]),
+    );
+
+    expect(rest).toHaveLength(1);
+    expect(rest[0].label).toBe('Tomorrow');
+    expect(rest[0].bookings.map((b) => b.eventId)).toEqual([2]);
+  });
+
+  it('drops a day the hero emptied — a heading with nothing under it is not a heading', () => {
+    const { next, rest } = splitNextUp(
+      toDaySections([
+        item(1, '2026-08-08T09:00:00.000Z', 'Tomorrow'),
+        item(2, '2026-08-09T10:00:00.000Z', 'Sunday'),
+      ]),
+    );
+
+    expect(next?.eventId).toBe(1);
+    expect(rest).toHaveLength(1);
+    expect(rest[0].label).toBe('Sunday');
+  });
+
+  it('leaves nothing behind when there is only one booking', () => {
+    const { next, rest } = splitNextUp(
+      toDaySections([item(1, '2026-08-08T09:00:00.000Z', 'Tomorrow')]),
+    );
+
+    expect(next?.eventId).toBe(1);
+    expect(rest).toEqual([]);
+  });
+
+  it('answers null for an empty calendar rather than throwing', () => {
+    expect(splitNextUp([])).toEqual({ next: null, rest: [] });
   });
 });

@@ -1,19 +1,34 @@
 /**
- * My Calendar — the client's own bookings.
+ * My Calendar — the client's own bookings. Redesigned 2026-08-13 (Alicia: "it looks messy, it
+ * needs to be more designed").
  *
- * ── It is the schedule, seen from the other side ────────────────────────────────────────────
- * Deliberately the SAME row shape as `ScheduleScreen`: a time rail on the left, the class and its
- * detail to the right, day headers between. Someone who books on the schedule and then checks what
- * they have booked is looking at the same objects, and a second visual language for them would be
- * two designs for one idea. Days are headed "Tomorrow" / "Fri, Aug 15" rather than dated, because
- * this is a list you plan around rather than one you scan by date.
+ * ── What was wrong with the first version ──────────────────────────────────────────────────────
+ * It was one undifferentiated scroll. Upcoming rows, then — with no warning and no break — past
+ * rows in a DIFFERENT shape, so the list appeared to change its mind halfway down. Nothing on the
+ * screen was bigger or more important than anything else, so the eye had nowhere to land, and the
+ * single most useful fact ("you have a class tomorrow at noon") was buried in row one of a list
+ * that looked exactly like row six. Beside the schedule screen — which opens with a solid accent
+ * block — it read as a page nobody had finished.
  *
- * ── Past is a different question, so it looks different ─────────────────────────────────────
- * Upcoming answers "where do I have to be". Past answers "what have I done" — no time rail, no
- * day headers, one line per booking with the outcome stated. Cancelled bookings live here rather
- * than vanishing: a client who cancelled wants to see that it happened.
+ * Three moves fix it, and each is a hierarchy decision rather than a decoration:
  *
- * There is no tab bar. A back chevron returns; the drawer moves sideways.
+ * **1. NEXT UP is a hero, not a row.** The next booking gets the accent field, the day named in
+ *    words, and the time set as a Fraunces numeral — the "numeral as a moment" role the template
+ *    reserves for exactly this. It is lifted OUT of the list rather than repeated in it
+ *    (`splitNextUp`), because a hero above a list starting with the same booking reads as a bug.
+ *
+ * **2. Upcoming and Past are two views, not one scroll.** A segmented control at the top. They
+ *    answer different questions — "where do I have to be" versus "what have I done" — and mixing
+ *    them was what made the shape change mid-scroll. Now each view has one row shape, all the way
+ *    down. The count rides on the tab, so orientation costs no reading.
+ *
+ * **3. Days are headed with a rule, not just an eyebrow.** A relative label ("Tomorrow") on the
+ *    left and the date on the right, over a hairline. The eyebrow alone gave the list no
+ *    structure; a stated date stops "Tomorrow" being the only thing anchoring a booking in time.
+ *
+ * The row anatomy still matches `ScheduleScreen` exactly — same 84pt time rail, same top
+ * alignment. Someone who books on the schedule and then checks what they booked is looking at the
+ * same objects, and a second visual language for them would be two designs for one idea.
  */
 import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -21,25 +36,195 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ApiError, describeApiError } from '@/api/errors';
 import { Button, EmptyState, ErrorState, Icon, SkeletonList, StatusTag, Text } from '@/components';
 import type { BookingDaySection, BookingListItem } from '@/domain/bookings/group-bookings';
+import { formatStoredTime } from '@/domain/time/studio-now';
 import { useTheme } from '@/theme/ThemeProvider';
 
 /** Matches ScheduleScreen's rail exactly — the two lists must line up. */
 const TIME_RAIL = 84;
 const TIME_SIZE = 17;
 
-function SectionLabel({ children }: { children: string }) {
+export type CalendarTab = 'upcoming' | 'past';
+
+/**
+ * Upcoming / Past, with the counts on them.
+ *
+ * A segmented pair rather than two chips: these are two views of one thing and exactly one is
+ * always active, which is what a segment means and what a chip does not. The accent wash marks
+ * the active side — the accent is scarce, and the hero below already has the filled version.
+ */
+function Segments({
+  tab,
+  upcomingCount,
+  pastCount,
+  onSelect,
+}: {
+  tab: CalendarTab;
+  upcomingCount: number;
+  pastCount: number;
+  onSelect: (tab: CalendarTab) => void;
+}) {
   const theme = useTheme();
+
+  const options: { key: CalendarTab; label: string }[] = [
+    { key: 'upcoming', label: upcomingCount > 0 ? `Upcoming · ${upcomingCount}` : 'Upcoming' },
+    { key: 'past', label: pastCount > 0 ? `Past · ${pastCount}` : 'Past' },
+  ];
+
   return (
     <View
       style={{
+        flexDirection: 'row',
+        gap: theme.spacing.xs,
+        padding: theme.spacing.xs,
+        borderRadius: theme.radii.pill,
+        backgroundColor: theme.colors.surface,
+      }}
+    >
+      {options.map((option) => {
+        const active = option.key === tab;
+        return (
+          <Pressable
+            key={option.key}
+            accessibilityRole="button"
+            accessibilityState={{ selected: active }}
+            accessibilityLabel={option.label}
+            onPress={() => onSelect(option.key)}
+            style={({ pressed }) => [{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: 36,
+              paddingVertical: theme.spacing.sm,
+              borderRadius: theme.radii.pill,
+              // The active segment lifts onto the page colour, so it reads as being in FRONT of
+              // the track rather than as a differently-tinted part of it.
+              backgroundColor: active
+                ? theme.colors.background
+                : pressed
+                  ? theme.colors.background
+                  : 'transparent',
+              opacity: pressed && !active ? 0.7 : 1,
+            }]}
+          >
+            <Text variant="label" color={active ? 'accent' : 'secondary'}>
+              {option.label}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+/**
+ * The next booking, given the room it earns.
+ *
+ * The day in words above, the time as the display numeral, the class under it. This is the one
+ * accent field on the screen and the one place the type scale is allowed to shout — everything
+ * below is a list, and a list with a hero above it is legible in a way a list alone is not.
+ */
+function NextUpCard({ booking }: { booking: BookingListItem }) {
+  const theme = useTheme();
+
+  // "6:00" and "PM", split so the meridiem can be set smaller. Split from ONE formatted string:
+  // `{ hour: 'numeric' }` alone renders "6 PM", so formatting twice puts the meridiem in twice.
+  const [clock, meridiem = ''] = formatStoredTime(booking.startsAt, {
+    hour: 'numeric',
+    minute: '2-digit',
+  }).split(/\s/);
+
+  const detail = [
+    booking.instructor && `with ${booking.instructor}`,
+    booking.locationLabel,
+  ].filter(Boolean);
+
+  return (
+    <View
+      style={{
+        borderRadius: theme.radii.card,
+        borderWidth: 1,
+        borderColor: theme.colors.accentBorder,
+        backgroundColor: theme.colors.accentWash,
+        padding: theme.spacing.lg,
+      }}
+    >
+      <Text variant="label" color="accent" uppercase>
+        Next up · {booking.whenLabel}
+      </Text>
+
+      <View style={{ flexDirection: 'row', alignItems: 'flex-end', marginTop: theme.spacing.sm }}>
+        {/* Stored wall-clock, printed verbatim — never device-converted. */}
+        <Text variant="hero" color="accent" style={{ fontSize: 48, lineHeight: 52 }}>
+          {clock}
+        </Text>
+        {meridiem ? (
+          <Text
+            variant="title"
+            color="accent"
+            style={{ marginLeft: theme.spacing.sm, marginBottom: theme.spacing.sm }}
+          >
+            {meridiem}
+          </Text>
+        ) : null}
+      </View>
+
+      <Text variant="title" style={{ marginTop: theme.spacing.xs }}>
+        {booking.name}
+      </Text>
+
+      {detail.length > 0 ? (
+        <Text variant="secondary" color="secondary" style={{ marginTop: theme.spacing.xs }}>
+          {detail.join(' · ')}
+        </Text>
+      ) : null}
+
+      {/* What it drew on. A client checking their calendar is often really checking whether this
+          one came off their pack. */}
+      {booking.paidWithLabel ? (
+        <Text variant="caption" color="tertiary" style={{ marginTop: theme.spacing.sm }}>
+          {booking.paidWithLabel}
+        </Text>
+      ) : null}
+    </View>
+  );
+}
+
+/** A relative label on the left, the date on the right, over a rule. */
+function DayHeader({ section }: { section: BookingDaySection }) {
+  const theme = useTheme();
+
+  // 'Aug 19' from the stored wall-clock date, so it agrees with the studio's calendar rather than
+  // the device's. `whenLabel` is relative ("Tomorrow") and cannot carry the date on its own.
+  const dateLabel = formatStoredTime(`${section.bookings[0].startsAt.slice(0, 10)}T12:00:00.000Z`, {
+    month: 'short',
+    day: 'numeric',
+  });
+
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'baseline',
+        justifyContent: 'space-between',
+        gap: theme.spacing.sm,
         paddingHorizontal: theme.spacing.lg,
         paddingTop: theme.spacing.lg,
         paddingBottom: theme.spacing.sm,
+        borderBottomWidth: 1,
+        borderBottomColor: theme.colors.border,
+        marginBottom: theme.spacing.xs,
       }}
     >
-      <Text variant="label" color="tertiary" uppercase>
-        {children}
+      <Text variant="label" color="secondary" uppercase>
+        {section.label}
       </Text>
+      {/* Suppressed when the relative label already IS the date — "Fri, Aug 15 · Aug 15" is the
+          same fact printed twice. */}
+      {section.label.includes(dateLabel) ? null : (
+        <Text variant="label" color="tertiary">
+          {dateLabel}
+        </Text>
+      )}
     </View>
   );
 }
@@ -88,6 +273,15 @@ function UpcomingRow({ booking }: { booking: BookingListItem }) {
   );
 }
 
+/**
+ * A past booking.
+ *
+ * Deliberately a different, denser shape from an upcoming one — no time rail, no day header, the
+ * outcome stated on the right. Upcoming answers "where do I have to be"; past answers "what have I
+ * done", and a list you scan by date does not need the same furniture as a list you plan around.
+ * Now that the two live under separate tabs, the shape only ever changes when the client asks it
+ * to.
+ */
 function PastRow({ booking }: { booking: BookingListItem }) {
   const theme = useTheme();
 
@@ -123,8 +317,12 @@ function PastRow({ booking }: { booking: BookingListItem }) {
 }
 
 export interface MyCalendarScreenProps {
-  /** Upcoming bookings, already grouped by the studio's day. */
+  /** The very next booking, lifted out of the sections by `splitNextUp`. */
+  nextUp: BookingListItem | null;
+  /** Everything after `nextUp`, still grouped by the studio's day. */
   sections: BookingDaySection[];
+  /** How many upcoming bookings there are IN TOTAL, `nextUp` included. Drives the tab count. */
+  upcomingCount: number;
   past: BookingListItem[];
   studioName: string;
   /**
@@ -136,6 +334,8 @@ export interface MyCalendarScreenProps {
   error?: unknown;
   isRefreshing?: boolean;
   onRefresh?: () => void;
+  tab: CalendarTab;
+  onSelectTab: (tab: CalendarTab) => void;
   onBack: () => void;
   /** The way out of an empty calendar. Without it the empty state is a dead end. */
   onBrowseClasses?: () => void;
@@ -143,7 +343,9 @@ export interface MyCalendarScreenProps {
 }
 
 export function MyCalendarScreen({
+  nextUp,
   sections,
+  upcomingCount,
   past,
   studioName,
   isSignedIn,
@@ -151,6 +353,8 @@ export function MyCalendarScreen({
   error,
   isRefreshing = false,
   onRefresh,
+  tab,
+  onSelectTab,
   onBack,
   onBrowseClasses,
   onOpenMenu,
@@ -158,7 +362,20 @@ export function MyCalendarScreen({
   const theme = useTheme();
   const insets = useSafeAreaInsets();
 
-  const hasNothing = sections.length === 0 && past.length === 0;
+  const hasNothing = upcomingCount === 0 && past.length === 0;
+
+  /**
+   * The tab that is actually rendered.
+   *
+   * `tab` is what the client last chose; this is what the data can honour. Sitting on Past when a
+   * refetch empties it — the client cancelled their only past booking, or the endpoint answered
+   * differently — would render an empty list under a hidden segmented control: a blank screen
+   * with no visible way off it, which is a dead end even though nothing threw.
+   *
+   * Derived rather than corrected with a `setState` in an effect: the effect would render the
+   * blank frame once before fixing it, and a state write during render is worse than either.
+   */
+  const activeTab: CalendarTab = tab === 'past' && past.length === 0 ? 'upcoming' : tab;
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background, paddingTop: insets.top }}>
@@ -200,7 +417,25 @@ export function MyCalendarScreen({
 
       <View style={{ paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.sm }}>
         <Text variant="display">My calendar</Text>
+        {/* The studio's name under the title, quietly. It is the answer to "whose classes am I
+            looking at" in an app that otherwise never repeats it after Home. */}
+        <Text variant="caption" color="tertiary" style={{ marginTop: theme.spacing.xs }}>
+          {studioName}
+        </Text>
       </View>
+
+      {/* The segments only appear once there is a choice to make. A single-option control is a
+          label pretending to be a switch. */}
+      {!isLoading && !hasNothing && past.length > 0 ? (
+        <View style={{ paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.lg }}>
+          <Segments
+            tab={activeTab}
+            upcomingCount={upcomingCount}
+            pastCount={past.length}
+            onSelect={onSelectTab}
+          />
+        </View>
+      ) : null}
 
       <ScrollView
         contentContainerStyle={{ paddingBottom: insets.bottom + theme.spacing.xxl }}
@@ -238,47 +473,50 @@ export function MyCalendarScreen({
                 : undefined
             }
           />
+        ) : activeTab === 'past' ? (
+          <View style={{ paddingTop: theme.spacing.md }}>
+            {past.map((booking) => (
+              <PastRow key={`${booking.eventId}@${booking.startsAt}`} booking={booking} />
+            ))}
+          </View>
+        ) : upcomingCount === 0 ? (
+          // History but nothing ahead. Its own state, and its own way forward — this is the most
+          // useful thing the screen can say to somebody who used to come and has stopped, and it
+          // is invisible unless it is said.
+          <View
+            style={{
+              paddingHorizontal: theme.spacing.lg,
+              paddingTop: theme.spacing.xl,
+              gap: theme.spacing.md,
+              alignItems: 'flex-start',
+            }}
+          >
+            <Text variant="title">Nothing coming up.</Text>
+            <Text variant="secondary" color="secondary">
+              Book your next class at {studioName} and it will appear here.
+            </Text>
+            {onBrowseClasses ? (
+              <View style={{ marginTop: theme.spacing.sm }}>
+                <Button label="Browse classes" fullWidth={false} onPress={onBrowseClasses} />
+              </View>
+            ) : null}
+          </View>
         ) : (
           <>
+            {nextUp ? (
+              <View style={{ paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.lg }}>
+                <NextUpCard booking={nextUp} />
+              </View>
+            ) : null}
+
             {sections.map((section) => (
-              <View key={section.label}>
-                <SectionLabel>{section.label}</SectionLabel>
+              <View key={`${section.label}-${section.bookings[0].startsAt}`}>
+                <DayHeader section={section} />
                 {section.bookings.map((booking) => (
                   <UpcomingRow key={`${booking.eventId}@${booking.startsAt}`} booking={booking} />
                 ))}
               </View>
             ))}
-
-            {/* "You have nothing coming up" is the single most useful thing this screen can say,
-                and it is invisible unless it is said. Without this the client with history but no
-                bookings sees an unheaded list of classes they have already been to and has to
-                work out for themselves that none of them is in the future. */}
-            {sections.length === 0 ? (
-              <View
-                style={{
-                  paddingHorizontal: theme.spacing.lg,
-                  paddingTop: theme.spacing.lg,
-                  paddingBottom: theme.spacing.base,
-                  gap: theme.spacing.md,
-                }}
-              >
-                <Text variant="body" color="secondary">
-                  Nothing coming up.
-                </Text>
-                {onBrowseClasses ? (
-                  <Button label="Browse classes" variant="secondary" fullWidth={false} onPress={onBrowseClasses} />
-                ) : null}
-              </View>
-            ) : null}
-
-            {past.length > 0 ? (
-              <>
-                <SectionLabel>Past</SectionLabel>
-                {past.map((booking) => (
-                  <PastRow key={`${booking.eventId}@${booking.startsAt}`} booking={booking} />
-                ))}
-              </>
-            ) : null}
           </>
         )}
       </ScrollView>

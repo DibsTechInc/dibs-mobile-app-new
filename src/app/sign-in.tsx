@@ -2,18 +2,31 @@
  * The auth route.
  *
  * Reached from Home rather than gating it: browsing the schedule needs no account, exactly as on
- * the widget. The gate belongs at booking and purchase, which are later phases.
+ * the widget. The gate belongs at booking and purchase.
+ *
+ * ── It hands people back where they came from ─────────────────────────────────────────────────
+ * A guest can fill a cart — the schedule is public and browsing is the point — and only meets the
+ * gate at `/checkout`, which sends them here with `?returnTo=/checkout`. Signing in then takes
+ * them back to their cart rather than to Home.
+ *
+ * Without that they land on Home holding a cart they cannot see, which is precisely the widget's
+ * post-login bounce: guest taps Confirm → signs in → arrives at "my classes" with the cart
+ * nowhere in sight. It took three attempts to fix there. `resolveReturnPath` is a route
+ * whitelist, so an unknown or mangled value lands on Home rather than on a route that does not
+ * exist.
  */
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
 
 import { useAuth } from '@/features/auth/AuthProvider';
 import { AuthScreen, type SessionPanelProps } from '@/features/auth/AuthScreen';
+import { resolveReturnPath } from '@/features/auth/returnPath';
 import { useAuthActions } from '@/features/auth/useAuthActions';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
 import { studio } from '@/config/studio';
 
 export default function SignInRoute() {
+  const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
   const { config } = useStudioConfig();
   const { status, session, account, accountMissing, isResolvingAccount, refetchAccount, signOut } =
     useAuth();
@@ -23,20 +36,23 @@ export default function SignInRoute() {
 
   const studioName = config?.studioName ?? studio.appName;
 
-  const goHome = useCallback(() => {
+  const goOnward = useCallback(() => {
     // `replace`, not `back`: a client who arrived here from a deep link has nothing to go back
     // to, and `back` on an empty stack does nothing at all — a button that looks broken.
-    router.replace('/');
-  }, []);
+    //
+    // `replace` also takes sign-in OUT of the stack, so the back gesture from the destination
+    // does not land somebody who just signed in on the login screen.
+    router.replace(resolveReturnPath(returnTo));
+  }, [returnTo]);
 
   const handleSignIn = useCallback(
     async (email: string, password: string) => {
       setError(null);
       const result = await signIn(email, password);
-      if (result.ok) goHome();
+      if (result.ok) goOnward();
       else setError(result.message ?? null);
     },
-    [signIn, goHome],
+    [signIn, goOnward],
   );
 
   const handleSignUp = useCallback(
@@ -49,10 +65,10 @@ export default function SignInRoute() {
     }) => {
       setError(null);
       const result = await signUp(values);
-      if (result.ok) goHome();
+      if (result.ok) goOnward();
       else setError(result.message ?? null);
     },
-    [signUp, goHome],
+    [signUp, goOnward],
   );
 
   const handleReset = useCallback(
