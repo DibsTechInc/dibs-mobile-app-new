@@ -105,43 +105,68 @@ describe('upcoming renewals', () => {
   });
 });
 
-describe('past rows', () => {
+describe('past rows — shapes captured from a real staging response, not guessed', () => {
   const row = (over = {}) =>
     buildBillingData(
-      input({ history: { data: { rows: [{ id: 1, ...over }] }, isPending: false, error: null } }),
+      input({ history: { data: { rows: [{ id: 'txn_1', ...over }] }, isPending: false, error: null } }),
     ).past.items[0];
 
-  it('renders a purchase amount', () => {
-    expect(row({ amount: 45.98, itemName: '10-Class Pass' })).toMatchObject({
-      title: '10-Class Pass',
+  it('titles a class booking from primary.eventName', () => {
+    expect(row({ activityType: 'class_booked', primary: { eventName: 'STUDIO Mixed Intermediate' } }).title)
+      .toBe('STUDIO Mixed Intermediate');
+  });
+
+  it('titles a pass purchase from primary.packageName', () => {
+    expect(row({ activityType: 'pass_purchased', amount: 303.05, primary: { packageName: '10-class Package' } }))
+      .toMatchObject({ title: '10-class Package', amountLabel: '$303.05' });
+  });
+
+  it('titles a credit movement from primary.itemName', () => {
+    expect(row({ activityType: 'credit_used', primary: { itemName: 'Credit applied to 10-class Package' } }).title)
+      .toBe('Credit applied to 10-class Package');
+  });
+
+  it('renders credit ADDED as money in, from amountSign', () => {
+    // Direction is amountSign, never the sign of `amount` — every amount arrives positive.
+    expect(row({ activityType: 'comp_credit_added', amount: 100, amountSign: 'credit',
+      primary: { itemName: 'Comp credit added' } }))
+      .toMatchObject({ amountLabel: '+$100.00', isCredit: true });
+  });
+
+  it('shows no amount for a NEUTRAL row', () => {
+    // A $0 comped session collected nothing. "$0.00" would read as a charge that happened.
+    expect(row({ activityType: 'session_payment_collected', amount: 0, amountSign: 'neutral',
+      primary: { eventName: 'STUDIO Advanced BEGINNER Ballet' } }).amountLabel).toBeNull();
+  });
+
+  it('shows no amount for a pass redemption', () => {
+    expect(row({ activityType: 'class_booked', amount: 0, amountSign: 'debit',
+      primary: { eventName: 'Ballet' } }).amountLabel).toBeNull();
+  });
+
+  it('states a partial refund ALONGSIDE the amount rather than netting it', () => {
+    // "$45.98" with "$10.00 refunded" under it is the truth; "−$35.98" is a number that appears
+    // on no statement, and the server hydrates refunds onto the same row.
+    expect(row({ amount: 45.98, refundedAmount: 10, amountSign: 'debit' })).toMatchObject({
       amountLabel: '$45.98',
+      refundLabel: '$10.00 refunded',
       isRefund: false,
     });
   });
 
-  it('keeps a PARTIALLY refunded purchase a purchase', () => {
-    // The server hydrates refunds onto the row rather than emitting a separate one. Flipping it
-    // to a refund here would double-count the same money.
-    expect(row({ amount: 45.98, amountRefunded: 10 })).toMatchObject({
-      isRefund: false,
-      amountLabel: '$45.98',
-    });
-  });
-
-  it('marks a FULLY refunded purchase as a refund', () => {
-    expect(row({ amount: 45.98, amountRefunded: 45.98 })).toMatchObject({
+  it('marks a FULLY refunded purchase', () => {
+    expect(row({ amount: 45.98, refundedAmount: 45.98, amountSign: 'debit' })).toMatchObject({
       isRefund: true,
-      amountLabel: '−$45.98',
+      refundLabel: '$45.98 refunded',
     });
   });
 
-  it('renders no amount for a row that moved no money', () => {
-    // A pass redemption. "$0.00" beside it reads as a charge that happened.
-    expect(row({ amount: 0, itemName: 'Beginner Ballet' }).amountLabel).toBeNull();
+  it('reads the date from occurredAt', () => {
+    expect(row({ amount: 10, occurredAt: '2026-08-14T20:48:22.671Z' }).dateLabel).not.toBeNull();
   });
 
-  it('never titles a row "undefined"', () => {
-    expect(row({ type: 'subscription_started' }).title).toBe('subscription started');
+  it('never titles a row "undefined", even for an activityType we have never seen', () => {
+    expect(row({ activityType: 'some_new_thing' }).title).toBe('some new thing');
     expect(row({}).title).toBe('Activity');
   });
 

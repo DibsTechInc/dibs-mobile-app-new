@@ -15,9 +15,13 @@ export interface BillingHistoryItem {
   key: string;
   title: string;
   dateLabel: string | null;
-  /** "$45.98", "−$45.98" for a refund, or null when the row moved no money. */
+  /** "$45.98", "+$100.00" for credit added, or null when the row moved no money. */
   amountLabel: string | null;
+  /** "$10.00 refunded", or null. Stated alongside the amount, never folded into it. */
+  refundLabel: string | null;
   isRefund: boolean;
+  /** Money IN (a comp credit), from `amountSign`. */
+  isCredit: boolean;
 }
 
 export interface UpcomingPaymentItem {
@@ -46,13 +50,20 @@ function statusFor(hasData: boolean, isPending: boolean, error: unknown): Billin
   return 'ready';
 }
 
-/** A readable label from whichever field the row carries. Never "undefined". */
+/**
+ * A readable label. Each `activityType` titles from a DIFFERENT field of `primary` — verified
+ * against a real staging response, not guessed.
+ *
+ * The chain is ordered rather than switched on the type so an activityType we have never seen
+ * still finds whichever of the four naming fields it carries. Only a row with none of them falls
+ * through to the humanised type, and only a row without even that reads "Activity".
+ */
 function titleFor(row: AccountActivityRow): string {
-  const candidate = row.itemName?.trim() || row.description?.trim();
-  if (candidate) return candidate;
-  // Fall back to the row type with its underscores removed — "subscription_started" reads badly
-  // but is still true, and is better than a blank line on a money surface.
-  if (row.type) return row.type.replace(/[_-]+/g, ' ');
+  const p = row.primary ?? {};
+  const named =
+    p.eventName?.trim() || p.packageName?.trim() || p.itemName?.trim() || p.passUsed?.name?.trim();
+  if (named) return named;
+  if (row.activityType) return row.activityType.replace(/[_-]+/g, ' ');
   return 'Activity';
 }
 
@@ -75,25 +86,32 @@ export function buildBillingData({
 }: BuildBillingInput): BillingData {
   const pastItems = (history.data?.rows ?? []).map<BillingHistoryItem>((row, index) => {
     const amount = typeof row.amount === 'number' ? row.amount : null;
-    const refunded = typeof row.amountRefunded === 'number' ? row.amountRefunded : 0;
-    // A partially-refunded purchase stays a PURCHASE with a refund annotation — the server
-    // hydrates refunds onto the row rather than emitting a separate one, and flipping it here
-    // would double-count it against the same money.
-    const isRefund = refunded > 0 && amount !== null && refunded >= amount;
-    const stamp = row.date || row.createdAt || null;
+    const refunded = typeof row.refundedAmount === 'number' ? row.refundedAmount : 0;
+    // A partially-refunded purchase stays a PURCHASE with a refund note — the server hydrates
+    // refunds onto the row rather than emitting a separate one, and flipping it would
+    // double-count the same money.
+    const isFullyRefunded = refunded > 0 && amount !== null && refunded >= amount;
+
+    // Direction comes from `amountSign`, not the sign of `amount` — every amount is positive and
+    // a comp credit ADDED is 'credit'. 'neutral' rows (a $0 comped session) moved no money.
+    const sign = row.amountSign ?? 'debit';
+    const hasMoney = amount !== null && amount !== 0 && sign !== 'neutral';
 
     return {
-      key: `${row.id ?? 'row'}-${index}`,
+      key: `${row.id ?? `row-${index}`}`,
       title: titleFor(row),
       // A real instant, read back in the studio's zone — not printed verbatim.
-      dateLabel: stamp ? formatInstantInStudioZone(stamp, timeZone) : null,
-      amountLabel:
-        amount === null || amount === 0
-          ? null
-          : isRefund
-            ? `−${formatBalance(amount, currency)}`
-            : formatBalance(amount, currency),
-      isRefund,
+      dateLabel: row.occurredAt ? formatInstantInStudioZone(row.occurredAt, timeZone) : null,
+      amountLabel: !hasMoney
+        ? null
+        : sign === 'credit'
+          ? `+${formatBalance(amount as number, currency)}`
+          : formatBalance(amount as number, currency),
+      // Stated separately rather than by negating the amount: "$45.98" with "$10.00 refunded"
+      // under it is the truth; "−$35.98" is a number that appears on no statement.
+      refundLabel: refunded > 0 ? `${formatBalance(refunded, currency)} refunded` : null,
+      isRefund: isFullyRefunded,
+      isCredit: sign === 'credit',
     };
   });
 

@@ -107,10 +107,21 @@ function HistoryRow({ item }: { item: BillingHistoryItem }) {
       </View>
       {/* Only rendered when the row moved money. A "$0.00" beside a pass redemption reads as a
           charge that happened. */}
-      {item.amountLabel ? (
-        <Text variant="body" color={item.isRefund ? 'success' : 'primary'}>
-          {item.amountLabel}
-        </Text>
+      {item.amountLabel || item.refundLabel ? (
+        <View style={{ alignItems: 'flex-end' }}>
+          {item.amountLabel ? (
+            <Text variant="body" color={item.isCredit ? 'success' : 'primary'}>
+              {item.amountLabel}
+            </Text>
+          ) : null}
+          {/* Stated under the amount, not folded into it — a netted figure appears on no
+              statement the client can reconcile against. */}
+          {item.refundLabel ? (
+            <Text variant="caption" color="tertiary">
+              {item.refundLabel}
+            </Text>
+          ) : null}
+        </View>
       ) : null}
     </View>
   );

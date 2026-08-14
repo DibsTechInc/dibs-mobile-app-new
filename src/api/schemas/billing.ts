@@ -4,28 +4,55 @@
  * Rows arrive ALREADY BUNDLED by `get-account-activity.js`. Do not re-derive the ±60s collapse in
  * TypeScript: a single-session card booking writes a purchase row and a booking row in the same
  * second, and the app would show twice the entries the web does for the same money.
+ *
+ * Shapes below were captured from a real staging response (studio 88, 32 rows) rather than
+ * guessed — an earlier version invented `type` / `date` / `itemName` / `amountRefunded` and every
+ * one of them was wrong, which would have rendered every row as a fallback label.
  */
 import { z } from 'zod';
 
 /**
- * One bundled event. Deliberately permissive — the library emits several row shapes
- * (`class_booked`, `pass_purchased`, `subscription_started`, credit movements…) and this screen
- * renders a label, a date and an amount. A strict schema would turn a new row type into a thrown
- * error on a money surface.
+ * `primary` differs per `activityType`, so it is one permissive object rather than a union —
+ * an unknown type must degrade to a readable row, never throw on a money surface.
+ *
+ * Observed types and the field each one titles from:
+ *   `class_booked`              → eventName
+ *   `pass_purchased`            → packageName
+ *   `credit_used`               → itemName
+ *   `comp_credit_added`         → itemName
+ *   `session_payment_collected` → eventName
  */
+const activityPrimarySchema = z
+  .object({
+    eventName: z.string().nullable().optional(),
+    eventDate: z.string().nullable().optional(),
+    packageName: z.string().nullable().optional(),
+    itemName: z.string().nullable().optional(),
+    passUsed: z
+      .object({ id: z.number().nullable().optional(), name: z.string().nullable().optional() })
+      .passthrough()
+      .nullable()
+      .optional(),
+  })
+  .passthrough();
+
 export const accountActivityRowSchema = z
   .object({
-    id: z.union([z.number(), z.string()]).nullable().optional(),
-    type: z.string().nullable().optional(),
-    /** A real instant. Rendered in the studio's zone, not verbatim. */
-    date: z.string().nullable().optional(),
-    createdAt: z.string().nullable().optional(),
-    description: z.string().nullable().optional(),
-    itemName: z.string().nullable().optional(),
-    /** DOLLARS, as the library emits them. */
+    /** A STRING with a source prefix — "txn_599875". Unique, so it is the render key. */
+    id: z.union([z.string(), z.number()]).nullable().optional(),
+    activityType: z.string().nullable().optional(),
+    /** A real instant. Rendered in the studio's zone, never verbatim. */
+    occurredAt: z.string().nullable().optional(),
+    /** DOLLARS. */
     amount: z.number().nullable().optional(),
-    amountRefunded: z.number().nullable().optional(),
-    creditsSpent: z.number().nullable().optional(),
+    /**
+     * `'debit'` money out · `'credit'` money in (a comp credit) · `'neutral'` nothing moved.
+     * This — not the sign of `amount` — is how direction is expressed.
+     */
+    amountSign: z.enum(['debit', 'credit', 'neutral']).nullable().optional(),
+    refundedAmount: z.number().nullable().optional(),
+    paymentMethod: z.string().nullable().optional(),
+    primary: activityPrimarySchema.nullable().optional(),
   })
   .passthrough();
 
