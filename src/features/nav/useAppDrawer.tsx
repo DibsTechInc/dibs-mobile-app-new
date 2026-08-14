@@ -75,6 +75,9 @@ export function useAppDrawer({ visible, onClose }: AppDrawerArgs) {
         icon: 'paymentMethods',
         onPress: go('/account/wallet'),
       });
+      // Next to Payment methods, because the pair is "how you pay" and "what you paid". Upcoming
+      // charges live here too, which is the half a client is most likely to be looking for.
+      rows.push({ label: 'Payments', icon: 'document', onPress: go('/account/billing') });
       rows.push({ label: 'Profile', icon: 'account', onPress: go('/account/profile') });
     } else {
       // A guest gets Packages too: the price list is public, and "what would this cost me" is a

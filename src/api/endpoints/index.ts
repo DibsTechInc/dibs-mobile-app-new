@@ -12,6 +12,12 @@
  */
 export { fetchBasicConfig } from './basic-config';
 export {
+  fetchAccountActivity,
+  fetchUpcomingPayments,
+  type AccountActivityPage,
+  type UpcomingPayments,
+} from './billing';
+export {
   BookingRefusedError,
   bookClassWithPass,
   confirmClassBooking,
