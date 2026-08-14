@@ -73,20 +73,48 @@ export default function CheckoutRoute() {
     [cart.lines, checkout.outcomes, timeZone, config],
   );
 
-  /** Lines a card can still pay for — booked ones have stopped counting. */
+  /** Lines still to book — booked ones have stopped counting. */
   const outstanding = useMemo(
-    () => lines.filter((line) => line.state === 'ready' && line.outcome.kind !== 'booked'),
+    () =>
+      lines.filter(
+        (line) =>
+          (line.state === 'ready' || line.state === 'covered') && line.outcome.kind !== 'booked',
+      ),
     [lines],
   );
 
-  const totalCents = useMemo(
-    () => outstanding.reduce((sum, line) => sum + effectiveTotalCents(line), 0),
+  /** Of those, the ones a CARD pays for. Covered lines cost nothing and are excluded. */
+  const outstandingChargeable = useMemo(
+    () => outstanding.filter((line) => line.state === 'ready'),
     [outstanding],
   );
 
-  const bookableItems = useMemo<BookableItem[]>(
-    () => outstanding.map((line) => ({ line, totalCents: effectiveTotalCents(line) })),
+  const outstandingCovered = useMemo(
+    () => outstanding.filter((line) => line.state === 'covered'),
     [outstanding],
+  );
+
+  const totalCents = useMemo(
+    () => outstandingChargeable.reduce((sum, line) => sum + effectiveTotalCents(line), 0),
+    [outstandingChargeable],
+  );
+
+  /**
+   * The run order: **pass-covered lines first, then card lines.**
+   *
+   * Two reasons, and the second is the one that matters. A pass booking opens no sheet and takes a
+   * second, so getting them out of the way means the client is not sitting through a payment sheet
+   * before finding out whether their free classes worked. And if they dismiss a card sheet halfway
+   * through, everything that cost nothing is already booked rather than abandoned alongside the
+   * charge they changed their mind about.
+   */
+  const bookableItems = useMemo<BookableItem[]>(
+    () =>
+      [...outstandingCovered, ...outstandingChargeable].map((line) => ({
+        line,
+        totalCents: effectiveTotalCents(line),
+      })),
+    [outstandingCovered, outstandingChargeable],
   );
 
   /**
@@ -122,7 +150,8 @@ export default function CheckoutRoute() {
   return (
     <CheckoutScreen
       lines={lines}
-      chargeableCount={outstanding.length}
+      chargeableCount={outstandingChargeable.length}
+      coveredCount={outstandingCovered.length}
       totalCents={totalCents}
       totalLabel={formatBalance(totalCents / 100, config?.currency)}
       isResolving={cart.isResolving}

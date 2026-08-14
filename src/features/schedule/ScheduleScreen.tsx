@@ -25,6 +25,7 @@ import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ApiError, describeApiError } from '@/api/errors';
+import type { Pass } from '@/api/schemas/passes';
 import { Button, EmptyState, ErrorState, Icon, SkeletonList, StatusTag, Text } from '@/components';
 import { monthLabelFor, type ScheduleDay } from '@/domain/schedule/days';
 import { toScheduleEntry } from '@/domain/schedule/entry';
@@ -277,6 +278,13 @@ export interface ScheduleScreenProps {
   studioName: string;
   showInstructor: boolean;
   currency?: string;
+  /**
+   * The client's usable passes. Rows a pass covers read "Included · {pass}" instead of a price.
+   *
+   * Undefined for a guest and while the wallet resolves — NOT `[]`, which would be a claim that
+   * they hold nothing.
+   */
+  passes?: Pass[];
   isLoading?: boolean;
   error?: unknown;
   isRefreshing?: boolean;
@@ -295,7 +303,12 @@ export interface ScheduleScreenProps {
   /** The sticky bar's destination. Absent → no bar, whatever is in the cart. */
   onOpenCart?: () => void;
   /** Rendered by the caller from `useCart`, so the bar and checkout quote the same figures. */
-  cartSummary?: { chargeableCount: number; blockedCount: number; totalLabel: string };
+  cartSummary?: {
+    chargeableCount: number;
+    coveredCount: number;
+    blockedCount: number;
+    totalLabel: string;
+  };
 }
 
 export function ScheduleScreen({
@@ -305,6 +318,7 @@ export function ScheduleScreen({
   studioName,
   showInstructor,
   currency,
+  passes,
   isLoading,
   error,
   isRefreshing = false,
@@ -324,7 +338,9 @@ export function ScheduleScreen({
   const inCart = useMemo(() => new Set(cartEventIds ?? []), [cartEventIds]);
 
   const showCartBar = Boolean(
-    onOpenCart && cartSummary && cartSummary.chargeableCount + cartSummary.blockedCount > 0,
+    onOpenCart &&
+      cartSummary &&
+      cartSummary.chargeableCount + cartSummary.coveredCount + cartSummary.blockedCount > 0,
   );
 
   // Fall back to the first day that HAS something rather than to a fixed index: the selected date
@@ -336,8 +352,11 @@ export function ScheduleScreen({
   );
 
   const entries = useMemo(
-    () => (active?.events ?? []).map((event) => toScheduleEntry(event, { showInstructor, currency })),
-    [active, showInstructor, currency],
+    () =>
+      (active?.events ?? []).map((event) =>
+        toScheduleEntry(event, { showInstructor, currency, passes }),
+      ),
+    [active, showInstructor, currency, passes],
   );
 
   const monthLabel = useMemo(() => monthLabelFor(days, active?.date ?? null), [days, active?.date]);
@@ -478,6 +497,7 @@ export function ScheduleScreen({
       {showCartBar && cartSummary && onOpenCart ? (
         <CartBar
           chargeableCount={cartSummary.chargeableCount}
+          coveredCount={cartSummary.coveredCount}
           blockedCount={cartSummary.blockedCount}
           totalLabel={cartSummary.totalLabel}
           onPress={onOpenCart}

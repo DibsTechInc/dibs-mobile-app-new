@@ -193,3 +193,72 @@ describe('buildPackages', () => {
     expect(buildPackages([pack({ price: null })])[0].priceLabel).toBeNull();
   });
 });
+
+/**
+ * What the card is actually charged, and whether the app may charge it at all.
+ *
+ * The total here is the client-side mirror of the server's `pricePackageForClient`, and it is what
+ * rides on the Buy button AND what is sent as `displayedTotalCents`. A drift does not mis-charge —
+ * the server refuses with `price_changed` — but it refuses EVERY purchase, so these are pinned.
+ */
+describe('buildPackages — what can be bought, and for how much', () => {
+  const taxed = (over: Partial<StudioPackage> = {}) => pack({ taxrate: 8.25, ...over });
+
+  it('adds tax as a PERCENTAGE, in integer cents, matching the server', () => {
+    const view = buildPackages([taxed({ price: 200 })])[0];
+    // $200 + 8.25% = $216.50. Treating the rate as a multiplier would quote $1,850.
+    expect(view.totalCents).toBe(21650);
+    expect(view.totalLabel).toBe('$216.50');
+    expect(view.taxNote).toBe('incl. $16.50 tax');
+  });
+
+  it('quotes the pre-tax price in the list and the WITH-tax total on the button', () => {
+    // A list is scanned, so it shows the drop-in figure; the button is what somebody presses to
+    // agree to a charge, so it carries the real one.
+    const view = buildPackages([taxed({ price: 200 })])[0];
+    expect(view.priceLabel).toBe('$200');
+    expect(view.totalLabel).toBe('$216.50');
+  });
+
+  it('says nothing about tax when the studio charges none', () => {
+    const view = buildPackages([pack({ price: 200, taxrate: 0 })])[0];
+    expect(view.totalCents).toBe(20000);
+    // "incl. $0.00 tax" is a line that exists to say nothing.
+    expect(view.taxNote).toBeNull();
+  });
+
+  it('is purchasable when it is a pack with a real price', () => {
+    const view = buildPackages([taxed()])[0];
+    expect(view.isPurchasable).toBe(true);
+    expect(view.notPurchasableReason).toBeNull();
+  });
+
+  it('refuses to offer a MEMBERSHIP for purchase, and says why', () => {
+    // Enrolling means creating a Stripe subscription, which the app cannot do and the server
+    // refuses (`membership_not_supported`). A Buy button here would lead straight to a refusal.
+    const view = buildPackages([membership()])[0];
+    expect(view.isPurchasable).toBe(false);
+    expect(view.notPurchasableReason).toMatch(/studio/i);
+    expect(view.totalCents).toBeNull();
+  });
+
+  it('refuses to offer an un-priced package', () => {
+    for (const price of [0, null]) {
+      const view = buildPackages([pack({ price })])[0];
+      expect(view.isPurchasable).toBe(false);
+      expect(view.totalCents).toBeNull();
+    }
+  });
+
+  it('charges the ONE-OFF price, never priceAutopay', () => {
+    // Only reachable for an ALLOW package, which is bought outright unless the client opts in.
+    const view = buildPackages([taxed({ autopay: 'ALLOW', price: 100, priceAutopay: 145 })])[0];
+    expect(view.kind).toBe('pack');
+    expect(view.totalCents).toBe(10825);
+  });
+
+  it('rounds tax the way the server rounds', () => {
+    // $39 at 8.25% = 321.75 → 322. A different rounding refuses every purchase.
+    expect(buildPackages([taxed({ price: 39 })])[0].totalCents).toBe(4222);
+  });
+});

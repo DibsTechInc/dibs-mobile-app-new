@@ -36,8 +36,10 @@ export interface CheckoutLineView extends CartLine {
 
 export interface CheckoutScreenProps {
   lines: CheckoutLineView[];
-  /** Counts and money from `useCart` — never recomputed here. */
+  /** Counts and money resolved by the route — never recomputed here. */
   chargeableCount: number;
+  /** Still-to-book lines a pass covers. They cost $0 and open no payment sheet. */
+  coveredCount: number;
   totalCents: number;
   totalLabel: string;
   /** True while the schedule is still arriving; without it every line reads as cancelled. */
@@ -121,6 +123,7 @@ function LineCard({
   // asked to confirm the server's number, so the server's number is what shows.
   const charge = line.outcome.kind === 'priceChanged' ? line.outcome.charge : line.charge;
   const showPrices = line.state === 'ready' && charge?.status === 'chargeable';
+  const covered = line.state === 'covered';
 
   return (
     <View
@@ -210,6 +213,24 @@ function LineCard({
             <Text variant="numeral">{charge.totalLabel}</Text>
           </View>
         </View>
+      ) : covered ? (
+        // Named, not just zeroed. "Included" alone leaves a member wondering WHICH of their passes
+        // is about to lose a class — and the pass named here is the one the server will spend,
+        // because both use the same chooser.
+        <View
+          style={{
+            marginTop: theme.spacing.base,
+            paddingTop: theme.spacing.md,
+            borderTopWidth: 1,
+            borderTopColor: theme.colors.divider,
+            ...priceRow,
+          }}
+        >
+          <Text variant="secondary" color="secondary" style={{ flexShrink: 1 }} numberOfLines={2}>
+            {line.passName ? `Using your ${line.passName}` : 'Covered by your pass'}
+          </Text>
+          <Text variant="numeral">$0</Text>
+        </View>
       ) : line.note ? (
         <Text variant="secondary" color="secondary" style={{ marginTop: theme.spacing.md }}>
           {line.note}
@@ -217,8 +238,10 @@ function LineCard({
       ) : null}
 
       {/* Stated BEFORE booking, in plain time. Someone deciding at 9pm whether to commit to a 7am
-          class deserves to know the window has already closed on them before they tap. */}
-      {line.cancelSentence && line.state === 'ready' && line.outcome.kind !== 'booked' ? (
+          class deserves to know the window has already closed on them before they tap. It applies
+          to a pass booking exactly as much as to a card one — arguably more, since a late cancel
+          there costs a class rather than money. */}
+      {line.cancelSentence && (line.state === 'ready' || covered) && line.outcome.kind !== 'booked' ? (
         <Text variant="caption" color="tertiary" style={{ marginTop: theme.spacing.md }}>
           {line.cancelSentence}
         </Text>
@@ -232,6 +255,7 @@ function LineCard({
 export function CheckoutScreen({
   lines,
   chargeableCount,
+  coveredCount,
   totalCents,
   totalLabel,
   isResolving,
@@ -251,13 +275,32 @@ export function CheckoutScreen({
   const bookedCount = lines.filter((line) => line.outcome.kind === 'booked').length;
   const anyRetryable = lines.some(
     (line) =>
-      line.state === 'ready' &&
+      (line.state === 'ready' || line.state === 'covered') &&
       (line.outcome.kind === 'failed' || line.outcome.kind === 'priceChanged'),
   );
-  // Finished ONLY when something actually booked and nothing is left to charge. A cart whose every
-  // line was blocked has `chargeableCount === 0` too, and titling that screen "Booked" would be
-  // the app claiming a booking nobody made.
-  const isComplete = bookedCount > 0 && chargeableCount === 0;
+
+  /** Everything still to book, by either route. What the CTA acts on. */
+  const bookableCount = chargeableCount + coveredCount;
+
+  // Finished ONLY when something actually booked and nothing is left to do. A cart whose every
+  // line was blocked has `bookableCount === 0` too, and titling that screen "Booked" would be the
+  // app claiming a booking nobody made.
+  const isComplete = bookedCount > 0 && bookableCount === 0;
+
+  /**
+   * What the button says.
+   *
+   * Three shapes, because a cart can be all-pass, all-card, or mixed — and a button reading
+   * "Book 2 classes · $0.00" for two pass-covered classes puts a price on something free, which is
+   * the sort of detail that makes people close an app.
+   */
+  const ctaLabel = (() => {
+    const noun = bookableCount === 1 ? 'class' : `${bookableCount} classes`;
+    const verb = anyRetryable ? 'Try again' : 'Book';
+    if (chargeableCount === 0) return `${verb} · ${noun} with your pass`;
+    if (anyRetryable) return `Try again · ${totalLabel}`;
+    return `Book ${noun} · ${totalLabel}`;
+  })();
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background, paddingTop: insets.top }}>
@@ -348,13 +391,21 @@ export function CheckoutScreen({
               <Text variant="heading">Total</Text>
               <Text variant="numeral">{totalLabel}</Text>
             </View>
+          ) : coveredCount > 0 ? (
+            // No Total row for a pass-only cart. "Total $0.00" is a money line about a transaction
+            // that is not happening, and it reads as though something might still be charged.
+            <Text variant="secondary" color="secondary" align="center">
+              {coveredCount === 1
+                ? 'Covered by your pass — nothing to pay.'
+                : `All ${coveredCount} covered by your passes — nothing to pay.`}
+            </Text>
           ) : null}
 
           {!acceptingBookings ? (
             <Text variant="secondary" color="secondary" align="center">
               Booking is temporarily unavailable. Contact {studioName} to book these classes.
             </Text>
-          ) : bookedCount > 0 && chargeableCount === 0 ? (
+          ) : bookedCount > 0 && bookableCount === 0 ? (
             // The end of the flow, and it must not be a dead end. A confirmation with no way
             // onward leaves somebody who just paid hunting for a back chevron.
             <>
@@ -366,32 +417,31 @@ export function CheckoutScreen({
               </Text>
               <Button label="See my calendar" variant="secondary" onPress={onViewCalendar} />
             </>
-          ) : chargeableCount === 0 ? (
-            // Every line is blocked and nothing booked. There is nothing to charge, so there is no
+          ) : bookableCount === 0 ? (
+            // Every line is blocked and nothing booked. There is nothing to do, so there is no
             // primary button — the lines above each say why, and Remove is still on all of them.
             <Text variant="secondary" color="secondary" align="center">
-              None of these can be booked with a card right now.
+              None of these can be booked right now.
             </Text>
           ) : (
             <Button
-              // The total rides ON the button, because that is the thing being pressed to agree
-              // to it.
-              label={
-                anyRetryable
-                  ? `Try again · ${totalLabel}`
-                  : `Book ${chargeableCount === 1 ? 'class' : `${chargeableCount} classes`} · ${totalLabel}`
-              }
+              // The total rides ON the button when there IS one, because that is the thing being
+              // pressed to agree to it. A pass-only cart gets no figure — see `ctaLabel`.
+              label={ctaLabel}
               loading={isWorking}
-              disabled={isWorking || totalCents <= 0}
+              // NOT gated on `totalCents > 0`: a pass-covered cart legitimately totals zero, and
+              // disabling the button there would leave a member holding a membership with no way
+              // to book at all.
+              disabled={isWorking}
               onPress={onConfirm}
             />
           )}
 
-          {phase.kind === 'done' && bookedCount > 0 && chargeableCount > 0 ? (
+          {phase.kind === 'done' && bookedCount > 0 && bookableCount > 0 ? (
             // A partial run. Say what landed, so the remaining button does not read as though
             // nothing worked.
             <Text variant="caption" color="tertiary" align="center">
-              {bookedCount} of {bookedCount + chargeableCount} booked. The rest are still here.
+              {bookedCount} of {bookedCount + bookableCount} booked. The rest are still here.
             </Text>
           ) : null}
         </View>

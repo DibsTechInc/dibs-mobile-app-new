@@ -21,6 +21,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { isAcceptingBookings } from '@/api/schemas/basic-config';
 import { studio } from '@/config/studio';
 import { fillEmptyDays, groupByStudioDay } from '@/domain/schedule/days';
+import { useClientPasses } from '@/features/account/useClientPasses';
 import { useCartStore } from '@/features/cart/cartStore';
 import { useCart } from '@/features/cart/useCart';
 import { useAppDrawer } from '@/features/nav/useAppDrawer';
@@ -32,6 +33,9 @@ export default function ScheduleRoute() {
   const { config, timeZone } = useStudioConfig();
   const schedule = useSchedule();
   const cart = useCart();
+  // Rows a pass covers read "Included · {pass}" instead of a price, and land in the cart as $0
+  // lines that book through `book-with-pass`. One coverage decision, shared by both.
+  const { passes } = useClientPasses();
   const cartEventIds = useCartStore((state) => state.eventIds);
   const toggleInCart = useCartStore((state) => state.toggle);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -65,6 +69,7 @@ export default function ScheduleRoute() {
         studioName={config?.studioName ?? studio.appName}
         showInstructor={studio.display.showInstructor}
         currency={config?.currency}
+        passes={passes}
         isLoading={schedule.isPending}
         error={schedule.error}
         isRefreshing={schedule.isRefetching}
@@ -76,6 +81,7 @@ export default function ScheduleRoute() {
         onOpenCart={canBook ? () => router.push('/checkout') : undefined}
         cartSummary={{
           chargeableCount: cart.chargeableCount,
+          coveredCount: cart.coveredCount,
           blockedCount: cart.blockedCount,
           totalLabel: cart.totalLabel,
         }}

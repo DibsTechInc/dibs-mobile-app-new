@@ -22,23 +22,37 @@ import { Text } from '@/components';
 import { useTheme } from '@/theme/ThemeProvider';
 
 export interface CartBarProps {
-  /** How many lines can actually be charged. */
+  /** How many lines will be charged to a card. */
   chargeableCount: number;
-  /** Lines that cannot — full, cancelled, or not card-payable. Named so they are not a surprise. */
+  /** How many a pass already covers. Bookable, and they cost nothing. */
+  coveredCount: number;
+  /** Lines that cannot be booked — full, cancelled, or not card-payable. Never a surprise. */
   blockedCount: number;
   totalLabel: string;
   onPress: () => void;
 }
 
-export function CartBar({ chargeableCount, blockedCount, totalLabel, onPress }: CartBarProps) {
+export function CartBar({
+  chargeableCount,
+  coveredCount,
+  blockedCount,
+  totalLabel,
+  onPress,
+}: CartBarProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
 
-  const total = chargeableCount + blockedCount;
+  const total = chargeableCount + coveredCount + blockedCount;
   if (total === 0) return null;
 
-  const canCheckout = chargeableCount > 0;
+  // A cart of nothing but pass-covered classes is perfectly checkoutable — it just costs $0.
+  // Gating this on `chargeableCount` alone would tell a member with an unlimited membership that
+  // their cart could not be booked, which is the exact inversion of the truth.
+  const canCheckout = chargeableCount + coveredCount > 0;
   const countLabel = `${total} ${total === 1 ? 'class' : 'classes'}`;
+  // No figure when nothing is being charged. "$0.00" beside Checkout reads as a price, and a
+  // member seeing a money amount for a class their membership covers will hesitate over it.
+  const showAmount = chargeableCount > 0;
 
   return (
     <View
@@ -61,7 +75,7 @@ export function CartBar({ chargeableCount, blockedCount, totalLabel, onPress }: 
         accessibilityRole="button"
         accessibilityLabel={
           canCheckout
-            ? `Check out. ${countLabel}, ${totalLabel}`
+            ? `Check out. ${countLabel}, ${showAmount ? totalLabel : 'covered by your pass'}`
             : `Review your cart. ${countLabel}, none can be booked right now`
         }
         onPress={onPress}
@@ -100,12 +114,15 @@ export function CartBar({ chargeableCount, blockedCount, totalLabel, onPress }: 
             {canCheckout
               ? blockedCount > 0
                 ? `${countLabel} · ${blockedCount} needs attention`
-                : countLabel
+                : // Good news, said in the one place a client is looking before they commit.
+                  chargeableCount === 0
+                  ? `${countLabel} · covered by your pass`
+                  : countLabel
               : `${countLabel} · nothing bookable right now`}
           </Text>
         </View>
 
-        {canCheckout ? (
+        {canCheckout && showAmount ? (
           <Text variant="numeral" color="onAccent" numberOfLines={1}>
             {totalLabel}
           </Text>

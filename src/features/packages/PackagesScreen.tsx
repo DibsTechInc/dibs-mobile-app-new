@@ -15,19 +15,24 @@
  * once. A membership card says "per month" beside its price and states any minimum commitment on
  * its face — the terms somebody is agreeing to belong on the card, not behind a tap.
  *
- * ── Purchase is not wired yet, and the screen says so plainly ────────────────────────────────
- * There is no app endpoint that buys a package (the class-booking pair has no package twin, and
- * the widget's legacy purchase route is unauthenticated and widget-shaped). So there is no Buy
- * button: an unpayable primary CTA is the "Use this card" dead end, and the honest alternative is
- * one sentence naming where a client CAN buy, once, under the heading — not on every card.
+ * ── Buying happens here, and only where it can succeed ───────────────────────────────────────
+ * A pack carries a **Buy · $216.50** button — the tax-inclusive total, because that is the figure
+ * being agreed to, and it is the same number sent as `displayedTotalCents` for the server to
+ * verify. A MEMBERSHIP does not: enrolling means creating a Stripe subscription, which the app
+ * cannot do yet and which the server refuses (`membership_not_supported`), so its card states
+ * where to go instead. A button that leads to a refusal is the "Use this card" dead end.
+ *
+ * The button is `accentOutline`, not filled: a price list is a list, and twelve filled accent
+ * buttons spend the studio's colour twelve times over.
  */
 import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ApiError, describeApiError } from '@/api/errors';
-import { Card, EmptyState, ErrorState, Icon, Skeleton, StatusTag, Text } from '@/components';
+import { Button, Card, EmptyState, ErrorState, Icon, Skeleton, StatusTag, Text } from '@/components';
 import type { PackageView } from '@/domain/packages/build-packages';
 import type { SectionStatus, WalletPass } from '@/domain/wallet/build-wallet';
+import type { PurchaseStatus } from '@/features/packages/usePurchasePackage';
 import { useTheme } from '@/theme/ThemeProvider';
 
 function SectionLabel({ children }: { children: string }) {
@@ -93,10 +98,32 @@ function OwnedPassRow({ pass }: { pass: WalletPass }) {
  * scanned by price. The terms — how many classes, how long it lasts, any minimum commitment — are
  * on the face of the card rather than behind a tap: they are what somebody is agreeing to.
  */
-function PackageCard({ pkg }: { pkg: PackageView }) {
+function PackageCard({
+  pkg,
+  purchase,
+  onBuy,
+  isSignedIn,
+  onSignIn,
+}: {
+  pkg: PackageView;
+  /** This package's slice of the purchase state machine. `null` when it is not the active one. */
+  purchase: PurchaseStatus | null;
+  onBuy?: (pkg: PackageView, totalCents: number) => void;
+  isSignedIn: boolean;
+  onSignIn?: () => void;
+}) {
   const theme = useTheme();
 
   const terms = [pkg.allowanceLabel, pkg.validityLabel, pkg.commitmentLabel].filter(Boolean);
+
+  // A price change replaces what the storefront implied for the rest of this card — the client is
+  // being asked to confirm the server's number, so the server's number is what shows and what the
+  // button sends.
+  const priceChanged = purchase?.kind === 'priceChanged';
+  const chargeCents = priceChanged ? purchase.totalCents : pkg.totalCents;
+  const chargeLabel = priceChanged ? purchase.totalLabel : pkg.totalLabel;
+  const isWorking = purchase?.kind === 'working';
+  const bought = purchase?.kind === 'bought';
 
   return (
     <Card>
@@ -156,6 +183,68 @@ function PackageCard({ pkg }: { pkg: PackageView }) {
           )}
         </View>
       </View>
+
+      {/* ── The action ──────────────────────────────────────────────────────────────────── */}
+      <View style={{ marginTop: theme.spacing.base }}>
+        {bought ? (
+          // The end of the flow for this card. Confirmation copy, not another button — a Buy
+          // button still sitting there after a successful purchase invites a second one.
+          <Text variant="secondary" color="success">
+            Added to your account. It is in Your passes above.
+          </Text>
+        ) : !pkg.isPurchasable ? (
+          // Stated, not disabled-and-unexplained. A membership needs a subscription the app cannot
+          // create yet, so the card says where to go rather than offering a button that refuses.
+          <Text variant="caption" color="tertiary">
+            {pkg.notPurchasableReason}
+          </Text>
+        ) : !isSignedIn ? (
+          <Button
+            label="Sign in to buy"
+            variant="secondary"
+            size="compact"
+            fullWidth={false}
+            onPress={onSignIn}
+          />
+        ) : onBuy && chargeCents ? (
+          <>
+            {purchase?.kind === 'error' ? (
+              <Text variant="secondary" color="danger" style={{ marginBottom: theme.spacing.md }}>
+                {purchase.message}
+                {/* Only ever said when the SERVER confirmed it. Claiming it on an unknown failure
+                    would be a guess about somebody's money. */}
+                {purchase.nothingCharged ? ' Your card was not charged.' : ''}
+              </Text>
+            ) : null}
+
+            {priceChanged ? (
+              // Deliberately worded as news, not as a failure. Nothing was charged — no
+              // PaymentIntent was even created.
+              <Text variant="secondary" color="secondary" style={{ marginBottom: theme.spacing.md }}>
+                The price updated to {chargeLabel}. Tap to buy at the new price.
+              </Text>
+            ) : null}
+
+            <Button
+              // The total rides ON the button, tax included, because that is the thing being
+              // pressed to agree to it. The card list quotes the pre-tax price because a list is
+              // scanned; this is where somebody commits.
+              label={`${priceChanged ? 'Confirm' : 'Buy'} · ${chargeLabel}`}
+              variant="accentOutline"
+              size="compact"
+              fullWidth={false}
+              loading={isWorking}
+              onPress={() => onBuy(pkg, chargeCents)}
+            />
+
+            {pkg.taxNote && !priceChanged ? (
+              <Text variant="caption" color="tertiary" style={{ marginTop: theme.spacing.sm }}>
+                {pkg.taxNote}
+              </Text>
+            ) : null}
+          </>
+        ) : null}
+      </View>
     </Card>
   );
 }
@@ -170,8 +259,11 @@ export interface PackagesScreenProps {
   ownedStatus: SectionStatus;
 
   studioName: string;
-  /** Where a client is told to buy, until the in-app purchase endpoint exists. */
-  purchaseHint: string;
+  /** Whether the client can buy at all — a guest is offered sign-in per card instead. */
+  isSignedIn: boolean;
+  /** Where the purchase flow currently is. One package at a time; see `usePurchasePackage`. */
+  purchase: PurchaseStatus;
+  onBuy?: (pkg: PackageView, totalCents: number) => void;
   isRefreshing?: boolean;
   onRefresh?: () => void;
   onBack: () => void;
@@ -187,7 +279,9 @@ export function PackagesScreen({
   ownedPasses,
   ownedStatus,
   studioName,
-  purchaseHint,
+  isSignedIn,
+  purchase,
+  onBuy,
   isRefreshing = false,
   onRefresh,
   onBack,
@@ -345,24 +439,22 @@ export function PackagesScreen({
               body={`${studioName} isn’t selling class packs or memberships in the app at the moment. You can still book classes one at a time.`}
             />
           ) : (
-            <>
-              {/*
-                Said ONCE, above the list, rather than as a disabled button on every card.
-
-                Twelve dead "Buy" buttons would be twelve invitations to a thing that cannot
-                happen. One sentence naming where a purchase CAN be made is the honest version, and
-                it costs the client one read instead of twelve taps.
-              */}
-              <Text variant="secondary" color="secondary" style={{ marginBottom: theme.spacing.base }}>
-                {purchaseHint}
-              </Text>
-
-              <View style={{ gap: theme.spacing.md }}>
-                {packages.map((pkg) => (
-                  <PackageCard key={pkg.id} pkg={pkg} />
-                ))}
-              </View>
-            </>
+            <View style={{ gap: theme.spacing.md }}>
+              {packages.map((pkg) => (
+                <PackageCard
+                  key={pkg.id}
+                  pkg={pkg}
+                  // Only the ACTIVE package's status reaches its card. Passing the whole machine to
+                  // every card would put one package's error under all of them.
+                  purchase={
+                    purchase.kind !== 'idle' && purchase.packageId === pkg.id ? purchase : null
+                  }
+                  onBuy={onBuy}
+                  isSignedIn={isSignedIn}
+                  onSignIn={onSignIn}
+                />
+              ))}
+            </View>
           )}
         </View>
       </ScrollView>

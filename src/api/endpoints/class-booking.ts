@@ -10,8 +10,10 @@ import type { ApiClient } from '../client';
 import { ApiError } from '../errors';
 import {
   bookingRefusalSchema,
+  bookWithPassResponseSchema,
   createClassPaymentIntentResponseSchema,
   confirmClassBookingResponseSchema,
+  type BookWithPassResponse,
   type ClassPriceBreakdown,
   type ConfirmClassBookingResponse,
 } from '../schemas/class-booking';
@@ -93,6 +95,45 @@ export async function createClassPaymentIntent(
       'checkout/class/create-payment-intent',
       { dibsStudioId, eventId, displayedTotalCents },
       createClassPaymentIntentResponseSchema,
+      { authenticated: true, signal },
+    );
+  } catch (error) {
+    return asRefusal(error);
+  }
+}
+
+export interface BookClassWithPassArgs {
+  dibsStudioId: number;
+  eventId: number;
+  /**
+   * Which pass to spend. Optional — the server chooses when it is omitted, using the same rule the
+   * app's `choosePassForClass` implements (unlimited first, then soonest expiry).
+   *
+   * It is a REQUEST, not an instruction: the server verifies the id against the client's own
+   * covering passes and refuses with `pass_not_usable` otherwise. An unchecked id would let
+   * somebody spend an expired pass, a placeholder hold, or another client's pass.
+   */
+  passId?: number | null;
+}
+
+/**
+ * Book a class with a pass the client already holds. ONE call, no PaymentSheet, no money.
+ *
+ * The seat and the pass use are both claimed by atomic conditional UPDATEs on the server, in that
+ * order, so a class that fills or a pass spent on another device refuses cleanly with nothing
+ * consumed.
+ */
+export async function bookClassWithPass(
+  client: ApiClient,
+  { dibsStudioId, eventId, passId }: BookClassWithPassArgs,
+  signal?: AbortSignal,
+): Promise<BookWithPassResponse> {
+  try {
+    // NOTE: no `userid`. Same auth trap as the card endpoints.
+    return await client.post(
+      'checkout/class/book-with-pass',
+      { dibsStudioId, eventId, ...(passId ? { passId } : {}) },
+      bookWithPassResponseSchema,
       { authenticated: true, signal },
     );
   } catch (error) {

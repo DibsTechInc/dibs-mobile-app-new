@@ -184,3 +184,127 @@ describe('buildCart', () => {
     expect(cart.lines[0].entry?.instructor).toBeNull();
   });
 });
+
+/**
+ * Pass coverage in the cart.
+ *
+ * This is the money-critical half of the file. A cart that prices a class a client's membership
+ * already covers charges a member for something they pay for monthly — the widget's single most
+ * expensive pass bug, and the reason `choosePassForClass` has exactly one implementation.
+ */
+describe('buildCart with the client’s passes', () => {
+  const pass = (over: Record<string, unknown> = {}) =>
+    ({
+      id: 900,
+      userid: 413885,
+      dibs_studio_id: 210,
+      private_pass: false,
+      totalUses: 10,
+      usesCount: 3,
+      expiresAt: '2099-01-01T00:00:00.000Z',
+      is_placeholder: false,
+      autopay: false,
+      studioPackage: { packageName: '10 Class Package', unlimited: false },
+      ...over,
+    }) as never;
+
+  const withPasses = (passes: unknown[]) => ({ ...OPTIONS, passes: passes as never });
+
+  it('marks a covered class as covered and charges nothing for it', () => {
+    const cart = buildCart([realEvent()], [180392617], withPasses([pass()]));
+
+    expect(cart.lines[0].state).toBe('covered');
+    expect(cart.lines[0].passId).toBe(900);
+    expect(cart.lines[0].passName).toBe('10 Class Package');
+    expect(cart.coveredCount).toBe(1);
+    expect(cart.chargeableCount).toBe(0);
+    // The whole point: not one cent.
+    expect(cart.totalCents).toBe(0);
+  });
+
+  it('is still checkoutable with nothing but covered classes', () => {
+    // A member with an unlimited membership has a $0 cart, and telling them it cannot be booked
+    // would be the exact inversion of the truth.
+    const cart = buildCart([realEvent()], [180392617], withPasses([pass({ totalUses: null })]));
+    expect(cart.canCheckout).toBe(true);
+    expect(cart.blockedCount).toBe(0);
+  });
+
+  it('mixes covered and card lines, and totals only the card ones', () => {
+    const events = [realEvent({ eventid: 1 }), realEvent({ eventid: 2 })];
+    // A one-use pass covers exactly one of them; the chooser returns it for both, but only the
+    // count of chargeable lines feeds the money.
+    const cart = buildCart(events, [1, 2], withPasses([pass()]));
+
+    expect(cart.coveredCount).toBe(2);
+    expect(cart.totalCents).toBe(0);
+  });
+
+  it('treats an EMPTY pass list as "you hold none", and prices the class', () => {
+    const cart = buildCart([realEvent()], [180392617], withPasses([]));
+    expect(cart.lines[0].state).toBe('ready');
+    expect(cart.totalCents).toBe(2382);
+  });
+
+  it('prices the class when passes are UNDEFINED — we have not asked', () => {
+    // Both look the same on screen, but only one is a claim. The server checks coverage again and
+    // refuses a card for a covered class, so the worst case is a refusal, never a wrong charge.
+    const cart = buildCart([realEvent()], [180392617], OPTIONS);
+    expect(cart.lines[0].state).toBe('ready');
+  });
+
+  it('never covers a class the studio has turned passes off for', () => {
+    const cart = buildCart(
+      [realEvent({ can_apply_pass: false })],
+      [180392617],
+      withPasses([pass()]),
+    );
+    expect(cart.lines[0].state).toBe('ready');
+  });
+
+  it('never spends a private appointment pass on a public class', () => {
+    const cart = buildCart([realEvent()], [180392617], withPasses([pass({ private_pass: true })]));
+    expect(cart.lines[0].state).toBe('ready');
+  });
+
+  it('never spends a placeholder hold — it is a marker for a CHARGE, not an entitlement', () => {
+    const cart = buildCart([realEvent()], [180392617], withPasses([pass({ is_placeholder: true })]));
+    expect(cart.lines[0].state).toBe('ready');
+  });
+
+  it('never spends a spent or expired pass', () => {
+    const spent = buildCart([realEvent()], [180392617], withPasses([pass({ usesCount: 10 })]));
+    expect(spent.lines[0].state).toBe('ready');
+
+    const expired = buildCart(
+      [realEvent()],
+      [180392617],
+      withPasses([pass({ expiresAt: '2020-01-01T00:00:00.000Z' })]),
+    );
+    expect(expired.lines[0].state).toBe('ready');
+  });
+
+  it('checks FULL before coverage — a covered seat that does not exist is still no seat', () => {
+    const cart = buildCart(
+      [realEvent({ seats: 5, spots_booked: 5 })],
+      [180392617],
+      withPasses([pass()]),
+    );
+    expect(cart.lines[0].state).toBe('full');
+    expect(cart.coveredCount).toBe(0);
+  });
+
+  it('names the MEMBERSHIP when the client holds both — the server picks the same one', () => {
+    const membership = pass({
+      id: 901,
+      totalUses: null,
+      studioPackage: { packageName: 'Month Unlimited', unlimited: true },
+    });
+    const cart = buildCart([realEvent()], [180392617], withPasses([pass(), membership]));
+
+    // Spending the membership preserves the pack. If the app named one and the server spent the
+    // other, the client would watch the wrong balance drop.
+    expect(cart.lines[0].passId).toBe(901);
+    expect(cart.lines[0].passName).toBe('Month Unlimited');
+  });
+});

@@ -4,7 +4,8 @@ Built 2026-08-13. Branch `feature/card-booking`. Studio for testing: **Everyday 
 staging, whose sandbox connected account is `acct_1U1fXzQTOTKua6cH`.
 
 Run before anything else: `npm run typecheck && npx jest && npx expo lint`
-(current: 751 tests / 27 suites green, 0 lint errors).
+(current: 771 tests / 27 suites green, 0 lint errors). Backend:
+`cd ../dibs-api && npx jest services/shared/checkout services/shared/pricing` (181 green).
 
 Stripe test cards: `4242 4242 4242 4242` succeeds · `4000 0000 0000 9995` insufficient funds ·
 `4000 0025 0000 3155` requires 3DS · `4000 0000 0000 0002` generic decline.
@@ -90,10 +91,9 @@ Stripe test cards: `4242 4242 4242 4242` succeeds · `4000 0000 0000 9995` insuf
 - [ ] Confirming books at the new price, and the charge equals what the button said
 
 ### 6b. Covered by a pass
-**Steps:** Sign in as a client holding an unlimited pass; cart a class it covers.
-- [ ] The line shows the server's sentence, styled as information (not red)
-- [ ] It stops counting toward the total
-- [ ] The line keeps its Remove control
+**Superseded by scenario 11** — the app now books these with the pass rather than reporting a
+refusal. The card endpoint's `covered_by_pass` refusal remains as a backstop; see 11d for the
+self-healing path that exercises it.
 
 ### 6c. Class fills while in the cart
 - [ ] The line reads "This class filled up while it was in your cart."
@@ -171,11 +171,120 @@ Stripe test cards: `4242 4242 4242 4242` succeeds · `4000 0000 0000 9995` insuf
 
 ## Known limitations, deliberately shipped
 
-- **No package purchase in the app.** There is no server endpoint for it (`checkout/class/*` has no
-  package twin, and the widget's `checkout-package-credit-card` is unauthenticated and
-  widget-shaped). The storefront states where to buy instead of offering a button that cannot work.
+- **No MEMBERSHIP purchase in the app.** A `FORCE`-autopay package is a Stripe subscription, not a
+  one-off charge; the server refuses it and the storefront says where to go. Packs and `ALLOW`
+  packages buy normally (Part 2).
 - **One charge per class.** No multi-class endpoint exists, so a 3-class cart is 3 statement lines.
   The checkout screen says so.
 - **No waitlist.** Full classes state the fact and stop.
 - **`useBookClass.ts` has no callers** — superseded by `useCartCheckout`, flagged in-file for delete
   approval rather than deleted.
+
+---
+
+# Part 2 — Buying a package, and booking with one (2026-08-13)
+
+Backend: `dibs-api` on branch `staging`. Endpoints are `requireWidgetAuth`; nothing needs a
+migration or a new env var.
+
+## 11. Book a class with a pass  ⚠️ the money-critical path
+
+**Setup:** sign in as a client at studio 88 holding a **finite pack** with uses left.
+
+- [ ] The schedule row reads **"Included · {pass name}"** where a price used to be
+- [ ] The Book button still appears and still toggles to Added
+- [ ] The cart bar reads "1 class · covered by your pass" with **no dollar amount**
+- [ ] Checkout shows "Using your {pass} — $0" and **no Total row**
+- [ ] The CTA reads **"Book · class with your pass"** — no figure
+- [ ] Confirm books it with **no PaymentSheet at all**
+- [ ] **DB:** ONE `dibs_transaction` (type `class`, `with_passid` = the pass, `amount_charged` **0**,
+      `original_price` = the pass's `passValue`), one `attendees` row with
+      `attendeeID = String(that transaction id)`, `source='dibs'`. **No purchase transaction.**
+- [ ] `passes.usesCount` went up by exactly **1**
+- [ ] `events.spots_booked` reconciled from the attendee count
+- [ ] Confirmation email says "pass", not a dollar amount
+
+### 11a. The unlimited membership — the trap that has bitten 13 surfaces
+**Setup:** a client on Month Unlimited (`totalUses` is **null**).
+- [ ] The row reads "Included", NOT a price
+- [ ] The booking succeeds — a bare `usesCount < totalUses` would refuse every member
+- [ ] `usesCount` increments; the pass stays usable for the next class
+
+### 11b. Which pass gets spent
+**Setup:** a client holding BOTH a membership and a 10-class pack.
+- [ ] The row, the cart line and the confirmation all name the **membership**
+- [ ] The **pack's** `usesCount` is unchanged — spending it would cost them a class they could keep
+- [ ] The app's name and the server's choice agree (this is the drift that matters)
+
+### 11c. Refusals
+- [ ] Pass with 0 uses left → `pass_spent`, "nothing was used", seat NOT consumed
+- [ ] Expired pass → not offered as coverage at all; the class prices normally
+- [ ] Placeholder / `[Admin] Unpaid Reservation` pass → never offered, never spent
+- [ ] Private appointment pass only → the class prices normally and books by card
+- [ ] A class with `can_apply_pass = false` → prices normally even for a member
+- [ ] Class fills between the screen and Confirm → `class_full`, pass use NOT consumed
+- [ ] **Race:** two devices booking the last use of a one-use pack — exactly one succeeds
+
+### 11d. Self-healing
+**Setup:** buy a pack on the web, then (without refreshing) Confirm a card booking in the app.
+- [ ] The server refuses `covered_by_pass` and the app **silently books it with the pass instead**
+- [ ] No charge, no error on screen, the line just turns Booked
+
+## 12. Buy a package
+
+**Setup:** studio 88, signed in, a real pack on the storefront.
+
+- [ ] The card shows **Buy · $216.50** — the total WITH tax, and "incl. $16.50 tax" beneath
+- [ ] The list price above still shows the pre-tax `$200`
+- [ ] Tapping Buy opens the PaymentSheet with the saved card preselected
+- [ ] On success the card says "Added to your account", and the pass appears in **Your passes**
+      above WITHOUT a manual refresh
+- [ ] The drawer balances and Account show it too
+- [ ] **A class the new pack covers now reads "Included" on the schedule** (this is the
+      invalidation that matters — it proves coverage re-ran)
+- [ ] **DB:** `passes` row (`totalUses` = class count, `usesCount` **0**, `studio_package_id` = the
+      package the client actually chose) + `dibs_transaction` (type `pack`, `for_passid`,
+      `amount_charged` = gross, `purchasePlace='mobile-app'`)
+- [ ] **Stripe:** one PaymentIntent on the studio's CONNECTED account, captured
+
+### 12a. Memberships are not sold here
+- [ ] A `FORCE`-autopay package shows **no Buy button** and reads "Memberships are set up with the
+      studio directly."
+- [ ] Its price still shows, with "per month" and any minimum commitment
+
+### 12b. Purchase limits
+- [ ] An intro offer bought once no longer shows a Buy button afterwards (refetch the storefront)
+- [ ] Buying the same intro pack twice in two sessions → `not_first_purchase`, **nothing charged**
+- [ ] `packagePurchaseLimit` at the boundary: the Nth succeeds, the N+1th refuses
+
+### 12c. Price and failure
+- [ ] Change the package price server-side between the storefront render and Buy →
+      "The price updated to $X", **nothing charged**, and confirming charges the NEW figure
+- [ ] Declined card (`4000 0000 0000 0002`) → the message sits on that card, no pass created
+- [ ] Dismiss the sheet → back to idle, no error, no charge
+- [ ] Unlimited package → the pass is created with `totalUses` **null**, and the wallet shows
+      "Unlimited" rather than a number
+
+### 12d. Guest
+- [ ] Signed out, the storefront still loads and each card offers **"Sign in to buy"**
+- [ ] "Your passes" says sign in — never "you have none"
+
+## Automated tests added (Part 2)
+
+| File | Covers |
+|---|---|
+| `dibs-api services/shared/pricing/__tests__/price-package-for-client.test.js` | Tax as a percentage, rounding pinned against the app's mirror, 0/null is not free (13) |
+| `dibs-api services/shared/checkout/package-card/__tests__/gates.test.js` | Membership refusal, storefront filters re-checked at charge time, both purchase limits, `paranoid: false` (15) |
+| `dibs-api services/shared/checkout/class-pass/__tests__/choose-pass-for-class.test.js` | Unlimited-first ordering, the null/999 conventions, public-vs-private coercion, a requested pass verified not trusted (19) |
+| `dibs-api services/shared/checkout/class-pass/__tests__/claim-pass-use.test.js` | The SQL itself — increment-in-SQL, `totalUses IS NULL`, NULL-safe expiry, placeholder refusal (11) |
+| `src/domain/cart/__tests__/build-cart.test.ts` | The `covered` state: $0, still checkoutable, full-before-covered, every never-spend case (13 added) |
+| `src/domain/packages/__tests__/build-packages.test.ts` | `isPurchasable`, the tax-inclusive total, memberships carrying no purchase total (9 added) |
+
+Totals: **dibs-api 181 passing** across checkout+pricing; **app 771 passing / 27 suites**.
+
+## Still owed before production
+
+1. **A LIVE-mode `dibs-payment-intent-success` Connect destination.** Sandbox only today. Both
+   package purchases and class bookings depend on it as their crash safety net. Verify with
+   `stripe.webhookEndpoints.list()` — mounting a handler proves nothing about delivery.
+2. **Deploy dibs-api.** These endpoints do not exist on any deployed host yet.

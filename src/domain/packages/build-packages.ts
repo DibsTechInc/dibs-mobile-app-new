@@ -22,7 +22,7 @@
  * product. The figure a card is charged is settled at checkout, by the server, as it is for a
  * class.
  */
-import { formatPrice } from '@/domain/money/format';
+import { formatBalance, formatPrice } from '@/domain/money/format';
 import type { StudioPackage } from '@/api/schemas/packages';
 
 export type PackageKind = 'pack' | 'membership';
@@ -48,6 +48,33 @@ export interface PackageView {
   description: string | null;
   /** An intro offer — only sellable as a first purchase. Worth flagging, it is a good deal. */
   isIntroOffer: boolean;
+
+  /**
+   * Can this be bought IN THE APP right now?
+   *
+   * False for a membership — enrolling in a recurring charge means creating a Stripe subscription,
+   * and the server refuses a one-off PaymentIntent for one (`membership_not_supported`). Rendering
+   * a Buy button that the server will refuse is the dead end this codebase keeps refusing to ship,
+   * so the card explains instead.
+   *
+   * Also false when the package carries no usable price — `price` of 0 or null means "priced
+   * elsewhere", not free.
+   */
+  isPurchasable: boolean;
+  /** Why not, in one sentence, when `isPurchasable` is false. Null when it is true. */
+  notPurchasableReason: string | null;
+
+  /**
+   * The tax-inclusive total, in CENTS — the figure sent as `displayedTotalCents`.
+   *
+   * This is the client-side mirror of `pricePackageForClient`, and the server refuses to charge
+   * anything else. It is null when there is no price to send.
+   */
+  totalCents: number | null;
+  /** "$216.50" — the total with tax, always two decimals. What the Buy button carries. */
+  totalLabel: string | null;
+  /** "incl. $16.50 tax", or null when the studio charges none. */
+  taxNote: string | null;
 }
 
 /** Anything not recognised is treated as a one-off. Never guess somebody into a subscription. */
@@ -144,6 +171,33 @@ function isSellable(pkg: StudioPackage): boolean {
   return true;
 }
 
+/**
+ * What the card will actually be charged, in cents — the client-side mirror of dibs-api's
+ * `pricePackageForClient`.
+ *
+ * NOT a second pricing brain: `price` is the studio's list price and `taxrate` is the studio's own
+ * percentage, both computed server-side and put on the row. This only adds them up, with the SAME
+ * `Math.round(subtotal * rate / 100)` on integer cents that the server uses. A different rounding
+ * here would refuse every purchase with `price_changed` rather than mis-charging one — the failure
+ * mode is a re-render, not a wrong total.
+ */
+function chargeCentsFor(pkg: StudioPackage, amountDollars: number | null) {
+  if (typeof amountDollars !== 'number' || !Number.isFinite(amountDollars) || amountDollars <= 0) {
+    return { subtotalCents: 0, taxCents: 0, totalCents: 0 };
+  }
+
+  const subtotalCents = Math.round(amountDollars * 100);
+  // `taxrate` is a PERCENTAGE (8.25 means 8.25%), not a multiplier. Dividing by 100 is what stops
+  // a $200 package being quoted $1,650 of tax.
+  const rate =
+    typeof pkg.taxrate === 'number' && Number.isFinite(pkg.taxrate) && pkg.taxrate > 0
+      ? pkg.taxrate
+      : 0;
+  const taxCents = rate > 0 ? Math.round((subtotalCents * rate) / 100) : 0;
+
+  return { subtotalCents, taxCents, totalCents: subtotalCents + taxCents };
+}
+
 export function buildPackages(
   packages: StudioPackage[],
   { currency }: BuildPackagesOptions = {},
@@ -158,6 +212,20 @@ export function buildPackages(
       kind === 'membership'
         ? (pkg.priceAutopay ?? pkg.price ?? null)
         : (pkg.price ?? null);
+
+    // The CHARGE is always computed from the one-off `price`, never from `priceAutopay` — that is
+    // what the server prices, and a membership never reaches the charge path anyway.
+    const charge = chargeCentsFor(pkg, pkg.price ?? null);
+
+    // A membership is refused server-side (`membership_not_supported`) because enrolling means
+    // creating a Stripe subscription, not taking a one-off payment. Saying so on the card beats a
+    // button that leads to a refusal.
+    const notPurchasableReason =
+      kind === 'membership'
+        ? 'Memberships are set up with the studio directly.'
+        : charge.totalCents <= 0
+          ? 'Ask the studio about this one.'
+          : null;
 
     return {
       id: pkg.id,
@@ -183,6 +251,27 @@ export function buildPackages(
       commitmentLabel: commitmentLabel(pkg),
       description: pkg.customDescription?.trim() || null,
       isIntroOffer: pkg.onlyFirstPurchase === true,
+
+      isPurchasable: notPurchasableReason === null,
+      notPurchasableReason,
+
+      /*
+       * NULL unless the package can actually be bought here.
+       *
+       * These three exist to feed the Buy button and `displayedTotalCents`, and a membership has
+       * no Buy button — so `price × tax` for one would be a one-off total nobody is ever charged,
+       * sitting on the view model waiting for a future surface to render it. A membership renews
+       * at `priceAutopay` through a subscription this app does not create; quoting it a purchase
+       * total is the same class of mistake as reading `classAmount` on an unlimited pack.
+       */
+      totalCents: notPurchasableReason === null ? charge.totalCents : null,
+      totalLabel:
+        notPurchasableReason === null ? formatBalance(charge.totalCents / 100, currency) : null,
+      // Only when there IS tax. "incl. $0.00 tax" is a line that exists to say nothing.
+      taxNote:
+        notPurchasableReason === null && charge.taxCents > 0
+          ? `incl. ${formatBalance(charge.taxCents / 100, currency)} tax`
+          : null,
     };
   });
 }

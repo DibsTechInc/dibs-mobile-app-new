@@ -100,12 +100,23 @@ describe('isUsablePass', () => {
 });
 
 describe('sortPassesByPriority', () => {
-  it('spends a finite pack before an unlimited membership', () => {
-    // The membership loses nothing by going unused this once; the pack has a fixed number of
-    // uses and an expiry date.
+  it('spends an unlimited membership before a finite pack', () => {
+    // While the membership is live it covers every class anyway, so drawing on the pack underneath
+    // it is pure loss — those classes could have been kept for after the membership ends.
+    //
+    // This must match the server's `comparePasses`, which chooses the pass that is actually spent.
+    // If the two drift, the app names one package and the account loses a use off another.
     const order = sortPassesByPriority([
-      pass({ id: 1, totalUses: null }),
-      pass({ id: 2, totalUses: 10, usesCount: 3 }),
+      pass({ id: 1, totalUses: 10, usesCount: 3 }),
+      pass({ id: 2, totalUses: null }),
+    ]);
+    expect(order.map((p) => p.id)).toEqual([2, 1]);
+  });
+
+  it('treats the legacy 999 sentinel as unlimited too', () => {
+    const order = sortPassesByPriority([
+      pass({ id: 1, totalUses: 10, usesCount: 3 }),
+      pass({ id: 2, totalUses: 999 }),
     ]);
     expect(order.map((p) => p.id)).toEqual([2, 1]);
   });
@@ -141,13 +152,13 @@ describe('sortPassesByPriority', () => {
 describe('choosePassForClass', () => {
   const publicClass = { can_apply_pass: true, private: false };
 
-  it('picks the highest-priority usable pass', () => {
+  it('picks the highest-priority usable pass — the membership, not the pack', () => {
     const chosen = choosePassForClass(
       [pass({ id: 1, totalUses: null }), pass({ id: 2, totalUses: 10, usesCount: 3 })],
       publicClass,
       NOW,
     );
-    expect(chosen?.id).toBe(2);
+    expect(chosen?.id).toBe(1);
   });
 
   it('refuses when the studio has turned passes off for this class', () => {

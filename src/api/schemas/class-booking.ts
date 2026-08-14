@@ -97,3 +97,29 @@ export const confirmClassBookingResponseSchema = z
   .passthrough();
 
 export type ConfirmClassBookingResponse = z.infer<typeof confirmClassBookingResponseSchema>;
+
+/**
+ * `POST checkout/class/book-with-pass` — booking with a pass the client already holds.
+ *
+ * No purchase transaction and no amount: the money lives on the transaction that created the pass,
+ * which may have been months ago. A response carrying an `amountChargedCents` here would be a
+ * charge that did not happen.
+ *
+ * Refusals share `bookingRefusalSchema`. Two codes are specific to this path:
+ * `no_covering_pass` (they hold nothing that covers this class) and `pass_spent` (it ran out or
+ * expired between the screen and the call — nothing was used).
+ */
+export const bookWithPassResponseSchema = z
+  .object({
+    ok: z.literal(true),
+    passId: z.number().nullable().optional(),
+    /** "Month Unlimited" — so the confirmation can say WHICH pass was spent. */
+    packageName: z.string().nullable().optional(),
+    redemptionTransactionId: z.number().nullable().optional(),
+    eventId: z.number().nullable().optional(),
+    eventName: z.string().nullable().optional(),
+    startsAt: z.string().nullable().optional(),
+  })
+  .passthrough();
+
+export type BookWithPassResponse = z.infer<typeof bookWithPassResponseSchema>;

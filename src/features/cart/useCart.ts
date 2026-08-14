@@ -9,6 +9,7 @@ import { useMemo } from 'react';
 
 import { studio } from '@/config/studio';
 import { buildCart, type CartSummary } from '@/domain/cart/build-cart';
+import { useClientPasses } from '@/features/account/useClientPasses';
 import { useSchedule } from '@/features/schedule/useSchedule';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
 
@@ -29,6 +30,7 @@ export interface CartState extends CartSummary {
 export function useCart(): CartState {
   const eventIds = useCartStore((state) => state.eventIds);
   const schedule = useSchedule();
+  const { passes } = useClientPasses();
   const { config } = useStudioConfig();
 
   const summary = useMemo(
@@ -36,8 +38,9 @@ export function useCart(): CartState {
       buildCart(schedule.data ?? [], eventIds, {
         showInstructor: studio.display.showInstructor,
         currency: config?.currency,
+        passes,
       }),
-    [schedule.data, eventIds, config?.currency],
+    [schedule.data, eventIds, config?.currency, passes],
   );
 
   return { ...summary, isResolving: !schedule.data && schedule.isPending };

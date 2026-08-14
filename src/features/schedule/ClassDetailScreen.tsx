@@ -94,13 +94,25 @@ export function ClassDetailScreen({
 
   const cancelSentence = cancelWindowSentence(cancelWindow);
 
+  /**
+   * A pass the client holds covers this class — decided by `toScheduleEntry`, which calls the same
+   * `choosePassForClass` the cart and the server use.
+   *
+   * Checked BEFORE `chargeable`, and that ordering is the point. `charge` is the CARD price and it
+   * is perfectly valid for a covered class — the studio still lists it at $39. Branching on
+   * `chargeable` first would put "Book · $42.23" on the button for a member whose membership
+   * already pays for it, which is the widget's single most expensive pass bug.
+   */
+  const coveredByPass = entry.price.kind === 'covered';
+
   const effectiveCharge = charge;
   const chargeable = effectiveCharge?.status === 'chargeable';
 
-  // The card path is the only one built. A free class, a pass-covered class or one priced
-  // elsewhere books through paths that do not exist in the app yet, so the CTA is not offered for
-  // them — an unpayable button is worse than an honest sentence.
-  const bookable = acceptingBookings && !entry.isFull && chargeable && Boolean(onAddToCart);
+  // A free class or one priced elsewhere books through paths that do not exist in the app yet, so
+  // the CTA is not offered for them — an unpayable button is worse than an honest sentence. A
+  // COVERED class is bookable regardless of what the card price says.
+  const bookable =
+    acceptingBookings && !entry.isFull && (coveredByPass || chargeable) && Boolean(onAddToCart);
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background, paddingTop: insets.top }}>
@@ -169,7 +181,19 @@ export function ClassDetailScreen({
             scanned; this is where somebody commits, so the TOTAL is the number set as the
             numeral and the tax is spelled out above it rather than appearing on a statement. */}
         <Card emphasis="flat">
-          {chargeable && effectiveCharge ? (
+          {coveredByPass ? (
+            // The pass is NAMED. "Included" alone leaves a member wondering which of their passes
+            // is about to lose a class, and the one named here is the one that gets spent.
+            <View style={{ ...priceRow, gap: theme.spacing.md }}>
+              <View style={{ gap: theme.spacing.xs, flexShrink: 1 }}>
+                <Text variant="heading">Included in your pass</Text>
+                <Text variant="secondary" color="secondary">
+                  {entry.price.kind === 'covered' ? entry.price.label : ''}
+                </Text>
+              </View>
+              <Text variant="numeral">$0</Text>
+            </View>
+          ) : chargeable && effectiveCharge ? (
             <View style={{ gap: theme.spacing.sm }}>
               <View style={priceRow}>
                 <Text variant="secondary" color="secondary">
@@ -280,11 +304,14 @@ export function ClassDetailScreen({
             <Button
               // The total rides ON the button, because that is the thing being pressed to agree
               // to it — tax included, which is the whole reason this screen quotes a total where
-              // the schedule row quotes a drop-in.
+              // the schedule row quotes a drop-in. A covered class carries no figure at all: a
+              // price on that button is a price nobody is paying.
               label={
-                chargeable && effectiveCharge
-                  ? `Book · ${effectiveCharge.totalLabel}`
-                  : 'Book this class'
+                coveredByPass
+                  ? 'Book with your pass'
+                  : chargeable && effectiveCharge
+                    ? `Book · ${effectiveCharge.totalLabel}`
+                    : 'Book this class'
               }
               // A CTA that no-ops against the state it appears to resolve is the shape of the
               // widget's "Use this card" dead end. When booking is not possible the button is
@@ -293,7 +320,7 @@ export function ClassDetailScreen({
               onPress={onAddToCart}
             />
 
-            {!chargeable ? (
+            {!coveredByPass && !chargeable ? (
               <Text
                 variant="caption"
                 color="tertiary"

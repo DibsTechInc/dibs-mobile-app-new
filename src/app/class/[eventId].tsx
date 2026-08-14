@@ -23,6 +23,7 @@ import { describeCancelWindow } from '@/domain/cancellation/cancel-window';
 import { resolveClassCharge } from '@/domain/pricing/class-charge';
 import { findEvent, longDayLabel } from '@/domain/schedule/days';
 import { toScheduleEntry } from '@/domain/schedule/entry';
+import { useClientPasses } from '@/features/account/useClientPasses';
 import { useCartStore, useIsInCart } from '@/features/cart/cartStore';
 import { ClassDetailScreen } from '@/features/schedule/ClassDetailScreen';
 import { useSchedule } from '@/features/schedule/useSchedule';
@@ -33,6 +34,7 @@ export default function ClassDetailRoute() {
   const { eventId } = useLocalSearchParams<{ eventId: string }>();
   const { config, timeZone } = useStudioConfig();
   const schedule = useSchedule();
+  const { passes } = useClientPasses();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -110,9 +112,13 @@ export default function ClassDetailRoute() {
     );
   }
 
+  // `passes` makes the price line read "Included · {pass}" when one covers this class, and it is
+  // the SAME decision the cart and the server make — so the CTA below cannot promise coverage that
+  // checkout refuses, nor quote a price for something already paid for.
   const entry = toScheduleEntry(event, {
     showInstructor: studio.display.showInstructor,
     currency: config?.currency,
+    passes,
   });
 
   const acceptingBookings = config ? isAcceptingBookings(config) : true;

@@ -6,8 +6,10 @@
  * schedule list, Home, and class detail cannot drift apart the way the widget's "Included"
  * label drifted from its cart price (shared CLAUDE.md, 2026-07-28).
  */
+import type { Pass } from '@/api/schemas/passes';
 import type { ScheduleEvent } from '@/api/schemas/schedule';
 import { formatPrice } from '@/domain/money/format';
+import { choosePassForClass, passName } from '@/domain/passes/select';
 import { parseStoredTime } from '@/domain/time/studio-now';
 
 import type { ScheduleEntry } from './types';
@@ -21,6 +23,15 @@ export interface ScheduleEntryOptions {
   showInstructor: boolean;
   /** ISO-4217, from `get-basic-config`. Defaults to USD only because every pilot is US. */
   currency?: string;
+  /**
+   * The client's usable passes at this studio, when we have them.
+   *
+   * Omitted for a guest and while the wallet is still resolving — and that distinction is the
+   * whole reason it is optional rather than defaulting to `[]`. An empty array means "we asked and
+   * they hold nothing", so the row shows a price; `undefined` means "we have not asked", and the
+   * row shows a price for that reason too. Both look the same, but only one of them is a claim.
+   */
+  passes?: Pass[];
 }
 
 const MS_PER_MINUTE = 60_000;
@@ -101,14 +112,29 @@ function capacity(event: ScheduleEvent): Pick<ScheduleEntry, 'spotsLeft' | 'isFu
 /**
  * What this session costs, from the studio's own numbers.
  *
- * This is the GUEST answer — a list price. It never claims a pass covers the class, because
- * knowing that needs the client's passes and the same coverage decision checkout will make. A
- * label promising coverage that checkout then refuses is the exact widget bug that charged a
- * member $22 for a class their unlimited membership included. When passes arrive, they get
- * layered on top of this by the one shared helper, not computed a second way.
+ * ── Coverage is decided by ONE helper, and this is where it lands ─────────────────────────────
+ * When the caller supplies the client's passes, `choosePassForClass` — the same function the cart
+ * and class detail call, mirroring the server's own chooser — decides whether one covers this
+ * class. Without passes this is the GUEST answer: a list price, and no claim about coverage.
+ *
+ * A label promising coverage that checkout then refuses is the exact widget bug that charged a
+ * member $22 for a class their unlimited membership included. That is why coverage is never
+ * computed a second way anywhere: the row's "Included", the cart's $0 line and the booking that
+ * actually happens all come from the same decision.
  */
-function price(event: ScheduleEvent, currency: string | undefined): ScheduleEntry['price'] {
+function price(
+  event: ScheduleEvent,
+  currency: string | undefined,
+  passes: Pass[] | undefined,
+): ScheduleEntry['price'] {
   if (event.free_class === true) return { kind: 'amount', amountLabel: 'Free' };
+
+  // Coverage BEFORE price: a covered class costs the client nothing, whatever the studio lists it
+  // at, and quoting a figure beside "Included" is the disagreement this file exists to prevent.
+  if (passes && passes.length > 0) {
+    const covering = choosePassForClass(passes, event);
+    if (covering) return { kind: 'covered', label: `Included · ${passName(covering)}` };
+  }
 
   // The backend already did the pricing-rule arithmetic; show its number, never re-derive one.
   if (event.pricing_rule && typeof event.pricing_rule.discounted_price === 'number') {
@@ -126,7 +152,7 @@ function price(event: ScheduleEvent, currency: string | undefined): ScheduleEntr
 
 export function toScheduleEntry(
   event: ScheduleEvent,
-  { showInstructor, currency }: ScheduleEntryOptions,
+  { showInstructor, currency, passes }: ScheduleEntryOptions,
 ): ScheduleEntry {
   return {
     eventId: event.eventid,
@@ -137,6 +163,6 @@ export function toScheduleEntry(
       : null,
     durationMinutes: durationMinutes(event),
     ...capacity(event),
-    price: price(event, currency),
+    price: price(event, currency, passes),
   };
 }

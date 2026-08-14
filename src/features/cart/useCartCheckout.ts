@@ -43,7 +43,13 @@ import { useStripe } from '@stripe/stripe-react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useRef, useState } from 'react';
 
-import { apiClient, confirmClassBooking, createClassPaymentIntent, queryKeys } from '@/api';
+import {
+  apiClient,
+  bookClassWithPass,
+  confirmClassBooking,
+  createClassPaymentIntent,
+  queryKeys,
+} from '@/api';
 import { BookingRefusedError } from '@/api/endpoints/class-booking';
 import { studio } from '@/config/studio';
 import type { CartLine } from '@/domain/cart/build-cart';
@@ -133,6 +139,55 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
     setOutcomes((current) => ({ ...current, [eventId]: outcome }));
   }, []);
 
+  /**
+   * Book ONE class with a pass. No sheet, no money, one call.
+   *
+   * Never throws: the only throw the runner treats specially is a sheet dismissal, and there is no
+   * sheet here. A pass line that fails leaves the run going — being refused for one class is not a
+   * reason to abandon the other two.
+   */
+  const bookOneWithPass = useCallback(
+    async (line: CartLine): Promise<boolean> => {
+      setOutcome(line.eventId, { kind: 'working' });
+
+      try {
+        await bookClassWithPass(apiClient, {
+          dibsStudioId: studio.dibsStudioId,
+          eventId: line.eventId,
+          // A REQUEST, not an instruction — the server verifies it against the client's own
+          // covering passes. Sent so the pass the screen named is the pass that gets spent.
+          passId: line.passId,
+        });
+
+        setOutcome(line.eventId, { kind: 'booked' });
+        if (!bookedIds.current.includes(line.eventId)) bookedIds.current.push(line.eventId);
+        return true;
+      } catch (error) {
+        if (error instanceof BookingRefusedError) {
+          setOutcome(line.eventId, {
+            kind: 'failed',
+            message: error.message,
+            // A pass booking never charges anything, so this is always true — and saying it is
+            // what stops "we could not book that" reading as "you may have been billed".
+            nothingCharged: true,
+          });
+          return false;
+        }
+
+        setOutcome(line.eventId, {
+          kind: 'failed',
+          message:
+            error instanceof Error && error.message
+              ? error.message
+              : 'Something went wrong. Please try again.',
+          nothingCharged: true,
+        });
+        return false;
+      }
+    },
+    [setOutcome],
+  );
+
   /** Book ONE class. Throws only `SheetDismissed`; every other failure becomes an outcome. */
   const bookOne = useCallback(
     async ({ line, totalCents }: BookableItem): Promise<boolean> => {
@@ -199,8 +254,15 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
 
         if (error instanceof BookingRefusedError) {
           if (error.refusalCode === 'covered_by_pass') {
-            setOutcome(line.eventId, { kind: 'coveredByPass', message: error.message });
-            return false;
+            /*
+             * The server knows a pass covers this class and the app did not — the client's pass
+             * list arrived after the screen rendered, or they bought a pack on another device.
+             *
+             * Book it with the pass rather than reporting a refusal. Nothing was charged (no
+             * PaymentIntent was created), so this is a free retry down the correct path, and the
+             * alternative is a line the client cannot act on for a class they already own.
+             */
+            return bookOneWithPass(line);
           }
           if (error.refusalCode === 'price_changed' && error.breakdown) {
             setOutcome(line.eventId, {
@@ -231,7 +293,15 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
         return false;
       }
     },
-    [account, currency, initPaymentSheet, presentPaymentSheet, publishableKey, setOutcome],
+    [
+      account,
+      bookOneWithPass,
+      currency,
+      initPaymentSheet,
+      presentPaymentSheet,
+      publishableKey,
+      setOutcome,
+    ],
   );
 
   const run = useCallback(
@@ -253,7 +323,13 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
 
         for (const item of items) {
           try {
-            if (await bookOne(item)) booked += 1;
+            // Pass-covered lines book through a different endpoint and open no sheet. Ordered by
+            // the CALLER, which puts them first — see `bookableItems` in the checkout route.
+            const succeeded =
+              item.line.state === 'covered'
+                ? await bookOneWithPass(item.line)
+                : await bookOne(item);
+            if (succeeded) booked += 1;
           } catch {
             // The only throw that reaches here is a sheet dismissal. Everything still pending is
             // left pending rather than marked failed — the client did not fail, they stopped.
@@ -283,7 +359,7 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
         }
       })();
     },
-    [account, bookOne, queryClient],
+    [account, bookOne, bookOneWithPass, queryClient],
   );
 
   const clearBooked = useCallback(() => {

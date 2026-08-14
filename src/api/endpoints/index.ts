@@ -13,10 +13,18 @@
 export { fetchBasicConfig } from './basic-config';
 export {
   BookingRefusedError,
+  bookClassWithPass,
   confirmClassBooking,
   createClassPaymentIntent,
+  type BookClassWithPassArgs,
   type CreateClassPaymentIntentArgs,
 } from './class-booking';
+export {
+  PurchaseRefusedError,
+  confirmPackagePurchase,
+  createPackagePaymentIntent,
+  type CreatePackagePaymentIntentArgs,
+} from './package-purchase';
 export {
   createSetupIntent,
   ensureConnectedCustomer,
