@@ -135,6 +135,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       // Same value the stale-project guard above checks against. Deliberately not re-derived
       // here: two copies of "what is this studio's bundle id" is how they drift apart.
       bundleIdentifier: iosBundleId,
+      // CFBundleVersion. Apple wants a string; the gate wants an integer; studio.json holds the
+      // integer and this is the only place it becomes a string. Without it every prebuild
+      // emitted "1", so every store upload after the first would be rejected as a duplicate and
+      // the version gate would have had a constant to compare against.
+      buildNumber: String(studio.store.buildNumber),
       infoPlist: {
         CFBundleDisplayName: studio.shortName,
         ...(allowsLocalHttp
@@ -152,6 +157,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
     android: {
       package: androidPackage,
+      // Android's own integer build identity. Same source value as iOS's buildNumber, so one
+      // studio.json bump moves both and the two platforms cannot disagree about what build this
+      // is. Play requires it to increase on every upload.
+      versionCode: studio.store.buildNumber,
       adaptiveIcon: {
         backgroundColor: '#FFFFFF',
         foregroundImage: './assets/images/android-icon-foreground.png',
@@ -218,6 +227,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         shortName: studio.shortName,
         accentColor: studio.accentColor,
         timezone: studio.timezone,
+        // The running build's integer identity, for the version gate. Read from the SAME value
+        // that becomes CFBundleVersion / versionCode below, so the number JS compares and the
+        // number the store sees cannot drift — which is the whole reason not to read this back
+        // out of expo-constants' deprecated nativeBuildVersion or a second config field.
+        buildNumber: studio.store.buildNumber,
         // Navigation reads these BEFORE the studio's own show_schedule/show_appts flags: a tab
         // may only appear when the build has code for it AND the studio offers it.
         features: studio.features,

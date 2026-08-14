@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { queryClient } from '@/api/query-client';
+import { AppReleaseGate } from '@/features/app-release/AppReleaseGate';
 import { AuthProvider } from '@/features/auth/AuthProvider';
 import { installAuthBridge } from '@/features/auth/bridge';
 import { StripeSdkProvider } from '@/features/payments/StripeSdkProvider';
@@ -46,7 +47,12 @@ export default function RootLayout() {
               {/* Wrapped in a fragment because StripeProvider types its children as a single
                   element. */}
               <>
-                <Stack screenOptions={{ headerShown: false }} />
+                {/* Above the navigation tree so a required update is never resolved mid-checkout.
+                    It overlays rather than blocking — it can never hold the app hostage to a
+                    request, and it fails open on every error. See AppReleaseGate. */}
+                <AppReleaseGate>
+                  <Stack screenOptions={{ headerShown: false }} />
+                </AppReleaseGate>
                 {/* Light content throughout: v1 has no dark mode, and the background is always light. */}
                 <StatusBar style="dark" />
               </>

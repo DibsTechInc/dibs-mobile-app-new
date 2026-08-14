@@ -10,6 +10,7 @@
  * is actually an outage. Each function below states what a *valid* response looks like and
  * raises a real error otherwise.
  */
+export { fetchAppRelease } from './app-release';
 export { fetchBasicConfig } from './basic-config';
 export {
   fetchAccountActivity,

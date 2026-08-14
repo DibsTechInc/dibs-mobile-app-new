@@ -18,6 +18,15 @@ export interface StudioIdentity {
   accentColor: string;
   /** IANA zone. The authoritative copy arrives from get-basic-config; this is the seed value. */
   timezone: string;
+  /**
+   * This build's integer identity — CFBundleVersion on iOS, versionCode on Android. The ONLY
+   * number the version gate compares, and never a version string: `"1.10.0" < "1.9.0"` is true
+   * lexically, which is how a gate ships inverted and blocks everybody.
+   *
+   * Comes from `store.buildNumber` in studio.json, the same value app.config.ts stamps into the
+   * native project, so the number JS compares and the number the store sees cannot drift.
+   */
+  buildNumber: number;
   features: {
     classes: boolean;
     appointments: boolean;

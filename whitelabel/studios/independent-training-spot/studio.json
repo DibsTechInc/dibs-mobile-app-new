@@ -9,6 +9,7 @@
     "ownership": "studio",
     "releaseType": "new",
     "version": "1.0.0",
+    "buildNumber": 1,
     "notes": "DEFERRED past v1 (Alicia, 2026-08-04). 263 is appointments-only and v1 ships classes only; it also needs a brand-new listing under the IGTS Apple/Play accounts (weeks of enrollment). Kept configured so nothing about it gets hardcoded elsewhere in the meantime.",
     "platforms": [
       "ios"
