@@ -13,8 +13,11 @@ import { useCallback, useState } from 'react';
 import { describeApiError } from '@/api';
 import { studio } from '@/config/studio';
 import type { SavedCard } from '@/domain/payments/cards';
+import type { WalletPass } from '@/domain/wallet/build-wallet';
 import { ManageCardSheet } from '@/features/account/ManageCardSheet';
 import { useCardActions, CardEntryCancelled } from '@/features/account/useCardActions';
+import { CancelMembershipSheet } from '@/features/account/CancelMembershipSheet';
+import { useCancelMembership } from '@/features/account/useCancelMembership';
 import { useWallet } from '@/features/account/useWallet';
 import { WalletScreen } from '@/features/account/WalletScreen';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -25,6 +28,8 @@ export default function WalletRoute() {
   const { status, account } = useAuth();
   const { config } = useStudioConfig();
   const wallet = useWallet();
+  const [cancelling, setCancelling] = useState<WalletPass | null>(null);
+  const cancelMembership = useCancelMembership();
   const stripe = useStripeReadiness();
   const { addCard, remove, makeDefault } = useCardActions();
 
@@ -75,6 +80,8 @@ export default function WalletRoute() {
           if (stripe.error) stripe.retry();
         }}
         onBack={onBack}
+        // The pass carries its own package id; without one there is nothing to cancel against.
+        onCancelMembership={(pass) => setCancelling(pass)}
         onAddCard={canAddCard ? () => addCard.mutate() : undefined}
         isAddingCard={addCard.isPending}
         addCardError={addCardError}

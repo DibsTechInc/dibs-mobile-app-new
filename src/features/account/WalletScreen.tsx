@@ -17,11 +17,12 @@
  * Neither is stubbed. A money surface with placeholder numbers on it is worse than one section
  * short.
  */
-import { RefreshControl, ScrollView, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button, Card, EmptyState, ErrorState, Skeleton, StatusTag, Text } from '@/components';
 import type { SavedCard } from '@/domain/payments/cards';
+import { formatIsoDate } from '@/domain/time/studio-now';
 import type { SectionStatus, WalletData, WalletPass } from '@/domain/wallet/build-wallet';
 import { useTheme } from '@/theme/ThemeProvider';
 
@@ -46,7 +47,71 @@ function SectionSkeleton({ lines = 2 }: { lines?: number }) {
   );
 }
 
-function PassCard({ pass }: { pass: WalletPass }) {
+/**
+ * The commitment line, or the Cancel action — never both, and never neither.
+ *
+ * Inside the commitment the Cancel button is ABSENT (Alicia, 2026-08-14): not disabled, not one
+ * that opens an explanation. But "no button" and "no information" are different things, and a
+ * member who sees neither phones the studio — which is the support load this app exists to
+ * reduce. So the commitment states itself in the button's place.
+ *
+ * Both branches read the SAME server-computed field. The app never does the arithmetic: that is
+ * the "a value feeding both a sentence and a gate must be resolved once" rule, and the widget's
+ * version of this bug came from a date resolved one way for the copy and another for the gate.
+ */
+function MembershipCancelRow({
+  pass,
+  onCancel,
+}: {
+  pass: WalletPass;
+  onCancel?: (pass: WalletPass) => void;
+}) {
+  const theme = useTheme();
+  if (!pass.isMembership || !onCancel) return null;
+
+  const commitment = pass.cancellation;
+
+  // Server says the commitment is unserved → state it, offer nothing.
+  if (commitment && commitment.canCancel === false) {
+    // `eligibleOn` is a YYYY-MM-DD from the server, rendered part-by-part. NEVER `new Date()`.
+    const until = formatIsoDate(commitment.eligibleOn);
+    return (
+      <Text variant="caption" color="tertiary" style={{ marginTop: theme.spacing.md }}>
+        {until
+          ? `Minimum commitment through ${until}.`
+          : 'This membership is inside its minimum commitment period.'}
+      </Text>
+    );
+  }
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`Cancel ${pass.name}`}
+      onPress={() => onCancel(pass)}
+      hitSlop={8}
+      style={({ pressed }) => [{
+        alignSelf: 'flex-start',
+        marginTop: theme.spacing.md,
+        paddingVertical: theme.spacing.xs,
+        paddingRight: theme.spacing.sm,
+        opacity: pressed ? 0.55 : 1,
+      }]}
+    >
+      <Text variant="label" color="secondary">
+        Cancel membership
+      </Text>
+    </Pressable>
+  );
+}
+
+function PassCard({
+  pass,
+  onCancelMembership,
+}: {
+  pass: WalletPass;
+  onCancelMembership?: (pass: WalletPass) => void;
+}) {
   const theme = useTheme();
   return (
     <Card>
@@ -82,6 +147,8 @@ function PassCard({ pass }: { pass: WalletPass }) {
           )}
         </View>
       </View>
+
+      <MembershipCancelRow pass={pass} onCancel={onCancelMembership} />
     </Card>
   );
 }
@@ -120,6 +187,11 @@ function CardRow({
 }
 
 export interface WalletScreenProps {
+  /**
+   * Opens the cancel-membership sheet. Omitted → no membership shows a Cancel action, but a
+   * commitment line still renders where one applies.
+   */
+  onCancelMembership?: (pass: WalletPass) => void;
   data: WalletData;
   studioName: string;
   isRefreshing?: boolean;
@@ -151,6 +223,7 @@ export function WalletScreen({
   addCardError,
   onManageCard,
   onBrowsePackages,
+  onCancelMembership,
 }: WalletScreenProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
@@ -236,7 +309,11 @@ export function WalletScreen({
             content: (
               <View style={{ gap: theme.spacing.md }}>
                 {data.passes.items.map((pass) => (
-                  <PassCard key={pass.id} pass={pass} />
+                  <PassCard
+                    key={pass.id}
+                    pass={pass}
+                    onCancelMembership={onCancelMembership}
+                  />
                 ))}
               </View>
             ),

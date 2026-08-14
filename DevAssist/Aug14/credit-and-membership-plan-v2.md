@@ -18,8 +18,10 @@ appendix.
   `events.is_virtual` (built by another workstream) and a new `dibs_configs.show_virtuals_on_app`
   — §5. Apple approved the 2021 builds on the grounds that every class was in person; a listing
   named "VIRTUAL ballet" puts that exemption at risk.
-- **One question still open**, in §5.5: whether a virtual class the client booked on the *web*
-  should remain visible in My Calendar. §5 should not be built until that is answered.
+- **§5.5 RULED 2026-08-14:** a virtual class booked on the *web* **does** still show in My
+  Calendar, and stays droppable. The gate is on browsing and buying, never on what the client
+  already owns. §5 is unblocked on this question; `events.is_virtual` landing is still a
+  prerequisite.
 
 ---
 
@@ -471,19 +473,26 @@ listing. It also covers the two cases the feed filter cannot:
   the cart with the item removed and say why — the `price_changed` pattern, applied to
   availability.
 
-### 5.5 Open decision — existing bookings in My Calendar
+### 5.5 RULED (Alicia, 2026-08-14) — a virtual class booked on the web DOES still show in My Calendar
 
-A client who booked a virtual class **on the web** and then opens the app: does that booking show?
+**The gate is on BROWSING and BUYING, never on what the client already owns.**
 
-**Recommendation: yes, keep showing it.** Hiding a class someone paid for leaves them unable to
-see it or drop it — a dead end and a support call, to protect against a risk Dibs already
-controls another way: the App Store reviewer uses a test account Dibs creates, and that account
-will have no virtual bookings. The gate's job is to keep virtual classes out of the *browsing and
-buying* surfaces, which is exactly where a reviewer looks.
+`get-upcoming-appts` does **not** get the virtual predicate. A client who booked a virtual class on
+the web sees it in the app's calendar and can drop it there like any other booking. Hiding a class
+someone paid for would leave them unable to see it or cancel it — a dead end and a support call,
+to protect against a risk that is already controlled another way: the App Store reviewer uses a
+test account Dibs creates, and that account will have no virtual bookings.
 
-**This one is genuinely arguable and needs Alicia's ruling before §5 is built.** If the answer is
-"hide them everywhere", `get-upcoming-appts` gets the same predicate — and the consequence to
-accept is that a client loses the ability to cancel a virtual booking from the app.
+Consequences to hold onto:
+
+- **§1's drop endpoint must not inherit the virtual refusal.** Dropping is not buying. A client
+  who cannot cancel the class they are looking at is the exact dead end the gate was supposed to
+  avoid creating.
+- The class detail screen reached **from My Calendar** renders for a virtual class. Only the
+  *booking* affordance is gated — and by then the client has already booked it, so there is
+  nothing to offer.
+- A deep link to `/class/[eventId]` for a virtual class the client has **not** booked still
+  refuses, per §5.4. "Already mine" and "reachable by URL" are different questions.
 
 ---
 

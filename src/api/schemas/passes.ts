@@ -75,6 +75,32 @@ export const passSchema = z
     /** Returned since the 2026-08-06 fix. Still optional: an older API build must not fail the schema. */
     is_placeholder: z.boolean().nullable().optional(),
     studioPackage: studioPackageSchema.nullable().optional(),
+    /**
+     * Whether this membership can be cancelled yet — computed server-side, rendered verbatim.
+     *
+     * The SAME value drives the server's own `commitment_not_met` refusal, so the button the app
+     * shows and the answer the endpoint gives cannot disagree. **Never re-derive `canCancel` from
+     * `eligibleOn` here**; that is two answers to one question, which is the bug this shape exists
+     * to prevent.
+     *
+     * Null for anything that is not an autopay membership. Optional so an older API build — one
+     * deployed before this field existed — degrades to "no commitment line", not a schema error.
+     */
+    cancellation: z
+      .object({
+        canCancel: z.boolean(),
+        /**
+         * `YYYY-MM-DD` in the STUDIO's timezone, never an instant.
+         * MUST NOT be passed through `new Date()` — `new Date('2026-11-03')` is parsed as UTC
+         * midnight and renders as Nov 2 in every negative-offset timezone, i.e. every Dibs studio.
+         * Render it part-by-part; `formatIsoDate` in `domain/time/studio-now` does that.
+         */
+        eligibleOn: z.string().nullable().optional(),
+        remainingCount: z.number().nullable().optional(),
+        remainingUnit: z.string().nullable().optional(),
+      })
+      .nullable()
+      .optional(),
   })
   .passthrough();
 

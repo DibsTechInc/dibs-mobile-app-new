@@ -34,6 +34,11 @@ export {
   setDefaultCard,
   type CreateSetupIntentArgs,
 } from './cards';
+export {
+  cancelMembership,
+  CommitmentNotMetError,
+  type CancelMembershipArgs,
+} from './membership';
 export { fetchPackages } from './packages';
 export { confirmPasswordSet } from './password';
 export { fetchSchedule } from './schedule';

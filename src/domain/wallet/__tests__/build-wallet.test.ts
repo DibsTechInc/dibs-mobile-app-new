@@ -197,3 +197,57 @@ describe('credit', () => {
     expect(wallet.credit.label).toBe('CA$40.00');
   });
 });
+
+describe('membership cancellation is the SERVER\'s answer, passed through', () => {
+  const membership = (cancellation: unknown) =>
+    buildWalletData(
+      input({
+        passes: {
+          data: [pass({ autopay: true, studio_package_id: 557, cancellation } as Partial<Pass>)],
+          isPending: false,
+          error: null,
+        },
+      }),
+    ).passes.items[0];
+
+  it('carries canCancel and the date through untouched', () => {
+    const item = membership({
+      canCancel: false,
+      eligibleOn: '2026-11-02',
+      remainingCount: 2,
+      remainingUnit: 'month',
+    });
+
+    expect(item.cancellation).toEqual({
+      canCancel: false,
+      eligibleOn: '2026-11-02',
+      remainingCount: 2,
+      remainingUnit: 'month',
+    });
+  });
+
+  it('does NOT re-derive canCancel from the date', () => {
+    // Two answers to one question is the bug this shape exists to prevent. Even a server answer
+    // that looks internally odd is passed through: the server is the one that refuses.
+    const item = membership({ canCancel: true, eligibleOn: '2099-01-01' });
+    expect(item.cancellation?.canCancel).toBe(true);
+  });
+
+  it('is null on an API build that predates the field', () => {
+    // Reads as "no commitment line" — the button still appears, and the server still refuses if
+    // it must. A missing field must never render as "cancellation blocked".
+    expect(membership(undefined)?.cancellation).toBeNull();
+  });
+
+  it('carries the package id the cancel endpoint keys on', () => {
+    const item = membership({ canCancel: true });
+    expect(item.packageId).toBe(557);
+  });
+
+  it('reports a missing package id as null rather than undefined', () => {
+    const item = buildWalletData(
+      input({ passes: { data: [pass({ autopay: true })], isPending: false, error: null } }),
+    ).passes.items[0];
+    expect(item.packageId).toBeNull();
+  });
+});
