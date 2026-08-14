@@ -145,6 +145,22 @@ function OutcomeNote({
           The price updated to {outcome.charge.totalLabel}. Confirm below to book at the new price.
         </Text>
       );
+    /*
+     * This class cannot be booked in the app at all — today, a virtual class at a studio that
+     * sells them only on the web.
+     *
+     * Neutral, not red: nothing went wrong and nothing was charged, and the class is genuinely
+     * bookable, just somewhere else. The one action that moves is Remove, which the line already
+     * carries — so this says so rather than adding a second button beside it. The CTA has already
+     * stopped counting this line (see `outstanding` in checkout.tsx), which is what stops it
+     * reading as a retryable failure.
+     */
+    case 'unavailable':
+      return (
+        <Text variant="secondary" color="secondary" style={{ marginTop: theme.spacing.md }}>
+          {outcome.message} Remove it to check out the rest.
+        </Text>
+      );
     case 'failed':
       return (
         <Text variant="secondary" color="danger" style={{ marginTop: theme.spacing.md }}>
@@ -608,7 +624,12 @@ export function CheckoutScreen({
             <Text variant="secondary" color="secondary" align="center">
               {lines.some((line) => line.outcome.kind === 'alreadyBooked')
                 ? 'Nothing more to book — you’re already in these classes.'
-                : 'None of these can be booked right now.'}
+                : lines.every((line) => line.outcome.kind === 'unavailable')
+                  ? // "right now" would be a lie here — it is not a temporary state, and telling
+                    // somebody to come back later for a class that will never be sold in the app
+                    // is how a support call starts.
+                    `These are only bookable on ${studioName}’s website.`
+                  : 'None of these can be booked right now.'}
             </Text>
           ) : (
             <Button

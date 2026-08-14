@@ -22,6 +22,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { isAcceptingBookings } from '@/api/schemas/basic-config';
 import { studio } from '@/config/studio';
 import { cancelWindowSentence, describeCancelWindow } from '@/domain/cancellation/cancel-window';
+import { countsTowardCheckout } from '@/domain/cart/outcome-status';
 import { formatBalance } from '@/domain/money/format';
 import { describeCheckoutPayment } from '@/domain/payments/checkout-method';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -80,19 +81,22 @@ export default function CheckoutRoute() {
   /**
    * Lines still to book — booked ones have stopped counting.
    *
-   * `alreadyBooked` stops counting too, and that is the load-bearing half. It is the one refusal
-   * the CTA cannot resolve: the server counts attendee rows, so re-running the same line produces
-   * the same refusal forever. Leaving it in would keep it in the total and on the button, which is
-   * how "Try again · $40.76" came to sit under "You're already booked into this class". Booking a
+   * `alreadyBooked` stops counting too, and that is the load-bearing half. It is a refusal the CTA
+   * cannot resolve: the server counts attendee rows, so re-running the same line produces the same
+   * refusal forever. Leaving it in would keep it in the total and on the button, which is how
+   * "Try again · $40.76" came to sit under "You're already booked into this class". Booking a
    * second spot is a per-line decision with its own button — see `onBookAnother`.
+   *
+   * `unavailable` stops counting for exactly the same reason, and it is the second member of what
+   * turns out to be a class rather than a special case: a refusal the client cannot answer. The
+   * server reads the event row and the studio config, so a virtual class at a studio that does not
+   * sell them in the app refuses identically forever. Its line keeps its explanation and its
+   * Remove button; what it must not keep is a share of the total and a button promising to retry.
    */
   const outstanding = useMemo(
     () =>
-      lines.filter(
-        (line) =>
-          (line.state === 'ready' || line.state === 'covered') &&
-          line.outcome.kind !== 'booked' &&
-          line.outcome.kind !== 'alreadyBooked',
+      lines.filter((line) =>
+        countsTowardCheckout(line.outcome.kind, line.state === 'ready' || line.state === 'covered'),
       ),
     [lines],
   );

@@ -88,7 +88,32 @@ export type LineOutcome =
    * is how the platform represents it. The line offers that explicitly; it is never assumed.
    */
   | { kind: 'alreadyBooked'; message: string; existingCount: number | null }
+  /**
+   * This class can never be booked from the app, however many times it is tried.
+   *
+   * Today that means one thing: a VIRTUAL class at a studio that does not sell them in the app
+   * (`class_unavailable_in_app`), reachable only from a cart persisted before the flag moved.
+   *
+   * It is separate from `failed` because the two need opposite handling by the CTA. A failed line
+   * is usually worth retrying — a network blip, a full class, a decline. This one is not: the
+   * server reads the event row and the studio config, so the answer is identical every time.
+   * Leaving it in `outstanding` would keep it in the total and on the button, and the client would
+   * tap "Try again · $22.00" forever underneath a sentence explaining why it cannot work.
+   *
+   * That is the same dead end `alreadyBooked` was pulled out of `failed` to fix, and the same
+   * shape as the widget's "Use this card" button that dispatched nothing.
+   */
+  | { kind: 'unavailable'; message: string }
   | { kind: 'failed'; message: string; nothingCharged: boolean };
+
+/**
+ * Refusal codes that will never succeed on a retry, whatever the client does.
+ *
+ * Deliberately a narrow allow-list rather than "anything that is not obviously transient". A code
+ * wrongly listed here costs the client a booking they could have had; a code wrongly absent costs
+ * them a retry. Add to it only when the server's answer is genuinely a property of the class.
+ */
+const PERMANENT_REFUSALS = new Set(['class_unavailable_in_app']);
 
 export type CheckoutPhase =
   | { kind: 'idle' }
@@ -189,6 +214,10 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
               message: error.message,
               existingCount: error.existingBookingCount,
             });
+            return false;
+          }
+          if (PERMANENT_REFUSALS.has(error.refusalCode ?? '')) {
+            setOutcome(line.eventId, { kind: 'unavailable', message: error.message });
             return false;
           }
 
@@ -310,6 +339,10 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
               charge: chargeFromServerBreakdown(error.breakdown, currency),
               message: error.message,
             });
+            return false;
+          }
+          if (PERMANENT_REFUSALS.has(error.refusalCode ?? '')) {
+            setOutcome(line.eventId, { kind: 'unavailable', message: error.message });
             return false;
           }
           setOutcome(line.eventId, {
