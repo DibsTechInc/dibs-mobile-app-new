@@ -137,11 +137,36 @@ describe('passes', () => {
     expect(wallet.passes.items.map((item) => item.isMembership)).toEqual([true, false]);
   });
 
-  it('treats the 999 sentinel as unlimited too', () => {
+  it('treats the sentinel family as unlimited too', () => {
+    for (const sentinel of [999, 9999, 99999]) {
+      const wallet = buildWalletData(
+        input({ passes: { data: [pass({ totalUses: sentinel })], isPending: false, error: null } }),
+      );
+      expect(wallet.passes.items[0].isUnlimited).toBe(true);
+    }
+  });
+
+  it('shows a package flagged unlimited as Unlimited, not as a countdown', () => {
+    // The card used to read "949 classes left" for a membership, because the count was believed
+    // over the flag. One helper drives the label, the count and the badge, so all three move.
     const wallet = buildWalletData(
-      input({ passes: { data: [pass({ totalUses: 999 })], isPending: false, error: null } }),
+      input({
+        passes: {
+          data: [
+            pass({
+              totalUses: 50,
+              usesCount: 1,
+              studioPackage: { packageName: 'Month Unlimited', unlimited: true },
+            }),
+          ],
+          isPending: false,
+          error: null,
+        },
+      }),
     );
     expect(wallet.passes.items[0].isUnlimited).toBe(true);
+    expect(wallet.passes.items[0].remainingLabel).toBe('Unlimited');
+    expect(wallet.passes.items[0].remainingCount).toBeNull();
   });
 
   it('drops a pass that has expired', () => {

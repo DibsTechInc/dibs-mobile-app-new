@@ -65,7 +65,11 @@ export const passSchema = z
     studio_package_id: z.number().nullable().optional(),
     /** Real instant, not wall-clock — a pass expires at a moment, not at a studio's clock time. */
     expiresAt: z.string().nullable().optional(),
-    /** null (or 999) means UNLIMITED. See `src/domain/passes/uses.ts`. */
+    /**
+     * null means UNLIMITED, and so does any of the legacy numeric sentinels (999, 9999, 99999).
+     * `studioPackage.unlimited` is the authority; this column is decorative on a membership.
+     * See `src/domain/passes/uses.ts` — never compare it to one sentinel value.
+     */
     totalUses: z.number().nullable().optional(),
     usesCount: z.number().nullable().optional(),
     autopay: z.boolean().nullable().optional(),
