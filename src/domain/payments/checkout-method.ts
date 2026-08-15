@@ -22,6 +22,15 @@ export interface CheckoutPaymentInput {
   /** The card the sheet will open on, when we know it. */
   card: SavedCard | null;
   status: CardLookupStatus;
+  /**
+   * Studio credit about to be spent across the outstanding lines, in cents. 0 when the client has
+   * none or turned it off.
+   */
+  creditAppliedCents?: number;
+  /** What a CARD is still being asked for after credit, in cents. */
+  cardCents?: number;
+  /** Formats cents for this studio's currency. Injected so this file stays pure. */
+  formatCents?: (cents: number) => string;
 }
 
 export interface CheckoutPaymentSummary {
@@ -58,8 +67,13 @@ export function describeCheckoutPayment({
   passNames,
   card,
   status,
+  creditAppliedCents = 0,
+  cardCents,
+  formatCents,
 }: CheckoutPaymentInput): CheckoutPaymentSummary {
   const passes = passPhrase(passNames);
+  const money = formatCents ?? ((cents: number) => `$${(cents / 100).toFixed(2)}`);
+  const credit = creditAppliedCents > 0 ? creditAppliedCents : 0;
 
   // ── Nothing but passes. No card is involved, so no card is mentioned. ──────────────────────
   if (chargeableCount === 0) {
@@ -71,15 +85,42 @@ export function describeCheckoutPayment({
     };
   }
 
+  /*
+   * ── Credit covers the whole remaining balance. No card, no sheet. ─────────────────────────
+   * This is a real branch and not a variation of the card one: the app calls a different endpoint,
+   * Stripe is never involved, and `needsCard` must be FALSE — otherwise a client with no card on
+   * file is told to add one to spend money they have already given the studio.
+   */
+  if (credit > 0 && cardCents === 0) {
+    const prefix = coveredCount > 0 ? `${passes}, then ` : '';
+    return {
+      label: `Paying with ${prefix}${money(credit)} studio credit`,
+      caption: 'No card needed — this comes out of your balance.',
+      needsCard: false,
+    };
+  }
+
   // ── A card is involved. What we can honestly say depends on whether we have asked. ─────────
   const mixedPrefix = coveredCount > 0 ? `${passes}, then ` : '';
+  /*
+   * The split line. Credit first because it is the part already paid for; the card figure is what
+   * actually leaves their account today.
+   *
+   * Both numbers come from the SERVER's resolution (or the app's mirror of it, which the server
+   * verifies) — never from arithmetic done here.
+   */
+  const creditCaption =
+    credit > 0 && typeof cardCents === 'number'
+      ? `${money(credit)} credit · ${money(cardCents)} card`
+      : null;
 
   if (card) {
     return {
       label: `Paying with ${mixedPrefix}${card.label}`,
       // The whole reason this is a caption and not a promise. The sheet is where the card is
-      // chosen; this row says which one it will open on.
-      caption: 'You can pick a different card when you confirm.',
+      // chosen; this row says which one it will open on. The split, when there is one, outranks
+      // it: which card is a detail, how much is coming from where is the thing being agreed to.
+      caption: creditCaption ?? 'You can pick a different card when you confirm.',
       needsCard: false,
     };
   }
@@ -88,7 +129,7 @@ export function describeCheckoutPayment({
     // Asked, and there genuinely is none. This is the only branch allowed to say so.
     return {
       label: coveredCount > 0 ? `Paying with ${passes}, then a card` : 'No card saved yet',
-      caption: 'You can add one when you confirm.',
+      caption: creditCaption ?? 'You can add one when you confirm.',
       needsCard: true,
     };
   }
@@ -97,7 +138,7 @@ export function describeCheckoutPayment({
   // still the pass half — and claim nothing about cards.
   return {
     label: coveredCount > 0 ? `Paying with ${passes}, then a card` : null,
-    caption: null,
+    caption: creditCaption,
     needsCard: false,
   };
 }

@@ -18,7 +18,7 @@
  * control. The CTA is present only when there is something a card can actually pay for; when there
  * is not, the screen says why instead of offering a button that cannot succeed.
  */
-import { Pressable, ScrollView, View } from 'react-native';
+import { Pressable, ScrollView, Switch, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button, EmptyState, Icon, SkeletonList, StatusTag, Text } from '@/components';
@@ -45,6 +45,19 @@ export interface CheckoutScreenProps {
   totalLabel: string;
   /** True while the schedule is still arriving; without it every line reads as cancelled. */
   isResolving: boolean;
+  /**
+   * The client's studio credit, and their choice about spending it.
+   *
+   * `creditBalanceCents` is what they hold; `creditAppliedCents` is what this cart will consume.
+   * The toggle is absent entirely when the balance is zero — an off switch for something they do
+   * not have is noise.
+   */
+  creditBalanceCents?: number;
+  creditAppliedCents?: number;
+  applyCredit?: boolean;
+  onApplyCreditChange?: (next: boolean) => void;
+  /** Formats cents in the studio's currency. */
+  formatCents?: (cents: number) => string;
   /** False when the studio is offboarded or in soft lockout — the CTA comes down. */
   acceptingBookings: boolean;
   studioName: string;
@@ -155,6 +168,17 @@ function OutcomeNote({
      * stopped counting this line (see `outstanding` in checkout.tsx), which is what stops it
      * reading as a retryable failure.
      */
+    /*
+     * Their credit balance moved between the screen and the tap — spent on another device, most
+     * often. Worded as news exactly like `priceChanged`, because that is what it is: nothing was
+     * charged, no PaymentIntent was created, and the same button confirms the new split.
+     */
+    case 'creditChanged':
+      return (
+        <Text variant="secondary" color="secondary" style={{ marginTop: theme.spacing.md }}>
+          Your credit balance changed. Confirm below to book at the updated split.
+        </Text>
+      );
     case 'unavailable':
       return (
         <Text variant="secondary" color="secondary" style={{ marginTop: theme.spacing.md }}>
@@ -435,6 +459,11 @@ export function CheckoutScreen({
   onBack,
   onViewCalendar,
   onBrowseClasses,
+  creditBalanceCents = 0,
+  creditAppliedCents = 0,
+  applyCredit = true,
+  onApplyCreditChange,
+  formatCents,
 }: CheckoutScreenProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
@@ -611,6 +640,46 @@ export function CheckoutScreen({
                 </Text>
               ) : null}
             </View>
+          ) : null}
+
+          {/*
+            The credit switch. Shown only when there IS a balance and something to spend it on —
+            an off switch for money the client does not have is noise, and one on an empty cart
+            controls nothing.
+
+            Default ON, decided by the route. This is the affordance for the real intention the
+            default cannot serve: keeping the balance for something else.
+          */}
+          {creditBalanceCents > 0 && bookableCount > 0 && onApplyCreditChange ? (
+            <Pressable
+              onPress={() => onApplyCreditChange(!applyCredit)}
+              accessibilityRole="switch"
+              accessibilityState={{ checked: applyCredit }}
+              accessibilityLabel="Use studio credit"
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: theme.spacing.md,
+                paddingVertical: theme.spacing.sm,
+              }}
+            >
+              <View style={{ flex: 1, minWidth: 0 }}>
+                <Text variant="secondary">Use studio credit</Text>
+                <Text variant="caption" color="tertiary">
+                  {/* The BALANCE, always — so turning it off still says what is being kept back. */}
+                  {formatCents ? formatCents(creditBalanceCents) : ''} available
+                  {applyCredit && creditAppliedCents > 0 && formatCents
+                    ? ` · ${formatCents(creditAppliedCents)} to this booking`
+                    : ''}
+                </Text>
+              </View>
+              <Switch
+                value={applyCredit}
+                onValueChange={onApplyCreditChange}
+                trackColor={{ true: theme.colors.accentFill, false: theme.colors.border }}
+              />
+            </Pressable>
           ) : null}
 
           {!acceptingBookings ? (

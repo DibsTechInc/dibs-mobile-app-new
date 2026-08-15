@@ -20,10 +20,12 @@ export {
 } from './billing';
 export {
   BookingRefusedError,
+  bookClassWithCredit,
   bookClassWithPass,
   confirmClassBooking,
   createClassPaymentIntent,
   dropClass,
+  type BookClassWithCreditArgs,
   type BookClassWithPassArgs,
   type CreateClassPaymentIntentArgs,
 } from './class-booking';

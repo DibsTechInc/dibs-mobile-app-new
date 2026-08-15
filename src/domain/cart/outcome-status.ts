@@ -31,6 +31,7 @@ export type CartOutcomeKind =
   | 'coveredByPass'
   | 'alreadyBooked'
   | 'unavailable'
+  | 'creditChanged'
   | 'failed';
 
 /**

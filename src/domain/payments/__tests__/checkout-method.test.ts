@@ -122,3 +122,71 @@ describe('describeCheckoutPayment', () => {
     expect(describeCheckoutPayment(base)).toEqual({ label: null, caption: null, needsCard: false });
   });
 });
+
+describe('studio credit', () => {
+  const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+
+  const base = {
+    chargeableCount: 1,
+    coveredCount: 0,
+    passNames: [],
+    card: { id: 'pm_1', label: 'Visa ending 4242' } as never,
+    status: 'ready' as const,
+    formatCents: money,
+  };
+
+  it('names both halves of a partial split, and the split OUTRANKS the card hint', () => {
+    // "$12.50 credit · $28.26 card" — the plan's worked example. Which card is a detail; how much
+    // is coming from where is the thing being agreed to.
+    const summary = describeCheckoutPayment({
+      ...base,
+      creditAppliedCents: 1250,
+      cardCents: 2826,
+    });
+    expect(summary.caption).toBe('$12.50 credit · $28.26 card');
+    expect(summary.needsCard).toBe(false);
+  });
+
+  it('says no card is needed when credit covers the lot', () => {
+    // A real branch, not a variation: a different endpoint is called and Stripe is never involved.
+    const summary = describeCheckoutPayment({
+      ...base,
+      card: null,
+      creditAppliedCents: 4076,
+      cardCents: 0,
+    });
+    expect(summary.label).toBe('Paying with $40.76 studio credit');
+    expect(summary.caption).toMatch(/no card needed/i);
+    // The one that matters: a client with no card on file must NOT be told to add one to spend
+    // money they already gave the studio.
+    expect(summary.needsCard).toBe(false);
+  });
+
+  it('still asks for a card when credit only covers part and none is saved', () => {
+    const summary = describeCheckoutPayment({
+      ...base,
+      card: null,
+      creditAppliedCents: 1250,
+      cardCents: 2826,
+    });
+    expect(summary.needsCard).toBe(true);
+    expect(summary.caption).toBe('$12.50 credit · $28.26 card');
+  });
+
+  it('says nothing about credit when none is being applied', () => {
+    const summary = describeCheckoutPayment({ ...base, creditAppliedCents: 0, cardCents: 4076 });
+    expect(summary.caption).toBe('You can pick a different card when you confirm.');
+  });
+
+  it('mentions passes and credit together on a mixed cart', () => {
+    const summary = describeCheckoutPayment({
+      ...base,
+      coveredCount: 1,
+      passNames: ['10-Class Pass'],
+      card: null,
+      creditAppliedCents: 4076,
+      cardCents: 0,
+    });
+    expect(summary.label).toBe('Paying with your 10-Class Pass, then $40.76 studio credit');
+  });
+});

@@ -23,6 +23,12 @@ describe('what the checkout button acts on', () => {
     expect(countsTowardCheckout('priceChanged', true)).toBe(true);
   });
 
+  it('counts creditChanged for the same reason — it is a re-render, not a refusal', () => {
+    // The balance moved on another device. Pressing again against the server's fresh split is
+    // exactly what should happen, so it must keep its place on the button.
+    expect(countsTowardCheckout('creditChanged', true)).toBe(true);
+  });
+
   describe('stops counting a line the button cannot resolve', () => {
     it.each<[CartOutcomeKind, string]>([
       ['booked', 'it is done — offering to do it again would double-charge'],
@@ -43,6 +49,7 @@ describe('what the checkout button acts on', () => {
       'coveredByPass',
       'alreadyBooked',
       'unavailable',
+      'creditChanged',
       'failed',
     ];
     for (const kind of everyKind) {

@@ -56,9 +56,29 @@ export const createClassPaymentIntentResponseSchema = z
      * confirm this PaymentIntent — see `features/payments/stripeSession.ts`.
      */
     stripeAccountId: z.string(),
+    /**
+     * What the CARD is charged — the PaymentIntent's own amount.
+     *
+     * ⚠️ With credit applied this is the REMAINDER, not the class price. The class price is
+     * `breakdown.totalCents`. Rendering this as "the total" would under-report what the client is
+     * spending, since the credit half is money too.
+     */
     amountCents: z.number(),
     currency: z.string(),
     breakdown: classPriceBreakdownSchema,
+    /**
+     * How much credit endpoint 2 is authorized to take. Echoed from the PaymentIntent's metadata,
+     * not recomputed — so the figure the app renders is the one that will actually be consumed.
+     * Absent on an older backend, which means no credit was applied.
+     */
+    creditAppliedCents: z.number().optional(),
+    creditBalanceCents: z.number().optional(),
+    /**
+     * The credit was reduced so the card portion clears Stripe's 50c floor. The client is being
+     * asked to spend less credit than they hold, which deserves a sentence rather than a number
+     * that looks wrong.
+     */
+    creditTrimmedForMinimum: z.boolean().optional(),
   })
   .passthrough();
 
@@ -67,6 +87,23 @@ export const createClassPaymentIntentResponseSchema = z
  * "carry on". A shipped app cannot be patched for days, so a new server-side refusal must degrade
  * to a safe message rather than to a booking.
  */
+/**
+ * The server's credit split. Mirrors `domain/credit/split.ts`, which is itself a mirror of
+ * `resolve-credit-split.js` — this is the shape that arrives on the wire.
+ */
+export const creditSplitSchema = z
+  .object({
+    kind: z.enum(['none', 'partial', 'credit-only']),
+    totalCents: z.number(),
+    creditAppliedCents: z.number(),
+    cardCents: z.number(),
+    balanceCents: z.number(),
+    trimmedForMinimum: z.boolean().optional(),
+  })
+  .passthrough();
+
+export type CreditSplitResponse = z.infer<typeof creditSplitSchema>;
+
 export const bookingRefusalSchema = z
   .object({
     ok: z.literal(false),
@@ -83,6 +120,16 @@ export const bookingRefusalSchema = z
      * something useful without it.
      */
     existingBookingCount: z.number().optional(),
+    /**
+     * On `credit_changed`, `credit_covers_class` and `insufficient_credit`: the SERVER's own
+     * resolution of the split, against the live balance.
+     *
+     * The app re-renders from this rather than recomputing — the whole point of those refusals is
+     * that the app's figure was stale, so asking it to guess again would reproduce the argument.
+     */
+    creditSplit: creditSplitSchema.optional(),
+    /** The live balance in cents, on the credit refusals. */
+    creditBalanceCents: z.number().optional(),
   })
   .passthrough();
 
@@ -117,6 +164,24 @@ export type ConfirmClassBookingResponse = z.infer<typeof confirmClassBookingResp
  * `no_covering_pass` (they hold nothing that covers this class) and `pass_spent` (it ran out or
  * expired between the screen and the call — nothing was used).
  */
+/**
+ * `POST /checkout/class/book-with-credit` — one call, no PaymentSheet, no card.
+ *
+ * Used ONLY when the balance covers the class outright. A partial split stays on the two-call card
+ * flow, because Stripe rejects a $0 PaymentIntent and a sheet for $0 is not a sheet.
+ */
+export const bookWithCreditResponseSchema = z
+  .object({
+    ok: z.literal(true),
+    passId: z.number().nullable().optional(),
+    transactionId: z.number().nullable().optional(),
+    creditAppliedCents: z.number().optional(),
+    creditBalanceCents: z.number().optional(),
+  })
+  .passthrough();
+
+export type BookWithCreditResponse = z.infer<typeof bookWithCreditResponseSchema>;
+
 export const bookWithPassResponseSchema = z
   .object({
     ok: z.literal(true),

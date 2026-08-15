@@ -45,6 +45,7 @@ import { useCallback, useRef, useState } from 'react';
 
 import {
   apiClient,
+  bookClassWithCredit,
   bookClassWithPass,
   confirmClassBooking,
   createClassPaymentIntent,
@@ -104,6 +105,22 @@ export type LineOutcome =
    * shape as the widget's "Use this card" button that dispatched nothing.
    */
   | { kind: 'unavailable'; message: string }
+  /**
+   * The client's studio credit balance moved between the screen and the call — spent on another
+   * device, most often.
+   *
+   * A RE-RENDER, not a failure: nothing was charged and no PaymentIntent was created. The line
+   * shows the server's fresh split and the same button confirms it. Same treatment as
+   * `priceChanged`, and it counts toward the CTA for the same reason — pressing again genuinely
+   * produces a different answer.
+   */
+  | {
+      kind: 'creditChanged';
+      charge: ClassCharge;
+      creditAppliedCents: number;
+      cardCents: number;
+      message: string;
+    }
   | { kind: 'failed'; message: string; nothingCharged: boolean };
 
 /**
@@ -140,6 +157,19 @@ export interface BookableItem {
    * one line is a duplicate must not silently license duplicates on the other two.
    */
   allowDuplicate?: boolean;
+  /**
+   * The credit portion this line DISPLAYED, in cents, from `allocateCreditAcrossLines`.
+   *
+   * A prediction, not a reservation. The server resolves the split itself against the live balance
+   * and refuses `credit_changed` if it disagrees — which is exactly what happens when the balance
+   * moved on another device, or when an earlier line in this run failed and did not consume its
+   * share. Either way the answer is a re-render, never a charge at a different number.
+   *
+   * Undefined means credit is not in play for this line at all.
+   */
+  creditCents?: number;
+  /** The client's own toggle. Sent as a yes/no; it never carries an amount. */
+  applyCredit?: boolean;
 }
 
 export interface CartCheckoutState {
@@ -175,6 +205,17 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
    * created — i.e. an empty map. The ref is the only value that is current at that moment.
    */
   const bookedIds = useRef<number[]>([]);
+  /**
+   * The credit-only booker, held in a ref purely to break a declaration cycle.
+   *
+   * The two paths hand off to each other in both directions — a card booking whose credit turns
+   * out to cover the class routes to credit, and a credit booking whose balance turns out not to
+   * cover it falls back to card. Neither can be declared first, and the alternative (inlining one
+   * inside the other) would give the same refusal two different handlers.
+   */
+  const bookWithCreditRef = useRef<
+    ((line: CartLine, totalCents: number, allowDuplicate?: boolean) => Promise<boolean>) | null
+  >(null);
 
   const setOutcome = useCallback((eventId: number, outcome: LineOutcome) => {
     setOutcomes((current) => ({ ...current, [eventId]: outcome }));
@@ -247,7 +288,13 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
 
   /** Book ONE class. Throws only `SheetDismissed`; every other failure becomes an outcome. */
   const bookOne = useCallback(
-    async ({ line, totalCents, allowDuplicate = false }: BookableItem): Promise<boolean> => {
+    async ({
+      line,
+      totalCents,
+      allowDuplicate = false,
+      creditCents,
+      applyCredit,
+    }: BookableItem): Promise<boolean> => {
       setOutcome(line.eventId, { kind: 'working' });
 
       try {
@@ -262,6 +309,8 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
           eventId: line.eventId,
           displayedTotalCents: totalCents,
           allowDuplicate,
+          ...(applyCredit === undefined ? {} : { applyCredit }),
+          ...(typeof creditCents === 'number' ? { displayedCreditCents: creditCents } : {}),
         });
 
         await withConnectedStripeAccount(
@@ -341,6 +390,33 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
             });
             return false;
           }
+          /*
+           * Their credit turns out to cover the whole class, so there is nothing for a card to do
+           * and Stripe would reject a $0 PaymentIntent. Book it the other way rather than reporting
+           * a refusal — nothing was charged (no PaymentIntent was created), so this is a free retry
+           * down the correct path. Exactly the shape of the `covered_by_pass` handoff above.
+           */
+          if (error.refusalCode === 'credit_covers_class' && bookWithCreditRef.current) {
+            return bookWithCreditRef.current(line, totalCents, allowDuplicate);
+          }
+          /*
+           * The balance moved between the screen and the call. A RE-RENDER, not an error — the
+           * line comes back showing the server's split and the client confirms it, which is the
+           * `price_changed` treatment applied to the second funding source.
+           *
+           * The server's figures are used verbatim. Recomputing here would reproduce the
+           * disagreement that caused the refusal.
+           */
+          if (error.refusalCode === 'credit_changed' && error.breakdown) {
+            setOutcome(line.eventId, {
+              kind: 'creditChanged',
+              charge: chargeFromServerBreakdown(error.breakdown, currency),
+              creditAppliedCents: error.creditSplit?.creditAppliedCents ?? 0,
+              cardCents: error.creditSplit?.cardCents ?? error.breakdown.totalCents,
+              message: error.message,
+            });
+            return false;
+          }
           if (PERMANENT_REFUSALS.has(error.refusalCode ?? '')) {
             setOutcome(line.eventId, { kind: 'unavailable', message: error.message });
             return false;
@@ -376,6 +452,84 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
       setOutcome,
     ],
   );
+
+  /**
+   * Book ONE class paid for entirely by credit. No sheet, no card, one call.
+   *
+   * Separate from the card path because Stripe rejects a $0 PaymentIntent — a fully-covered class
+   * cannot go down the card flow at all. Never throws.
+   */
+  const bookOneWithCredit = useCallback(
+    async (line: CartLine, totalCents: number, allowDuplicate = false): Promise<boolean> => {
+      setOutcome(line.eventId, { kind: 'working' });
+
+      try {
+        await bookClassWithCredit(apiClient, {
+          dibsStudioId: studio.dibsStudioId,
+          eventId: line.eventId,
+          displayedTotalCents: totalCents,
+          allowDuplicate,
+        });
+
+        setOutcome(line.eventId, { kind: 'booked' });
+        if (!bookedIds.current.includes(line.eventId)) bookedIds.current.push(line.eventId);
+        return true;
+      } catch (error) {
+        if (error instanceof BookingRefusedError) {
+          /*
+           * The balance no longer covers it — spent on another device, or an earlier line in this
+           * run took more than predicted. NOT an error: the card flow handles a partial split, so
+           * this falls back to it rather than telling the client something went wrong.
+           *
+           * The fresh figures ride on the refusal, and the card path will resolve the split again
+           * server-side anyway, so nothing here has to recompute.
+           */
+          if (error.refusalCode === 'insufficient_credit') {
+            return bookOne({
+              line,
+              totalCents,
+              allowDuplicate,
+              applyCredit: true,
+              creditCents: error.creditSplit?.creditAppliedCents ?? 0,
+            });
+          }
+          if (error.refusalCode === 'already_booked') {
+            setOutcome(line.eventId, {
+              kind: 'alreadyBooked',
+              message: error.message,
+              existingCount: error.existingBookingCount,
+            });
+            return false;
+          }
+          if (PERMANENT_REFUSALS.has(error.refusalCode ?? '')) {
+            setOutcome(line.eventId, { kind: 'unavailable', message: error.message });
+            return false;
+          }
+          setOutcome(line.eventId, {
+            kind: 'failed',
+            message: error.message,
+            // No card was involved at all, so this is always true.
+            nothingCharged: true,
+          });
+          return false;
+        }
+
+        setOutcome(line.eventId, {
+          kind: 'failed',
+          message:
+            error instanceof Error && error.message
+              ? error.message
+              : 'Something went wrong. Please try again.',
+          nothingCharged: true,
+        });
+        return false;
+      }
+    },
+    [setOutcome, bookOne],
+  );
+
+
+  bookWithCreditRef.current = bookOneWithCredit;
 
   const run = useCallback(
     (items: BookableItem[]) => {

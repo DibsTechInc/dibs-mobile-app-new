@@ -10,13 +10,16 @@ import type { ApiClient } from '../client';
 import { ApiError } from '../errors';
 import {
   bookingRefusalSchema,
+  bookWithCreditResponseSchema,
   bookWithPassResponseSchema,
   createClassPaymentIntentResponseSchema,
   confirmClassBookingResponseSchema,
   dropClassResponseSchema,
+  type BookWithCreditResponse,
   type BookWithPassResponse,
   type ClassPriceBreakdown,
   type ConfirmClassBookingResponse,
+  type CreditSplitResponse,
   type DropClassResponse,
 } from '../schemas/class-booking';
 
@@ -32,6 +35,14 @@ export class BookingRefusedError extends ApiError {
    * say — an older build, or a different refusal entirely.
    */
   readonly existingBookingCount: number | null;
+  /**
+   * On the credit refusals: the SERVER's split, against the live balance.
+   *
+   * The app re-renders from this rather than recomputing. `credit_changed` means the app's figure
+   * was stale, so asking it to work the split out again would reproduce the disagreement.
+   */
+  readonly creditSplit: CreditSplitResponse | null;
+  readonly creditBalanceCents: number | null;
 
   constructor(args: {
     status: number;
@@ -40,6 +51,8 @@ export class BookingRefusedError extends ApiError {
     breakdown?: ClassPriceBreakdown | null;
     nothingCharged?: boolean;
     existingBookingCount?: number | null;
+    creditSplit?: CreditSplitResponse | null;
+    creditBalanceCents?: number | null;
     body: unknown;
   }) {
     super({
@@ -56,6 +69,8 @@ export class BookingRefusedError extends ApiError {
     this.breakdown = args.breakdown ?? null;
     this.nothingCharged = args.nothingCharged ?? false;
     this.existingBookingCount = args.existingBookingCount ?? null;
+    this.creditSplit = args.creditSplit ?? null;
+    this.creditBalanceCents = args.creditBalanceCents ?? null;
   }
 }
 
@@ -74,6 +89,8 @@ function asRefusal(error: unknown): never {
         breakdown: parsed.data.breakdown ?? null,
         nothingCharged: parsed.data.nothingCharged ?? false,
         existingBookingCount: parsed.data.existingBookingCount ?? null,
+        creditSplit: parsed.data.creditSplit ?? null,
+        creditBalanceCents: parsed.data.creditBalanceCents ?? null,
         body: error.body,
       });
     }
@@ -100,11 +117,34 @@ export interface CreateClassPaymentIntentArgs {
    * unrelated retry is a silent second charge.
    */
   allowDuplicate?: boolean;
+  /**
+   * The client's own choice about their credit — a yes/no, never a figure.
+   *
+   * Default ON is a product decision: credit is money the client has already given the studio, and
+   * making them opt in every time is asking them to remember they have it.
+   */
+  applyCredit?: boolean;
+  /**
+   * The credit portion the app DISPLAYED, in cents, from `domain/credit/split.ts`.
+   *
+   * Sent for the same reason as `displayedTotalCents`: so the server can refuse rather than take a
+   * figure that was not on screen. The server resolves the split itself from the live balance and
+   * answers `credit_changed` if the two disagree. **The app never decides how much credit is
+   * spent** — it only says what it showed.
+   */
+  displayedCreditCents?: number;
 }
 
 export async function createClassPaymentIntent(
   client: ApiClient,
-  { dibsStudioId, eventId, displayedTotalCents, allowDuplicate }: CreateClassPaymentIntentArgs,
+  {
+    dibsStudioId,
+    eventId,
+    displayedTotalCents,
+    allowDuplicate,
+    applyCredit,
+    displayedCreditCents,
+  }: CreateClassPaymentIntentArgs,
   signal?: AbortSignal,
 ) {
   try {
@@ -119,8 +159,57 @@ export async function createClassPaymentIntent(
         // Omitted entirely unless asked for, so the request carries no duplicate-booking field at
         // all on the ordinary path.
         ...(allowDuplicate === true ? { allowDuplicate: true } : {}),
+        // Both omitted entirely when credit is not in play, so a no-credit booking sends the same
+        // request it always did. The server reads an absent `displayedCreditCents` as "an older
+        // build that knows nothing about credit" and holds it to the no-credit answer.
+        ...(applyCredit === undefined ? {} : { applyCredit }),
+        ...(typeof displayedCreditCents === 'number'
+          ? { displayedCreditCents }
+          : {}),
       },
       createClassPaymentIntentResponseSchema,
+      { authenticated: true, signal },
+    );
+  } catch (error) {
+    return asRefusal(error);
+  }
+}
+
+export interface BookClassWithCreditArgs {
+  dibsStudioId: number;
+  eventId: number;
+  /** What the app showed as the class price. The server prices it again and refuses a mismatch. */
+  displayedTotalCents: number;
+  allowDuplicate?: boolean;
+}
+
+/**
+ * Book a class paid for ENTIRELY by studio credit. One call, no PaymentSheet.
+ *
+ * Reached only when the split resolves `credit-only` — Stripe rejects a $0 PaymentIntent, so a
+ * fully-covered class cannot go down the card flow at all. A PARTIAL split is not this endpoint's
+ * job and it will refuse with `insufficient_credit` carrying both figures, which the caller uses to
+ * fall back to the card flow rather than to show an error.
+ *
+ * The seat and the credit are both claimed by atomic conditional UPDATEs on the server, seat
+ * first, each released if what follows fails.
+ */
+export async function bookClassWithCredit(
+  client: ApiClient,
+  { dibsStudioId, eventId, displayedTotalCents, allowDuplicate }: BookClassWithCreditArgs,
+  signal?: AbortSignal,
+): Promise<BookWithCreditResponse> {
+  try {
+    // NOTE: no `userid`. Same auth trap as every other endpoint here.
+    return await client.post(
+      'checkout/class/book-with-credit',
+      {
+        dibsStudioId,
+        eventId,
+        displayedTotalCents,
+        ...(allowDuplicate === true ? { allowDuplicate: true } : {}),
+      },
+      bookWithCreditResponseSchema,
       { authenticated: true, signal },
     );
   } catch (error) {

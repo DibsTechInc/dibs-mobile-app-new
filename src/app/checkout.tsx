@@ -17,12 +17,13 @@
  * lines that have not booked yet, and they are the only figures the screen is given.
  */
 import { Redirect, router } from 'expo-router';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { isAcceptingBookings } from '@/api/schemas/basic-config';
 import { studio } from '@/config/studio';
 import { cancelWindowSentence, describeCancelWindow } from '@/domain/cancellation/cancel-window';
 import { countsTowardCheckout } from '@/domain/cart/outcome-status';
+import { allocateCreditAcrossLines, balanceToCents } from '@/domain/credit/split';
 import { formatBalance } from '@/domain/money/format';
 import { describeCheckoutPayment } from '@/domain/payments/checkout-method';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -30,6 +31,7 @@ import { CheckoutScreen, type CheckoutLineView } from '@/features/cart/CheckoutS
 import { useCartStore } from '@/features/cart/cartStore';
 import { useCart } from '@/features/cart/useCart';
 import { useCartCheckout, type BookableItem, type LineOutcome } from '@/features/cart/useCartCheckout';
+import { useCreditBalance } from '@/features/account/useCreditBalance';
 import { useSavedCards } from '@/features/payments/useSavedCards';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
 
@@ -44,6 +46,9 @@ const PENDING: LineOutcome = { kind: 'pending' };
  */
 function effectiveTotalCents(line: CheckoutLineView): number {
   if (line.outcome.kind === 'priceChanged') return line.outcome.charge.totalCents;
+  // A credit change does not move the CLASS price — only which part of it credit pays for. The
+  // server still verifies `displayedTotalCents` against the class, so this must stay the total.
+  if (line.outcome.kind === 'creditChanged') return line.outcome.charge.totalCents;
   return line.charge?.totalCents ?? 0;
 }
 
@@ -118,6 +123,49 @@ export default function CheckoutRoute() {
   );
 
   /**
+   * Studio credit, and the client's choice about spending it.
+   *
+   * **Default ON.** Credit is money already handed to the studio, and making somebody opt in each
+   * time is asking them to remember they have it. The toggle exists because saving it for
+   * something else is a real intention, not because the default is in doubt.
+   */
+  const [applyCredit, setApplyCredit] = useState(true);
+  // The wallet's own credit read, so the balance the cart spends against is the one the account
+  // screen shows. `staleTime: 0` there is deliberate — credit moves on other devices.
+  const creditQuery = useCreditBalance();
+  const creditBalanceCents = balanceToCents(creditQuery.data ?? null);
+
+  /*
+   * How the balance falls across the outstanding CHARGEABLE lines, in the order they will be
+   * booked — a prediction of what the server will resolve, not a reservation.
+   *
+   * Pass-covered lines are excluded because they cost nothing and consume no credit. The order
+   * matters: `bookableItems` books covered lines first and then chargeable ones, and the server
+   * resolves each against the balance as it stands at that moment, so allocating in the same order
+   * is what makes the two agree.
+   *
+   * When they disagree anyway — the balance moved on another device, or an earlier line failed and
+   * did not consume its share — the server refuses `credit_changed` and the line re-renders. That
+   * is the whole reason this is allowed to be a prediction.
+   */
+  const creditAllocation = useMemo(
+    () =>
+      allocateCreditAcrossLines(
+        outstandingChargeable,
+        (line) => effectiveTotalCents(line),
+        creditBalanceCents,
+        applyCredit,
+      ),
+    [outstandingChargeable, creditBalanceCents, applyCredit],
+  );
+
+  const creditTotals = useMemo(() => {
+    const creditCents = creditAllocation.reduce((sum, a) => sum + a.split.creditAppliedCents, 0);
+    const cardCents = creditAllocation.reduce((sum, a) => sum + a.split.cardCents, 0);
+    return { creditCents, cardCents };
+  }, [creditAllocation]);
+
+  /**
    * The run order: **pass-covered lines first, then card lines.**
    *
    * Two reasons, and the second is the one that matters. A pass booking opens no sheet and takes a
@@ -126,14 +174,21 @@ export default function CheckoutRoute() {
    * through, everything that cost nothing is already booked rather than abandoned alongside the
    * charge they changed their mind about.
    */
-  const bookableItems = useMemo<BookableItem[]>(
-    () =>
-      [...outstandingCovered, ...outstandingChargeable].map((line) => ({
+  const bookableItems = useMemo<BookableItem[]>(() => {
+    // Keyed by event id so a chargeable line finds its own allocation regardless of the reorder
+    // below. Covered lines have no allocation and send no credit fields at all.
+    const creditByEvent = new Map(
+      creditAllocation.map(({ item, split }) => [item.eventId, split]),
+    );
+    return [...outstandingCovered, ...outstandingChargeable].map((line) => {
+      const split = creditByEvent.get(line.eventId);
+      return {
         line,
         totalCents: effectiveTotalCents(line),
-      })),
-    [outstandingCovered, outstandingChargeable],
-  );
+        ...(split ? { creditCents: split.creditAppliedCents, applyCredit } : {}),
+      };
+    });
+  }, [outstandingCovered, outstandingChargeable, creditAllocation, applyCredit]);
 
   /**
    * Booked classes leave the cart when the client leaves checkout — not the moment they book.
@@ -194,8 +249,18 @@ export default function CheckoutRoute() {
         ],
         card: cards.defaultCard,
         status: cards.status,
+        creditAppliedCents: creditTotals.creditCents,
+        cardCents: creditTotals.cardCents,
+        formatCents: (cents) => formatBalance(cents / 100, config?.currency),
       }),
-    [outstandingChargeable, outstandingCovered, cards.defaultCard, cards.status],
+    [
+      outstandingChargeable,
+      outstandingCovered,
+      cards.defaultCard,
+      cards.status,
+      creditTotals,
+      config?.currency,
+    ],
   );
 
   const onBack = useCallback(() => {
@@ -219,6 +284,11 @@ export default function CheckoutRoute() {
       studioName={studioName}
       phase={checkout.phase}
       payment={payment}
+      creditBalanceCents={creditBalanceCents}
+      creditAppliedCents={creditTotals.creditCents}
+      applyCredit={applyCredit}
+      onApplyCreditChange={setApplyCredit}
+      formatCents={(cents) => formatBalance(cents / 100, config?.currency)}
       onRemove={removeFromCart}
       onConfirm={() => checkout.run(bookableItems)}
       onBookAnother={onBookAnother}
