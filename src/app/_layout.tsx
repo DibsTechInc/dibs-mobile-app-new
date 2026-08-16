@@ -9,6 +9,7 @@ import { AppReleaseGate } from '@/features/app-release/AppReleaseGate';
 import { AuthProvider } from '@/features/auth/AuthProvider';
 import { installAuthBridge } from '@/features/auth/bridge';
 import { StripeSdkProvider } from '@/features/payments/StripeSdkProvider';
+import { AppWarmup } from '@/features/prefetch/AppWarmup';
 import { StudioConfigProvider } from '@/features/studio/StudioConfigProvider';
 
 // Module scope, not an effect. Effects run child-first, so by the time a provider's effect ran,
@@ -53,6 +54,10 @@ export default function RootLayout() {
                 <AppReleaseGate>
                   <Stack screenOptions={{ headerShown: false }} />
                 </AppReleaseGate>
+                {/* Warms the schedule/bookings/billing caches at launch so the first tap into
+                    any of them lands on data, not a skeleton. Renders nothing; failures are
+                    silent — every screen keeps its own loading and error states. */}
+                <AppWarmup />
                 {/* Light content throughout: v1 has no dark mode, and the background is always light. */}
                 <StatusBar style="dark" />
               </>
