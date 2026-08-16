@@ -84,7 +84,10 @@ function toItem(
     locationLabel: row.location?.locationName?.trim() || null,
     whenLabel: describeBookingDay(row.start_date, timeZone, now),
     timeLabel: formatStoredTime(row.start_date),
-    paidWithLabel: row.serviceName?.trim() || null,
+    // The server's payment description wins ("Booked with studio credit") — it exists precisely
+    // because `serviceName` for booking-time payments is the internal "[Admin] Paid Session ($X)"
+    // bookkeeping package. Genuine packs carry no paidWithLabel and keep their package name.
+    paidWithLabel: row.paidWithLabel?.trim() || row.serviceName?.trim() || null,
     isCancelled: row.dropped === true,
     didAttend: row.checkedin === true,
   };

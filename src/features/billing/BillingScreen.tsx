@@ -99,9 +99,11 @@ function HistoryRow({ item }: { item: BillingHistoryItem }) {
     >
       <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
         <Text variant="body">{item.title}</Text>
-        {item.dateLabel ? (
+        {/* Date and method share one quiet line — "Aug 16 · Credit applied". The method is why
+            two identical $22 rows can be different events in the client's bank account. */}
+        {item.dateLabel || item.paymentLabel ? (
           <Text variant="caption" color="tertiary">
-            {item.dateLabel}
+            {[item.dateLabel, item.paymentLabel].filter(Boolean).join(' · ')}
           </Text>
         ) : null}
       </View>

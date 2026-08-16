@@ -22,6 +22,11 @@ export interface BillingHistoryItem {
   isRefund: boolean;
   /** Money IN (a comp credit), from `amountSign`. */
   isCredit: boolean;
+  /**
+   * How the row was paid — "Credit applied", "Paid by card", "$9.50 credit · $12.50 card" — or
+   * null when the method is unknown or already the row's whole story (a credit-ledger row).
+   */
+  paymentLabel: string | null;
 }
 
 export interface UpcomingPaymentItem {
@@ -89,6 +94,42 @@ export interface BuildBillingInput {
  * direction, and anything carrying a refund — a refund-only row's amount can be 0 while the
  * refund line is the whole point of showing it.
  */
+/**
+ * "Gentle Flow · $22.00" with no method line looked identical whether the $22 hit a card or came
+ * off the client's balance (Alicia, 2026-08-16). The server already classifies the method —
+ * bundle-aware, from the PURCHASE transaction's own money — so this only words it. A mixed
+ * payment states both figures; a split whose amounts did not survive the wire still says
+ * "Credit + card" rather than pretending to be one or the other.
+ */
+function paymentLabelFor(row: AccountActivityRow, currency: string): string | null {
+  switch (row.paymentMethod) {
+    case 'credit':
+      return 'Credit applied';
+    case 'card':
+      return 'Paid by card';
+    case 'mixed': {
+      const p = row.primary ?? {};
+      const s = row.secondary ?? {};
+      const credit =
+        typeof p.creditApplied === 'number' && p.creditApplied > 0
+          ? p.creditApplied
+          : typeof p.creditSpent === 'number' && p.creditSpent > 0
+            ? p.creditSpent
+            : typeof s.refundTargetStudioCreditsSpent === 'number'
+              ? s.refundTargetStudioCreditsSpent
+              : null;
+      const card =
+        typeof s.refundTargetAmountCharged === 'number' ? s.refundTargetAmountCharged : null;
+      if (credit && card && credit > 0 && card > 0) {
+        return `${formatBalance(credit, currency)} credit · ${formatBalance(card, currency)} card`;
+      }
+      return 'Credit + card';
+    }
+    default:
+      return null;
+  }
+}
+
 function movedMoney(row: AccountActivityRow): boolean {
   const amount = typeof row.amount === 'number' ? row.amount : null;
   const refunded = typeof row.refundedAmount === 'number' ? row.refundedAmount : 0;
@@ -132,6 +173,7 @@ export function buildBillingData({
         refundLabel: refunded > 0 ? `${formatBalance(refunded, currency)} refunded` : null,
         isRefund: isFullyRefunded,
         isCredit: sign === 'credit',
+        paymentLabel: paymentLabelFor(row, currency),
       };
     });
 

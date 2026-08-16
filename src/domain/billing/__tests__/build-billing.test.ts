@@ -175,6 +175,45 @@ describe('past rows — shapes captured from a real staging response, not guesse
   });
 });
 
+describe('the payment-method line', () => {
+  const row = (over = {}) =>
+    buildBillingData(
+      input({ history: { data: { rows: [{ id: 'txn_1', amount: 22, ...over }] }, isPending: false, error: null } }),
+    ).past.items[0];
+
+  it("a credit-paid booking says so — the row Alicia flagged as indistinguishable", () => {
+    expect(row({ activityType: 'class_booked', paymentMethod: 'credit',
+      primary: { eventName: 'Gentle Flow' } }))
+      .toMatchObject({ title: 'Gentle Flow', paymentLabel: 'Credit applied' });
+  });
+
+  it('a card charge says so', () => {
+    expect(row({ paymentMethod: 'card' }).paymentLabel).toBe('Paid by card');
+  });
+
+  it('a mixed payment states BOTH figures, from the bundle-aware refund-target fields', () => {
+    expect(row({ paymentMethod: 'mixed',
+      secondary: { refundTargetAmountCharged: 12.5, refundTargetStudioCreditsSpent: 9.5 } })
+      .paymentLabel).toBe('$9.50 credit · $12.50 card');
+  });
+
+  it('the ledger enrichment amount wins over the raw split when present', () => {
+    expect(row({ paymentMethod: 'mixed',
+      primary: { creditApplied: 9.5 },
+      secondary: { refundTargetAmountCharged: 12.5, refundTargetStudioCreditsSpent: 0 } })
+      .paymentLabel).toBe('$9.50 credit · $12.50 card');
+  });
+
+  it('a mixed row whose amounts did not survive still names both sources', () => {
+    expect(row({ paymentMethod: 'mixed' }).paymentLabel).toBe('Credit + card');
+  });
+
+  it('an unknown or absent method stays silent rather than guessing', () => {
+    expect(row({ paymentMethod: null }).paymentLabel).toBeNull();
+    expect(row({ paymentMethod: 'something_new' }).paymentLabel).toBeNull();
+  });
+});
+
 describe('only rows that moved money reach the Payments screen', () => {
   /**
    * The endpoint is the full activity timeline; most of a pass-holder's rows are bookings whose

@@ -33,6 +33,22 @@ const activityPrimarySchema = z
       .passthrough()
       .nullable()
       .optional(),
+    /** DOLLARS of studio credit this row consumed, from the ledger enrichment. */
+    creditApplied: z.number().nullable().optional(),
+    /** DOLLARS of credit on the (possibly bundled) transaction row itself. */
+    creditSpent: z.number().nullable().optional(),
+  })
+  .passthrough();
+
+/**
+ * The server's refund-target fields double as the row's money split: for bundled single-session
+ * bookings they are read off the PURCHASE transaction, so card and credit portions are correct
+ * even though the class row itself carries $0.
+ */
+const activitySecondarySchema = z
+  .object({
+    refundTargetAmountCharged: z.number().nullable().optional(),
+    refundTargetStudioCreditsSpent: z.number().nullable().optional(),
   })
   .passthrough();
 
@@ -53,6 +69,7 @@ export const accountActivityRowSchema = z
     refundedAmount: z.number().nullable().optional(),
     paymentMethod: z.string().nullable().optional(),
     primary: activityPrimarySchema.nullable().optional(),
+    secondary: activitySecondarySchema.nullable().optional(),
   })
   .passthrough();
 

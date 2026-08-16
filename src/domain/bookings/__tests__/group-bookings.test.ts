@@ -135,6 +135,19 @@ describe('groupBookings', () => {
     expect(upcoming[0].instructor).toBeNull();
   });
 
+  it("prefers the server's paidWithLabel over the bookkeeping package name", () => {
+    const { upcoming } = groupBookings(
+      {
+        upcomingAppts: [
+          row({ serviceName: '[Admin] Paid Session ($22)', paidWithLabel: 'Booked with studio credit' }),
+        ],
+      },
+      OPTS,
+    );
+
+    expect(upcoming[0].paidWithLabel).toBe('Booked with studio credit');
+  });
+
   it('leaves paidWithLabel null rather than inventing a payment the row does not state', () => {
     const { upcoming } = groupBookings(
       { upcomingAppts: [row({ serviceName: null })] },
