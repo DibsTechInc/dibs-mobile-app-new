@@ -24,7 +24,9 @@
     "showInstructor": true
   },
   "ios": {
-    "bundleId": "com.ondibs.everydayballetapp"
+    "bundleId": "com.ondibs.everydayballetapp",
+    "merchantId": "merchant.com.ondibs.everydayballetapp",
+    "appleTeamId": "R8RUP42952"
   },
   "android": {},
   "support": {
@@ -34,7 +36,7 @@
     "clarityProjectId": "y3cpunfvqj"
   },
   "legal": {
-    "privacyPolicyUrl": "https://dibsonline.com/apple/privacy-policy",
+    "privacyPolicyUrl": "https://dibsonline.com/privacy-policy",
     "privacyPolicyLive": false
   },
   "api": {

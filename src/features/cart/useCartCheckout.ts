@@ -58,7 +58,7 @@ import { studio } from '@/config/studio';
 import type { CartLine } from '@/domain/cart/build-cart';
 import { chargeFromServerBreakdown, type ClassCharge } from '@/domain/pricing/class-charge';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { stripeRedirectUrl, withConnectedStripeAccount } from '@/features/payments/stripeSession';
+import { applePaySheetParams, stripeRedirectUrl, withConnectedStripeAccount } from '@/features/payments/stripeSession';
 import { useStripeReadiness } from '@/features/payments/StripeSdkProvider';
 
 import { useCartStore } from './cartStore';
@@ -374,6 +374,8 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
               customerSessionClientSecret: intent.customerSessionClientSecret,
               // Where a 3DS challenge returns to. Without it the challenge is a dead end.
               returnURL: stripeRedirectUrl(),
+              // Apple Pay, when this studio's build carries a merchant id. See applePaySheetParams.
+              ...applePaySheetParams(),
               allowsDelayedPaymentMethods: false,
               defaultBillingDetails: {
                 name:

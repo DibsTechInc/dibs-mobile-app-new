@@ -53,7 +53,7 @@ import {
   type ClassCharge,
 } from '@/domain/pricing/class-charge';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { stripeRedirectUrl, withConnectedStripeAccount } from '@/features/payments/stripeSession';
+import { applePaySheetParams, stripeRedirectUrl, withConnectedStripeAccount } from '@/features/payments/stripeSession';
 import { useStripeReadiness } from '@/features/payments/StripeSdkProvider';
 
 /** The client dismissed the sheet. Never shown to them. */
@@ -137,6 +137,8 @@ export function useBookClass({ eventId, currency }: UseBookClassArgs) {
             customerSessionClientSecret: intent.customerSessionClientSecret,
             // Where a 3DS challenge returns to. Without it the challenge is a dead end.
             returnURL: stripeRedirectUrl(),
+            // Apple Pay, when this studio's build carries a merchant id. See applePaySheetParams.
+            ...applePaySheetParams(),
             // v1 is card-only server-side, and cards settle immediately — nothing in this sheet
             // completes after a delay.
             allowsDelayedPaymentMethods: false,

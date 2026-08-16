@@ -28,7 +28,7 @@ import type { ConfirmPackagePurchaseResponse } from '@/api/schemas/package-purch
 import { studio } from '@/config/studio';
 import { formatBalance } from '@/domain/money/format';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { stripeRedirectUrl, withConnectedStripeAccount } from '@/features/payments/stripeSession';
+import { applePaySheetParams, stripeRedirectUrl, withConnectedStripeAccount } from '@/features/payments/stripeSession';
 import { useStripeReadiness } from '@/features/payments/StripeSdkProvider';
 
 /** The client dismissed the sheet. Never shown to them. */
@@ -101,6 +101,8 @@ export function usePurchasePackage({ currency }: UsePurchasePackageArgs = {}) {
             customerSessionClientSecret: intent.customerSessionClientSecret,
             // Where a 3DS challenge returns to. Without it the challenge is a dead end.
             returnURL: stripeRedirectUrl(),
+            // Apple Pay, when this studio's build carries a merchant id. See applePaySheetParams.
+            ...applePaySheetParams(),
             allowsDelayedPaymentMethods: false,
             defaultBillingDetails: {
               name: [account?.firstName, account?.lastName].filter(Boolean).join(' ') || undefined,

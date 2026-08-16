@@ -23,6 +23,7 @@ import { StripeProvider } from '@stripe/stripe-react-native';
 import { createContext, use, useMemo, type ReactElement } from 'react';
 
 import { apiClient, fetchPublishableKey } from '@/api';
+import { studio } from '@/config/studio';
 
 export interface StripeReadiness {
   /** True once the SDK has a real key and a PaymentSheet can be presented. */
@@ -78,7 +79,14 @@ export function StripeSdkProvider({ children }: { children: ReactElement }) {
         mounts once and swaps the key in when it lands, rather than remounting every child the
         moment the request resolves.
       */}
-      <StripeProvider publishableKey={data ?? ''}>{children}</StripeProvider>
+      <StripeProvider
+        publishableKey={data ?? ''}
+        // Same value the session re-inits carry (stripeSession.ts) — Apple Pay availability
+        // must not depend on which configuration ran last. Undefined → card-only, by design.
+        merchantIdentifier={studio.merchantId ?? undefined}
+      >
+        {children}
+      </StripeProvider>
     </StripeReadinessContext>
   );
 }

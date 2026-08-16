@@ -59,12 +59,16 @@ export async function withConnectedStripeAccount<T>(
 ): Promise<T> {
   const urlScheme = appUrlScheme();
 
-  // No `merchantIdentifier`: v1 is card-only inside the sheet (`payment_method_types: ['card']`
-  // server-side), so Apple Pay is not offered and passing an id would imply otherwise. It is also
-  // absent until the studio enrols their own Apple team (§6.3).
+  // The merchant id rides on BOTH configurations (connected and the platform restore below):
+  // Apple Pay availability must not depend on which init ran last. Null → the key is omitted and
+  // the sheet stays card-only, which is the whole off switch for a studio without the Apple-side
+  // setup. Server-side `payment_method_types: ['card']` is compatible — Apple Pay IS a card to
+  // Stripe.
+  const merchantIdentifier = studio.merchantId ?? undefined;
   await initStripe({
     publishableKey,
     stripeAccountId,
+    merchantIdentifier,
     // Required for 3DS to return to the app, and for any redirect-based method.
     urlScheme,
   });
@@ -75,11 +79,22 @@ export async function withConnectedStripeAccount<T>(
     // Restore the PLATFORM configuration. Not optional and not best-effort: the Account tab's
     // SetupIntent is created on the platform account, and a platform client secret against a
     // connected-account init 400s on every Elements call.
-    await initStripe({ publishableKey, urlScheme }).catch((restoreError: unknown) => {
+    await initStripe({ publishableKey, merchantIdentifier, urlScheme }).catch((restoreError: unknown) => {
       console.error(
         '[stripe] could not restore the platform configuration — card saving may fail until relaunch',
         restoreError,
       );
     });
   }
+}
+
+/**
+ * The PaymentSheet's Apple Pay configuration — or nothing at all.
+ *
+ * ONE owner, spread by every sheet init, so "does this build offer Apple Pay" has a single
+ * answer: the studio has a merchant id, or the sheet is card-only. 'US' is every live studio
+ * today; a non-US studio makes this a per-studio field, not a second hardcode.
+ */
+export function applePaySheetParams(): { applePay?: { merchantCountryCode: string } } {
+  return studio.merchantId ? { applePay: { merchantCountryCode: 'US' } } : {};
 }

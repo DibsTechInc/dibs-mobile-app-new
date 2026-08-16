@@ -50,6 +50,14 @@ export interface StudioIdentity {
    * studio ships with recordings only when their studio.json deliberately carries a project id.
    */
   clarityProjectId: string | null;
+  /**
+   * The Apple Pay merchant identifier (`merchant.com.ondibs…`), or null for none.
+   *
+   * Null is the OFF switch: the Stripe session never passes a merchantIdentifier and the
+   * PaymentSheet never offers Apple Pay, so a studio without the Apple-side setup ships a
+   * card-only sheet rather than an Apple Pay button that errors.
+   */
+  merchantId: string | null;
   apiUrl: string;
 }
 
