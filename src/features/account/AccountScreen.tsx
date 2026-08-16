@@ -90,6 +90,8 @@ export interface AccountScreenProps {
   balances: AccountBalance[] | null;
   rows: AccountRow[];
   onSignOut: () => void;
+  /** Opens the delete-account flow (Apple 5.1.1(v)). Absent → the row does not render. */
+  onDeleteAccount?: () => void;
   onBack: () => void;
   onOpenMenu?: () => void;
 }
@@ -101,6 +103,7 @@ export function AccountScreen({
   balances,
   rows,
   onSignOut,
+  onDeleteAccount,
   onBack,
   onOpenMenu,
 }: AccountScreenProps) {
@@ -229,6 +232,30 @@ export function AccountScreen({
           >
             <Text variant="body">Sign out</Text>
           </Pressable>
+
+          {/* Quiet and last, below Sign out: present because Apple requires it in-app
+              (5.1.1(v)) and because it is honest — but styled at the weight of a footnote,
+              never competing with anything above it. Danger ink is what says "this one is
+              different"; the typed confirmation in the sheet is what makes it deliberate. */}
+          {onDeleteAccount ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Delete account"
+              onPress={onDeleteAccount}
+              style={({ pressed }) => [{
+                minHeight: theme.minTapTarget,
+                justifyContent: 'center',
+                paddingVertical: theme.spacing.md,
+                borderBottomWidth: 1,
+                borderBottomColor: theme.colors.divider,
+                opacity: pressed ? 0.55 : 1,
+              }]}
+            >
+              <Text variant="body" color="danger">
+                Delete account
+              </Text>
+            </Pressable>
+          ) : null}
 
           {/* The only Dibs mark anywhere in a studio's app. */}
           <Text variant="caption" color="tertiary" style={{ paddingTop: theme.spacing.base }}>

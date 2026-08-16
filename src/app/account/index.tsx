@@ -13,6 +13,8 @@ import { Alert, Linking } from 'react-native';
 import { studio } from '@/config/studio';
 import { formatPhoneForDisplay } from '@/domain/profile/validate';
 import { AccountScreen, type AccountBalance, type AccountRow } from '@/features/account/AccountScreen';
+import { DeleteAccountSheet } from '@/features/account/DeleteAccountSheet';
+import { useDeleteAccount } from '@/features/account/useDeleteAccount';
 import { useWallet } from '@/features/account/useWallet';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useAppDrawer } from '@/features/nav/useAppDrawer';
@@ -23,6 +25,8 @@ export default function AccountRoute() {
   const { config } = useStudioConfig();
   const wallet = useWallet();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const deletion = useDeleteAccount();
   const drawer = useAppDrawer({ visible: menuOpen, onClose: () => setMenuOpen(false) });
 
   const studioName = config?.studioName ?? studio.appName;
@@ -146,8 +150,26 @@ export default function AccountRoute() {
           // out lands them on a full screen rather than on a login wall.
           router.replace('/');
         }}
+        onDeleteAccount={() => setDeleting(true)}
         onBack={onBack}
         onOpenMenu={() => setMenuOpen(true)}
+      />
+      <DeleteAccountSheet
+        visible={deleting}
+        studioName={studioName}
+        status={deletion.status}
+        onConfirm={deletion.deleteAccount}
+        onClose={() => {
+          setDeleting(false);
+          // Reset AFTER closing so the sheet does not flash back mid-dismissal.
+          deletion.reset();
+        }}
+        // The blocked refusal's way forward: memberships are cancelled from the wallet.
+        onGoToPasses={() => {
+          setDeleting(false);
+          deletion.reset();
+          router.push('/account/wallet');
+        }}
       />
       {drawer}
     </>

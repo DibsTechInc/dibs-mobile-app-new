@@ -53,6 +53,7 @@ export { confirmPasswordSet } from './password';
 export { fetchSchedule } from './schedule';
 export { fetchClientBookings, type ClientBookings } from './upcoming';
 export { updateProfile, type UpdateProfileArgs } from './profile';
+export { deleteAccount, AccountDeletionRefusedError } from './delete-account';
 export { createDibsUser, fetchUserAccount } from './user-account';
 export {
   fetchCredit,
