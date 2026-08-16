@@ -88,6 +88,15 @@ export default function AccountRoute() {
       onPress: () => router.push('/account/wallet'),
     },
     {
+      // Beside Payment methods, the same pairing as the drawer: how you pay, then what you paid.
+      // It was drawer-only, and a client on this screen had no path to their payment history at
+      // all (Alicia, 2026-08-16) — the account page is where people go looking for money things.
+      label: 'Payments',
+      icon: 'document',
+      detail: 'Charges and upcoming renewals',
+      onPress: () => router.push('/account/billing'),
+    },
+    {
       label: 'Profile',
       icon: 'account',
       detail: 'Your name and mobile number',
