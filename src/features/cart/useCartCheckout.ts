@@ -73,7 +73,12 @@ class SheetDismissed extends Error {
 
 export type LineOutcome =
   | { kind: 'pending' }
-  | { kind: 'working' }
+  /**
+   * In flight, via a named funding route. `via` exists because the in-progress sentence is a
+   * claim about the client's MONEY: "Charging your card…" over a pass booking told a member
+   * their card was being charged for a class their membership covers (Alicia, 2026-08-16).
+   */
+  | { kind: 'working'; via: 'card' | 'pass' | 'credit' }
   | { kind: 'booked' }
   /**
    * The server priced this class differently from what was on screen. NOT an error — nothing was
@@ -270,7 +275,7 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
    */
   const bookOneWithPass = useCallback(
     async (line: CartLine, allowDuplicate = false): Promise<boolean> => {
-      setOutcome(line.eventId, { kind: 'working' });
+      setOutcome(line.eventId, { kind: 'working', via: 'pass' });
 
       try {
         const result = await bookClassWithPass(apiClient, {
@@ -341,7 +346,7 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
       creditCents,
       applyCredit,
     }: BookableItem): Promise<boolean> => {
-      setOutcome(line.eventId, { kind: 'working' });
+      setOutcome(line.eventId, { kind: 'working', via: 'card' });
 
       try {
         if (!publishableKey) {
@@ -512,7 +517,7 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
    */
   const bookOneWithCredit = useCallback(
     async (line: CartLine, totalCents: number, allowDuplicate = false): Promise<boolean> => {
-      setOutcome(line.eventId, { kind: 'working' });
+      setOutcome(line.eventId, { kind: 'working', via: 'credit' });
 
       try {
         const result = await bookClassWithCredit(apiClient, {

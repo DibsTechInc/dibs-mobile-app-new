@@ -153,9 +153,16 @@ function OutcomeNote({
         </View>
       );
     case 'working':
+      // Named by funding route, because this sentence is a claim about the client's money —
+      // "Charging your card…" over a pass booking reads as being billed for a class their
+      // membership covers.
       return (
         <Text variant="caption" color="secondary" style={{ marginTop: theme.spacing.md }}>
-          Charging your card…
+          {outcome.via === 'pass'
+            ? 'Booking with your pass…'
+            : outcome.via === 'credit'
+              ? 'Paying with your studio credit…'
+              : 'Charging your card…'}
         </Text>
       );
     case 'coveredByPass':
