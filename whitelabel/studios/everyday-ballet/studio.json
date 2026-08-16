@@ -36,8 +36,8 @@
     "clarityProjectId": "y3cpunfvqj"
   },
   "legal": {
-    "privacyPolicyUrl": "https://dibsonline.com/privacy-policy",
-    "privacyPolicyLive": false
+    "privacyPolicyUrl": "https://www.dibsonline.com/privacy-policy",
+    "privacyPolicyLive": true
   },
   "api": {
     "url": "https://api.dibsonline.com/api/v2"
