@@ -145,8 +145,13 @@ function DayChip({
  * rendered at numeral size took nearly the whole row and squeezed "STUDIO Beginner BASIC Ballet"
  * into a single character per line, top to bottom (reported on device 2026-08-14). Coverage now
  * lives in the main column where it belongs, and this stops any future label doing the same thing.
+ *
+ * 120, not 96: the cap has to clear the column's own widest content — the "Book again" button —
+ * or it crushes the control it exists to contain. At 96 even "Added" wrapped mid-word
+ * ("Adde / d", reported on device 2026-08-15). The button label is one-line-only now, so an
+ * overflow ellipsizes rather than wraps, but the cap should never be what triggers that.
  */
-const ACTION_COLUMN_MAX = 96;
+const ACTION_COLUMN_MAX = 120;
 
 /**
  * One class.

@@ -83,6 +83,9 @@ export function Button({
   }[variant];
 
   const verticalPadding = size === 'compact' ? theme.spacing.md - 2 : theme.spacing.base - 2;
+  // Compact buttons live inline — in a row's action column, beside other controls — where CTA-scale
+  // padding eats the room the label needs and wraps it ("Adde / d" on the schedule's Added button).
+  const horizontalPadding = size === 'compact' ? theme.spacing.base : theme.spacing.lg;
 
   return (
     <Pressable
@@ -94,7 +97,7 @@ export function Button({
         {
           minHeight: theme.minTapTarget,
           paddingVertical: verticalPadding,
-          paddingHorizontal: theme.spacing.lg,
+          paddingHorizontal: horizontalPadding,
           borderRadius: theme.radii.button,
           borderWidth: surfaces.border === 'transparent' ? 0 : 1,
           borderColor: surfaces.border,
@@ -118,7 +121,9 @@ export function Button({
         ) : (
           icon
         )}
-        <Text variant="button" color={surfaces.textColor}>
+        {/* One line, always. A label that wraps mid-word reads as a broken control; if space truly
+            runs out, an ellipsis is the honest failure and the layout above it is the real bug. */}
+        <Text variant="button" color={surfaces.textColor} numberOfLines={1}>
           {label}
         </Text>
       </View>
