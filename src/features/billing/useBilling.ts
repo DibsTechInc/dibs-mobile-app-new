@@ -16,7 +16,7 @@ export interface BillingState {
   /** True only while BOTH sections are still in the dark. */
   isLoading: boolean;
   isRefreshing: boolean;
-  refresh: () => void;
+  refresh: () => Promise<unknown>;
 }
 
 export function useBilling(): BillingState {
@@ -73,9 +73,6 @@ export function useBilling(): BillingState {
     data,
     isLoading: enabled && data.past.status === 'loading' && data.upcoming.status === 'loading',
     isRefreshing: historyQuery.isFetching || upcomingQuery.isFetching,
-    refresh: () => {
-      void historyQuery.refetch();
-      void upcomingQuery.refetch();
-    },
+    refresh: () => Promise.all([historyQuery.refetch(), upcomingQuery.refetch()]),
   };
 }

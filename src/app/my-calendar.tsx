@@ -23,6 +23,7 @@ import { useDropClass } from '@/features/bookings/useDropClass';
 import { useUpcomingBookings } from '@/features/bookings/useUpcomingBookings';
 import { useAppDrawer } from '@/features/nav/useAppDrawer';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
+import { usePullRefresh } from '@/lib/usePullRefresh';
 
 export default function MyCalendarRoute() {
   const { config, timeZone } = useStudioConfig();
@@ -31,14 +32,8 @@ export default function MyCalendarRoute() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [tab, setTab] = useState<CalendarTab>('upcoming');
   const [cancelling, setCancelling] = useState<BookingListItem | null>(null);
-  /*
-   * True only for a refresh the client PULLED for. `isRefetching` covers every background refetch
-   * too — a cancel invalidates this query, and binding the RefreshControl to that painted a
-   * spinner into the middle of the screen over a list nobody had pulled, which read as the app
-   * being stuck (the 2026-08-16 cancel report). The pull gesture keeps its spinner; background
-   * reconciliation happens without theatre.
-   */
-  const [isPullRefreshing, setIsPullRefreshing] = useState(false);
+  // Pull-only spinner — the same rule every list screen now shares. See usePullRefresh.
+  const pull = usePullRefresh(() => bookings.refetch());
   const drop = useDropClass();
   const drawer = useAppDrawer({ visible: menuOpen, onClose: () => setMenuOpen(false) });
 
@@ -91,11 +86,8 @@ export default function MyCalendarRoute() {
         // `isPending` stays true forever and the screen would spin at a visitor indefinitely.
         isLoading={status === 'signedIn' && bookings.isPending}
         error={bookings.error}
-        isRefreshing={isPullRefreshing}
-        onRefresh={() => {
-          setIsPullRefreshing(true);
-          void bookings.refetch().finally(() => setIsPullRefreshing(false));
-        }}
+        isRefreshing={pull.isRefreshing}
+        onRefresh={pull.onRefresh}
         tab={tab}
         onSelectTab={setTab}
         onBack={onBack}

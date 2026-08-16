@@ -30,10 +30,14 @@ import { useAppDrawer } from '@/features/nav/useAppDrawer';
 import { ScheduleScreen } from '@/features/schedule/ScheduleScreen';
 import { useSchedule } from '@/features/schedule/useSchedule';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
+import { usePullRefresh } from '@/lib/usePullRefresh';
 
 export default function ScheduleRoute() {
   const { config, timeZone } = useStudioConfig();
   const schedule = useSchedule();
+  // The pull gesture keeps its spinner; background refetches (a booking invalidates the
+  // schedule) get no theatre. See usePullRefresh.
+  const pull = usePullRefresh(() => schedule.refetch());
   const cart = useCart();
   // Rows a pass covers read "Included · {pass}" instead of a price, and land in the cart as $0
   // lines that book through `book-with-pass`. One coverage decision, shared by both.
@@ -89,8 +93,8 @@ export default function ScheduleRoute() {
         passes={passes}
         isLoading={schedule.isPending}
         error={schedule.error}
-        isRefreshing={schedule.isRefetching}
-        onRefresh={() => void schedule.refetch()}
+        isRefreshing={pull.isRefreshing}
+        onRefresh={pull.onRefresh}
         onOpenClass={(eventId) => router.push(`/class/${eventId}`)}
         onBookClass={canBook ? toggleInCart : undefined}
         cartEventIds={cartEventIds}

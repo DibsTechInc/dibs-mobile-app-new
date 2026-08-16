@@ -18,7 +18,7 @@ export interface WalletState {
   /** True only while NOTHING has arrived yet — the one moment a full skeleton is honest. */
   isLoading: boolean;
   isRefreshing: boolean;
-  refresh: () => void;
+  refresh: () => Promise<unknown>;
 }
 
 export function useWallet(): WalletState {
@@ -95,10 +95,7 @@ export function useWallet(): WalletState {
       data.credit.status === 'loading' &&
       data.cards.status === 'loading',
     isRefreshing: passesQuery.isFetching || creditQuery.isFetching || savedCards.isFetching,
-    refresh: () => {
-      void passesQuery.refetch();
-      void creditQuery.refetch();
-      savedCards.refresh();
-    },
+    refresh: () =>
+      Promise.all([passesQuery.refetch(), creditQuery.refetch(), savedCards.refresh()]),
   };
 }

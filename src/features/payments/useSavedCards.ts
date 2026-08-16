@@ -21,7 +21,7 @@ export interface SavedCardsState {
   /** At least one of the two Stripe reads failed, so this list may be incomplete. */
   lookupFailed: boolean;
   isFetching: boolean;
-  refresh: () => void;
+  refresh: () => Promise<unknown>;
 }
 
 export function useSavedCards(): SavedCardsState {
@@ -67,6 +67,6 @@ export function useSavedCards(): SavedCardsState {
     hadExpiredCards: merged?.hadExpiredCards ?? false,
     lookupFailed: query.data?.lookupFailed ?? false,
     isFetching: query.isFetching,
-    refresh: () => void query.refetch(),
+    refresh: () => query.refetch(),
   };
 }

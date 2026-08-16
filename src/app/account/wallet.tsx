@@ -23,6 +23,7 @@ import { WalletScreen } from '@/features/account/WalletScreen';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useStripeReadiness } from '@/features/payments/StripeSdkProvider';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
+import { usePullRefresh } from '@/lib/usePullRefresh';
 
 export default function WalletRoute() {
   const { status, account } = useAuth();
@@ -31,6 +32,12 @@ export default function WalletRoute() {
   const [cancelling, setCancelling] = useState<WalletPass | null>(null);
   const cancelMembership = useCancelMembership();
   const stripe = useStripeReadiness();
+  const pull = usePullRefresh(() => {
+    // A failed key fetch is the reason the add-card button is missing, so the gesture that
+    // refreshes the screen also retries it.
+    if (stripe.error) stripe.retry();
+    return wallet.refresh();
+  });
   const { addCard, remove, makeDefault } = useCardActions();
 
   /** The card whose sheet is open. Null closes it. */
@@ -72,13 +79,8 @@ export default function WalletRoute() {
       <WalletScreen
         data={wallet.data}
         studioName={studioName}
-        isRefreshing={wallet.isRefreshing}
-        onRefresh={() => {
-          wallet.refresh();
-          // A failed key fetch is the reason the add-card button is missing, so the gesture that
-          // refreshes the screen should also retry it.
-          if (stripe.error) stripe.retry();
-        }}
+        isRefreshing={pull.isRefreshing}
+        onRefresh={pull.onRefresh}
         onBack={onBack}
         // The pass carries its own package id; without one there is nothing to cancel against.
         onCancelMembership={(pass) => setCancelling(pass)}

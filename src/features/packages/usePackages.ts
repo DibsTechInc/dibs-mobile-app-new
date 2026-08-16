@@ -23,7 +23,7 @@ export interface PackagesState {
   isLoading: boolean;
   isRefreshing: boolean;
   error: unknown;
-  refresh: () => void;
+  refresh: () => Promise<unknown>;
 }
 
 export function usePackages(): PackagesState {
@@ -46,6 +46,6 @@ export function usePackages(): PackagesState {
     isLoading: query.isPending && !query.data,
     isRefreshing: query.isFetching,
     error: query.error,
-    refresh: () => void query.refetch(),
+    refresh: () => query.refetch(),
   };
 }

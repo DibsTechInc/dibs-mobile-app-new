@@ -18,6 +18,7 @@ import { PackagesScreen } from '@/features/packages/PackagesScreen';
 import { usePackages } from '@/features/packages/usePackages';
 import { usePurchasePackage } from '@/features/packages/usePurchasePackage';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
+import { usePullRefresh } from '@/lib/usePullRefresh';
 
 export default function PackagesRoute() {
   const { status } = useAuth();
@@ -30,6 +31,9 @@ export default function PackagesRoute() {
 
   const studioName = config?.studioName ?? studio.appName;
   const isSignedIn = status === 'signedIn';
+  const pull = usePullRefresh(() =>
+    Promise.all([packages.refresh(), isSignedIn ? wallet.refresh() : null]),
+  );
 
   const onBack = useCallback(() => {
     if (router.canGoBack()) router.back();
@@ -52,11 +56,8 @@ export default function PackagesRoute() {
         // Only ever called for a package `buildPackages` marked purchasable, and the figure comes
         // from the card the client just pressed — never re-derived here.
         onBuy={isSignedIn ? (pkg, totalCents) => purchase.buy(pkg.id, totalCents) : undefined}
-        isRefreshing={packages.isRefreshing || wallet.isRefreshing}
-        onRefresh={() => {
-          packages.refresh();
-          if (isSignedIn) wallet.refresh();
-        }}
+        isRefreshing={pull.isRefreshing}
+        onRefresh={pull.onRefresh}
         onBack={onBack}
         onOpenMenu={() => setMenuOpen(true)}
         onSignIn={() => router.push('/sign-in')}
