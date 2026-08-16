@@ -29,13 +29,13 @@
  */
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Pressable, useWindowDimensions, View } from 'react-native';
+import { Image as RNImage, Pressable, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ApiError, describeApiError } from '@/api/errors';
 import { ErrorState, Icon, Text, type IconName } from '@/components';
 import { FadeRise, HeroSettle, useAppOpenEntrance } from '@/components/motion';
-import { bundledHero } from '@/config/studio-assets';
+import { bundledHero, bundledLogo } from '@/config/studio-assets';
 import { useTheme } from '@/theme/ThemeProvider';
 import { motion } from '@/theme/tokens';
 
@@ -119,6 +119,37 @@ function Choice({
         {choice.label}
       </Text>
     </Pressable>
+  );
+}
+
+/**
+ * The studio's mark on a soft near-white plate, sized from the asset's own aspect ratio.
+ *
+ * The plate exists because logos are arbitrary artwork on top of a veiled photograph — see the
+ * comment at the render site. Height is fixed; width follows the mark (clamped to 60% of the
+ * screen so an extreme wordmark cannot crowd the greeting).
+ */
+function LogoPlate({ windowWidth }: { windowWidth: number }) {
+  const theme = useTheme();
+  const resolved = RNImage.resolveAssetSource(bundledLogo);
+  const height = 34;
+  const ratio = resolved?.width && resolved?.height ? resolved.width / resolved.height : 1;
+  const width = Math.min(height * ratio, windowWidth * 0.6);
+
+  return (
+    <View
+      style={{
+        alignSelf: 'flex-start',
+        backgroundColor: 'rgba(255, 255, 255, 0.94)',
+        borderRadius: theme.radii.card,
+        paddingHorizontal: theme.spacing.md,
+        paddingVertical: theme.spacing.sm,
+        marginBottom: theme.spacing.base,
+      }}
+    >
+      {/* Decorative: the greeting block right under it already names the studio for a reader. */}
+      <Image source={bundledLogo} style={{ width, height }} contentFit="contain" accessible={false} />
+    </View>
   );
 }
 
@@ -260,6 +291,17 @@ export function HomeScreen({
           paddingBottom: theme.spacing.lg,
         }}
       >
+        {/*
+          The studio's own mark, above the greeting — the opening screen used to carry the brand
+          only as a caption line, which read as a template with a name filled in (Alicia,
+          2026-08-16: "it just looks a bit mid"). It sits on a soft near-white plate because
+          studio logos are arbitrary artwork, and both live studios' marks are dark ink that
+          would vanish into the veiled photograph; the plate is the one treatment that survives
+          any logo a studio hands us. Sized from the asset's own aspect ratio so a square badge
+          (Carlsbad) and a 6:1 wordmark (Everyday Ballet) each get a plate that fits the mark,
+          never a letterboxed strip.
+        */}
+        <LogoPlate windowWidth={windowWidth} />
         <Text variant="display" color="inverse">
           {greeting}
         </Text>
