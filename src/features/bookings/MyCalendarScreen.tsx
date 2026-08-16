@@ -34,7 +34,7 @@ import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ApiError, describeApiError } from '@/api/errors';
-import { Button, EmptyState, ErrorState, Icon, SkeletonList, StatusTag, Text } from '@/components';
+import { Button, EmptyState, ErrorState, Icon, Skeleton, StatusTag, Text } from '@/components';
 import type { BookingDaySection, BookingListItem } from '@/domain/bookings/group-bookings';
 import { formatStoredTime } from '@/domain/time/studio-now';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -232,6 +232,71 @@ function NextUpCard({
       ) : null}
 
       <CancelAction booking={booking} onCancel={onCancel} />
+    </View>
+  );
+}
+
+/**
+ * The loading state, in this screen's own shape.
+ *
+ * The generic `SkeletonList` here read as BROKEN, not as loading (Alicia, 2026-08-16): four
+ * near-empty outlined cards that look nothing like what the screen becomes — no segments, no
+ * hero, no time rail. A skeleton earns its keep by matching the eventual layout, so this one
+ * mirrors the real anatomy: the segmented pill, the accent-washed NEXT UP field, and two rows
+ * with the schedule's 84pt time rail. The sentence at the bottom is the explicit "something is
+ * happening" signal — a first-ever load against a slow connection can sit here a while, and a
+ * wireframe alone does not say whether anything is in flight.
+ */
+function CalendarSkeleton() {
+  const theme = useTheme();
+
+  return (
+    <View
+      style={{
+        paddingHorizontal: theme.spacing.lg,
+        paddingTop: theme.spacing.lg,
+        gap: theme.spacing.lg,
+      }}
+    >
+      <Skeleton height={44} radius={theme.radii.pill} />
+
+      <View
+        style={{
+          borderRadius: theme.radii.card,
+          borderWidth: 1,
+          borderColor: theme.colors.accentBorder,
+          backgroundColor: theme.colors.accentWash,
+          padding: theme.spacing.lg,
+          gap: theme.spacing.md,
+        }}
+      >
+        {/* Bars go to the page colour here: the default warm-grey surface tone muddies against
+            the accent wash, and white is what the card's own type sits on when it arrives. */}
+        <Skeleton width="40%" height={12} style={{ backgroundColor: theme.colors.background }} />
+        <Skeleton
+          width="55%"
+          height={44}
+          radius={theme.radii.card}
+          style={{ backgroundColor: theme.colors.background }}
+        />
+        <Skeleton width="75%" height={18} style={{ backgroundColor: theme.colors.background }} />
+      </View>
+
+      {[0, 1].map((row) => (
+        <View key={row} style={{ flexDirection: 'row', gap: theme.spacing.md }}>
+          <View style={{ width: TIME_RAIL }}>
+            <Skeleton width={56} height={16} />
+          </View>
+          <View style={{ flex: 1, gap: theme.spacing.sm }}>
+            <Skeleton width="70%" height={16} />
+            <Skeleton width="45%" height={12} />
+          </View>
+        </View>
+      ))}
+
+      <Text variant="caption" color="tertiary" align="center">
+        Loading your classes…
+      </Text>
     </View>
   );
 }
@@ -508,9 +573,7 @@ export function MyCalendarScreen({
         }
       >
         {isLoading ? (
-          <View style={{ padding: theme.spacing.lg }}>
-            <SkeletonList count={4} />
-          </View>
+          <CalendarSkeleton />
         ) : error && hasNothing ? (
           <ErrorState
             message={describeApiError(error)}
