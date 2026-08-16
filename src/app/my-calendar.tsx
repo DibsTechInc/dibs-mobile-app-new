@@ -31,6 +31,14 @@ export default function MyCalendarRoute() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [tab, setTab] = useState<CalendarTab>('upcoming');
   const [cancelling, setCancelling] = useState<BookingListItem | null>(null);
+  /*
+   * True only for a refresh the client PULLED for. `isRefetching` covers every background refetch
+   * too — a cancel invalidates this query, and binding the RefreshControl to that painted a
+   * spinner into the middle of the screen over a list nobody had pulled, which read as the app
+   * being stuck (the 2026-08-16 cancel report). The pull gesture keeps its spinner; background
+   * reconciliation happens without theatre.
+   */
+  const [isPullRefreshing, setIsPullRefreshing] = useState(false);
   const drop = useDropClass();
   const drawer = useAppDrawer({ visible: menuOpen, onClose: () => setMenuOpen(false) });
 
@@ -57,10 +65,11 @@ export default function MyCalendarRoute() {
   const closeCancelSheet = useCallback(() => {
     setCancelling(null);
     // Reset AFTER closing so the sheet does not flash back to the question on its way out.
+    // No refetch here: a successful drop already rewrote the cached row (`useDropClass`) and
+    // invalidated the query, which refetches it. A second one from this handler was a second
+    // identical round trip against the slowest endpoint the app calls.
     drop.reset();
-    // A completed drop leaves this list stale until the invalidated query lands.
-    void bookings.refetch();
-  }, [bookings, drop]);
+  }, [drop]);
 
   const onBack = useCallback(() => {
     // `replace` rather than `back`: arriving from a link there is nothing behind this screen, and
@@ -82,8 +91,11 @@ export default function MyCalendarRoute() {
         // `isPending` stays true forever and the screen would spin at a visitor indefinitely.
         isLoading={status === 'signedIn' && bookings.isPending}
         error={bookings.error}
-        isRefreshing={bookings.isRefetching}
-        onRefresh={() => void bookings.refetch()}
+        isRefreshing={isPullRefreshing}
+        onRefresh={() => {
+          setIsPullRefreshing(true);
+          void bookings.refetch().finally(() => setIsPullRefreshing(false));
+        }}
         tab={tab}
         onSelectTab={setTab}
         onBack={onBack}

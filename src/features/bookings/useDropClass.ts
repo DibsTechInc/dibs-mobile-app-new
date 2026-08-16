@@ -7,9 +7,10 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 
-import { apiClient, dropClass, queryKeys, BookingRefusedError } from '@/api';
+import { apiClient, dropClass, queryKeys, BookingRefusedError, type ClientBookings } from '@/api';
 import { describeApiError } from '@/api/errors';
 import type { DropClassResponse } from '@/api/schemas/class-booking';
+import type { UpcomingBookingRow } from '@/api/schemas/upcoming';
 import { studio } from '@/config/studio';
 import { useAuth } from '@/features/auth/AuthProvider';
 
@@ -39,6 +40,32 @@ export function useDropClass(): DropClassState {
         try {
           const result = await dropClass(apiClient, booking);
           setStatus({ kind: 'done', result });
+
+          /*
+           * The row leaves the list NOW, from the cache — not when the refetch lands.
+           *
+           * This is not a guess: the server has just confirmed the drop, so marking the cached row
+           * `dropped` is writing a fact we hold. Without it the cancelled class sat on My Calendar
+           * for the whole `get-upcoming-appts` round trip — a slow legacy handler, tens of seconds
+           * on staging — looking exactly like a cancel that had not worked (Alicia, 2026-08-16:
+           * "is it happening? is it broken?"). The invalidation below still reconciles with the
+           * server's own answer when it arrives.
+           */
+          if (account) {
+            const markDropped = (rows: UpcomingBookingRow[]) =>
+              rows.map((row) =>
+                row.dibsTransactionId === booking.dibsTransactionId
+                  ? { ...row, dropped: true }
+                  : row,
+              );
+            queryClient.setQueryData<ClientBookings>(
+              queryKeys.upcoming(account.userid, studio.dibsStudioId),
+              (cached) =>
+                cached
+                  ? { upcoming: markDropped(cached.upcoming), previous: markDropped(cached.previous) }
+                  : cached,
+            );
+          }
 
           // Everything a drop can move. The pass balance in particular: a returned use that leaves
           // the wallet showing the old count is the widget's "Included label disagrees with the
