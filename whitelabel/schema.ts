@@ -202,6 +202,22 @@ export const studioConfigSchema = z.object({
     email: z.string().email(),
   }),
 
+  /**
+   * Session analytics, per studio app.
+   *
+   * `clarityProjectId` is the Microsoft Clarity project this binary reports into — one project
+   * per studio app, the same way the widget and studio-admin each have their own, so a studio's
+   * recordings are never mixed with another studio's. ABSENT means the Clarity SDK never
+   * initialises: the integration is dormant until somebody creates the project at
+   * clarity.microsoft.com and records its id here. Store note: an ACTIVE id makes the app
+   * collect usage analytics, which must be declared in the App Store privacy answers.
+   */
+  analytics: z
+    .object({
+      clarityProjectId: z.string().min(1).optional(),
+    })
+    .default({}),
+
   legal: z.object({
     /** Required on every store listing. */
     privacyPolicyUrl: z.string().url().optional(),

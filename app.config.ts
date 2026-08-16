@@ -240,6 +240,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         heroSource: studio.assets.heroSource,
         supportEmail: studio.support.email,
         privacyPolicyUrl: studio.legal.privacyPolicyUrl ?? null,
+        // Null keeps the Clarity SDK dormant — see `analytics` in whitelabel/schema.ts.
+        clarityProjectId: studio.analytics.clarityProjectId ?? null,
         // EXPO_PUBLIC_API_URL wins in development so a simulator, an emulator and a device on
         // the LAN can each point somewhere different without editing studio.json.
         apiUrl: devApiUrl ?? studio.api.url,

@@ -43,6 +43,13 @@ export interface StudioIdentity {
   heroSource: 'bundled' | 'remote';
   supportEmail: string;
   privacyPolicyUrl: string | null;
+  /**
+   * The Microsoft Clarity project this binary records sessions into, or null for none.
+   *
+   * Null is the OFF switch: `ClarityIntegration` never initialises the SDK without it, so a
+   * studio ships with recordings only when their studio.json deliberately carries a project id.
+   */
+  clarityProjectId: string | null;
   apiUrl: string;
 }
 

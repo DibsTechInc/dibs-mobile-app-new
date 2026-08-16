@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { queryClient } from '@/api/query-client';
+import { ClarityIntegration } from '@/features/analytics/ClarityIntegration';
 import { AppReleaseGate } from '@/features/app-release/AppReleaseGate';
 import { AuthProvider } from '@/features/auth/AuthProvider';
 import { installAuthBridge } from '@/features/auth/bridge';
@@ -58,6 +59,9 @@ export default function RootLayout() {
                     any of them lands on data, not a skeleton. Renders nothing; failures are
                     silent — every screen keeps its own loading and error states. */}
                 <AppWarmup />
+                {/* Session recordings. Dormant unless this studio's studio.json carries a
+                    Clarity project id — see ClarityIntegration. */}
+                <ClarityIntegration />
                 {/* Light content throughout: v1 has no dark mode, and the background is always light. */}
                 <StatusBar style="dark" />
               </>
