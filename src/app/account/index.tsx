@@ -52,9 +52,11 @@ export default function AccountRoute() {
     if (credit.status === 'loading' && passes.status === 'loading') return null;
 
     const rows: AccountBalance[] = [];
-    if (credit.label) rows.push({ label: 'Credit balance', value: credit.label });
+    if (credit.label) rows.push({ key: 'credit', label: 'Credit balance', value: credit.label });
     for (const pass of passes.items) {
+      // Keyed by the pass id — two purchases of the same package share a label.
       rows.push({
+        key: `pass-${pass.id}`,
         label: pass.name,
         detail: pass.expiresLabel ?? undefined,
         value: pass.remainingLabel,

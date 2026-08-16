@@ -49,9 +49,11 @@ export function useAppDrawer({ visible, onClose }: AppDrawerArgs) {
     if (credit.status === 'loading' && passes.status === 'loading') return null;
 
     const rows: DrawerBalance[] = [];
-    if (credit.label) rows.push({ label: 'Credit balance', value: credit.label });
+    if (credit.label) rows.push({ key: 'credit', label: 'Credit balance', value: credit.label });
     for (const pass of passes.items) {
-      rows.push({ label: pass.name, value: pass.remainingLabel });
+      // Keyed by the pass id, never the name — two purchases of the same package are two rows
+      // with identical labels, and React must still tell them apart.
+      rows.push({ key: `pass-${pass.id}`, label: pass.name, value: pass.remainingLabel });
     }
     return rows;
   }, [isSignedIn, wallet.data]);

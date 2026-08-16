@@ -30,6 +30,11 @@ export interface AccountRow {
 }
 
 export interface AccountBalance {
+  /**
+   * Stable render key — the pass id, never the label. Two purchases of the same package are two
+   * rows with identical labels, and keying on the label made React drop one (2026-08-16).
+   */
+  key: string;
   label: string;
   /** A second, quieter line under the label — an expiry date, never a restatement. */
   detail?: string;
@@ -169,7 +174,7 @@ export function AccountScreen({
           >
             {balances.map((balance, index) => (
               <View
-                key={balance.label}
+                key={balance.key}
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'space-between',
