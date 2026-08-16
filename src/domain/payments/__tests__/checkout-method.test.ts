@@ -57,14 +57,17 @@ describe('describeCheckoutPayment', () => {
     expect(result.needsCard).toBe(true);
   });
 
-  it('never mentions a card for a pass-only cart', () => {
+  it('says the whole thing in ONE line for a pass-only cart', () => {
+    // The screen used to stack a centred "Covered by your pass — nothing to pay." above a
+    // left-aligned "Paying with your Unlimited Test" — the same fact twice in two alignments.
+    // This line is now the only payment statement a pass-only cart renders.
     const result = describeCheckoutPayment({
       ...base,
       coveredCount: 1,
       passNames: ['10-class Package'],
     });
 
-    expect(result.label).toBe('Paying with your 10-class Package');
+    expect(result.label).toBe('Covered by your 10-class Package — nothing to pay.');
     expect(result.caption).toBeNull();
     expect(result.needsCard).toBe(false);
   });
@@ -76,7 +79,7 @@ describe('describeCheckoutPayment', () => {
       passNames: ['10-class Package'],
     });
 
-    expect(result.label).toBe('Paying with your 10-class Package');
+    expect(result.label).toBe('Covered by your 10-class Package — nothing to pay.');
     expect(result.caption).toBe('Covers all 3 classes.');
   });
 
@@ -111,11 +114,11 @@ describe('describeCheckoutPayment', () => {
     expect(
       describeCheckoutPayment({ ...base, coveredCount: 2, passNames: ['5 Pack', 'Month Unlimited'] })
         .label,
-    ).toBe('Paying with your 5 Pack and Month Unlimited');
+    ).toBe('Covered by your 5 Pack and Month Unlimited — nothing to pay.');
 
     expect(
       describeCheckoutPayment({ ...base, coveredCount: 3, passNames: ['A', 'B', 'C'] }).label,
-    ).toBe('Paying with your passes');
+    ).toBe('Covered by your passes — nothing to pay.');
   });
 
   it('says nothing at all for an empty cart', () => {

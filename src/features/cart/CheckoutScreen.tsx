@@ -627,19 +627,15 @@ export function CheckoutScreen({
             gap: theme.spacing.md,
           }}
         >
+          {/* No Total row for a pass-only cart: "Total $0.00" is a money line about a transaction
+              that is not happening. The payment line below carries the whole statement instead —
+              "Covered by your Unlimited Test — nothing to pay." One sentence, one alignment; it
+              used to be said twice (a centred version here AND the payment line under it). */}
           {chargeableCount > 0 ? (
             <View style={priceRow}>
               <Text variant="heading">Total</Text>
               <Text variant="numeral">{totalLabel}</Text>
             </View>
-          ) : coveredCount > 0 ? (
-            // No Total row for a pass-only cart. "Total $0.00" is a money line about a transaction
-            // that is not happening, and it reads as though something might still be charged.
-            <Text variant="secondary" color="secondary" align="center">
-              {coveredCount === 1
-                ? 'Covered by your pass — nothing to pay.'
-                : `All ${coveredCount} covered by your passes — nothing to pay.`}
-            </Text>
           ) : null}
 
           {/*

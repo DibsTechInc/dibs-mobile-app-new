@@ -78,8 +78,12 @@ export function describeCheckoutPayment({
   // ── Nothing but passes. No card is involved, so no card is mentioned. ──────────────────────
   if (chargeableCount === 0) {
     if (coveredCount === 0) return { label: null, caption: null, needsCard: false };
+    // The WHOLE statement for a pass-only cart, in one line. The screen used to stack a centred
+    // "Covered by your pass — nothing to pay." above a left-aligned "Paying with your Unlimited
+    // Test" — the same fact twice in two alignments (Alicia, 2026-08-16). This names the pass AND
+    // says what it means for their money, and the screen renders nothing else about payment.
     return {
-      label: `Paying with ${passes}`,
+      label: `Covered by ${passes} — nothing to pay.`,
       caption: coveredCount === 1 ? null : `Covers all ${coveredCount} classes.`,
       needsCard: false,
     };
