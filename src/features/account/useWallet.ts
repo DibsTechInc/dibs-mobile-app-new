@@ -44,8 +44,9 @@ export function useWallet(): WalletState {
       fetchCredit(apiClient, { userid: userid!, dibsStudioId: studio.dibsStudioId }, signal),
     enabled,
     // Displayed from here; never SPENT from here — checkout re-reads the balance server-side,
-    // because credit can be spent from another device between screens.
-    staleTime: 60 * 1000,
+    // because credit can be spent from another device between screens. 30s, matching
+    // `useCreditBalance` — same query key, so the two must agree on one staleness contract.
+    staleTime: 30 * 1000,
   });
 
   const savedCards = useSavedCards();

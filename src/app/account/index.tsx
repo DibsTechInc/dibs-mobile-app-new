@@ -19,6 +19,7 @@ import { useWallet } from '@/features/account/useWallet';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useAppDrawer } from '@/features/nav/useAppDrawer';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
+import { usePullRefresh } from '@/lib/usePullRefresh';
 
 export default function AccountRoute() {
   const { status, account, signOut } = useAuth();
@@ -28,6 +29,9 @@ export default function AccountRoute() {
   const [deleting, setDeleting] = useState(false);
   const deletion = useDeleteAccount();
   const drawer = useAppDrawer({ visible: menuOpen, onClose: () => setMenuOpen(false) });
+  // The balances above the rows are the whole point of this screen — a pull must re-ask for them.
+  // `wallet.refresh` refetches passes, credit and cards, bypassing staleTime.
+  const pull = usePullRefresh(wallet.refresh);
 
   const studioName = config?.studioName ?? studio.appName;
 
@@ -153,6 +157,8 @@ export default function AccountRoute() {
         onDeleteAccount={() => setDeleting(true)}
         onBack={onBack}
         onOpenMenu={() => setMenuOpen(true)}
+        isRefreshing={pull.isRefreshing}
+        onRefresh={pull.onRefresh}
       />
       <DeleteAccountSheet
         visible={deleting}

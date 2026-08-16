@@ -243,7 +243,14 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
    * row would claim the OTHER bookings don't exist, and the refetch covers that case anyway.
    */
   const addToCalendarCache = useCallback(
-    (line: CartLine, booked: { transactionId: number | null; serviceName: string | null }) => {
+    (
+      line: CartLine,
+      booked: {
+        transactionId: number | null;
+        serviceName: string | null;
+        paidWithLabel?: string | null;
+      },
+    ) => {
       if (!account || !line.entry) return;
       const row: UpcomingBookingRow = {
         eventid: line.eventId,
@@ -253,6 +260,9 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
         dropped: false,
         checkedin: false,
         serviceName: booked.serviceName,
+        // The same sentence the server will derive for this row, so the sketch and the refetched
+        // truth read identically ("Booked with studio credit" / "Paid by card").
+        paidWithLabel: booked.paidWithLabel ?? null,
         // Null is honest when the response did not carry one — the row renders without a Cancel
         // affordance until the refetch supplies the real id, rather than posting NaN at the
         // drop endpoint.
@@ -346,7 +356,17 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
       creditCents,
       applyCredit,
     }: BookableItem): Promise<boolean> => {
-      setOutcome(line.eventId, { kind: 'working', via: 'card' });
+      // Named from the split we already hold: "Charging your card…" over a fully-credit-covered
+      // line is a claim the client's card is being billed when it never will be. `run` routes
+      // those lines to the credit path before this is reached; this guard covers any caller that
+      // does not.
+      setOutcome(line.eventId, {
+        kind: 'working',
+        via:
+          applyCredit === true && (creditCents ?? 0) > 0 && (creditCents ?? 0) >= totalCents
+            ? 'credit'
+            : 'card',
+      });
 
       try {
         if (!publishableKey) {
@@ -411,6 +431,7 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
         addToCalendarCache(line, {
           transactionId: confirmed.redemptionTransactionId ?? null,
           serviceName: null,
+          paidWithLabel: applyCredit === true && (creditCents ?? 0) > 0 ? null : 'Paid by card',
         });
         return true;
       } catch (error) {
@@ -534,6 +555,7 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
         addToCalendarCache(line, {
           transactionId: result.transactionId ?? null,
           serviceName: null,
+          paidWithLabel: 'Booked with studio credit',
         });
         return true;
       } catch (error) {
@@ -563,6 +585,24 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
             });
             return false;
           }
+          /*
+           * Reachable now that `run` sends credit-covered lines here FIRST — before, this path was
+           * only entered via the card endpoint's handoff, which had already run both of these
+           * gates. A pass that covers the class books down the pass path instead of burning
+           * credit (same self-heal as the card path's `covered_by_pass`); a price change is a
+           * re-render, not a failure.
+           */
+          if (error.refusalCode === 'covered_by_pass') {
+            return bookOneWithPass(line, allowDuplicate);
+          }
+          if (error.refusalCode === 'price_changed' && error.breakdown) {
+            setOutcome(line.eventId, {
+              kind: 'priceChanged',
+              charge: chargeFromServerBreakdown(error.breakdown, currency),
+              message: error.message,
+            });
+            return false;
+          }
           if (PERMANENT_REFUSALS.has(error.refusalCode ?? '')) {
             setOutcome(line.eventId, { kind: 'unavailable', message: error.message });
             return false;
@@ -587,7 +627,7 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
         return false;
       }
     },
-    [addToCalendarCache, setOutcome, bookOne],
+    [addToCalendarCache, bookOneWithPass, currency, setOutcome, bookOne],
   );
 
 
@@ -614,10 +654,21 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
           try {
             // Pass-covered lines book through a different endpoint and open no sheet. Ordered by
             // the CALLER, which puts them first — see `bookableItems` in the checkout route.
+            // Credit-covered lines likewise go straight to the credit endpoint: routing them
+            // through the card path just bounces off `credit_covers_class` one round trip later,
+            // with "Charging your card…" on screen the whole time. The server still owns the
+            // split — a balance that shrank underneath us refuses `insufficient_credit`, and that
+            // handler falls back to the card path.
+            const creditCovers =
+              item.applyCredit === true &&
+              (item.creditCents ?? 0) > 0 &&
+              (item.creditCents ?? 0) >= item.totalCents;
             const succeeded =
               item.line.state === 'covered'
                 ? await bookOneWithPass(item.line, item.allowDuplicate === true)
-                : await bookOne(item);
+                : creditCovers
+                  ? await bookOneWithCredit(item.line, item.totalCents, item.allowDuplicate === true)
+                  : await bookOne(item);
             if (succeeded) booked += 1;
           } catch {
             // The only throw that reaches here is a sheet dismissal. Everything still pending is
@@ -644,11 +695,23 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
             void queryClient.invalidateQueries({
               queryKey: queryKeys.passes(account.userid, studio.dibsStudioId),
             });
+            // A booking can SPEND credit, and the drop path already invalidates this — without it
+            // the Account screen shows the pre-booking balance for a full staleTime window.
+            void queryClient.invalidateQueries({
+              queryKey: queryKeys.credit(account.userid, studio.dibsStudioId),
+            });
+            // The Payments screen must show the charge that just happened.
+            void queryClient.invalidateQueries({
+              queryKey: queryKeys.accountActivity(account.userid, studio.dibsStudioId),
+            });
+            void queryClient.invalidateQueries({
+              queryKey: queryKeys.upcomingPayments(account.userid, studio.dibsStudioId),
+            });
           }
         }
       })();
     },
-    [account, bookOne, bookOneWithPass, queryClient],
+    [account, bookOne, bookOneWithCredit, bookOneWithPass, queryClient],
   );
 
   const clearBooked = useCallback(() => {

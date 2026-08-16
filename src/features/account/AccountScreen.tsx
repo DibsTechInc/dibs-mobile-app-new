@@ -14,7 +14,7 @@
  * whose destinations exist. There is no tab bar — a back chevron returns, the drawer moves
  * sideways.
  */
-import { Pressable, ScrollView, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon, Skeleton, Text, type IconName } from '@/components';
@@ -94,6 +94,9 @@ export interface AccountScreenProps {
   onDeleteAccount?: () => void;
   onBack: () => void;
   onOpenMenu?: () => void;
+  /** Pull-to-refresh, spinner answering only to the pull — see `usePullRefresh`. */
+  isRefreshing?: boolean;
+  onRefresh?: () => void;
 }
 
 export function AccountScreen({
@@ -106,6 +109,8 @@ export function AccountScreen({
   onDeleteAccount,
   onBack,
   onOpenMenu,
+  isRefreshing,
+  onRefresh,
 }: AccountScreenProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
@@ -150,6 +155,15 @@ export function AccountScreen({
           paddingTop: theme.spacing.sm,
           paddingBottom: insets.bottom + theme.spacing.xxl,
         }}
+        refreshControl={
+          onRefresh ? (
+            <RefreshControl
+              refreshing={isRefreshing ?? false}
+              onRefresh={onRefresh}
+              tintColor={theme.colors.textSecondary}
+            />
+          ) : undefined
+        }
       >
         <Text variant="display">{name ?? 'Your account'}</Text>
         {email ? (
