@@ -112,7 +112,9 @@ describe('past rows — shapes captured from a real staging response, not guesse
     ).past.items[0];
 
   it('titles a class booking from primary.eventName', () => {
-    expect(row({ activityType: 'class_booked', primary: { eventName: 'STUDIO Mixed Intermediate' } }).title)
+    // An amount because a card-paid booking is the only class row that belongs here — see the
+    // "only rows that moved money" describe below.
+    expect(row({ activityType: 'class_booked', amount: 40.76, primary: { eventName: 'STUDIO Mixed Intermediate' } }).title)
       .toBe('STUDIO Mixed Intermediate');
   });
 
@@ -122,7 +124,7 @@ describe('past rows — shapes captured from a real staging response, not guesse
   });
 
   it('titles a credit movement from primary.itemName', () => {
-    expect(row({ activityType: 'credit_used', primary: { itemName: 'Credit applied to 10-class Package' } }).title)
+    expect(row({ activityType: 'credit_used', amount: 25, primary: { itemName: 'Credit applied to 10-class Package' } }).title)
       .toBe('Credit applied to 10-class Package');
   });
 
@@ -133,15 +135,13 @@ describe('past rows — shapes captured from a real staging response, not guesse
       .toMatchObject({ amountLabel: '+$100.00', isCredit: true });
   });
 
-  it('shows no amount for a NEUTRAL row', () => {
-    // A $0 comped session collected nothing. "$0.00" would read as a charge that happened.
-    expect(row({ activityType: 'session_payment_collected', amount: 0, amountSign: 'neutral',
-      primary: { eventName: 'STUDIO Advanced BEGINNER Ballet' } }).amountLabel).toBeNull();
-  });
-
-  it('shows no amount for a pass redemption', () => {
-    expect(row({ activityType: 'class_booked', amount: 0, amountSign: 'debit',
-      primary: { eventName: 'Ballet' } }).amountLabel).toBeNull();
+  it('drops a NEUTRAL row — a $0 comped collection is not a payment', () => {
+    const items = buildBillingData(
+      input({ history: { data: { rows: [{ id: 'txn_1', activityType: 'session_payment_collected',
+        amount: 0, amountSign: 'neutral', primary: { eventName: 'STUDIO Advanced BEGINNER Ballet' } }] },
+        isPending: false, error: null } }),
+    ).past.items;
+    expect(items).toHaveLength(0);
   });
 
   it('states a partial refund ALONGSIDE the amount rather than netting it', () => {
@@ -166,11 +166,43 @@ describe('past rows — shapes captured from a real staging response, not guesse
   });
 
   it('never titles a row "undefined", even for an activityType we have never seen', () => {
-    expect(row({ activityType: 'some_new_thing' }).title).toBe('some new thing');
-    expect(row({}).title).toBe('Activity');
+    expect(row({ activityType: 'some_new_thing', amount: 10 }).title).toBe('some new thing');
+    expect(row({ amount: 10 }).title).toBe('Activity');
   });
 
   it('tolerates a missing date rather than rendering Invalid Date', () => {
     expect(row({ amount: 10 }).dateLabel).toBeNull();
+  });
+});
+
+describe('only rows that moved money reach the Payments screen', () => {
+  /**
+   * The endpoint is the full activity timeline; most of a pass-holder's rows are bookings whose
+   * redemption moved no money. On a screen titled Payments those rendered as name-and-date rows
+   * that read as payments with their amounts missing (2026-08-16). Bookings live in My Calendar;
+   * this screen keeps what a bank statement would.
+   */
+  const itemsFor = (rows: Record<string, unknown>[]) =>
+    buildBillingData(
+      input({ history: { data: { rows }, isPending: false, error: null } }),
+    ).past.items;
+
+  it('drops a $0 pass-redemption booking and keeps the purchases around it', () => {
+    const items = itemsFor([
+      { id: 'txn_1', activityType: 'class_booked', amount: 0, amountSign: 'debit',
+        primary: { eventName: 'Ballet', passUsed: { id: 9, name: '10-class Package' } } },
+      { id: 'txn_2', activityType: 'pass_purchased', amount: 303.05, amountSign: 'debit',
+        primary: { packageName: '10-class Package' } },
+      { id: 'crdt_3', activityType: 'credit_adjustment', amount: 45.98, amountSign: 'credit',
+        primary: { itemName: 'Credit back from a cancelled class' } },
+    ]);
+    expect(items.map((item) => item.key)).toEqual(['txn_2', 'crdt_3']);
+  });
+
+  it('keeps a refund-only row even though its amount is zero', () => {
+    // The refund line is the whole point of showing it.
+    const items = itemsFor([{ id: 'txn_1', amount: 0, refundedAmount: 45.98 }]);
+    expect(items).toHaveLength(1);
+    expect(items[0].refundLabel).toBe('$45.98 refunded');
   });
 });

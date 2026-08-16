@@ -78,42 +78,62 @@ export interface BuildBillingInput {
   currency?: string;
 }
 
+/**
+ * Does this activity row belong on a screen called PAYMENTS?
+ *
+ * The endpoint is the full event timeline, and most of a pass-holder's rows are bookings that
+ * moved no money — the redemption row of a class covered by their pack carries $0 by design. On
+ * the Payments screen those rendered as bare name-and-date rows that looked like payments with
+ * their amounts missing (Alicia, 2026-08-16: "Not showing the dollar amount of payments"). They
+ * are not payments; they live in My Calendar. Kept here: anything that moved money in either
+ * direction, and anything carrying a refund — a refund-only row's amount can be 0 while the
+ * refund line is the whole point of showing it.
+ */
+function movedMoney(row: AccountActivityRow): boolean {
+  const amount = typeof row.amount === 'number' ? row.amount : null;
+  const refunded = typeof row.refundedAmount === 'number' ? row.refundedAmount : 0;
+  const sign = row.amountSign ?? 'debit';
+  return (amount !== null && amount !== 0 && sign !== 'neutral') || refunded > 0;
+}
+
 export function buildBillingData({
   history,
   upcoming,
   timeZone,
   currency = 'USD',
 }: BuildBillingInput): BillingData {
-  const pastItems = (history.data?.rows ?? []).map<BillingHistoryItem>((row, index) => {
-    const amount = typeof row.amount === 'number' ? row.amount : null;
-    const refunded = typeof row.refundedAmount === 'number' ? row.refundedAmount : 0;
-    // A partially-refunded purchase stays a PURCHASE with a refund note — the server hydrates
-    // refunds onto the row rather than emitting a separate one, and flipping it would
-    // double-count the same money.
-    const isFullyRefunded = refunded > 0 && amount !== null && refunded >= amount;
+  const pastItems = (history.data?.rows ?? [])
+    .filter(movedMoney)
+    .map<BillingHistoryItem>((row, index) => {
+      const amount = typeof row.amount === 'number' ? row.amount : null;
+      const refunded = typeof row.refundedAmount === 'number' ? row.refundedAmount : 0;
+      // A partially-refunded purchase stays a PURCHASE with a refund note — the server hydrates
+      // refunds onto the row rather than emitting a separate one, and flipping it would
+      // double-count the same money.
+      const isFullyRefunded = refunded > 0 && amount !== null && refunded >= amount;
 
-    // Direction comes from `amountSign`, not the sign of `amount` — every amount is positive and
-    // a comp credit ADDED is 'credit'. 'neutral' rows (a $0 comped session) moved no money.
-    const sign = row.amountSign ?? 'debit';
-    const hasMoney = amount !== null && amount !== 0 && sign !== 'neutral';
+      // Direction comes from `amountSign`, not the sign of `amount` — every amount is positive and
+      // a comp credit ADDED is 'credit'. 'neutral' rows (a $0 comped session) moved no money.
+      const sign = row.amountSign ?? 'debit';
+      const hasMoney = amount !== null && amount !== 0 && sign !== 'neutral';
 
-    return {
-      key: `${row.id ?? `row-${index}`}`,
-      title: titleFor(row),
-      // A real instant, read back in the studio's zone — not printed verbatim.
-      dateLabel: row.occurredAt ? formatInstantInStudioZone(row.occurredAt, timeZone) : null,
-      amountLabel: !hasMoney
-        ? null
-        : sign === 'credit'
-          ? `+${formatBalance(amount as number, currency)}`
-          : formatBalance(amount as number, currency),
-      // Stated separately rather than by negating the amount: "$45.98" with "$10.00 refunded"
-      // under it is the truth; "−$35.98" is a number that appears on no statement.
-      refundLabel: refunded > 0 ? `${formatBalance(refunded, currency)} refunded` : null,
-      isRefund: isFullyRefunded,
-      isCredit: sign === 'credit',
-    };
-  });
+      return {
+        key: `${row.id ?? `row-${index}`}`,
+        title: titleFor(row),
+        // A real instant, read back in the studio's zone — not printed verbatim.
+        dateLabel: row.occurredAt ? formatInstantInStudioZone(row.occurredAt, timeZone) : null,
+        amountLabel: !hasMoney
+          ? null
+          : sign === 'credit'
+            ? `+${formatBalance(amount as number, currency)}`
+            : formatBalance(amount as number, currency),
+        // Stated separately rather than by negating the amount: "$45.98" with "$10.00 refunded"
+        // under it is the truth; "−$35.98" is a number that appears on no statement.
+        refundLabel: refunded > 0 ? `${formatBalance(refunded, currency)} refunded` : null,
+        isRefund: isFullyRefunded,
+        isCredit: sign === 'credit',
+      };
+    });
 
   const upcomingItems = (upcoming.data?.renewals ?? []).map<UpcomingPaymentItem>((renewal) => {
     // Epoch SECONDS from Stripe. Null is a real answer and gets its own sentence — never a
