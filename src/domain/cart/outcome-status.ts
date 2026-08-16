@@ -18,7 +18,7 @@
  * the button again could produce a different answer.
  *
  * Lines that stop counting do NOT disappear. They keep their explanation and their own action —
- * "Book another spot" for a duplicate, Remove for an unavailable one. Silently dropping a line
+ * the add-another-spot yes/no for a duplicate, Remove for an unavailable one. Silently dropping a line
  * from a cart is worse than leaving a line that says why.
  */
 

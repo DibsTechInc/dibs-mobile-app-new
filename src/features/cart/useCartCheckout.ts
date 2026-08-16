@@ -152,7 +152,7 @@ export interface BookableItem {
   /**
    * Book a SECOND spot in a class the client already holds one in.
    *
-   * True ONLY on a run the client started by tapping "Book another spot" on a line that had come
+   * True ONLY on a run the client started by answering "Yes, add a spot" on a line that had come
    * back `already_booked`. It is deliberately per-item rather than per-run: a cart of three where
    * one line is a duplicate must not silently license duplicates on the other two.
    */

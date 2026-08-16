@@ -89,10 +89,13 @@ const priceRow = {
 function OutcomeNote({
   outcome,
   onBookAnother,
+  onDecline,
 }: {
   outcome: LineOutcome;
   /** Absent while a run is in flight, so a second tap cannot open a second sheet. */
   onBookAnother?: () => void;
+  /** "No" to the second-spot question — takes the line out of the cart. Same in-flight guard. */
+  onDecline?: () => void;
 }) {
   const theme = useTheme();
 
@@ -110,29 +113,41 @@ function OutcomeNote({
      * trying again could only ever produce the same refusal, because the server counts attendee
      * rows and nothing about tapping changes that. A wall dressed as a retry.
      *
-     * It is a question instead. Booking a second spot is legitimate and common (a friend, a
-     * partner, a child), so the line states the fact in a neutral voice and offers the one action
-     * that actually moves: book another. Nothing is assumed — the duplicate permission is minted
-     * by this tap and nothing else.
+     * So it is an explicit question, in three parts (Alicia, 2026-08-15 — the earlier statement +
+     * lone "Book another spot" button left her unsure whether anything had just been booked):
+     * first the plain fact that NOTHING new was booked, then the question, then a yes and a no
+     * that each do exactly what they say. "Yes" books a second spot — legitimate and common (a
+     * friend, a partner, a child) — and the duplicate permission is minted by that tap and nothing
+     * else. "No" takes the line out of the cart, because a question answered "no" should not leave
+     * its subject sitting in the cart asking again.
      */
     case 'alreadyBooked':
       return (
         <View style={{ marginTop: theme.spacing.md, gap: theme.spacing.md }}>
           <Text variant="secondary" color="secondary">
             {outcome.existingCount && outcome.existingCount > 1
-              ? `You already have ${outcome.existingCount} spots in this class.`
-              : 'You’re already booked into this class.'}{' '}
-            Booking again adds another spot — useful if you’re bringing someone.
+              ? `You already have ${outcome.existingCount} spots in this class, so nothing new was booked.`
+              : 'You’re already booked into this class, so nothing new was booked.'}
           </Text>
+          <Text variant="bodyMedium">Do you want to add another spot?</Text>
           {onBookAnother ? (
-            <View style={{ alignSelf: 'flex-start' }}>
+            <View style={{ flexDirection: 'row', gap: theme.spacing.sm }}>
               <Button
-                label="Book another spot"
+                label="Yes, add a spot"
                 variant="secondary"
                 size="compact"
                 fullWidth={false}
                 onPress={onBookAnother}
               />
+              {onDecline ? (
+                <Button
+                  label="No thanks"
+                  variant="secondary"
+                  size="compact"
+                  fullWidth={false}
+                  onPress={onDecline}
+                />
+              ) : null}
             </View>
           ) : null}
         </View>
@@ -340,7 +355,13 @@ function LineCard({
         </Text>
       ) : null}
 
-      <OutcomeNote outcome={line.outcome} onBookAnother={onBookAnother} />
+      <OutcomeNote
+        outcome={line.outcome}
+        onBookAnother={onBookAnother}
+        // The "No" answer removes the line, so it shares Remove's own guard: never while a run is
+        // in flight, and never on a line that already booked.
+        onDecline={removable ? onRemove : undefined}
+      />
     </View>
   );
 }
@@ -643,14 +664,19 @@ export function CheckoutScreen({
           ) : null}
 
           {/*
-            The credit switch. Shown only when there IS a balance and something to spend it on —
-            an off switch for money the client does not have is noise, and one on an empty cart
-            controls nothing.
+            The credit switch. Shown only when there IS a balance and a CHARGE it could offset —
+            an off switch for money the client does not have is noise, and one on a cart that is
+            entirely pass-covered controls nothing: covered lines cost $0 and consume no credit,
+            so rendering the switch there implies credit is about to be spent when it is not
+            (reported on device 2026-08-15, beside "Covered by your pass — nothing to pay").
+
+            `chargeableCount`, not `bookableCount`: pass coverage is what makes a line covered, so
+            toggling credit can never change this condition out from under the switch mid-tap.
 
             Default ON, decided by the route. This is the affordance for the real intention the
             default cannot serve: keeping the balance for something else.
           */}
-          {creditBalanceCents > 0 && bookableCount > 0 && onApplyCreditChange ? (
+          {creditBalanceCents > 0 && chargeableCount > 0 && onApplyCreditChange ? (
             <Pressable
               onPress={() => onApplyCreditChange(!applyCredit)}
               accessibilityRole="switch"
@@ -688,11 +714,17 @@ export function CheckoutScreen({
             </Text>
           ) : bookableCount === 0 ? (
             // Nothing left the button could act on. Each line above says why and keeps its own
-            // action — an already-booked line has "Book another spot", the rest have Remove — so
+            // action — an already-booked line asks its yes/no question, the rest have Remove — so
             // there is deliberately no primary button here to give them a false one.
             <Text variant="secondary" color="secondary" align="center">
               {lines.some((line) => line.outcome.kind === 'alreadyBooked')
-                ? 'Nothing more to book — you’re already in these classes.'
+                ? // States the outcome, not a riddle. "Nothing more to book — you're already in
+                  // these classes" left Alicia unsure whether her tap had booked anything
+                  // (2026-08-15); this answers that question and defers the decision to the
+                  // yes/no on the card above.
+                  lines.filter((line) => line.outcome.kind === 'alreadyBooked').length === 1
+                  ? 'Nothing new was booked — you already have a spot in this class.'
+                  : 'Nothing new was booked — you already have spots in these classes.'
                 : lines.every((line) => line.outcome.kind === 'unavailable')
                   ? // "right now" would be a lie here — it is not a temporary state, and telling
                     // somebody to come back later for a class that will never be sold in the app
