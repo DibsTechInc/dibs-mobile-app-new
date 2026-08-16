@@ -24,15 +24,17 @@
     "showInstructor": true
   },
   "ios": {
-    "bundleId": "com.ondibs.carlsbadvillageyogaapp"
+    "bundleId": "com.ondibs.carlsbadvillageyogaapp",
+  "merchantId": "merchant.com.ondibs.carlsbadvillageyogaapp",
+  "appleTeamId": "R8RUP42952"
   },
   "android": {},
   "support": {
     "email": "info@carlsbadvillageyoga.com"
   },
   "legal": {
-    "privacyPolicyUrl": "https://dibsonline.com/apple/privacy-policy",
-    "privacyPolicyLive": false
+    "privacyPolicyUrl": "https://www.dibsonline.com/privacy-policy",
+    "privacyPolicyLive": true
   },
   "api": {
     "url": "https://api.dibsonline.com/api/v2"
