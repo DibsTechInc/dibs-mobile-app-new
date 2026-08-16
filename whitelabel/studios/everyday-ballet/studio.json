@@ -30,6 +30,9 @@
   "support": {
     "email": "tiekka@everydayballet.com"
   },
+  "analytics": {
+    "clarityProjectId": "y3cpunfvqj"
+  },
   "legal": {
     "privacyPolicyUrl": "https://dibsonline.com/apple/privacy-policy",
     "privacyPolicyLive": false
