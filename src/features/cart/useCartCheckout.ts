@@ -50,8 +50,10 @@ import {
   confirmClassBooking,
   createClassPaymentIntent,
   queryKeys,
+  type ClientBookings,
 } from '@/api';
 import { BookingRefusedError } from '@/api/endpoints/class-booking';
+import type { UpcomingBookingRow } from '@/api/schemas/upcoming';
 import { studio } from '@/config/studio';
 import type { CartLine } from '@/domain/cart/build-cart';
 import { chargeFromServerBreakdown, type ClassCharge } from '@/domain/pricing/class-charge';
@@ -222,6 +224,44 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
   }, []);
 
   /**
+   * Put the just-booked class into the cached calendar NOW, from what we hold.
+   *
+   * The mirror of the drop path's optimistic write, for the same reason: the server has just
+   * CONFIRMED this booking, and `get-upcoming-appts` is the slowest endpoint the app calls — so
+   * without this, a client who books and taps My Calendar sees a list without the class they
+   * just paid for, which reads as a booking that did not happen (Alicia, 2026-08-16). The
+   * invalidation in `run` still refetches, and the server's own row — with the instructor and
+   * location this sketch omits — replaces the sketch when it lands (`groupBookings` dedupes on
+   * event id + start).
+   *
+   * Skipped when there is no cached response to extend: inventing a whole response around one
+   * row would claim the OTHER bookings don't exist, and the refetch covers that case anyway.
+   */
+  const addToCalendarCache = useCallback(
+    (line: CartLine, booked: { transactionId: number | null; serviceName: string | null }) => {
+      if (!account || !line.entry) return;
+      const row: UpcomingBookingRow = {
+        eventid: line.eventId,
+        start_date: line.entry.startsAt,
+        name: line.entry.name,
+        classtitle: line.entry.name,
+        dropped: false,
+        checkedin: false,
+        serviceName: booked.serviceName,
+        // Null is honest when the response did not carry one — the row renders without a Cancel
+        // affordance until the refetch supplies the real id, rather than posting NaN at the
+        // drop endpoint.
+        dibsTransactionId: booked.transactionId,
+      };
+      queryClient.setQueryData<ClientBookings>(
+        queryKeys.upcoming(account.userid, studio.dibsStudioId),
+        (cached) => (cached ? { ...cached, upcoming: [...cached.upcoming, row] } : cached),
+      );
+    },
+    [account, queryClient],
+  );
+
+  /**
    * Book ONE class with a pass. No sheet, no money, one call.
    *
    * Never throws: the only throw the runner treats specially is a sheet dismissal, and there is no
@@ -233,7 +273,7 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
       setOutcome(line.eventId, { kind: 'working' });
 
       try {
-        await bookClassWithPass(apiClient, {
+        const result = await bookClassWithPass(apiClient, {
           dibsStudioId: studio.dibsStudioId,
           eventId: line.eventId,
           // A REQUEST, not an instruction — the server verifies it against the client's own
@@ -244,6 +284,12 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
 
         setOutcome(line.eventId, { kind: 'booked' });
         if (!bookedIds.current.includes(line.eventId)) bookedIds.current.push(line.eventId);
+        addToCalendarCache(line, {
+          transactionId: result.redemptionTransactionId ?? null,
+          // The server's name for the pass it actually spent, falling back to the one the screen
+          // offered — the calendar row's "paid with" line.
+          serviceName: result.packageName ?? line.passName ?? null,
+        });
         return true;
       } catch (error) {
         if (error instanceof BookingRefusedError) {
@@ -283,7 +329,7 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
         return false;
       }
     },
-    [setOutcome],
+    [addToCalendarCache, setOutcome],
   );
 
   /** Book ONE class. Throws only `SheetDismissed`; every other failure becomes an outcome. */
@@ -348,13 +394,17 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
 
         // The card is AUTHORIZED, not charged. The server claims the seat first and captures only
         // once it is secured.
-        await confirmClassBooking(apiClient, {
+        const confirmed = await confirmClassBooking(apiClient, {
           dibsStudioId: studio.dibsStudioId,
           paymentIntentId: intent.paymentIntentId,
         });
 
         setOutcome(line.eventId, { kind: 'booked' });
         if (!bookedIds.current.includes(line.eventId)) bookedIds.current.push(line.eventId);
+        addToCalendarCache(line, {
+          transactionId: confirmed.redemptionTransactionId ?? null,
+          serviceName: null,
+        });
         return true;
       } catch (error) {
         if (error instanceof SheetDismissed) throw error;
@@ -444,6 +494,7 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
     },
     [
       account,
+      addToCalendarCache,
       bookOneWithPass,
       currency,
       initPaymentSheet,
@@ -464,7 +515,7 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
       setOutcome(line.eventId, { kind: 'working' });
 
       try {
-        await bookClassWithCredit(apiClient, {
+        const result = await bookClassWithCredit(apiClient, {
           dibsStudioId: studio.dibsStudioId,
           eventId: line.eventId,
           displayedTotalCents: totalCents,
@@ -473,6 +524,10 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
 
         setOutcome(line.eventId, { kind: 'booked' });
         if (!bookedIds.current.includes(line.eventId)) bookedIds.current.push(line.eventId);
+        addToCalendarCache(line, {
+          transactionId: result.transactionId ?? null,
+          serviceName: null,
+        });
         return true;
       } catch (error) {
         if (error instanceof BookingRefusedError) {
@@ -525,7 +580,7 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
         return false;
       }
     },
-    [setOutcome, bookOne],
+    [addToCalendarCache, setOutcome, bookOne],
   );
 
 
