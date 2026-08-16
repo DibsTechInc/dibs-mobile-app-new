@@ -52,11 +52,16 @@ export function ClarityIntegration() {
 
   // Initialise exactly once, and only for a build whose studio carries a project id.
   useEffect(() => {
-    if (initialized.current || !studio.clarityProjectId) return;
+    // typeof, not truthiness: a stale manifest can carry null/odd shapes here, and the SDK
+    // throws 'received object' on anything that is not a real string (seen on device
+    // 2026-08-16 running a studio with no Clarity project at all).
+    if (initialized.current) return;
+    const projectId = studio.clarityProjectId;
+    if (typeof projectId !== 'string' || projectId.length === 0) return;
     sdk.current = loadSdk();
     if (!sdk.current) return;
     try {
-      sdk.current.initialize(studio.clarityProjectId);
+      sdk.current.initialize(projectId);
       initialized.current = true;
     } catch (error) {
       console.warn('[clarity] failed to initialise (recordings off):', error);

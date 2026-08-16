@@ -101,9 +101,22 @@ export default ({ config }: ConfigContext): ExpoConfig => {
    */
   const usesBundledHero = studio.assets.heroSource !== 'remote';
   const splashConfig = usesBundledHero
-    ? { backgroundColor: '#FFFFFF', image: studioAsset(studio.assets.hero), resizeMode: 'cover' as const }
+    ? {
+        backgroundColor: '#FFFFFF',
+        image: studioAsset(studio.assets.hero),
+        resizeMode: 'cover' as const,
+        // Without this, SDK 52+'s splash renders the image as a small centered icon on
+        // white — the hero appeared as a postage stamp at launch (2026-08-16 screenshot),
+        // destroying the invisible splash→Home handoff this whole block exists for.
+        enableFullScreenImage_legacy: true,
+      }
     : studio.assets.splash
-      ? { backgroundColor: '#FFFFFF', image: studioAsset(studio.assets.splash), resizeMode: 'cover' as const }
+      ? {
+          backgroundColor: '#FFFFFF',
+          image: studioAsset(studio.assets.splash),
+          resizeMode: 'cover' as const,
+          enableFullScreenImage_legacy: true,
+        }
       : {
           backgroundColor: '#FFFFFF',
           image: hasStoreReadyIcon ? studioAsset(studio.assets.iconSource) : './assets/images/splash-icon.png',
