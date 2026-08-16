@@ -20,8 +20,11 @@ import { EmptyState, ErrorState, SkeletonList } from '@/components';
 import { studio } from '@/config/studio';
 import { isAcceptingBookings } from '@/api/schemas/basic-config';
 import { describeCancelWindow } from '@/domain/cancellation/cancel-window';
+import { resolveClassCharge } from '@/domain/pricing/class-charge';
 import { findEvent, longDayLabel } from '@/domain/schedule/days';
 import { toScheduleEntry } from '@/domain/schedule/entry';
+import { useClientPasses } from '@/features/account/useClientPasses';
+import { useCartStore, useIsInCart } from '@/features/cart/cartStore';
 import { ClassDetailScreen } from '@/features/schedule/ClassDetailScreen';
 import { useSchedule } from '@/features/schedule/useSchedule';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
@@ -31,6 +34,7 @@ export default function ClassDetailRoute() {
   const { eventId } = useLocalSearchParams<{ eventId: string }>();
   const { config, timeZone } = useStudioConfig();
   const schedule = useSchedule();
+  const { passes } = useClientPasses();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -39,10 +43,40 @@ export default function ClassDetailRoute() {
     [schedule.data, eventId],
   );
 
+  /**
+   * What the card will be charged, tax included — the ONE client-side answer, and the figure sent
+   * as `displayedTotalCents` so the server can refuse to charge anything else.
+   *
+   * Resolved before the early returns because hooks cannot be conditional; the null event case
+   * yields a placeholder that the screen never renders.
+   */
+  const charge = useMemo(
+    () => (event ? resolveClassCharge(event, config?.currency) : null),
+    [event, config?.currency],
+  );
+
+  /**
+   * Adding to the cart, not charging.
+   *
+   * This screen used to run its own booking state machine, which made it a SECOND place that could
+   * create a PaymentIntent and decide a price. There is one now — `/checkout` — and both entry
+   * points (the schedule row's Book button and this CTA) lead to it.
+   */
+  const addToCart = useCartStore((state) => state.add);
+  const inCart = useIsInCart(Number(eventId));
+
   const onBack = useCallback(() => {
     if (router.canGoBack()) router.back();
     else router.replace('/schedule');
   }, []);
+
+  const onAddToCart = useCallback(() => {
+    addToCart(Number(eventId));
+    // Straight to checkout: somebody who has read the whole page and pressed a button carrying a
+    // total has decided. Leaving them here to find the cart themselves would be the "to do X, go
+    // to Y" pattern the product principles rule out.
+    router.push('/checkout');
+  }, [addToCart, eventId]);
 
   if (schedule.isPending) {
     return (
@@ -78,10 +112,16 @@ export default function ClassDetailRoute() {
     );
   }
 
+  // `passes` makes the price line read "Included · {pass}" when one covers this class, and it is
+  // the SAME decision the cart and the server make — so the CTA below cannot promise coverage that
+  // checkout refuses, nor quote a price for something already paid for.
   const entry = toScheduleEntry(event, {
     showInstructor: studio.display.showInstructor,
     currency: config?.currency,
+    passes,
   });
+
+  const acceptingBookings = config ? isAcceptingBookings(config) : true;
 
   return (
     <ClassDetailScreen
@@ -96,7 +136,11 @@ export default function ClassDetailRoute() {
         // `.claude/CANCELLATION.md` §3.
         config?.defaultCancelTimeGroup ?? config?.cancelTime,
       )}
-      acceptingBookings={config ? isAcceptingBookings(config) : true}
+      acceptingBookings={acceptingBookings}
+      charge={charge}
+      inCart={inCart}
+      onAddToCart={acceptingBookings ? onAddToCart : undefined}
+      onOpenCart={acceptingBookings ? () => router.push('/checkout') : undefined}
       onBack={onBack}
     />
   );

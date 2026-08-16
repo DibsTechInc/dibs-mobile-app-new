@@ -260,6 +260,7 @@ export function HomeScreen({
           paddingBottom: theme.spacing.lg,
         }}
       >
+        
         <Text variant="display" color="inverse">
           {greeting}
         </Text>

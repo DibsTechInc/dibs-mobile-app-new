@@ -9,6 +9,7 @@
     "ownership": "dibs",
     "releaseType": "update",
     "version": "2.0.0",
+    "buildNumber": 1,
     "lastKnownStoreVersion": "1.6",
     "notes": "Live iOS listing under Dibs Technology Inc since 2021-02-08, currently broken. Rebuild ships as an in-place update to the same bundle id so existing installs self-heal. iOS only for v1 — nothing has ever been submitted to Google Play.",
     "platforms": [
@@ -23,15 +24,20 @@
     "showInstructor": true
   },
   "ios": {
-    "bundleId": "com.ondibs.everydayballetapp"
+    "bundleId": "com.ondibs.everydayballetapp",
+    "merchantId": "merchant.com.ondibs.everydayballetapp",
+    "appleTeamId": "R8RUP42952"
   },
   "android": {},
   "support": {
     "email": "tiekka@everydayballet.com"
   },
+  "analytics": {
+    "clarityProjectId": "y3cpunfvqj"
+  },
   "legal": {
-    "privacyPolicyUrl": "https://dibsonline.com/apple/privacy-policy",
-    "privacyPolicyLive": false
+    "privacyPolicyUrl": "https://www.dibsonline.com/privacy-policy",
+    "privacyPolicyLive": true
   },
   "api": {
     "url": "https://api.dibsonline.com/api/v2"

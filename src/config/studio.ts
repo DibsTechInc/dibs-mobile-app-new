@@ -18,6 +18,15 @@ export interface StudioIdentity {
   accentColor: string;
   /** IANA zone. The authoritative copy arrives from get-basic-config; this is the seed value. */
   timezone: string;
+  /**
+   * This build's integer identity — CFBundleVersion on iOS, versionCode on Android. The ONLY
+   * number the version gate compares, and never a version string: `"1.10.0" < "1.9.0"` is true
+   * lexically, which is how a gate ships inverted and blocks everybody.
+   *
+   * Comes from `store.buildNumber` in studio.json, the same value app.config.ts stamps into the
+   * native project, so the number JS compares and the number the store sees cannot drift.
+   */
+  buildNumber: number;
   features: {
     classes: boolean;
     appointments: boolean;
@@ -34,6 +43,21 @@ export interface StudioIdentity {
   heroSource: 'bundled' | 'remote';
   supportEmail: string;
   privacyPolicyUrl: string | null;
+  /**
+   * The Microsoft Clarity project this binary records sessions into, or null for none.
+   *
+   * Null is the OFF switch: `ClarityIntegration` never initialises the SDK without it, so a
+   * studio ships with recordings only when their studio.json deliberately carries a project id.
+   */
+  clarityProjectId: string | null;
+  /**
+   * The Apple Pay merchant identifier (`merchant.com.ondibs…`), or null for none.
+   *
+   * Null is the OFF switch: the Stripe session never passes a merchantIdentifier and the
+   * PaymentSheet never offers Apple Pay, so a studio without the Apple-side setup ships a
+   * card-only sheet rather than an Apple Pay button that errors.
+   */
+  merchantId: string | null;
   apiUrl: string;
 }
 

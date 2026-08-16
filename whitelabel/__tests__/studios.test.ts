@@ -269,10 +269,20 @@ describe.each(slugs)('studio: %s', (slug) => {
   });
 
   it('is correctly classified as release-ready or not', () => {
-    // Store fields arrive with the studio's own Apple/Play enrollment (§6.3). Until then a
-    // release build MUST refuse — silently shipping a half-configured app is the failure mode.
-    const hasStoreIdentity = Boolean(config.ios.bundleId && config.android.package);
-    if (hasStoreIdentity) {
+    // An independent restatement of the validator's contract, so a regression in EITHER
+    // direction fails: a studio the fields say is ready must pass, and a half-configured one
+    // must refuse. Platform-keyed exactly like RELEASE_REQUIRED — v1 studios are iOS-only and
+    // must never be held hostage to an Android package nobody has chosen (the original form of
+    // this test did exactly that, which is why it "failed" the day both rescue studios became
+    // genuinely release-ready, 2026-08-16).
+    const targets = new Set(config.store.platforms);
+    const iosReady =
+      !targets.has('ios') ||
+      Boolean(config.ios.bundleId && config.ios.appleTeamId && config.ios.merchantId);
+    const androidReady = !targets.has('android') || Boolean(config.android.package);
+    const legalReady = Boolean(config.legal.privacyPolicyUrl && config.legal.privacyPolicyLive);
+
+    if (iosReady && androidReady && legalReady) {
       expect(() => validateStudioForRelease(config)).not.toThrow();
     } else {
       expect(() => validateStudioForRelease(config)).toThrow(/cannot be released yet/);

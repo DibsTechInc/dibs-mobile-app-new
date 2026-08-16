@@ -46,6 +46,22 @@ function resolveHeroPath() {
 
 const HERO_PATH = resolveHeroPath();
 
+/** Same contract as the hero: filename from studio.json, fail at build time if it is missing. */
+function resolveLogoPath() {
+  const configPath = path.join(STUDIO_DIR, 'studio.json');
+  const studio = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+  const logo = studio?.assets?.logo ?? 'assets/logo.png';
+  const logoPath = path.join(STUDIO_DIR, logo);
+  if (!fs.existsSync(logoPath)) {
+    throw new Error(
+      `Studio "${STUDIO_SLUG}" declares assets.logo "${logo}" but ${logoPath} does not exist.`,
+    );
+  }
+  return logoPath;
+}
+
+const LOGO_PATH = resolveLogoPath();
+
 /**
  * Stripe is native-only, so the WEB bundle cannot build with it — and the web bundle is the only
  * way to look at a screen without a device. Two builds shipped broken on 2026-08-07 because there
@@ -60,6 +76,9 @@ const defaultResolveRequest = config.resolver.resolveRequest;
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   if (moduleName === '@studio/hero') {
     return { type: 'sourceFile', filePath: HERO_PATH };
+  }
+  if (moduleName === '@studio/logo') {
+    return { type: 'sourceFile', filePath: LOGO_PATH };
   }
   if (platform === 'web' && moduleName.startsWith('@stripe/stripe-react-native')) {
     return { type: 'sourceFile', filePath: STRIPE_WEB_STUB };

@@ -29,6 +29,8 @@ export type SectionStatus = 'loading' | 'ready' | 'partial' | 'error';
 
 export interface WalletPass {
   id: number;
+  /** `studio_packages.id` — the cancel endpoint keys on it alongside the pass id. */
+  packageId: number | null;
   name: string;
   /** "Unlimited" or "6 classes left". */
   remainingLabel: string;
@@ -39,6 +41,17 @@ export interface WalletPass {
   expiresLabel: string | null;
   /** A membership renews; a pack runs out. The distinction changes the words used. */
   isMembership: boolean;
+  /**
+   * Server-computed. Null for a non-membership, and for a membership on an older API build.
+   * `eligibleOn` is a `YYYY-MM-DD` in the studio's zone — render with `formatIsoDate`, never
+   * through `new Date()`.
+   */
+  cancellation: {
+    canCancel: boolean;
+    eligibleOn?: string | null;
+    remainingCount?: number | null;
+    remainingUnit?: string | null;
+  } | null;
 }
 
 export interface WalletData {
@@ -102,6 +115,7 @@ export function buildWalletData({
     name: passName(pass),
     remainingLabel: remainingPassUsesLabel(pass),
     remainingCount: isUnlimitedPass(pass) ? null : remainingPassUses(pass),
+    packageId: typeof pass.studio_package_id === 'number' ? pass.studio_package_id : null,
     isUnlimited: isUnlimitedPass(pass),
     // `expiresAt` is a REAL INSTANT — end of day in the studio's zone, stored as true UTC — so it
     // is read back in that zone rather than printed verbatim. Verbatim would say "Dec 1" for a
@@ -118,6 +132,15 @@ export function buildWalletData({
      * so reading the package would call a one-off purchase a membership and miss real ones.
      */
     isMembership: pass.autopay === true,
+    /**
+     * The server's answer on whether this membership may be cancelled yet, passed through
+     * UNTOUCHED. The same value backs the endpoint's own refusal, so the button and the answer
+     * cannot disagree — do not recompute `canCancel` from `eligibleOn` here.
+     *
+     * Undefined on an API build that predates the field, which reads as "no commitment line" —
+     * the button still appears and the server still refuses if it must.
+     */
+    cancellation: pass.cancellation ?? null,
   }));
 
   const creditAmount = credit.data;

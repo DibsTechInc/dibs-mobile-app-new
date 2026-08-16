@@ -29,8 +29,14 @@ export type AuthStatus =
 export interface AuthSession {
   uid: string;
   /**
-   * Exactly as Firebase holds it. NOT lowercased — `get-user-account` looks the Dibs row up
-   * with a case-sensitive match, so normalizing here can turn a real account into "no account".
+   * Exactly as Firebase holds it.
+   *
+   * It used to be load-bearing that this was NOT lowercased: `get-user-account` matched the Dibs
+   * row case-sensitively, so normalizing here could turn a real account into "no account". That
+   * reader was made case-insensitive on 2026-08-14 (`get-user-has-account.js` now compares
+   * `LOWER(email)`), so the case no longer decides anything — but it is still passed through
+   * untouched, because this is the address Firebase authenticated and the app has no business
+   * rewriting it.
    */
   email: string;
 }

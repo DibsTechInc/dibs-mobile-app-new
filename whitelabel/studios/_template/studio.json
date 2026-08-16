@@ -13,7 +13,8 @@
     "ownership": "studio",
     "releaseType": "new",
     "platforms": ["ios"],
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "buildNumber": 1
   },
 
   "//features": "v1 ships classes only. Set appointments true once that module exists.",

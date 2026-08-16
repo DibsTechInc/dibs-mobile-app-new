@@ -33,6 +33,11 @@ export const queryKeys = {
 
   upcoming: (userId: number, dibsStudioId: number) => ['upcoming', userId, dibsStudioId] as const,
   history: (userId: number) => ['history', userId] as const,
+  /** Bundled billing timeline. Never persisted — it is account data. */
+  accountActivity: (userId: number, dibsStudioId: number) =>
+    ['accountActivity', userId, dibsStudioId] as const,
+  upcomingPayments: (userId: number, dibsStudioId: number) =>
+    ['upcomingPayments', userId, dibsStudioId] as const,
   subscriptions: (userId: number) => ['subscriptions', userId] as const,
   flashCredits: (userId: number, dibsStudioId: number) =>
     ['flashCredits', userId, dibsStudioId] as const,

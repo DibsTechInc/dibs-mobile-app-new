@@ -14,7 +14,7 @@
  * whose destinations exist. There is no tab bar — a back chevron returns, the drawer moves
  * sideways.
  */
-import { Pressable, ScrollView, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon, Skeleton, Text, type IconName } from '@/components';
@@ -30,6 +30,11 @@ export interface AccountRow {
 }
 
 export interface AccountBalance {
+  /**
+   * Stable render key — the pass id, never the label. Two purchases of the same package are two
+   * rows with identical labels, and keying on the label made React drop one (2026-08-16).
+   */
+  key: string;
   label: string;
   /** A second, quieter line under the label — an expiry date, never a restatement. */
   detail?: string;
@@ -85,8 +90,13 @@ export interface AccountScreenProps {
   balances: AccountBalance[] | null;
   rows: AccountRow[];
   onSignOut: () => void;
+  /** Opens the delete-account flow (Apple 5.1.1(v)). Absent → the row does not render. */
+  onDeleteAccount?: () => void;
   onBack: () => void;
   onOpenMenu?: () => void;
+  /** Pull-to-refresh, spinner answering only to the pull — see `usePullRefresh`. */
+  isRefreshing?: boolean;
+  onRefresh?: () => void;
 }
 
 export function AccountScreen({
@@ -96,8 +106,11 @@ export function AccountScreen({
   balances,
   rows,
   onSignOut,
+  onDeleteAccount,
   onBack,
   onOpenMenu,
+  isRefreshing,
+  onRefresh,
 }: AccountScreenProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
@@ -142,6 +155,15 @@ export function AccountScreen({
           paddingTop: theme.spacing.sm,
           paddingBottom: insets.bottom + theme.spacing.xxl,
         }}
+        refreshControl={
+          onRefresh ? (
+            <RefreshControl
+              refreshing={isRefreshing ?? false}
+              onRefresh={onRefresh}
+              tintColor={theme.colors.textSecondary}
+            />
+          ) : undefined
+        }
       >
         <Text variant="display">{name ?? 'Your account'}</Text>
         {email ? (
@@ -169,7 +191,7 @@ export function AccountScreen({
           >
             {balances.map((balance, index) => (
               <View
-                key={balance.label}
+                key={balance.key}
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'space-between',
@@ -224,6 +246,30 @@ export function AccountScreen({
           >
             <Text variant="body">Sign out</Text>
           </Pressable>
+
+          {/* Quiet and last, below Sign out: present because Apple requires it in-app
+              (5.1.1(v)) and because it is honest — but styled at the weight of a footnote,
+              never competing with anything above it. Danger ink is what says "this one is
+              different"; the typed confirmation in the sheet is what makes it deliberate. */}
+          {onDeleteAccount ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Delete account"
+              onPress={onDeleteAccount}
+              style={({ pressed }) => [{
+                minHeight: theme.minTapTarget,
+                justifyContent: 'center',
+                paddingVertical: theme.spacing.md,
+                borderBottomWidth: 1,
+                borderBottomColor: theme.colors.divider,
+                opacity: pressed ? 0.55 : 1,
+              }]}
+            >
+              <Text variant="body" color="danger">
+                Delete account
+              </Text>
+            </Pressable>
+          ) : null}
 
           {/* The only Dibs mark anywhere in a studio's app. */}
           <Text variant="caption" color="tertiary" style={{ paddingTop: theme.spacing.base }}>

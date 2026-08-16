@@ -57,6 +57,12 @@ export const upcomingBookingSchema = z
 
     /** The package this booking drew on, or 'Drop In'. */
     serviceName: z.string().nullable().optional(),
+    /**
+     * Server-derived "how was this paid" line — "Booked with studio credit", "Paid by card",
+     * "$9.50 credit + $12.50 card". Present only when the server has something better than the
+     * package name (booking-time payments); genuine packs keep `serviceName`.
+     */
+    paidWithLabel: z.string().nullable().optional(),
     dibsTransactionId: z.number().nullable().optional(),
     unpaid: z.boolean().nullable().optional(),
   })

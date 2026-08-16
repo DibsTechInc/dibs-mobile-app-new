@@ -25,6 +25,12 @@ export interface DrawerItem {
 }
 
 export interface DrawerBalance {
+  /**
+   * Stable render key — the pass id, not the label. Two passes can share a name (buy the same
+   * 10-class package twice and both rows read "10-class Package"), and duplicate keys made React
+   * drop one of the rows (reported on device 2026-08-16).
+   */
+  key: string;
   label: string;
   /** Already formatted. This component never does money arithmetic. */
   value: string;
@@ -157,7 +163,7 @@ export function DrawerMenu({
             >
               {balances.map((balance, index) => (
                 <View
-                  key={balance.label}
+                  key={balance.key}
                   style={{
                     flexDirection: 'row',
                     justifyContent: 'space-between',

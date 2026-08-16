@@ -137,11 +137,36 @@ describe('passes', () => {
     expect(wallet.passes.items.map((item) => item.isMembership)).toEqual([true, false]);
   });
 
-  it('treats the 999 sentinel as unlimited too', () => {
+  it('treats the sentinel family as unlimited too', () => {
+    for (const sentinel of [999, 9999, 99999]) {
+      const wallet = buildWalletData(
+        input({ passes: { data: [pass({ totalUses: sentinel })], isPending: false, error: null } }),
+      );
+      expect(wallet.passes.items[0].isUnlimited).toBe(true);
+    }
+  });
+
+  it('shows a package flagged unlimited as Unlimited, not as a countdown', () => {
+    // The card used to read "949 classes left" for a membership, because the count was believed
+    // over the flag. One helper drives the label, the count and the badge, so all three move.
     const wallet = buildWalletData(
-      input({ passes: { data: [pass({ totalUses: 999 })], isPending: false, error: null } }),
+      input({
+        passes: {
+          data: [
+            pass({
+              totalUses: 50,
+              usesCount: 1,
+              studioPackage: { packageName: 'Month Unlimited', unlimited: true },
+            }),
+          ],
+          isPending: false,
+          error: null,
+        },
+      }),
     );
     expect(wallet.passes.items[0].isUnlimited).toBe(true);
+    expect(wallet.passes.items[0].remainingLabel).toBe('Unlimited');
+    expect(wallet.passes.items[0].remainingCount).toBeNull();
   });
 
   it('drops a pass that has expired', () => {
@@ -195,5 +220,59 @@ describe('credit', () => {
       input({ credit: { data: 40, isPending: false, error: null }, currency: 'CAD' }),
     );
     expect(wallet.credit.label).toBe('CA$40.00');
+  });
+});
+
+describe('membership cancellation is the SERVER\'s answer, passed through', () => {
+  const membership = (cancellation: unknown) =>
+    buildWalletData(
+      input({
+        passes: {
+          data: [pass({ autopay: true, studio_package_id: 557, cancellation } as Partial<Pass>)],
+          isPending: false,
+          error: null,
+        },
+      }),
+    ).passes.items[0];
+
+  it('carries canCancel and the date through untouched', () => {
+    const item = membership({
+      canCancel: false,
+      eligibleOn: '2026-11-02',
+      remainingCount: 2,
+      remainingUnit: 'month',
+    });
+
+    expect(item.cancellation).toEqual({
+      canCancel: false,
+      eligibleOn: '2026-11-02',
+      remainingCount: 2,
+      remainingUnit: 'month',
+    });
+  });
+
+  it('does NOT re-derive canCancel from the date', () => {
+    // Two answers to one question is the bug this shape exists to prevent. Even a server answer
+    // that looks internally odd is passed through: the server is the one that refuses.
+    const item = membership({ canCancel: true, eligibleOn: '2099-01-01' });
+    expect(item.cancellation?.canCancel).toBe(true);
+  });
+
+  it('is null on an API build that predates the field', () => {
+    // Reads as "no commitment line" — the button still appears, and the server still refuses if
+    // it must. A missing field must never render as "cancellation blocked".
+    expect(membership(undefined)?.cancellation).toBeNull();
+  });
+
+  it('carries the package id the cancel endpoint keys on', () => {
+    const item = membership({ canCancel: true });
+    expect(item.packageId).toBe(557);
+  });
+
+  it('reports a missing package id as null rather than undefined', () => {
+    const item = buildWalletData(
+      input({ passes: { data: [pass({ autopay: true })], isPending: false, error: null } }),
+    ).passes.items[0];
+    expect(item.packageId).toBeNull();
   });
 });
