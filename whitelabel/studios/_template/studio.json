@@ -17,10 +17,18 @@
     "buildNumber": 1
   },
 
-  "//features": "v1 ships classes only. Set appointments true once that module exists.",
+  "//features": "One bookable surface per app today: classes OR appointments. roomBooking = the appointments are rooms, not people (skips the provider step; needs appointments.providerByServiceId). monthlyCommitment = a chosen slot offers the Single / Lock-in-monthly toggle.",
   "features": {
     "classes": true,
-    "appointments": false
+    "appointments": false,
+    "roomBooking": false,
+    "monthlyCommitment": false
+  },
+
+  "//appointments": "Only needed when features.appointments is true. availabilityVariant 'custom-263' exists solely for studio 263's server-side endpoint. providerByServiceId maps appointment_type id -> the instructor id every booking of that type carries (required for roomBooking studios).",
+  "appointments": {
+    "availabilityVariant": "standard",
+    "providerByServiceId": {}
   },
 
   "display": {

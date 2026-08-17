@@ -308,3 +308,31 @@ export async function dropClass(
     return asRefusal(error);
   }
 }
+
+/**
+ * Cancel an APPOINTMENT — the sibling endpoint, same contract, same response shape, one extra
+ * rule: the server is notice-or-nothing. Inside the studio's private window the request is
+ * refused (`late_cancel`, carrying `noticeHours` + the deadline), and there is no override
+ * anybody can send. The sheet pre-empts that refusal by not offering the button when the window
+ * has closed — but the SERVER's clock is the one that decides, so the refusal path still renders
+ * honestly when the boundary is crossed mid-tap.
+ *
+ * Subscription-owned sessions come back `subscription_session` — one date of a recurring
+ * reservation is a commitment question the studio answers, not this endpoint.
+ */
+export async function cancelAppointment(
+  client: ApiClient,
+  { dibsTransactionId, eventId }: { dibsTransactionId: number; eventId: number },
+  signal?: AbortSignal,
+): Promise<DropClassResponse> {
+  try {
+    return await client.post(
+      'checkout/appointment/cancel',
+      { dibsTransactionId, eventId },
+      dropClassResponseSchema,
+      { authenticated: true, signal },
+    );
+  } catch (error) {
+    return asRefusal(error);
+  }
+}

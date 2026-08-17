@@ -15,7 +15,12 @@ import { useCallback, useMemo, useState } from 'react';
 import { studio } from '@/config/studio';
 import type { BookingListItem } from '@/domain/bookings/group-bookings';
 import { groupBookings, splitNextUp, toDaySections } from '@/domain/bookings/group-bookings';
-import { describeCancelWindow, resolveClassNoticeHours } from '@/domain/cancellation/cancel-window';
+import {
+  appointmentCancelSentence,
+  describeCancelWindow,
+  resolveAppointmentNoticeHours,
+  resolveClassNoticeHours,
+} from '@/domain/cancellation/cancel-window';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { CancelBookingSheet } from '@/features/bookings/CancelBookingSheet';
 import { MyCalendarScreen, type CalendarTab } from '@/features/bookings/MyCalendarScreen';
@@ -99,17 +104,42 @@ export default function MyCalendarRoute() {
       />
       <CancelBookingSheet
         booking={cancelling}
+        // The APPOINTMENT window, for appointment rows — `default_cancel_time_private`'s rule,
+        // matching the server's own notice-or-nothing check. The two must name the same deadline.
         window={
           cancelling
             ? describeCancelWindow(
                 cancelling.startsAt,
                 timeZone,
-                resolveClassNoticeHours(config),
+                cancelling.isAppointment
+                  ? resolveAppointmentNoticeHours(config)
+                  : resolveClassNoticeHours(config),
               )
             : null
         }
         status={drop.status}
         currency={config?.currency}
+        // Appointments differ in KIND, not just copy: inside the window the server REFUSES, so
+        // the sheet says so and withholds the button rather than offering one that must fail.
+        consequence={
+          cancelling?.isAppointment
+            ? appointmentCancelSentence(
+                describeCancelWindow(
+                  cancelling.startsAt,
+                  timeZone,
+                  resolveAppointmentNoticeHours(config),
+                ),
+              )
+            : undefined
+        }
+        blocked={
+          cancelling?.isAppointment === true &&
+          describeCancelWindow(
+            cancelling.startsAt,
+            timeZone,
+            resolveAppointmentNoticeHours(config),
+          )?.isStillFree === false
+        }
         onConfirm={() => {
           // Guarded by the affordance — CancelAction does not render without an id — and again
           // here, because a null would post `NaN` and 400.
@@ -117,6 +147,7 @@ export default function MyCalendarRoute() {
           drop.drop({
             dibsTransactionId: cancelling.dibsTransactionId,
             eventId: cancelling.eventId,
+            isAppointment: cancelling.isAppointment,
           });
         }}
         onClose={closeCancelSheet}

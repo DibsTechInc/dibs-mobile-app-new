@@ -7,8 +7,8 @@ Dibs mobile app (Expo/React Native, TypeScript). legacy-reference/ is read-only 
 The user-level /orchestrate skill runs batches here. Project facts it needs:
 
 - Ask-first zones: payment/booking flows, app.json + native config (store-release impact), anything under legacy-reference/ (read-only — never modify).
-- Hot-spot files (reviewer pass): src/domain/pricing (the pricing waterfall).
-- Canary gate: the src/domain/pricing golden-master tests are the canary precedent — run them on every branch (`npx jest src/domain/pricing`); extend the same golden-master style for new domains.
+- Hot-spot files (reviewer pass): src/domain/pricing (the pricing waterfall) and src/domain/appointments (the monthly-commitment bill — the recurring endpoint charges whatever the client computes).
+- Canary gate: the src/domain/pricing golden-master tests are the canary precedent — run them on every branch (`npx jest src/domain/pricing src/domain/appointments`); extend the same golden-master style for new domains.
 - Test gate: `npm run typecheck && npx jest`.
 - Branch naming: `feature/<short-description>` or `bugfix/<short-description>`.
 - Commit format: imperative subject under 72 chars, 2-5 plain sentences, no em dashes.

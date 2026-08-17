@@ -55,6 +55,14 @@ export const upcomingBookingSchema = z
       .nullable()
       .optional(),
 
+    /**
+     * Set when the EVENT belongs to a recurring reservation (263 monthly and its kin).
+     * `subscription_ids` is a comma-joined string on the event row; either being populated means
+     * this session is one date of a commitment — cancellable only through the studio.
+     */
+    subscription_id: z.number().nullable().optional(),
+    subscription_ids: z.string().nullable().optional(),
+
     /** The package this booking drew on, or 'Drop In'. */
     serviceName: z.string().nullable().optional(),
     /**

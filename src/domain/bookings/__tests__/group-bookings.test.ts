@@ -176,6 +176,8 @@ describe('toDaySections', () => {
     eventId, startsAt, whenLabel, dibsTransactionId: eventId * 10,
     name: 'Class', instructor: null, locationLabel: null,
     timeLabel: '6:30 PM', paidWithLabel: null, isCancelled: false, didAttend: false,
+    isAppointment: false,
+    isSubscriptionSession: false,
   });
 
   it('puts two classes on one day under a single heading', () => {
@@ -219,6 +221,8 @@ describe('splitNextUp', () => {
     eventId, startsAt, whenLabel, dibsTransactionId: eventId * 10,
     name: 'Class', instructor: null, locationLabel: null,
     timeLabel: '6:30 PM', paidWithLabel: null, isCancelled: false, didAttend: false,
+    isAppointment: false,
+    isSubscriptionSession: false,
   });
 
   it('lifts the next booking out and does NOT leave it in the list', () => {

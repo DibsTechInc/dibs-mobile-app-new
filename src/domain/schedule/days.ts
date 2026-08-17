@@ -34,8 +34,11 @@ export function storedDate(storedTime: string): string {
  * Render a `YYYY-MM-DD` as if it were a stored time, so the labels come out in the studio's
  * calendar rather than the device's. Noon avoids any chance of a boundary rounding to the
  * neighbouring day.
+ *
+ * Exported for the appointment flow's day strip, which builds its days from a date RANGE rather
+ * than from events — the labels must come from one place or the two strips drift.
  */
-function labelsFor(date: string) {
+export function labelsFor(date: string) {
   const midday = `${date}T12:00:00.000Z`;
   return {
     weekdayLabel: formatStoredTime(midday, { weekday: 'short' }).toUpperCase(),

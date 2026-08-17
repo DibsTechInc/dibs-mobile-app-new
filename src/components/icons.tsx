@@ -17,6 +17,7 @@
  */
 import {
   CalendarCheck,
+  Check,
   ChevronLeft,
   ChevronRight,
   CreditCard,
@@ -100,6 +101,8 @@ const icons = {
   back: ChevronLeft,
   forward: ChevronRight,
   paymentMethods: CreditCard,
+  /** A selected state — the services checkbox, the booked-success mark. */
+  check: Check,
   contact: Mail,
   phone: Phone,
   document: FileText,

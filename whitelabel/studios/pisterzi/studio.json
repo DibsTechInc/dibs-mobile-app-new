@@ -1,0 +1,50 @@
+{
+  "//": "PLACEHOLDER CONFIG (2026-08-16) — real values pending from Alicia. Every field marked below needs confirmation before a store build: accentColor (currently the widget's Pisterzi button blue), support.email (currently the Dibs studios inbox so a misdirected mail lands with us, never a stranger), appName/shortName, and ALL THREE files in assets/ (flat placeholder PNGs in the widget's Pisterzi neutrals — recorded in KNOWN_ASSET_GAPS). Booking note: 226 does not collect payments through Dibs, and the app's appointment checkout currently always offers payment — the no-charge booking path is an open decision (see DevAssist/Aug16/IntegrateAppointments/PLAN.md, 'What 226 still needs') and must land before this app ships.",
+
+  "slug": "pisterzi",
+  "dibsStudioId": 226,
+  "appName": "Pisterzi",
+  "shortName": "Pisterzi",
+  "accentColor": "#0820A3",
+  "timezone": "America/New_York",
+  "store": {
+    "ownership": "studio",
+    "releaseType": "new",
+    "version": "1.0.0",
+    "buildNumber": 1,
+    "notes": "Not buildable for release yet: placeholder assets + no Apple enrollment + the no-charge booking path is undecided. Kept configured so nothing about 226 gets hardcoded elsewhere in the meantime (same reasoning as 263's deferral note).",
+    "platforms": [
+      "ios"
+    ]
+  },
+  "features": {
+    "classes": false,
+    "appointments": true,
+    "roomBooking": false,
+    "monthlyCommitment": false
+  },
+  "appointments": {
+    "availabilityVariant": "standard",
+    "providerByServiceId": {}
+  },
+  "display": {
+    "showInstructor": true
+  },
+  "ios": {},
+  "android": {},
+  "support": {
+    "email": "studios@ondibs.com"
+  },
+  "legal": {
+    "privacyPolicyUrl": "https://dibsonline.com/apple/privacy-policy",
+    "privacyPolicyLive": false
+  },
+  "api": {
+    "url": "https://api.dibsonline.com/api/v2"
+  },
+  "assets": {
+    "logo": "assets/logo.png",
+    "hero": "assets/hero.png",
+    "iconSource": "assets/icon-source.png"
+  }
+}

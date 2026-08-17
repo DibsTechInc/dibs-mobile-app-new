@@ -16,7 +16,16 @@
  */
 
 /** Every destination sign-in is allowed to hand somebody back to. */
-const RETURN_ROUTES = ['/checkout', '/schedule', '/my-calendar', '/account', '/packages'] as const;
+const RETURN_ROUTES = [
+  '/checkout',
+  '/schedule',
+  '/my-calendar',
+  '/account',
+  '/packages',
+  // The appointment flow's commit point. The draft lives in memory, so a guest who met the gate
+  // there gets handed straight back to the booking they were reviewing.
+  '/book/checkout',
+] as const;
 
 export type ReturnRoute = (typeof RETURN_ROUTES)[number];
 

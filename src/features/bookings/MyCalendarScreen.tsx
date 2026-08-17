@@ -139,6 +139,27 @@ function CancelAction({
   compact?: boolean;
 }) {
   const theme = useTheme();
+
+  /*
+   * A session of a RECURRING RESERVATION never offers the in-app Cancel: one date of a
+   * commitment is the studio's to change (the server refuses it, `subscription_session`), and a
+   * button that can only fail is worse than none. Saying how to change it is the affordance
+   * instead — "no button" and "no information" are different things, and the second is a
+   * support call. Single appointments cancel in-app like classes do, through their own
+   * notice-or-nothing endpoint (2026-08-16).
+   */
+  if (booking.isAppointment && booking.isSubscriptionSession) {
+    return (
+      <Text
+        variant="caption"
+        color="tertiary"
+        style={{ marginTop: compact ? theme.spacing.xs : theme.spacing.sm }}
+      >
+        Part of your recurring reservation — contact the studio to change it.
+      </Text>
+    );
+  }
+
   if (!onCancel || booking.dibsTransactionId === null) return null;
 
   return (

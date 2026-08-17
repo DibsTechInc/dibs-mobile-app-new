@@ -7,7 +7,14 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 
-import { apiClient, dropClass, queryKeys, BookingRefusedError, type ClientBookings } from '@/api';
+import {
+  apiClient,
+  cancelAppointment,
+  dropClass,
+  queryKeys,
+  BookingRefusedError,
+  type ClientBookings,
+} from '@/api';
 import { describeApiError } from '@/api/errors';
 import type { DropClassResponse } from '@/api/schemas/class-booking';
 import type { UpcomingBookingRow } from '@/api/schemas/upcoming';
@@ -22,7 +29,12 @@ export type DropStatus =
 
 export interface DropClassState {
   status: DropStatus;
-  drop: (booking: { dibsTransactionId: number; eventId: number }) => void;
+  /**
+   * `isAppointment` routes to the appointment sibling endpoint — same request keys, same
+   * response shape, one extra server rule (notice-or-nothing). The two endpoints are mutually
+   * exclusive server-side, so sending the wrong one is a refusal, never a wrong cancel.
+   */
+  drop: (booking: { dibsTransactionId: number; eventId: number; isAppointment?: boolean }) => void;
   reset: () => void;
 }
 
@@ -32,13 +44,16 @@ export function useDropClass(): DropClassState {
   const [status, setStatus] = useState<DropStatus>({ kind: 'idle' });
 
   const drop = useCallback(
-    (booking: { dibsTransactionId: number; eventId: number }) => {
+    (booking: { dibsTransactionId: number; eventId: number; isAppointment?: boolean }) => {
       if (status.kind === 'working') return;
       setStatus({ kind: 'working' });
 
       void (async () => {
         try {
-          const result = await dropClass(apiClient, booking);
+          const keys = { dibsTransactionId: booking.dibsTransactionId, eventId: booking.eventId };
+          const result = booking.isAppointment
+            ? await cancelAppointment(apiClient, keys)
+            : await dropClass(apiClient, keys);
           setStatus({ kind: 'done', result });
 
           /*

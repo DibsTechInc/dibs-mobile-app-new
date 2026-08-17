@@ -46,6 +46,11 @@ const KNOWN_ASSET_GAPS: Record<string, { hero?: string; icon?: string }> = {
     icon: '180×281 logo — too small and not square for a 1024² app icon',
     // Deferred past v1 anyway (§0.1-B), so these are not on the critical path.
   },
+  pisterzi: {
+    hero: 'flat placeholder PNG — real brand photography pending from the studio',
+    icon: 'flat placeholder PNG — real logo/icon source pending from the studio',
+    // The whole config is a placeholder (2026-08-16); see the "//" note in its studio.json.
+  },
   // Carlsbad Village Yoga's assets landed 2026-08-04 and it is off this list. Its icon is derived
   // from a 774² source (badge cropped, flattened, upscaled 1.61×) rather than a native 1024²
   // export — good enough to ship, and a fresh export from the .eps would sharpen the App Store
