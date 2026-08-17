@@ -38,10 +38,12 @@ export function describeDropOutcome(
       // the client to go and check, which is the support call this screen exists to prevent.
       // Cents on the wire, dollars on screen. `formatBalance` (not `formatPrice`) because this
       // lands in a balance, and a balance always shows its cents.
+      // "Before the deadline" is safe to state: this endpoint only returns credit on an early
+      // drop — a late drop comes back 'none'.
       body:
         amount > 0
-          ? `Your spot is free and ${formatBalance(amount / 100, currency)} has been added to your account credit.`
-          : 'Your spot is free and the value has been added to your account credit.',
+          ? `Thank you for cancelling before the deadline. ${formatBalance(amount / 100, currency)} has been added to your account credit.`
+          : 'Thank you for cancelling before the deadline. The value has been added to your account credit.',
     };
   }
 

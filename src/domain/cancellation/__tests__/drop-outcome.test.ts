@@ -35,15 +35,24 @@ describe('describeDropOutcome', () => {
     expect(body).not.toContain('after the cancellation window');
   });
 
-  it('always confirms the spot is free, whatever came back', () => {
-    // The one fact that is true in every branch — and the reason they tapped cancel.
+  it('confirms the spot is free on the pass and none branches', () => {
+    // The credit branch leads with a thank-you instead (Alicia, 2026-08-16); the others keep
+    // the spot-is-free confirmation.
     for (const outcome of [
       describeDropOutcome('pass', null, true),
-      describeDropOutcome('credit', 2250, true),
       describeDropOutcome('none', 0, false),
       describeDropOutcome('none', 0, true),
     ]) {
       expect(outcome.body).toContain('Your spot is free');
     }
+  });
+
+  it('thanks the client for cancelling before the deadline on a credit return', () => {
+    expect(describeDropOutcome('credit', 2200, true).body).toContain(
+      'Thank you for cancelling before the deadline',
+    );
+    expect(describeDropOutcome('credit', null, true).body).toContain(
+      'Thank you for cancelling before the deadline',
+    );
   });
 });
