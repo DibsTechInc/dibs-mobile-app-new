@@ -13,6 +13,21 @@ export const queryKeys = {
 
   schedule: (dibsStudioId: number, range: string) => ['schedule', dibsStudioId, range] as const,
 
+  /** The studio's bookable services (appointment types). Public studio data. */
+  appointmentTypes: (dibsStudioId: number) => ['appointmentTypes', dibsStudioId] as const,
+  /** The studio's provider roster. Public studio data. */
+  providers: (dibsStudioId: number) => ['providers', dibsStudioId] as const,
+  /**
+   * One day's open slots for one (service, provider) pair. Deliberately fully keyed: a stale
+   * slot grid surviving a date or service change is a double-booking waiting to happen.
+   */
+  availability: (
+    dibsStudioId: number,
+    serviceId: number,
+    providerId: number | null,
+    date: string,
+  ) => ['availability', dibsStudioId, serviceId, providerId ?? 'any', date] as const,
+
   /**
    * The signed-in client's Dibs record, keyed by the EMAIL the session carries — because the
    * userid is the thing this query resolves, so it cannot also be the key. Keying on the live

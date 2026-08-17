@@ -46,6 +46,9 @@ export const basicConfigSchema = z
     /** Replaces the word "Instructor" everywhere it appears. */
     instructorAltName: z.string().nullable().optional(),
 
+    /** How many days ahead the studio publishes bookable time. Drives the day strips. */
+    intervalEnd: z.number().nullable().optional(),
+
     // Money.
     taxRate: z.number().optional(),
     salesTaxRate: z.number().optional(),

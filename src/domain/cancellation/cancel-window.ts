@@ -70,6 +70,22 @@ export function resolveClassNoticeHours(config: {
 }
 
 /**
+ * The APPOINTMENT (private-session) notice window — the private twin of the group rule above:
+ * per-type window first, the studio-level `cancelTime` as the fallback, 12 as the platform
+ * default. Same `||` semantics so a 0 falls through.
+ *
+ * Display copy only, as ever: appointments cannot be cancelled in the app at all (the mobile
+ * drop endpoint refuses them), so this only feeds the "free to cancel until…" sentence a client
+ * reads before booking.
+ */
+export function resolveAppointmentNoticeHours(config: {
+  defaultCancelTimePrivate?: number;
+  cancelTime?: number;
+} | null | undefined): number {
+  return Number(config?.defaultCancelTimePrivate) || Number(config?.cancelTime) || 12;
+}
+
+/**
  * The cancellation deadline for one session.
  *
  * Returns null when the studio publishes no window — better to say nothing than to invent a

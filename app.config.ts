@@ -248,6 +248,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         // Navigation reads these BEFORE the studio's own show_schedule/show_appts flags: a tab
         // may only appear when the build has code for it AND the studio offers it.
         features: studio.features,
+        // The per-studio appointment wiring (endpoint variant, phantom-provider map). Data, not
+        // code — this is what keeps `=== 263` out of src/.
+        appointments: studio.appointments,
         display: studio.display,
         // Which photograph Home opens on. 'bundled' is what makes the splash handoff invisible.
         heroSource: studio.assets.heroSource,

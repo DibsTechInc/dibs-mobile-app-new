@@ -30,6 +30,18 @@ export interface StudioIdentity {
   features: {
     classes: boolean;
     appointments: boolean;
+    /** Appointments are ROOMS (263): no provider step, "studio time" copy. */
+    roomBooking: boolean;
+    /** A selected slot offers the Single / Lock-in-monthly toggle (263). */
+    monthlyCommitment: boolean;
+  };
+  /**
+   * Per-studio appointment wiring — data that would otherwise be a hardcoded studio-id branch.
+   * See whitelabel/schema.ts for field semantics.
+   */
+  appointments: {
+    availabilityVariant: 'standard' | 'custom-263';
+    providerByServiceId: Record<string, number>;
   };
   display: {
     showInstructor: boolean;
@@ -75,7 +87,25 @@ function readStudioIdentity(): StudioIdentity {
     );
   }
 
-  return studio as StudioIdentity;
+  // Fields added after a binary shipped arrive as `undefined` when an OTA bundle runs inside an
+  // older native shell (the config is baked at prebuild, not at bundle time). Backfill the two
+  // newest blocks with their schema defaults so reading them never crashes — absent flags mean
+  // the conservative behavior (no room booking, no monthly toggle, standard endpoint).
+  const identity = studio as StudioIdentity;
+  const features = identity.features as Partial<StudioIdentity['features']> & {
+    classes: boolean;
+    appointments: boolean;
+  };
+  identity.features = {
+    ...features,
+    roomBooking: features.roomBooking ?? false,
+    monthlyCommitment: features.monthlyCommitment ?? false,
+  };
+  identity.appointments = identity.appointments ?? {
+    availabilityVariant: 'standard',
+    providerByServiceId: {},
+  };
+  return identity;
 }
 
 export const studio: StudioIdentity = readStudioIdentity();

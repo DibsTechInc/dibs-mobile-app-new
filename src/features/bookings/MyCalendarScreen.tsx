@@ -139,6 +139,26 @@ function CancelAction({
   compact?: boolean;
 }) {
   const theme = useTheme();
+
+  /*
+   * An APPOINTMENT row never offers the in-app Cancel: the mobile drop endpoint refuses
+   * appointments by design (dropping one to zero attendees cancels the event itself —
+   * CANCELLATION.md §4.3), and a button that can only fail is worse than none. Saying how to
+   * change it is the affordance instead — "no button" and "no information" are different things,
+   * and the second is a support call.
+   */
+  if (booking.isAppointment) {
+    return (
+      <Text
+        variant="caption"
+        color="tertiary"
+        style={{ marginTop: compact ? theme.spacing.xs : theme.spacing.sm }}
+      >
+        To change or cancel, contact the studio.
+      </Text>
+    );
+  }
+
   if (!onCancel || booking.dibsTransactionId === null) return null;
 
   return (

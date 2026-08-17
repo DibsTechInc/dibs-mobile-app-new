@@ -17,7 +17,16 @@
   },
   "features": {
     "classes": false,
-    "appointments": true
+    "appointments": true,
+    "roomBooking": true,
+    "monthlyCommitment": true
+  },
+  "appointments": {
+    "availabilityVariant": "custom-263",
+    "providerByServiceId": {
+      "149": 3865566,
+      "150": 3865565
+    }
   },
   "display": {
     "showInstructor": false

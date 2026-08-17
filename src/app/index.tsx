@@ -12,6 +12,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { studio } from '@/config/studio';
 import { buildGreeting } from '@/domain/home/build-home-data';
+import { bookRouteForSurface, resolveBookingSurface } from '@/domain/studio/booking-surface';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useCartCount } from '@/features/cart/cartStore';
 import { HomeScreen, type HomeChoice } from '@/features/home/HomeScreen';
@@ -33,9 +34,20 @@ export default function HomeRoute() {
     [account?.firstName, studioName],
   );
 
+  /**
+   * Which surface "Book" opens — classes or appointments — is the AND of what this build ships
+   * (`studio.features`) and what the studio's own `dibs_configs` flags say it offers
+   * (`offersClasses` / `offersAppointments` from get-basic-config). One resolver owns the
+   * answer; see `domain/studio/booking-surface`.
+   */
+  const bookRoute = useMemo(
+    () => bookRouteForSurface(resolveBookingSurface(studio.features, config)),
+    [config],
+  );
+
   const choices = useMemo<[HomeChoice, HomeChoice, HomeChoice]>(
     () => [
-      { label: 'Book', icon: 'book', onPress: () => router.push('/schedule') },
+      { label: 'Book', icon: 'book', onPress: () => router.push(bookRoute) },
       {
         label: 'My Calendar',
         icon: 'myCalendar',
@@ -47,7 +59,7 @@ export default function HomeRoute() {
         ? { label: 'Account', icon: 'account', onPress: () => router.push('/account') }
         : { label: 'Sign In', icon: 'account', onPress: () => router.push('/sign-in') },
     ],
-    [isSignedIn],
+    [isSignedIn, bookRoute],
   );
 
   const onRetry = useCallback(() => refetchConfig(), [refetchConfig]);

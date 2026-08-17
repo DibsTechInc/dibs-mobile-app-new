@@ -10,6 +10,17 @@
  * is actually an outage. Each function below states what a *valid* response looks like and
  * raises a real error otherwise.
  */
+export {
+  AppointmentRefusedError,
+  checkSlotConflict,
+  completeAppointmentBooking,
+  createRecurringAppointment,
+  fetchAppointmentTypes,
+  fetchAvailability,
+  fetchProviders,
+  type CheckSlotConflictArgs,
+  type FetchAvailabilityArgs,
+} from './appointments';
 export { fetchAppRelease } from './app-release';
 export { fetchBasicConfig } from './basic-config';
 export {

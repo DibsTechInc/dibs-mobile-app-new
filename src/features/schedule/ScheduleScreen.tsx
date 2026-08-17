@@ -118,9 +118,13 @@ function DayChip({
         opacity: empty && !selected ? 0.42 : pressed ? 0.7 : 1,
       }]}
     >
+      {/* `onAccent`, not textInverse: on a LIGHT accent (IGTS's blue) the readable ink on the
+          accent block is dark, and white labels vanish at ~2.4:1. `onAccent` is the colour the
+          theme already computed to pass AA on this fill — for dark accents it IS white, so the
+          existing studios render identically. */}
       <Text
         variant="label"
-        style={{ color: selected ? theme.colors.accentInk : theme.colors.textInverse, opacity: selected ? 1 : 0.8 }}
+        style={{ color: selected ? theme.colors.accentInk : theme.colors.onAccent, opacity: selected ? 1 : 0.8 }}
       >
         {day.weekdayLabel}
       </Text>
@@ -129,7 +133,7 @@ function DayChip({
           phrase and does the editorial work on its own. */}
       <Text
         variant="heading"
-        style={{ color: selected ? theme.colors.accentInk : theme.colors.textInverse }}
+        style={{ color: selected ? theme.colors.accentInk : theme.colors.onAccent }}
       >
         {day.dayOfMonth}
       </Text>

@@ -160,8 +160,46 @@ export const studioConfigSchema = z.object({
     .object({
       classes: z.boolean().default(true),
       appointments: z.boolean().default(false),
+      /**
+       * The studio's appointments are ROOMS, not people (studio 263 rents space to independent
+       * trainers). true → the provider step is skipped entirely, copy says "studio time" rather
+       * than "session with", and bookings carry the phantom provider from
+       * `appointments.providerByServiceId` (see that field for why one is still required).
+       */
+      roomBooking: z.boolean().default(false),
+      /**
+       * A selected slot offers "Single session / Lock in monthly" (the 263 recurring
+       * reservation). Monthly books every remaining occurrence of that weekday this month now,
+       * plus a recurring subscription billed on the 25th.
+       */
+      monthlyCommitment: z.boolean().default(false),
     })
-    .default({ classes: true, appointments: false }),
+    .default({ classes: true, appointments: false, roomBooking: false, monthlyCommitment: false }),
+
+  /**
+   * Appointment-flow wiring that is per-studio DATA, not code. Exists so nothing under `src/`
+   * ever branches on a studio id — the widget hardcodes `=== '263'` in a dozen places and that
+   * is the thing this schema exists not to copy.
+   */
+  appointments: z
+    .object({
+      /**
+       * Which availability endpoint this studio's server expects. `'custom-263'` is the
+       * server-side variant that exists ONLY for studio 263 (the dibs-api controller rejects any
+       * other id): fixed hourly slot times, room-conflict-only checking, and per-slot
+       * pricing-rule enrichment. Every other studio uses the standard 30-minute-step endpoint.
+       */
+      availabilityVariant: z.enum(['standard', 'custom-263']).default('standard'),
+      /**
+       * roomBooking studios: appointment_type id → the provider id every booking of that type
+       * must carry. The backend writes `event.trainerid` verbatim and the upcoming-bookings
+       * enricher dereferences the instructor row with no null guard — an unresolvable trainerid
+       * HANGS the client's My Calendar request server-side. So a room booking still needs a real
+       * (phantom) instructor id, and the widget's hardcoded map lives here as config instead.
+       */
+      providerByServiceId: z.record(z.string(), z.number()).default({}),
+    })
+    .default({ availabilityVariant: 'standard', providerByServiceId: {} }),
 
   /**
    * Per-studio display switches that are NOT derivable from get-basic-config.

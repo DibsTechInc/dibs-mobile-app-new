@@ -12,6 +12,7 @@ import { router } from 'expo-router';
 import { useMemo } from 'react';
 
 import { studio } from '@/config/studio';
+import { bookRouteForSurface, resolveBookingSurface } from '@/domain/studio/booking-surface';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
 import { useWallet } from '@/features/account/useWallet';
@@ -58,8 +59,21 @@ export function useAppDrawer({ visible, onClose }: AppDrawerArgs) {
     return rows;
   }, [isSignedIn, wallet.data]);
 
+  // One resolver decides which surface "Book" means — the same one Home's tile reads.
+  const surface = resolveBookingSurface(studio.features, config);
+
   const items = useMemo<DrawerItem[]>(() => {
-    const rows: DrawerItem[] = [{ label: 'Book', icon: 'book', onPress: go('/schedule') }];
+    const rows: DrawerItem[] = [
+      { label: 'Book', icon: 'book', onPress: go(bookRouteForSurface(surface)) },
+    ];
+
+    /**
+     * Packages hide at an appointments-only studio — the widget's own rule (its nav drops
+     * Packages for every appointment studio): appointment entitlements are sold per booking or
+     * as the monthly commitment, and a Packages page selling class packs at a studio with no
+     * classes is a shop full of things that fit nothing.
+     */
+    const sellsPackages = surface !== 'appointments';
 
     // Only rows whose destinations exist. Referrals are later — and a drawer row that leads
     // nowhere is the dead end this codebase keeps refusing to ship.
@@ -70,7 +84,9 @@ export function useAppDrawer({ visible, onClose }: AppDrawerArgs) {
       // Third, between what you have booked and your account: buying a pack is the thing you do
       // BETWEEN booking and administration, and burying it under Account is how a client
       // concludes the app has no way to buy one (Alicia, 2026-08-13).
-      rows.push({ label: 'Packages', icon: 'packages', onPress: go('/packages') });
+      if (sellsPackages) {
+        rows.push({ label: 'Packages', icon: 'packages', onPress: go('/packages') });
+      }
       rows.push({ label: 'Account', icon: 'account', onPress: go('/account') });
       rows.push({
         label: 'Payment methods',
@@ -84,7 +100,9 @@ export function useAppDrawer({ visible, onClose }: AppDrawerArgs) {
     } else {
       // A guest gets Packages too: the price list is public, and "what would this cost me" is a
       // reasonable question to answer before making an account.
-      rows.push({ label: 'Packages', icon: 'packages', onPress: go('/packages') });
+      if (sellsPackages) {
+        rows.push({ label: 'Packages', icon: 'packages', onPress: go('/packages') });
+      }
       rows.push({ label: 'Sign in', icon: 'account', onPress: go('/sign-in') });
     }
 
@@ -92,7 +110,7 @@ export function useAppDrawer({ visible, onClose }: AppDrawerArgs) {
     // `go` closes over `onClose`, which the caller keeps stable; rebuilding these rows per render
     // would be cheap anyway, and the alternative is memoising a function that pushes a route.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSignedIn, onClose]);
+  }, [isSignedIn, onClose, surface]);
 
   return (
     <DrawerMenu

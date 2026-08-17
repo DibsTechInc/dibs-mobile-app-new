@@ -47,6 +47,12 @@ export interface BookingListItem {
   isCancelled: boolean;
   /** The studio marked them present. Only ever meaningful on a past booking. */
   didAttend: boolean;
+  /**
+   * An appointment, not a class (`eventtype === 'appt'`). Appointments cannot be cancelled from
+   * the app — the mobile drop endpoint refuses them by design (CANCELLATION.md §4.3) — so a row
+   * carrying this must offer the studio's contact path instead of a Cancel that can only fail.
+   */
+  isAppointment: boolean;
 }
 
 export interface GroupedBookings {
@@ -90,6 +96,7 @@ function toItem(
     paidWithLabel: row.paidWithLabel?.trim() || row.serviceName?.trim() || null,
     isCancelled: row.dropped === true,
     didAttend: row.checkedin === true,
+    isAppointment: row.eventtype === 'appt',
   };
 }
 
