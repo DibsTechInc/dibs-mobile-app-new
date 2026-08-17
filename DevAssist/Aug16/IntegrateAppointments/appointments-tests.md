@@ -103,7 +103,9 @@ credit < total.
 ### 9. My Calendar — appointment rows
 **Success criteria:**
 - [ ] Appointment rows use the schedule row anatomy; no instructor at 263; room/service name shown.
-- [ ] NO Cancel affordance on appointment rows; the row carries the contact-the-studio line.
+- [ ] Single appointment rows offer Cancel (see §11-13); SUBSCRIPTION-owned rows carry the
+      contact-the-studio line instead. (Superseded the original "no cancel on appointments" —
+      self-cancel shipped in the second pass, 2026-08-16.)
 - [ ] Class studios' rows unchanged (regression: everyday-ballet build, cancel a class still works).
 
 ### 10. Schedule DayChip contrast fix (regression)
@@ -134,3 +136,29 @@ credit < total.
 - The monthly billing sentence copy — the widget charges the rest of this month AND bills on the
   25th; the handoff flags the rule itself for your confirmation before the copy ships.
 - Visual pass on device: services, slots, review, checkout, booked, My Calendar at 263's accent.
+
+## Added 2026-08-16 (second pass): appointment self-cancel
+
+### 11. Cancel a single appointment — early (notice given)
+**Steps:** Book a single session at 263 more than the notice window out; My Calendar → Cancel booking.
+**Success criteria:**
+- [ ] The sheet names the appointment deadline from `default_cancel_time_private || cancel_time || 12`.
+- [ ] Confirm calls `POST /checkout/appointment/cancel`; response `returned` drives the outcome copy.
+- [ ] DB: transaction soft-deleted, attendee dropped, EVENT cancelled (canceled=1/deleted=1),
+      `appointment.status='cancelled'`, history note says "Cancelled by the client from the mobile app".
+- [ ] 263: the room-hour is bookable again (availability shows the slot).
+- [ ] Value returned per the studio's `return_classes_as` (credit by default for card bookings;
+      use back on a genuine pack); wallet reflects it after refetch.
+- [ ] Client cancellation email received; ops email fired.
+
+### 12. Cancel — late (inside the window)
+- [ ] The sheet explains the window closed at the actual deadline and offers NO cancel button.
+- [ ] Forcing the request anyway (curl) → 409 `late_cancel` with `noticeHours` + `deadline`; nothing changes.
+
+### 13. Subscription-owned session
+- [ ] A monthly-reservation date shows "Part of your recurring reservation — contact the studio",
+      no Cancel; curl → 409 `subscription_session`.
+
+### 14. Email instructor suppression (263)
+- [ ] Single-appt confirmation email at 263 shows NO "w/ Strength Instructor" line; other studios'
+      confirmation emails still show their instructor.

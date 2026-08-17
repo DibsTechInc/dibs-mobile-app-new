@@ -33,6 +33,7 @@ export {
   BookingRefusedError,
   bookClassWithCredit,
   bookClassWithPass,
+  cancelAppointment,
   confirmClassBooking,
   createClassPaymentIntent,
   dropClass,

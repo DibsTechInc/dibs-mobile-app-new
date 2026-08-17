@@ -21,6 +21,17 @@ export interface CancelBookingSheetProps {
   window: CancelWindow | null;
   status: DropStatus;
   currency?: string;
+  /**
+   * Overrides `cancelWindowSentence` — the appointment flow's copy differs in KIND (a late
+   * appointment cancel is refused, not merely unreturned), so the caller supplies the sentence.
+   */
+  consequence?: string | null;
+  /**
+   * The cancel cannot proceed at all (an appointment inside its notice window). The confirm CTA
+   * is withheld — offering a button the server must refuse is the dead end this app keeps
+   * refusing to ship — and the sheet becomes the explanation plus a way out.
+   */
+  blocked?: boolean;
   onConfirm: () => void;
   onClose: () => void;
 }
@@ -30,6 +41,8 @@ export function CancelBookingSheet({
   window,
   status,
   currency = 'USD',
+  consequence,
+  blocked = false,
   onConfirm,
   onClose,
 }: CancelBookingSheetProps) {
@@ -65,9 +78,9 @@ export function CancelBookingSheet({
             {/* The consequence, in the studio's terms, BEFORE the tap. Silent when the studio
                 publishes no window — inventing a policy on their behalf is worse than saying
                 nothing. */}
-            {cancelWindowSentence(window) ? (
+            {(consequence ?? cancelWindowSentence(window)) ? (
               <Text variant="body" color={window?.isStillFree ? 'secondary' : 'primary'}>
-                {cancelWindowSentence(window)}
+                {consequence ?? cancelWindowSentence(window)}
               </Text>
             ) : null}
             {status.kind === 'error' ? (
@@ -81,6 +94,8 @@ export function CancelBookingSheet({
         <View style={{ gap: theme.spacing.sm, marginTop: theme.spacing.xs }}>
           {outcome ? (
             <Button label="Done" onPress={onClose} />
+          ) : blocked ? (
+            <Button label="Close" variant="secondary" onPress={onClose} />
           ) : (
             <>
               <Button

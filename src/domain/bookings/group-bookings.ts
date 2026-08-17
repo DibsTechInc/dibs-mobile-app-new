@@ -48,11 +48,17 @@ export interface BookingListItem {
   /** The studio marked them present. Only ever meaningful on a past booking. */
   didAttend: boolean;
   /**
-   * An appointment, not a class (`eventtype === 'appt'`). Appointments cannot be cancelled from
-   * the app — the mobile drop endpoint refuses them by design (CANCELLATION.md §4.3) — so a row
-   * carrying this must offer the studio's contact path instead of a Cancel that can only fail.
+   * An appointment, not a class (`eventtype === 'appt'`). Cancellable in-app since 2026-08-16 —
+   * through its OWN endpoint (`/checkout/appointment/cancel`, notice-or-nothing) — EXCEPT when
+   * the session belongs to a recurring reservation (`isSubscriptionSession`).
    */
   isAppointment: boolean;
+  /**
+   * One date of a recurring reservation (the event carries a subscription linkage). The server
+   * refuses these (`subscription_session`) — a commitment is the studio's to change — so the row
+   * offers the contact path instead of a Cancel that can only fail.
+   */
+  isSubscriptionSession: boolean;
 }
 
 export interface GroupedBookings {
@@ -97,6 +103,9 @@ function toItem(
     isCancelled: row.dropped === true,
     didAttend: row.checkedin === true,
     isAppointment: row.eventtype === 'appt',
+    isSubscriptionSession:
+      typeof row.subscription_id === 'number' ||
+      (typeof row.subscription_ids === 'string' && row.subscription_ids.trim().length > 0),
   };
 }
 

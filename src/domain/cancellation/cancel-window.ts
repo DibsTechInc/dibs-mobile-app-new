@@ -124,6 +124,19 @@ export function describeCancelWindow(
  * whether to book at 9pm for a 7am class deserves to know the window has already closed on them
  * before they commit, not after.
  */
+/**
+ * The appointment version of the sentence below. Different in kind, not just in words: a late
+ * CLASS drop is allowed and simply returns nothing, but a late APPOINTMENT cancel is REFUSED
+ * outright (the server is notice-or-nothing), so the closed-window copy has to say "the studio
+ * is the way", not "you won't get the class back".
+ */
+export function appointmentCancelSentence(window: CancelWindow | null): string | null {
+  if (!window) return null;
+  return window.isStillFree
+    ? `Free to cancel until ${window.deadlineLabel} — ${window.noticeHours} hour${window.noticeHours === 1 ? '' : 's'} before your appointment.`
+    : `This appointment needed ${window.noticeHours} hour${window.noticeHours === 1 ? '' : 's'}' notice to cancel, and that window closed at ${window.deadlineLabel}. Contact the studio and they can help.`;
+}
+
 export function cancelWindowSentence(window: CancelWindow | null): string | null {
   if (!window) return null;
   const hours = `${window.noticeHours} hour${window.noticeHours === 1 ? '' : 's'} before class`;
