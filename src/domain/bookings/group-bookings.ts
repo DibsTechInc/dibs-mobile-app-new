@@ -19,6 +19,14 @@ import { formatStoredTime, hoursUntilStoredTime } from '@/domain/time/studio-now
 
 export interface BookingListItem {
   eventId: number;
+  /**
+   * The booking's transaction id — the key the drop endpoint takes.
+   *
+   * Never null in practice: `add-data-to-appts.js` returns null for the whole row when it cannot
+   * resolve one, so a booking without it does not reach the app at all. Typed nullable anyway,
+   * because "no id" must render as "no cancel button" rather than as a request with `NaN` in it.
+   */
+  dibsTransactionId: number | null;
   /** Stored wall-clock, carried verbatim so the screen never re-derives a time. */
   startsAt: string;
   name: string;
@@ -67,6 +75,7 @@ function toItem(
 ): BookingListItem {
   return {
     eventId: row.eventid,
+    dibsTransactionId: typeof row.dibsTransactionId === 'number' ? row.dibsTransactionId : null,
     startsAt: row.start_date,
     name: (row.name ?? row.classtitle ?? 'Your booking').trim(),
     instructor: showInstructor
@@ -75,7 +84,10 @@ function toItem(
     locationLabel: row.location?.locationName?.trim() || null,
     whenLabel: describeBookingDay(row.start_date, timeZone, now),
     timeLabel: formatStoredTime(row.start_date),
-    paidWithLabel: row.serviceName?.trim() || null,
+    // The server's payment description wins ("Booked with studio credit") — it exists precisely
+    // because `serviceName` for booking-time payments is the internal "[Admin] Paid Session ($X)"
+    // bookkeeping package. Genuine packs carry no paidWithLabel and keep their package name.
+    paidWithLabel: row.paidWithLabel?.trim() || row.serviceName?.trim() || null,
     isCancelled: row.dropped === true,
     didAttend: row.checkedin === true,
   };
@@ -138,6 +150,39 @@ export interface BookingDaySection {
  * Input is assumed already sorted, which `groupBookings` guarantees; the sections come out in the
  * same order without a second sort.
  */
+export interface NextUpSplit {
+  /** The very next thing the client has to be somewhere for. Null when nothing is upcoming. */
+  next: BookingListItem | null;
+  /** Everything after it, still grouped by day. The day `next` is on keeps its other bookings. */
+  rest: BookingDaySection[];
+}
+
+/**
+ * Lift the next booking out of the sections.
+ *
+ * My Calendar gives it an editorial treatment of its own — the time set large, the day named in
+ * words — because "where do I have to be next" is the question the screen exists to answer, and
+ * making somebody read it out of row one of a list is making them do the work.
+ *
+ * It is REMOVED from the list rather than repeated in it. A hero above a list whose first row is
+ * the same booking reads as a rendering bug, and the client counts their classes wrong.
+ *
+ * A day that had only the next booking on it disappears from `rest` entirely — an empty day header
+ * is a heading with nothing under it.
+ */
+export function splitNextUp(sections: BookingDaySection[]): NextUpSplit {
+  const next = sections[0]?.bookings[0] ?? null;
+  if (!next) return { next: null, rest: [] };
+
+  const rest = sections
+    .map((section, index) =>
+      index === 0 ? { ...section, bookings: section.bookings.slice(1) } : section,
+    )
+    .filter((section) => section.bookings.length > 0);
+
+  return { next, rest };
+}
+
 export function toDaySections(upcoming: BookingListItem[]): BookingDaySection[] {
   const sections: BookingDaySection[] = [];
   let currentDate: string | null = null;

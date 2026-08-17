@@ -2,11 +2,12 @@ import {
   formatPhoneForDisplay,
   hasProfileErrors,
   isProfileDirty,
+  normalizeBirthday,
   normalizePhone,
   validateProfile,
 } from '../validate';
 
-const base = { firstName: 'Elan', lastName: 'Marek', phone: '3104037905' };
+const base = { firstName: 'Elan', lastName: 'Marek', phone: '3104037905', birthday: '' };
 
 describe('normalizePhone', () => {
   it('reduces every written form of one number to the same digits', () => {
@@ -69,5 +70,46 @@ describe('isProfileDirty', () => {
 
   it('is true for a real edit', () => {
     expect(isProfileDirty({ ...base, lastName: 'Marek-Ross' }, base)).toBe(true);
+  });
+});
+
+describe('birthday', () => {
+  it('accepts MM/DD and normalizes what people actually type', () => {
+    // A date field that rejects a plausible keystroke is a field people give up on.
+    expect(normalizeBirthday('03/14')).toBe('03/14');
+    expect(normalizeBirthday('3/14')).toBe('03/14');
+    expect(normalizeBirthday('3-14')).toBe('03/14');
+    expect(normalizeBirthday('314')).toBe('03/14');
+    expect(normalizeBirthday('0314')).toBe('03/14');
+  });
+
+  it('is optional — empty is a real answer, not an error', () => {
+    expect(validateProfile({ ...base, birthday: '' }).birthday).toBeUndefined();
+    expect(validateProfile({ ...base, birthday: '   ' }).birthday).toBeUndefined();
+  });
+
+  it('allows February 29 — a leap-day birthday is a birthday', () => {
+    // There is no year stored, so there is nothing to check a leap day against. Rejecting it
+    // would tell roughly five million people their birthday does not exist.
+    expect(validateProfile({ ...base, birthday: '02/29' }).birthday).toBeUndefined();
+  });
+
+  it('rejects a day that does not exist in that month', () => {
+    // Checked against the actual month rather than a flat 31.
+    expect(validateProfile({ ...base, birthday: '02/30' }).birthday).toBeDefined();
+    expect(validateProfile({ ...base, birthday: '04/31' }).birthday).toBeDefined();
+    expect(validateProfile({ ...base, birthday: '13/01' }).birthday).toBeDefined();
+    expect(validateProfile({ ...base, birthday: '00/10' }).birthday).toBeDefined();
+  });
+
+  it('rejects a year, because the platform does not store one', () => {
+    expect(validateProfile({ ...base, birthday: '03/14/1990' }).birthday).toBeDefined();
+  });
+
+  it('does not count a reformat as a change to save', () => {
+    // Typing 3/14 over a stored 03/14 is the same birthday. Saving it would be a write nobody
+    // asked for, and it would light up the Save button for no reason.
+    expect(isProfileDirty({ ...base, birthday: '3/14' }, { ...base, birthday: '03/14' })).toBe(false);
+    expect(isProfileDirty({ ...base, birthday: '03/15' }, { ...base, birthday: '03/14' })).toBe(true);
   });
 });

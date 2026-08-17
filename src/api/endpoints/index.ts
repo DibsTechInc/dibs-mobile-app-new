@@ -10,7 +10,31 @@
  * is actually an outage. Each function below states what a *valid* response looks like and
  * raises a real error otherwise.
  */
+export { fetchAppRelease } from './app-release';
 export { fetchBasicConfig } from './basic-config';
+export {
+  fetchAccountActivity,
+  fetchUpcomingPayments,
+  type AccountActivityPage,
+  type UpcomingPayments,
+} from './billing';
+export {
+  BookingRefusedError,
+  bookClassWithCredit,
+  bookClassWithPass,
+  confirmClassBooking,
+  createClassPaymentIntent,
+  dropClass,
+  type BookClassWithCreditArgs,
+  type BookClassWithPassArgs,
+  type CreateClassPaymentIntentArgs,
+} from './class-booking';
+export {
+  PurchaseRefusedError,
+  confirmPackagePurchase,
+  createPackagePaymentIntent,
+  type CreatePackagePaymentIntentArgs,
+} from './package-purchase';
 export {
   createSetupIntent,
   ensureConnectedCustomer,
@@ -19,9 +43,17 @@ export {
   setDefaultCard,
   type CreateSetupIntentArgs,
 } from './cards';
+export {
+  cancelMembership,
+  CommitmentNotMetError,
+  type CancelMembershipArgs,
+} from './membership';
+export { fetchPackages } from './packages';
+export { confirmPasswordSet } from './password';
 export { fetchSchedule } from './schedule';
 export { fetchClientBookings, type ClientBookings } from './upcoming';
 export { updateProfile, type UpdateProfileArgs } from './profile';
+export { deleteAccount, AccountDeletionRefusedError } from './delete-account';
 export { createDibsUser, fetchUserAccount } from './user-account';
 export {
   fetchCredit,

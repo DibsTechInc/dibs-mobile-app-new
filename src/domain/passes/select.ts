@@ -40,18 +40,30 @@ export function usablePasses(passes: Pass[], now: Date = new Date()): Pass[] {
 /**
  * Order passes by which should be spent first.
  *
- * 1. **Finite before unlimited.** An unlimited pass loses nothing by going unused this once; a
- *    10-class pack has a fixed number of uses and an expiry, so spending it first is what a
- *    client would choose if asked.
- * 2. **Expiring soonest first**, for the same reason — use it before it evaporates.
- * 3. **Fewest uses remaining**, to finish off a nearly-spent pack rather than stranding one use.
+ * ⚠️ **The SERVER is the authority. This must stay identical to
+ * `dibs-api/services/shared/checkout/class-pass/choose-pass-for-class.js#comparePasses`.**
+ * The app only shows which pass is about to be used; `book-with-pass` chooses again and its choice
+ * is the one that happens. If the two orderings drift, the app names one package and the client's
+ * account loses a use off another — which reads as the app spending the wrong thing.
+ *
+ * 1. **UNLIMITED first.** A client holding a membership AND a 10-class pack should spend the
+ *    membership: it is already paid for, it has no balance to run down, and drawing on the pack
+ *    instead silently costs them a class they could have kept for after the membership ends.
+ * 2. **Then the finite pass expiring soonest** — it is the one about to become worthless.
+ * 3. **No expiry sorts last** within that group, for the same reason.
  * 4. **Lowest id**, so the order is stable and two surfaces never disagree over a tie.
+ *
+ * This REVERSED rule 1 on 2026-08-13 (it read "finite before unlimited"). The old note argued a
+ * pack should go first because it has a fixed number of uses and an expiry — but that reasoning
+ * only holds if the two are alternatives, and they are not: while a membership is live it covers
+ * every class anyway, so burning pack classes underneath it is pure loss to the client. The
+ * function had no production callers at the time, so nothing shipped on the old order.
  */
 export function sortPassesByPriority(passes: Pass[]): Pass[] {
   return [...passes].sort((a, b) => {
     const aInfinite = remainingPassUses(a) === Number.POSITIVE_INFINITY;
     const bInfinite = remainingPassUses(b) === Number.POSITIVE_INFINITY;
-    if (aInfinite !== bInfinite) return aInfinite ? 1 : -1;
+    if (aInfinite !== bInfinite) return aInfinite ? -1 : 1;
 
     const aExpiry = a.expiresAt ? new Date(a.expiresAt).getTime() : Number.POSITIVE_INFINITY;
     const bExpiry = b.expiresAt ? new Date(b.expiresAt).getTime() : Number.POSITIVE_INFINITY;

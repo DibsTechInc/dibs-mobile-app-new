@@ -116,6 +116,25 @@ export const studioConfigSchema = z.object({
     /** The version this build ships as. Must exceed `lastKnownStoreVersion` for an update. */
     version: storeVersion.default('2.0.0'),
     /**
+     * CFBundleVersion / versionCode — the build's INTEGER identity, and the only number the
+     * version gate compares.
+     *
+     * Separate from `version` because a store version is a string, and `"1.10.0" < "1.9.0"` is
+     * true in a lexical comparison. That is how a version gate ships inverted and blocks
+     * everybody. Integers cannot do that.
+     *
+     * ⚠️ **Bump this by hand for every store upload.** eas.json sets `autoIncrement` on the
+     * production profile, but with `appVersionSource: "local"` and a DYNAMIC config
+     * (app.config.ts rather than app.json) EAS has nowhere to write the incremented value back
+     * to — so the auto-increment cannot persist and this file is the source of truth. Apple
+     * rejects a second upload carrying a CFBundleVersion it has already seen for the same
+     * version, so a forgotten bump fails at upload rather than silently.
+     *
+     * The server-side counterpart is `mobile_app_releases.latest_build`. Raise that at release;
+     * raise `minimum_build` days LATER, once the release has actually rolled out.
+     */
+    buildNumber: z.number().int().positive().default(1),
+    /**
      * What the store showed last time we looked, for reference and for the version guard.
      * Not authoritative — App Store Connect is. Update it when you check.
      */
@@ -182,6 +201,22 @@ export const studioConfigSchema = z.object({
   support: z.object({
     email: z.string().email(),
   }),
+
+  /**
+   * Session analytics, per studio app.
+   *
+   * `clarityProjectId` is the Microsoft Clarity project this binary reports into — one project
+   * per studio app, the same way the widget and studio-admin each have their own, so a studio's
+   * recordings are never mixed with another studio's. ABSENT means the Clarity SDK never
+   * initialises: the integration is dormant until somebody creates the project at
+   * clarity.microsoft.com and records its id here. Store note: an ACTIVE id makes the app
+   * collect usage analytics, which must be declared in the App Store privacy answers.
+   */
+  analytics: z
+    .object({
+      clarityProjectId: z.string().min(1).optional(),
+    })
+    .default({}),
 
   legal: z.object({
     /** Required on every store listing. */

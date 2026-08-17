@@ -9,6 +9,7 @@
     "ownership": "dibs",
     "releaseType": "update",
     "version": "2.0.0",
+    "buildNumber": 1,
     "lastKnownStoreVersion": "1.8",
     "notes": "Live iOS listing under Dibs Technology Inc since 2021-04-01, currently broken. Rebuild ships as an in-place update to the same bundle id. iOS only for v1 — nothing has ever been submitted to Google Play.",
     "platforms": [
@@ -23,15 +24,17 @@
     "showInstructor": true
   },
   "ios": {
-    "bundleId": "com.ondibs.carlsbadvillageyogaapp"
+    "bundleId": "com.ondibs.carlsbadvillageyogaapp",
+  "merchantId": "merchant.com.ondibs.carlsbadvillageyogaapp",
+  "appleTeamId": "R8RUP42952"
   },
   "android": {},
   "support": {
     "email": "info@carlsbadvillageyoga.com"
   },
   "legal": {
-    "privacyPolicyUrl": "https://dibsonline.com/apple/privacy-policy",
-    "privacyPolicyLive": false
+    "privacyPolicyUrl": "https://www.dibsonline.com/privacy-policy",
+    "privacyPolicyLive": true
   },
   "api": {
     "url": "https://api.dibsonline.com/api/v2"

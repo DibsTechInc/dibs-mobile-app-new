@@ -242,3 +242,40 @@ export function describeTimeUntil(
   if (abs < 24) return phrase(abs, 'hour');
   return phrase(abs / 24, 'day');
 }
+
+/** Month names for `formatIsoDate`. Hand-rolled for the same reason the widget's are: */
+const MONTH_ABBR = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec',
+] as const;
+
+/**
+ * Render a bare `YYYY-MM-DD` as "Nov 2, 2026" — WITHOUT ever constructing a Date.
+ *
+ * `new Date('2026-11-03')` is parsed as UTC midnight, so `.toLocaleDateString()` renders it as
+ * Nov 2 in every negative-offset timezone — which is every Dibs studio. The server already
+ * resolved this date in the studio's frame; the app's only job is to print the parts it was
+ * given. Parsing it back into an instant is the entire bug class.
+ *
+ * `Sept` rather than `Sep`, matching the widget's table — `toLocaleDateString({month:'short'})`
+ * gives "Sep", which is why that table is hand-rolled there too.
+ *
+ * @returns null for anything that is not a well-formed date string, so a caller renders nothing
+ *          rather than "Invalid Date".
+ */
+export function formatIsoDate(isoDate: string | null | undefined, withYear = true): string | null {
+  if (typeof isoDate !== 'string') return null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoDate.trim());
+  if (!match) return null;
+
+  const [, year, month, day] = match;
+  const monthIndex = Number(month) - 1;
+  if (monthIndex < 0 || monthIndex > 11) return null;
+
+  const dayNumber = Number(day);
+  if (dayNumber < 1 || dayNumber > 31) return null;
+
+  return withYear
+    ? `${MONTH_ABBR[monthIndex]} ${dayNumber}, ${year}`
+    : `${MONTH_ABBR[monthIndex]} ${dayNumber}`;
+}

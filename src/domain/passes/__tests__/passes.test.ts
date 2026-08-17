@@ -15,7 +15,12 @@ import {
   sortPassesByPriority,
   usablePasses,
 } from '../select';
-import { isUnlimitedPass, remainingPassUses, remainingPassUsesLabel, UNLIMITED_SENTINEL } from '../uses';
+import {
+  isUnlimitedPass,
+  remainingPassUses,
+  remainingPassUsesLabel,
+  UNLIMITED_SENTINEL_MIN,
+} from '../uses';
 
 const NOW = new Date('2026-08-06T12:00:00.000Z');
 
@@ -38,9 +43,37 @@ describe('the unlimited rule', () => {
     expect(remainingPassUses(pass({ totalUses: null, usesCount: 400 }))).toBe(Number.POSITIVE_INFINITY);
   });
 
-  it('treats the legacy 999 sentinel the same way', () => {
-    expect(isUnlimitedPass(pass({ totalUses: UNLIMITED_SENTINEL }))).toBe(true);
-    expect(remainingPassUses(pass({ totalUses: 999, usesCount: 50 }))).toBe(Number.POSITIVE_INFINITY);
+  it('treats the WHOLE legacy sentinel family as unlimited, not just 999', () => {
+    // 999, 9999, 99999 all mean the same thing. `=== 999` answered for one member of a family and
+    // read a 9999 pass as finite — while the server read it as unlimited and sorted it first.
+    for (const sentinel of [UNLIMITED_SENTINEL_MIN, 9999, 99999]) {
+      expect(isUnlimitedPass(pass({ totalUses: sentinel }))).toBe(true);
+      expect(remainingPassUses(pass({ totalUses: sentinel, usesCount: 50 }))).toBe(
+        Number.POSITIVE_INFINITY,
+      );
+    }
+  });
+
+  it('believes the PACKAGE over the count — an unlimited membership is never a countdown', () => {
+    // The live symptom this fixes: a membership card reading "949 classes left". `totalUses` is
+    // decorative on a package flagged unlimited; the flag is the authority.
+    const membership = pass({
+      totalUses: 50,
+      usesCount: 1,
+      studioPackage: { packageName: 'Month Unlimited', unlimited: true },
+    });
+    expect(isUnlimitedPass(membership)).toBe(true);
+    expect(remainingPassUsesLabel(membership)).toBe('Unlimited');
+  });
+
+  it('does not call a plain pack unlimited just because the flag is absent or false', () => {
+    expect(isUnlimitedPass(pass({ totalUses: 10, studioPackage: { packageName: '10-Class Pass' } }))).toBe(
+      false,
+    );
+    expect(
+      isUnlimitedPass(pass({ totalUses: 10, studioPackage: { packageName: 'Pack', unlimited: false } })),
+    ).toBe(false);
+    expect(isUnlimitedPass(pass({ totalUses: 10, studioPackage: null }))).toBe(false);
   });
 
   it('NEVER reports an unlimited pass as over-spent', () => {
@@ -100,12 +133,23 @@ describe('isUsablePass', () => {
 });
 
 describe('sortPassesByPriority', () => {
-  it('spends a finite pack before an unlimited membership', () => {
-    // The membership loses nothing by going unused this once; the pack has a fixed number of
-    // uses and an expiry date.
+  it('spends an unlimited membership before a finite pack', () => {
+    // While the membership is live it covers every class anyway, so drawing on the pack underneath
+    // it is pure loss — those classes could have been kept for after the membership ends.
+    //
+    // This must match the server's `comparePasses`, which chooses the pass that is actually spent.
+    // If the two drift, the app names one package and the account loses a use off another.
     const order = sortPassesByPriority([
-      pass({ id: 1, totalUses: null }),
-      pass({ id: 2, totalUses: 10, usesCount: 3 }),
+      pass({ id: 1, totalUses: 10, usesCount: 3 }),
+      pass({ id: 2, totalUses: null }),
+    ]);
+    expect(order.map((p) => p.id)).toEqual([2, 1]);
+  });
+
+  it('treats the legacy 999 sentinel as unlimited too', () => {
+    const order = sortPassesByPriority([
+      pass({ id: 1, totalUses: 10, usesCount: 3 }),
+      pass({ id: 2, totalUses: 999 }),
     ]);
     expect(order.map((p) => p.id)).toEqual([2, 1]);
   });
@@ -141,13 +185,13 @@ describe('sortPassesByPriority', () => {
 describe('choosePassForClass', () => {
   const publicClass = { can_apply_pass: true, private: false };
 
-  it('picks the highest-priority usable pass', () => {
+  it('picks the highest-priority usable pass — the membership, not the pack', () => {
     const chosen = choosePassForClass(
       [pass({ id: 1, totalUses: null }), pass({ id: 2, totalUses: 10, usesCount: 3 })],
       publicClass,
       NOW,
     );
-    expect(chosen?.id).toBe(2);
+    expect(chosen?.id).toBe(1);
   });
 
   it('refuses when the studio has turned passes off for this class', () => {

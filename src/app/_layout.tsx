@@ -5,9 +5,12 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { queryClient } from '@/api/query-client';
+import { ClarityIntegration } from '@/features/analytics/ClarityIntegration';
+import { AppReleaseGate } from '@/features/app-release/AppReleaseGate';
 import { AuthProvider } from '@/features/auth/AuthProvider';
 import { installAuthBridge } from '@/features/auth/bridge';
 import { StripeSdkProvider } from '@/features/payments/StripeSdkProvider';
+import { AppWarmup } from '@/features/prefetch/AppWarmup';
 import { StudioConfigProvider } from '@/features/studio/StudioConfigProvider';
 
 // Module scope, not an effect. Effects run child-first, so by the time a provider's effect ran,
@@ -46,7 +49,19 @@ export default function RootLayout() {
               {/* Wrapped in a fragment because StripeProvider types its children as a single
                   element. */}
               <>
-                <Stack screenOptions={{ headerShown: false }} />
+                {/* Above the navigation tree so a required update is never resolved mid-checkout.
+                    It overlays rather than blocking — it can never hold the app hostage to a
+                    request, and it fails open on every error. See AppReleaseGate. */}
+                <AppReleaseGate>
+                  <Stack screenOptions={{ headerShown: false }} />
+                </AppReleaseGate>
+                {/* Warms the schedule/bookings/billing caches at launch so the first tap into
+                    any of them lands on data, not a skeleton. Renders nothing; failures are
+                    silent — every screen keeps its own loading and error states. */}
+                <AppWarmup />
+                {/* Session recordings. Dormant unless this studio's studio.json carries a
+                    Clarity project id — see ClarityIntegration. */}
+                <ClarityIntegration />
                 {/* Light content throughout: v1 has no dark mode, and the background is always light. */}
                 <StatusBar style="dark" />
               </>

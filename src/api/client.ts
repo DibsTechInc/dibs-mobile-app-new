@@ -38,6 +38,11 @@ export interface RequestOptions {
   /** Send the Authorization header even though the route does not strictly require it. */
   authenticated?: boolean;
   signal?: AbortSignal;
+  /**
+   * Override the client-wide timeout for this one call. For requests whose answer stops being
+   * useful quickly — the version gate, which nothing waits on — rather than a general knob.
+   */
+  timeoutMs?: number;
 }
 
 const DEFAULT_TIMEOUT_MS = 20_000;
@@ -98,7 +103,7 @@ export class ApiClient {
     const token = await this.safeGetToken();
     if (token) headers.Authorization = `Bearer ${token}`;
 
-    const timeoutMs = this.options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+    const timeoutMs = requestOptions.timeoutMs ?? this.options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     // Honour a caller-supplied cancellation (TanStack Query passes one) alongside our timeout.

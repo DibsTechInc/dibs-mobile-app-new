@@ -1,8 +1,18 @@
 /**
- * The button. Four variants, and the accent appears on exactly one of them.
+ * The button. Five variants, and the accent is FILLED on exactly one of them.
  *
  * `primary` is the studio's colour, so a screen with two primaries has spent the scarcity that
  * makes the accent mean something. One per screen, at most.
+ *
+ * ── Why `accentOutline` exists ─────────────────────────────────────────────────────────────────
+ * The schedule shows a Book button on EVERY row, and the booking widget draws them outlined in the
+ * studio's colour rather than filled. That is not a stylistic copy — it is what makes the one
+ * filled button on the screen (the sticky Checkout bar) still read as the primary action. Twelve
+ * filled accent buttons stacked down a list is the scarcity rule broken twelve times over, and the
+ * thing you actually want pressed disappears among them.
+ *
+ * `secondary` is NOT a substitute: its border is the neutral `border` token, so a row of them reads
+ * as disabled chrome rather than as the studio inviting you to book.
  */
 import { ActivityIndicator, Pressable, type PressableProps, View } from 'react-native';
 
@@ -10,7 +20,7 @@ import { useTheme } from '@/theme/ThemeProvider';
 
 import { Text } from './Text';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive';
+export type ButtonVariant = 'primary' | 'accentOutline' | 'secondary' | 'ghost' | 'destructive';
 
 export interface ButtonProps extends Omit<PressableProps, 'style' | 'children'> {
   label: string;
@@ -43,6 +53,13 @@ export function Button({
       border: 'transparent',
       textColor: 'onAccent' as const,
     },
+    // The studio's colour as a BORDER and as ink, never as a field. See the note at the top.
+    accentOutline: {
+      background: theme.colors.background,
+      pressed: theme.colors.accentWash,
+      border: theme.colors.accentBorder,
+      textColor: 'accent' as const,
+    },
     secondary: {
       background: theme.colors.background,
       pressed: theme.colors.surface,
@@ -66,6 +83,9 @@ export function Button({
   }[variant];
 
   const verticalPadding = size === 'compact' ? theme.spacing.md - 2 : theme.spacing.base - 2;
+  // Compact buttons live inline — in a row's action column, beside other controls — where CTA-scale
+  // padding eats the room the label needs and wraps it ("Adde / d" on the schedule's Added button).
+  const horizontalPadding = size === 'compact' ? theme.spacing.base : theme.spacing.lg;
 
   return (
     <Pressable
@@ -77,7 +97,7 @@ export function Button({
         {
           minHeight: theme.minTapTarget,
           paddingVertical: verticalPadding,
-          paddingHorizontal: theme.spacing.lg,
+          paddingHorizontal: horizontalPadding,
           borderRadius: theme.radii.button,
           borderWidth: surfaces.border === 'transparent' ? 0 : 1,
           borderColor: surfaces.border,
@@ -101,7 +121,9 @@ export function Button({
         ) : (
           icon
         )}
-        <Text variant="button" color={surfaces.textColor}>
+        {/* One line, always. A label that wraps mid-word reads as a broken control; if space truly
+            runs out, an ellipsis is the honest failure and the layout above it is the real bug. */}
+        <Text variant="button" color={surfaces.textColor} numberOfLines={1}>
           {label}
         </Text>
       </View>

@@ -13,3 +13,9 @@ declare module '@studio/hero' {
   const asset: number;
   export default asset;
 }
+
+/** `@studio/logo` — this build's studio logo. Same contract and rationale as `@studio/hero`. */
+declare module '@studio/logo' {
+  const asset: number;
+  export default asset;
+}

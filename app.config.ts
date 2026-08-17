@@ -101,9 +101,22 @@ export default ({ config }: ConfigContext): ExpoConfig => {
    */
   const usesBundledHero = studio.assets.heroSource !== 'remote';
   const splashConfig = usesBundledHero
-    ? { backgroundColor: '#FFFFFF', image: studioAsset(studio.assets.hero), resizeMode: 'cover' as const }
+    ? {
+        backgroundColor: '#FFFFFF',
+        image: studioAsset(studio.assets.hero),
+        resizeMode: 'cover' as const,
+        // Without this, SDK 52+'s splash renders the image as a small centered icon on
+        // white — the hero appeared as a postage stamp at launch (2026-08-16 screenshot),
+        // destroying the invisible splash→Home handoff this whole block exists for.
+        enableFullScreenImage_legacy: true,
+      }
     : studio.assets.splash
-      ? { backgroundColor: '#FFFFFF', image: studioAsset(studio.assets.splash), resizeMode: 'cover' as const }
+      ? {
+          backgroundColor: '#FFFFFF',
+          image: studioAsset(studio.assets.splash),
+          resizeMode: 'cover' as const,
+          enableFullScreenImage_legacy: true,
+        }
       : {
           backgroundColor: '#FFFFFF',
           image: hasStoreReadyIcon ? studioAsset(studio.assets.iconSource) : './assets/images/splash-icon.png',
@@ -135,6 +148,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       // Same value the stale-project guard above checks against. Deliberately not re-derived
       // here: two copies of "what is this studio's bundle id" is how they drift apart.
       bundleIdentifier: iosBundleId,
+      // CFBundleVersion. Apple wants a string; the gate wants an integer; studio.json holds the
+      // integer and this is the only place it becomes a string. Without it every prebuild
+      // emitted "1", so every store upload after the first would be rejected as a duplicate and
+      // the version gate would have had a constant to compare against.
+      buildNumber: String(studio.store.buildNumber),
       infoPlist: {
         CFBundleDisplayName: studio.shortName,
         ...(allowsLocalHttp
@@ -152,6 +170,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
     android: {
       package: androidPackage,
+      // Android's own integer build identity. Same source value as iOS's buildNumber, so one
+      // studio.json bump moves both and the two platforms cannot disagree about what build this
+      // is. Play requires it to increase on every upload.
+      versionCode: studio.store.buildNumber,
       adaptiveIcon: {
         backgroundColor: '#FFFFFF',
         foregroundImage: './assets/images/android-icon-foreground.png',
@@ -218,6 +240,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         shortName: studio.shortName,
         accentColor: studio.accentColor,
         timezone: studio.timezone,
+        // The running build's integer identity, for the version gate. Read from the SAME value
+        // that becomes CFBundleVersion / versionCode below, so the number JS compares and the
+        // number the store sees cannot drift — which is the whole reason not to read this back
+        // out of expo-constants' deprecated nativeBuildVersion or a second config field.
+        buildNumber: studio.store.buildNumber,
         // Navigation reads these BEFORE the studio's own show_schedule/show_appts flags: a tab
         // may only appear when the build has code for it AND the studio offers it.
         features: studio.features,
@@ -226,6 +253,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         heroSource: studio.assets.heroSource,
         supportEmail: studio.support.email,
         privacyPolicyUrl: studio.legal.privacyPolicyUrl ?? null,
+        // Null keeps the Clarity SDK dormant — see `analytics` in whitelabel/schema.ts.
+        clarityProjectId: studio.analytics.clarityProjectId ?? null,
+        // Null → Apple Pay is simply not offered; the sheet stays card-only.
+        merchantId: studio.ios.merchantId ?? null,
         // EXPO_PUBLIC_API_URL wins in development so a simulator, an emulator and a device on
         // the LAN can each point somewhere different without editing studio.json.
         apiUrl: devApiUrl ?? studio.api.url,

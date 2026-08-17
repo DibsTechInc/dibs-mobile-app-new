@@ -1,0 +1,47 @@
+I read the plan and verified its claims against the code and against the live Stripe docs. Short verdict: the core decision is right — manual capture instead of the holds table is correct, well argued, and the "the seat claim is the attendee insert, not spots_booked" catch is real (update-event-spots-booked-new.js does recount, unconditionally, past seats). But several things will bite, and one of them is the paragraph the doc is most confident about.
+
+Will bite
+
+1. Endpoint 2 trusts the client for what was paid for. Step 1 says "never trust the client's word that it paid" — then takes eventId and dibsStudioId from the body and only checks the PI's status. A client can authorize a $12 PI on the 7am class and call confirm-booking with the $45 class's eventId. The PI is real, the status is requires_capture, the check passes. eventId, dibsStudioId, userid and the amount must come from pi.metadata and be rejected on mismatch — which is exactly why step 6 puts them there. The body should carry nothing but the PI id.
+
+2. The "atomic" conditional insert is not atomic. INSERT … WHERE (SELECT count(*) FROM attendees …) < seats does not serialize under READ COMMITTED — rows that don't exist yet can't be locked, so two concurrent bookings both count N and both insert. Last-seat double-booking survives exactly the test the plan lists. You need a lock on something that does exist: SELECT … FROM events WHERE eventid = $1 FOR UPDATE before the count, or the ClassPass-style UPDATE events SET spots_booked = spots_booked + 1 WHERE eventid = $1 AND spots_booked < seats purely as the gate (the reconcile afterwards overwrites it with the true count anyway, which is fine — the update is the lock, not the bookkeeping).
+
+3. automatic_payment_methods: true + card-only manual capture leaves the guarantee off exactly where it matters. Verified against the docs today: payment_method_options[card][capture_method]=manual places only card payments on hold. Link, Cash App Pay, Klarna, Affirm, Amazon Pay — anything else enabled in the Dashboard — confirm with automatic capture, land on succeeded, and endpoint 2 rejects them. Money taken, no booking, and the plan's own parenthetical routes that to "idempotent replay," which finds nothing. The doc describes this as a feature ("so a payment method that cannot authorize separately is not blocked"); it is the hole. For v1: payment_method_types: ['card'], or top-level capture_method: 'manual' and let Stripe filter.
+
+4. "Price it server-side" is a build, not a line — and getting it wrong overcharges. Nothing in dibs-api prices a class server-side today: create-payment-intent-new.js takes costToCharge and taxAmount straight from the body. Meanwhile the schedule feed the app renders applies dynamic pricing rules (get-schedule.js:120-146 → getApplicableDiscountMatcher / applyPricingRule → pricing_rule.discounted_price) on top of events.price_dibs, and tax comes off dibs_studio_locations.tax_rate. An endpoint that prices from price_dibs + tax and forgets the rule overcharges every off-peak class and fires the mismatch alert on every single booking. The real deliverable here is one priceClassForClient() that both the schedule feed and this endpoint call. Otherwise you've built a second pricing brain, which is the thing the plan is trying to prevent.
+
+5. Wrong transaction on the attendee row. The plan says attendeeID = String(purchase transaction id). Every live writer uses the redemption row: complete-appointment-booking.js:902, record-booking-with-pass.js, add-client-to-attendees, create-recurring-appointment-enhanced.js. Readers bridge Number(attendeeID) expecting with_passid on the other side. Purchase row is correct for the mismatch email (that's where the money is); it's wrong for the attendee link.
+
+6. Idempotency has nowhere to live. There is no PaymentIntent column on dibs_transaction, and stripePaymentId is already spoken for — link-transactions-to-payout.js:74 joins source.charge → stripePaymentId. Adding a column is an approval gate. Cheapest correct answer that needs no migration: after capture, pi.latest_charge is the charge id, so idempotency is findOne({ stripe_charge_id: pi.latest_charge }), which doubles as the crash-repair lookup.
+
+7. The dangerous window isn't the one you tested. "Kill the app between the sheet and endpoint 2" is the safe case — the auth lapses. The unsafe window is inside endpoint 2: capture() succeeds, the DB write throws, money is gone and nothing sweeps it. Ditto the inverse (seat claimed, capture fails, orphan attendee). Stripe's own docs on this page: "Listen for these events rather than waiting on a callback from the client." Given this platform just learned that dibs-connect-subscription sat undelivered for three months — webhooks are the fast path, reconciliation is the guarantee — a card-money endpoint shipping with neither is the gap I'd fix before launch. payment_intent.amount_capturable_updated and payment_intent.succeeded on a Connect destination, plus a sweep for captured-but-unbooked.
+
+Should fix
+
+8. Ephemeral key version trap — and the pattern has moved on. globals/index.js pins 2026-02-25.clover. An ephemeral key must be created with the version the mobile SDK expects, passed explicitly, or PaymentSheet fails to load. The current React Native docs use CustomerSession (components[mobile_payment_element][features][payment_method_save|redisplay|remove]) instead, which has no version pin and gives you save/remove control. Recommend CustomerSession, not ephemeral keys.
+
+9. StripeProvider is global native state. StripeSdkProvider.tsx mounts one provider at the root on the platform key. initStripe is a global native call — the last init wins app-wide, so mounting a connected-account provider for booking silently re-points the Account tab's platform SetupIntent flow too. That needs an explicit strategy with restore-on-exit, not a nested provider. And urlScheme is an app.config.ts change, which is the whitelabel prebuild trap.
+
+10. setup_future_usage: 'off_session' saves to the connected customer only. Dibs keeps cards on the platform customer and clones down. A card saved this way exists on that one studio's connected customer and is invisible to the widget's merged list and to multi-studio mode. Deliberate or not, decide it on purpose.
+
+11. Partial credit is silently dropped. "If a pass or credit covers it" → else card. A client with $10 credit and a $22 class gets charged $22 while holding a balance the widget would have applied. Either apply credit server-side before pricing, or say in the doc that v1 ignores it.
+
+12. No studio gates. 226 doesn't collect fees through Dibs; trial soft-lockout blocks new bookings; dibs_studio.live; a studio with no stripe_account_id_test. Refuse cleanly, don't 500.
+
+13. "Already started" must use getStudioWallClock, not NOW() — the documented trap where every ET evening class reads as started after 8pm.
+
+14. requireWidgetAuth is [isWidgetUserAuthenticated, isRequestingOwnData], and the second only compares when req.body.userid !== undefined. Sending no userid makes the ownership check a no-op. Correct here because you read req.authenticatedUserId — but write that down, because a future dev who adds userid to the body changes the gate without noticing.
+
+Doc inconsistencies
+
+- The test list contradicts the design: "two devices at once — one succeeds, one is refunded." Leftover from the holds draft; the whole point is that nothing is refunded. The later bullet has it right.
+- Endpoint 1 step 6 never mentions capture_method. It only appears in the capacity section. An executor building from the numbered list ships automatic capture.
+- breakdown appears in the response shape and is never defined.
+- create-payment-intent-connected.js already exists and is mounted at /stripe/create-payment-intent-connected: unconfirmed, connected account, automatic_payment_methods, setup_future_usage: 'off_session', env-aware account id. It does most of endpoint 1 (and has the same client-names-the-price hole). The plan doesn't mention it. Reuse it or say why not — two connected-PI creators will drift.
+- Scenario 5 is a choice, not the status quo. The claim that pass+redemption is "what every other way a class gets booked" does is not true of the closest live analog: create-payment-intent-new.js writes one transaction with amount_charged = gross and links the attendee to it, no pass at all. Both shapes are in production. Scenario 5 is the better choice (it's what revenue-attribution's single-session bucket expects), but say you're diverging. And name the missing specifics: which studio_packages row (studio_package_id is always populated), totalUses: 1, passValue (drives credit-back on cancellation — get it wrong and an early drop returns nothing), purchasePlace ≤ 32 chars.
+
+One product question
+
+The mismatch alert emails ops when the app displayed a different number than the server charged. But the failure mode you can't email your way out of is server price > displayed price — the client saw $20 and was charged $22. Worth deciding whether that case should refuse the charge and force a refetch, rather than charge and notify. Below-displayed is a footnote; above-displayed is a chargeback.
+
+✻ Worked for 5m 57s

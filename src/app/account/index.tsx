@@ -13,17 +13,25 @@ import { Alert, Linking } from 'react-native';
 import { studio } from '@/config/studio';
 import { formatPhoneForDisplay } from '@/domain/profile/validate';
 import { AccountScreen, type AccountBalance, type AccountRow } from '@/features/account/AccountScreen';
+import { DeleteAccountSheet } from '@/features/account/DeleteAccountSheet';
+import { useDeleteAccount } from '@/features/account/useDeleteAccount';
 import { useWallet } from '@/features/account/useWallet';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useAppDrawer } from '@/features/nav/useAppDrawer';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
+import { usePullRefresh } from '@/lib/usePullRefresh';
 
 export default function AccountRoute() {
   const { status, account, signOut } = useAuth();
   const { config } = useStudioConfig();
   const wallet = useWallet();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const deletion = useDeleteAccount();
   const drawer = useAppDrawer({ visible: menuOpen, onClose: () => setMenuOpen(false) });
+  // The balances above the rows are the whole point of this screen — a pull must re-ask for them.
+  // `wallet.refresh` refetches passes, credit and cards, bypassing staleTime.
+  const pull = usePullRefresh(wallet.refresh);
 
   const studioName = config?.studioName ?? studio.appName;
 
@@ -52,9 +60,11 @@ export default function AccountRoute() {
     if (credit.status === 'loading' && passes.status === 'loading') return null;
 
     const rows: AccountBalance[] = [];
-    if (credit.label) rows.push({ label: 'Credit balance', value: credit.label });
+    if (credit.label) rows.push({ key: 'credit', label: 'Credit balance', value: credit.label });
     for (const pass of passes.items) {
+      // Keyed by the pass id — two purchases of the same package share a label.
       rows.push({
+        key: `pass-${pass.id}`,
         label: pass.name,
         detail: pass.expiresLabel ?? undefined,
         value: pass.remainingLabel,
@@ -71,10 +81,28 @@ export default function AccountRoute() {
 
   const rows: AccountRow[] = [
     {
+      // Above Payment methods on purpose: buying a pack is a thing a client wants to DO, and
+      // saved-card administration is a thing they occasionally have to. The balances block above
+      // already tells them what they hold; this is the way to get more of it.
+      label: 'Packages',
+      icon: 'packages',
+      detail: 'Class packs and memberships',
+      onPress: () => router.push('/packages'),
+    },
+    {
       label: 'Payment methods',
       icon: 'paymentMethods',
       detail: 'Saved cards',
       onPress: () => router.push('/account/wallet'),
+    },
+    {
+      // Beside Payment methods, the same pairing as the drawer: how you pay, then what you paid.
+      // It was drawer-only, and a client on this screen had no path to their payment history at
+      // all (Alicia, 2026-08-16) — the account page is where people go looking for money things.
+      label: 'Payments',
+      icon: 'document',
+      detail: 'Charges and upcoming renewals',
+      onPress: () => router.push('/account/billing'),
     },
     {
       label: 'Profile',
@@ -126,8 +154,28 @@ export default function AccountRoute() {
           // out lands them on a full screen rather than on a login wall.
           router.replace('/');
         }}
+        onDeleteAccount={() => setDeleting(true)}
         onBack={onBack}
         onOpenMenu={() => setMenuOpen(true)}
+        isRefreshing={pull.isRefreshing}
+        onRefresh={pull.onRefresh}
+      />
+      <DeleteAccountSheet
+        visible={deleting}
+        studioName={studioName}
+        status={deletion.status}
+        onConfirm={deletion.deleteAccount}
+        onClose={() => {
+          setDeleting(false);
+          // Reset AFTER closing so the sheet does not flash back mid-dismissal.
+          deletion.reset();
+        }}
+        // The blocked refusal's way forward: memberships are cancelled from the wallet.
+        onGoToPasses={() => {
+          setDeleting(false);
+          deletion.reset();
+          router.push('/account/wallet');
+        }}
       />
       {drawer}
     </>

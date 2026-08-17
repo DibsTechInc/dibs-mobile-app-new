@@ -49,9 +49,11 @@ export function useAppDrawer({ visible, onClose }: AppDrawerArgs) {
     if (credit.status === 'loading' && passes.status === 'loading') return null;
 
     const rows: DrawerBalance[] = [];
-    if (credit.label) rows.push({ label: 'Credit balance', value: credit.label });
+    if (credit.label) rows.push({ key: 'credit', label: 'Credit balance', value: credit.label });
     for (const pass of passes.items) {
-      rows.push({ label: pass.name, value: pass.remainingLabel });
+      // Keyed by the pass id, never the name — two purchases of the same package are two rows
+      // with identical labels, and React must still tell them apart.
+      rows.push({ key: `pass-${pass.id}`, label: pass.name, value: pass.remainingLabel });
     }
     return rows;
   }, [isSignedIn, wallet.data]);
@@ -59,20 +61,30 @@ export function useAppDrawer({ visible, onClose }: AppDrawerArgs) {
   const items = useMemo<DrawerItem[]>(() => {
     const rows: DrawerItem[] = [{ label: 'Book', icon: 'book', onPress: go('/schedule') }];
 
-    // Only rows whose destinations exist. Packages is P4, referrals are later — and a drawer row
-    // that leads nowhere is the dead end this codebase keeps refusing to ship.
+    // Only rows whose destinations exist. Referrals are later — and a drawer row that leads
+    // nowhere is the dead end this codebase keeps refusing to ship.
     if (isSignedIn) {
       // Directly under Book, as in the approved mock's drawer: the two are a pair — what is on
       // offer, and what you have taken up.
       rows.push({ label: 'My calendar', icon: 'myCalendar', onPress: go('/my-calendar') });
+      // Third, between what you have booked and your account: buying a pack is the thing you do
+      // BETWEEN booking and administration, and burying it under Account is how a client
+      // concludes the app has no way to buy one (Alicia, 2026-08-13).
+      rows.push({ label: 'Packages', icon: 'packages', onPress: go('/packages') });
       rows.push({ label: 'Account', icon: 'account', onPress: go('/account') });
       rows.push({
         label: 'Payment methods',
         icon: 'paymentMethods',
         onPress: go('/account/wallet'),
       });
+      // Next to Payment methods, because the pair is "how you pay" and "what you paid". Upcoming
+      // charges live here too, which is the half a client is most likely to be looking for.
+      rows.push({ label: 'Payments', icon: 'document', onPress: go('/account/billing') });
       rows.push({ label: 'Profile', icon: 'account', onPress: go('/account/profile') });
     } else {
+      // A guest gets Packages too: the price list is public, and "what would this cost me" is a
+      // reasonable question to answer before making an account.
+      rows.push({ label: 'Packages', icon: 'packages', onPress: go('/packages') });
       rows.push({ label: 'Sign in', icon: 'account', onPress: go('/sign-in') });
     }
 

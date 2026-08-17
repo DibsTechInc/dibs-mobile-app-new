@@ -21,6 +21,7 @@
  * bundled into any given build.
  */
 import heroImage from '@studio/hero';
+import logoImage from '@studio/logo';
 
 import { studio } from './studio';
 
@@ -31,3 +32,9 @@ import { studio } from './studio';
  * `heroUrl` from get-basic-config.
  */
 export const bundledHero: number | null = studio.heroSource === 'remote' ? null : heroImage;
+
+/**
+ * The studio's logo, bundled. Always present — the metro resolver fails the build for a studio
+ * whose declared logo file is missing, which beats a brand mark silently absent from Home.
+ */
+export const bundledLogo: number = logoImage;

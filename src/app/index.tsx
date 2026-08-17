@@ -13,6 +13,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { studio } from '@/config/studio';
 import { buildGreeting } from '@/domain/home/build-home-data';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { useCartCount } from '@/features/cart/cartStore';
 import { HomeScreen, type HomeChoice } from '@/features/home/HomeScreen';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
 import { useAppDrawer } from '@/features/nav/useAppDrawer';
@@ -20,6 +21,7 @@ import { useAppDrawer } from '@/features/nav/useAppDrawer';
 export default function HomeRoute() {
   const { config, error: configError, refetch: refetchConfig } = useStudioConfig();
   const { status, account } = useAuth();
+  const cartCount = useCartCount();
   const [menuOpen, setMenuOpen] = useState(false);
   const drawer = useAppDrawer({ visible: menuOpen, onClose: () => setMenuOpen(false) });
 
@@ -57,6 +59,16 @@ export default function HomeRoute() {
         subtitle={greeting.subtitle}
         choices={choices}
         onOpenMenu={() => setMenuOpen(true)}
+        /*
+         * Only when there is something in it.
+         *
+         * Home is the one screen with no cart bar — it is a photograph, and a bar across the foot
+         * of it would be the wrong thing entirely. But a client can reach Home with a live cart
+         * (they backed out of the schedule, or they just signed in), and a cart with no way to it
+         * is a cart nobody finishes. The icon is that way, and it disappears again the moment the
+         * cart empties rather than sitting there permanently as chrome.
+         */
+        onOpenCart={cartCount > 0 ? () => router.push('/checkout') : undefined}
         remoteHeroUri={config?.heroUrl ?? null}
         // Only reported when there is no photograph at all — which is the one state this screen
         // cannot render, since every element on it exists to sit on an image.

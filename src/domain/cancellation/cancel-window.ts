@@ -53,6 +53,23 @@ function describeDay(deadline: Date, timeZone: string, now: Date): string {
 }
 
 /**
+ * The group-class notice window, in hours.
+ *
+ * MIRRORS the server's `resolveNoticeHours` (`class-drop/drop-class.js`) and the widget's
+ * `indiClass.jsx` — group window first, the studio-level `cancelTime` as the fallback, 12 as the
+ * column default. `||` rather than `??` so a 0 falls through, exactly as both do.
+ *
+ * The server decides what a cancel actually costs; this only decides what the client is TOLD it
+ * will cost. They must agree, or the sheet names a deadline the backend does not honour.
+ */
+export function resolveClassNoticeHours(config: {
+  defaultCancelTimeGroup?: number;
+  cancelTime?: number;
+} | null | undefined): number {
+  return Number(config?.defaultCancelTimeGroup) || Number(config?.cancelTime) || 12;
+}
+
+/**
  * The cancellation deadline for one session.
  *
  * Returns null when the studio publishes no window — better to say nothing than to invent a
