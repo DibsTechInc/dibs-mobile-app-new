@@ -51,3 +51,5 @@ example
 # are not what the app builds from. The DERIVED, correctly-sized assets are committed under
 # whitelabel/studios/<slug>/assets/. Keep the originals here locally, or in shared storage.
 brand-assets/
+DevAssist/
+Temp_Reference_For_New_App/
