@@ -25,6 +25,24 @@ export const packagePriceBreakdownSchema = z
 
 export type PackagePriceBreakdown = z.infer<typeof packagePriceBreakdownSchema>;
 
+/**
+ * The server's own resolution of "how much of this does the client's credit pay for" — the same
+ * shape `domain/credit/split.ts` mirrors. Rides on `credit_covers_package`, `credit_changed` and
+ * `insufficient_credit` refusals so the app can re-render the TRUE figures.
+ */
+export const packageCreditSplitSchema = z
+  .object({
+    kind: z.enum(['none', 'partial', 'credit-only']),
+    totalCents: z.number(),
+    creditAppliedCents: z.number(),
+    cardCents: z.number(),
+    balanceCents: z.number(),
+    trimmedForMinimum: z.boolean().optional(),
+  })
+  .passthrough();
+
+export type PackageCreditSplit = z.infer<typeof packageCreditSplitSchema>;
+
 export const createPackagePaymentIntentResponseSchema = z
   .object({
     ok: z.literal(true),
@@ -39,7 +57,10 @@ export const createPackagePaymentIntentResponseSchema = z
      * knowing it.
      */
     stripeAccountId: z.string(),
+    /** What the CARD will be charged — the remainder once credit is applied, else the total. */
     amountCents: z.number(),
+    /** Studio credit the confirm endpoint will claim, in cents. Absent on an older API. */
+    creditAppliedCents: z.number().nullable().optional(),
     currency: z.string(),
     breakdown: packagePriceBreakdownSchema,
     packageName: z.string().nullable().optional(),
@@ -55,7 +76,12 @@ export const confirmPackagePurchaseResponseSchema = z
     packageName: z.string().nullable().optional(),
     /** `null` means UNLIMITED — the platform convention. Never render it as a number. */
     totalUses: z.number().nullable().optional(),
+    /** What the CARD took. With credit applied this is less than the package total. */
     amountChargedCents: z.number().nullable().optional(),
+    packageTotalCents: z.number().nullable().optional(),
+    creditAppliedCents: z.number().nullable().optional(),
+    /** The balance after a credit purchase, in cents. */
+    creditBalanceCents: z.number().nullable().optional(),
     /** True when a retry replayed a purchase already recorded, rather than making a second one. */
     alreadyRecorded: z.boolean().optional(),
     repaired: z.boolean().optional(),
@@ -79,6 +105,9 @@ export const packageRefusalSchema = z
     code: z.string(),
     message: z.string(),
     breakdown: packagePriceBreakdownSchema.optional(),
+    /** The server's fresh split, on the credit refusals. */
+    creditSplit: packageCreditSplitSchema.optional(),
+    creditBalanceCents: z.number().optional(),
     nothingCharged: z.boolean().optional(),
   })
   .passthrough();

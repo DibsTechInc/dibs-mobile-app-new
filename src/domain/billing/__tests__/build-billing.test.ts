@@ -214,6 +214,84 @@ describe('the payment-method line', () => {
   });
 });
 
+describe('the class detail line — "9/18 · 10:00 AM" (Alicia, 2026-08-27)', () => {
+  const row = (over = {}) =>
+    buildBillingData(
+      input({
+        history: {
+          data: { rows: [{ id: 'txn_1', amount: 22, ...over }] },
+          isPending: false,
+          error: null,
+        },
+      }),
+    ).past.items[0];
+
+  it('renders the CLASS date and time from eventDate, dot-separated, verbatim wall clock', () => {
+    // 6:00 PM stored as fake-UTC. Verbatim means 6:00 PM whatever zone this test runs in —
+    // that is the platform's one unbreakable time rule.
+    const item = row({
+      activityType: 'class_booked',
+      paymentMethod: 'credit',
+      primary: { eventName: 'Sunday Stretch', eventDate: '2026-09-18T18:00:00.000Z' },
+    });
+    expect(item.detailLabel).toBe('9/18 · 6:00 PM');
+  });
+
+  it('a row with no session behind it carries no detail line', () => {
+    const item = row({
+      activityType: 'pass_purchased',
+      paymentMethod: 'card',
+      primary: { packageName: '10 Class Pack' },
+    });
+    expect(item.detailLabel).toBeNull();
+  });
+
+  it('junk in eventDate degrades to no detail line, never a crash on a money surface', () => {
+    expect(row({ primary: { eventName: 'X', eventDate: 'not a date' } }).detailLabel).toBeNull();
+  });
+});
+
+describe('a cancellation credit says WHY (Alicia, 2026-08-27)', () => {
+  it('the class_canceled row reads as the class name, its date, and "Class cancelled"', () => {
+    // The shape the server emits for a cancellation that absorbed its credit twin — captured
+    // from get-account-activity.js's Source 4, not guessed.
+    const item = buildBillingData(
+      input({
+        history: {
+          data: {
+            rows: [
+              {
+                id: 'cancel_599875',
+                activityType: 'class_canceled',
+                occurredAt: '2026-08-27T18:20:00.000Z',
+                amount: 22,
+                amountSign: 'credit',
+                refundedAmount: 0,
+                paymentMethod: null,
+                primary: {
+                  eventName: 'Sunday Stretch',
+                  eventDate: '2026-09-18T10:00:00.000Z',
+                  itemName: 'Credit back from Sunday Stretch',
+                  outcome: 'credit_returned',
+                },
+              },
+            ],
+          },
+          isPending: false,
+          error: null,
+        },
+      }),
+    ).past.items[0];
+
+    // Titled by the class, not the fuller ledger phrase — the reason line carries the why.
+    expect(item.title).toBe('Sunday Stretch');
+    expect(item.detailLabel).toBe('9/18 · 10:00 AM');
+    expect(item.paymentLabel).toBe('Class cancelled');
+    expect(item.isCredit).toBe(true);
+    expect(item.amountLabel).toBe('+$22.00');
+  });
+});
+
 describe('only rows that moved money reach the Payments screen', () => {
   /**
    * The endpoint is the full activity timeline; most of a pass-holder's rows are bookings whose

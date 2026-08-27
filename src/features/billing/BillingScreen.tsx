@@ -83,13 +83,24 @@ function UpcomingRow({ item }: { item: UpcomingPaymentItem }) {
   );
 }
 
+/**
+ * One statement line, in three columns (Alicia, 2026-08-27):
+ *
+ *   Aug 27   Sunday Stretch                          +$22.00
+ *            9/18 · 10:00 AM · Class cancelled
+ *
+ * The LEFT column is when the money moved — the fact a statement is scanned by. Under the title
+ * sits the class the row is about (its own date and time, dot-separated) and the method or, for
+ * a cancellation's credit, the REASON. Two different dates on one row is the point: "charged on
+ * Aug 27, for the Sept 18 class".
+ */
 function HistoryRow({ item }: { item: BillingHistoryItem }) {
   const theme = useTheme();
+  const detailLine = [item.detailLabel, item.paymentLabel].filter(Boolean).join(' · ');
   return (
     <View
       style={{
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'flex-start',
         gap: theme.spacing.md,
         paddingVertical: theme.spacing.base,
@@ -97,13 +108,17 @@ function HistoryRow({ item }: { item: BillingHistoryItem }) {
         borderBottomColor: theme.colors.divider,
       }}
     >
+      {/* Fixed width so the titles align down the page — a ragged left edge reads as a list,
+          a flush one as a statement. "Aug 27" and "Dec 31" both fit at caption size. */}
+      <Text variant="caption" color="tertiary" style={{ width: 52, paddingTop: 2 }}>
+        {item.dateLabel ?? ''}
+      </Text>
+
       <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
         <Text variant="body">{item.title}</Text>
-        {/* Date and method share one quiet line — "Aug 16 · Credit applied". The method is why
-            two identical $22 rows can be different events in the client's bank account. */}
-        {item.dateLabel || item.paymentLabel ? (
+        {detailLine ? (
           <Text variant="caption" color="tertiary">
-            {[item.dateLabel, item.paymentLabel].filter(Boolean).join(' · ')}
+            {detailLine}
           </Text>
         ) : null}
       </View>
