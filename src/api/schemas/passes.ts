@@ -56,6 +56,15 @@ export const studioPackageSchema = z
     autopayStatus: z.union([z.string(), z.boolean()]).nullable().optional(),
     commitment_period: z.number().nullable().optional(),
     on_demand_access: z.boolean().nullable().optional(),
+    /**
+     * Both feed the package-allowlist platform exemption (`domain/passes/select.ts`
+     * `packageAllowedForClass`): `[Admin]`/placeholder/front-desk-"Unpaid" packages are platform
+     * machinery a studio never ticked into a list and must never be greyed out by one. Returned by
+     * get-passes since 2026-08-27; optional so an older API build degrades to name-prefix-only
+     * exemption rather than a schema error.
+     */
+    is_placeholder: z.boolean().nullable().optional(),
+    front_desk_only: z.boolean().nullable().optional(),
   })
   .passthrough();
 

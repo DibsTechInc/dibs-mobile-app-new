@@ -144,6 +144,52 @@ describe('toScheduleEntry — price', () => {
   });
 });
 
+describe('toScheduleEntry — the package allowlist', () => {
+  // Studio 88's shape: pkg 9383 "Virtual Class 10-pack", off a STUDIO class's resolved list and
+  // on a VIRTUAL class's. Same golden figures as `domain/passes/__tests__/passes.test.ts` and the
+  // server suites.
+  const virtualPack = {
+    id: 911,
+    private_pass: false,
+    totalUses: 10,
+    usesCount: 2,
+    expiresAt: '2099-01-01T00:00:00.000Z',
+    is_placeholder: false,
+    studio_package_id: 9383,
+    studioPackage: { packageName: 'Virtual Class 10-pack', unlimited: false },
+  } as never;
+
+  const restricted = { packagesAllowed: true, allowedPackageIds: [557], source: 'type' } as never;
+  const listing = { packagesAllowed: true, allowedPackageIds: [9383], source: 'type' } as never;
+
+  it('prices an excluded class and NAMES the pass; covers the listed one — same pass, both ways', () => {
+    const excludedEntry = toScheduleEntry(
+      realEvent({ packageRestriction: restricted }),
+      { ...OPTIONS, passes: [virtualPack] },
+    );
+    expect(excludedEntry.price.kind).toBe('amount');
+    expect(excludedEntry.excludedPassName).toBe('Virtual Class 10-pack');
+
+    const coveredEntry = toScheduleEntry(
+      realEvent({ packageRestriction: listing }),
+      { ...OPTIONS, passes: [virtualPack] },
+    );
+    expect(coveredEntry.price).toEqual({ kind: 'covered', label: 'Included · Virtual Class 10-pack' });
+    expect(coveredEntry.excludedPassName).toBeNull();
+  });
+
+  it('an ABSENT restriction (older API) fails OPEN — covered, nothing to explain', () => {
+    const entry = toScheduleEntry(realEvent(), { ...OPTIONS, passes: [virtualPack] });
+    expect(entry.price.kind).toBe('covered');
+    expect(entry.excludedPassName).toBeNull();
+  });
+
+  it('names nothing for a guest — no passes, no exclusion story', () => {
+    const entry = toScheduleEntry(realEvent({ packageRestriction: restricted }), OPTIONS);
+    expect(entry.excludedPassName).toBeNull();
+  });
+});
+
 describe('toScheduleEntry — the rest', () => {
   it('trims the trailing space studios leave on class names', () => {
     expect(toScheduleEntry(realEvent(), OPTIONS).name).toBe('Flow');

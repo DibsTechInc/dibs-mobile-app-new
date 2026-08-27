@@ -246,6 +246,63 @@ describe('buildCart with the client’s passes', () => {
     expect(cart.totalCents).toBe(2382);
   });
 
+  describe('the package allowlist', () => {
+    // Studio 88's shape: the pass's package (id 9383) off one class's resolved list, on
+    // another's. The restriction arrives RESOLVED from the server; the cart only honours it.
+    const virtualPack = () =>
+      pass({
+        id: 911,
+        studio_package_id: 9383,
+        studioPackage: { packageName: 'Virtual Class 10-pack', unlimited: false },
+      });
+
+    it('prices an allowlist-excluded class, NAMES the pass — and still covers the listed one', () => {
+      const events = [
+        realEvent({
+          eventid: 1,
+          packageRestriction: { packagesAllowed: true, allowedPackageIds: [557], source: 'type' },
+        }),
+        realEvent({
+          eventid: 2,
+          packageRestriction: { packagesAllowed: true, allowedPackageIds: [9383], source: 'type' },
+        }),
+      ];
+      const cart = buildCart(events, [1, 2], withPasses([virtualPack()]));
+
+      // The excluded line is a normal card line — with a sentence, not a silent price.
+      expect(cart.lines[0].state).toBe('ready');
+      expect(cart.lines[0].note).toBe(
+        'Virtual Class 10-pack isn’t accepted for this class, so it’s priced as a drop-in.',
+      );
+      // The non-empty half: the same pass still covers the class whose list carries it, which is
+      // what proves the filter discriminates rather than coverage having broken outright.
+      expect(cart.lines[1].state).toBe('covered');
+      expect(cart.lines[1].passName).toBe('Virtual Class 10-pack');
+      expect(cart.totalCents).toBe(2382);
+    });
+
+    it('an ABSENT restriction (older API) books exactly as today — covered, no note', () => {
+      const cart = buildCart([realEvent()], [180392617], withPasses([virtualPack()]));
+      expect(cart.lines[0].state).toBe('covered');
+      expect(cart.lines[0].note).toBe('');
+    });
+
+    it('a class the client holds NO pass for gets no allowlist sentence', () => {
+      // The note explains an exclusion; with nothing excluded it would be an invented grievance.
+      const cart = buildCart(
+        [
+          realEvent({
+            packageRestriction: { packagesAllowed: true, allowedPackageIds: [557], source: 'type' },
+          }),
+        ],
+        [180392617],
+        withPasses([]),
+      );
+      expect(cart.lines[0].state).toBe('ready');
+      expect(cart.lines[0].note).toBe('');
+    });
+  });
+
   it('prices the class when passes are UNDEFINED — we have not asked', () => {
     // Both look the same on screen, but only one is a claim. The server checks coverage again and
     // refuses a card for a covered class, so the worst case is a refusal, never a wrong charge.
