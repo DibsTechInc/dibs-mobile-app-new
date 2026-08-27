@@ -28,13 +28,33 @@ import { getAuth, getReactNativePersistence, initializeAuth, type Auth } from 'f
 /** The one project this app is allowed to authenticate against. */
 const CLIENT_PROJECT_ID = 'dibs-studio-clients';
 
+/**
+ * The dibs-studio-clients web-app config, baked in as defaults so no build can ship without
+ * it. Same for every studio — the client Firebase project is shared. These were env-only
+ * until 2026-08-17, and that is how the first TestFlight build (Carlsbad 2.0.0 (4)) crashed
+ * at launch: `.env` is gitignored, EAS cloud uploads respect .gitignore, so every cloud
+ * build inlined `undefined` here and readConfig() threw its fail-loudly error — which in a
+ * release binary is a SIGABRT before the first frame. Dev builds never caught it because
+ * the laptop has the .env. Env vars still OVERRIDE these, for pointing a dev build at a
+ * different project; the project-id guard below still refuses anything that is not
+ * dibs-studio-clients.
+ */
+const DEFAULT_CONFIG = {
+  apiKey: 'AIzaSyAYkBJs7p1XlCC1xjFvQ5t2woRwElbhjA4',
+  authDomain: 'dibs-studio-clients.firebaseapp.com',
+  projectId: CLIENT_PROJECT_ID,
+  appId: '1:1092882678128:web:14529f6e9b169f1ff04fb5',
+  messagingSenderId: '1092882678128',
+} as const;
+
 function readConfig(): FirebaseOptions {
   const config = {
-    apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
-    authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
-    appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
-    messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY ?? DEFAULT_CONFIG.apiKey,
+    authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN ?? DEFAULT_CONFIG.authDomain,
+    projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID ?? DEFAULT_CONFIG.projectId,
+    appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID ?? DEFAULT_CONFIG.appId,
+    messagingSenderId:
+      process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? DEFAULT_CONFIG.messagingSenderId,
   };
 
   const missing = Object.entries(config)

@@ -121,6 +121,18 @@ export function mismatchMessage({ slug, platform, expected, found }: MismatchInp
  * Throws when the on-disk native projects belong to another studio. No-ops when they are absent
  * (prebuild will create them correctly) or when this process is prebuild itself.
  */
+/**
+ * Expo's bare template scaffolds with an `org.name.<AppName>` identity, which the config plugin
+ * replaces a moment later. `expo run:*` with NO native project runs that scaffold-then-configure
+ * sequence itself — under argv `run:ios`, not `prebuild`, so isPrebuilding does not cover it —
+ * and this guard used to fire in the gap, reading the placeholder as a stale foreign studio
+ * (seen 2026-08-18, first Everyday Ballet screenshot run). A placeholder is nobody's app; only
+ * a REAL bundle id from a different studio is a hazard.
+ */
+function isTemplatePlaceholder(id: string): boolean {
+  return id === 'org.name' || id.startsWith('org.name.');
+}
+
 export function assertNativeProjectsMatchStudio(opts: {
   slug: string;
   projectRoot: string;
@@ -131,6 +143,17 @@ export function assertNativeProjectsMatchStudio(opts: {
   if (isPrebuilding(opts.argv ?? process.argv)) return;
 
   const foundIos = readIosBundleId(opts.projectRoot);
+  if (foundIos && isTemplatePlaceholder(foundIos)) {
+    // Tolerated so run:ios's scaffold-then-configure sequence can finish — but if you are
+    // seeing this on a SECOND run, an interrupted prebuild left a half-configured template
+    // and run:ios will happily build it (wrong bundle id, no iPad support — seen 2026-08-18
+    // as a phone-shaped window on iPad). `npx expo prebuild --clean` repairs it.
+    console.warn(
+      `[native-identity] ios/ carries the template placeholder id (${foundIos}). ` +
+        'Fine mid-prebuild; if this build INSTALLS, run `npx expo prebuild --clean` first.',
+    );
+    return;
+  }
   if (foundIos && foundIos !== opts.iosBundleId) {
     throw new Error(
       mismatchMessage({
@@ -143,6 +166,7 @@ export function assertNativeProjectsMatchStudio(opts: {
   }
 
   const foundAndroid = readAndroidPackage(opts.projectRoot);
+  if (foundAndroid && isTemplatePlaceholder(foundAndroid)) return;
   if (foundAndroid && foundAndroid !== opts.androidPackage) {
     throw new Error(
       mismatchMessage({

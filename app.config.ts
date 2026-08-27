@@ -47,6 +47,21 @@ function isReleaseBuild(): boolean {
 }
 
 export default ({ config }: ConfigContext): ExpoConfig => {
+  /**
+   * Inside EAS Build the default is FORBIDDEN: the container gets neither the local shell env
+   * nor .env, so without this guard every cloud build silently became DEFAULT_STUDIO_SLUG —
+   * Carlsbad's five builds were correct only because the default happened to match, and the
+   * first Everyday Ballet build died on a projectId mismatch (2026-08-17). Each EAS project
+   * carries its own STUDIO_SLUG env var (eas env:create --name STUDIO_SLUG --value <slug>,
+   * all three environments); creating a NEW studio's EAS project includes that step.
+   */
+  if (process.env.EAS_BUILD === 'true' && !process.env.STUDIO_SLUG) {
+    throw new Error(
+      'STUDIO_SLUG is not set inside EAS Build. Set it as a project-level EAS environment ' +
+        'variable (eas env:create --name STUDIO_SLUG --value <slug> for production, preview ' +
+        'and development) — defaulting here would build the wrong studio.',
+    );
+  }
   const slug = process.env.STUDIO_SLUG ?? DEFAULT_STUDIO_SLUG;
   const { config: studio } = loadStudioConfig(slug);
 
@@ -144,7 +159,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     icon: hasStoreReadyIcon ? studioAsset(studio.assets.iconSource) : './assets/images/icon.png',
 
     ios: {
-      supportsTablet: false,
+      // TRUE is load-bearing for the rescue apps: the 2021 listings were universal
+      // (iPhone + iPad), and Apple rejects any update that drops a previously supported
+      // device family (error 90101, QA1623). Flipping this to false blocks every upload.
+      supportsTablet: true,
       // Same value the stale-project guard above checks against. Deliberately not re-derived
       // here: two copies of "what is this studio's bundle id" is how they drift apart.
       bundleIdentifier: iosBundleId,
@@ -155,6 +173,15 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       buildNumber: String(studio.store.buildNumber),
       infoPlist: {
         CFBundleDisplayName: studio.shortName,
+        // Export compliance, answered once here instead of per-upload in App Store
+        // Connect: the app implements no encryption of its own — HTTPS/TLS and the
+        // Stripe/Firebase SDKs all use the OS's standard encryption (exempt).
+        ITSAppUsesNonExemptEncryption: false,
+        // Apple 90683: the Stripe SDK ships card-scanning code, so its camera API
+        // references make this purpose string mandatory even though the app never
+        // opens the camera unless a client chooses to scan a card.
+        NSCameraUsageDescription:
+          'The camera is used only if you choose to scan a payment card when saving one.',
         ...(allowsLocalHttp
           ? {
               NSAppTransportSecurity: {
