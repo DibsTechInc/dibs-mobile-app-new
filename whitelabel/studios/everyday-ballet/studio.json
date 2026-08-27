@@ -8,9 +8,9 @@
   "store": {
     "ownership": "dibs",
     "releaseType": "update",
-    "version": "2.0.0",
-    "buildNumber": 1,
-    "lastKnownStoreVersion": "1.6",
+    "version": "2.0.1",
+    "buildNumber": 2,
+    "lastKnownStoreVersion": "2.0.0",
     "notes": "Live iOS listing under Dibs Technology Inc since 2021-02-08, currently broken. Rebuild ships as an in-place update to the same bundle id so existing installs self-heal. iOS only for v1 — nothing has ever been submitted to Google Play.",
     "platforms": [
       "ios"

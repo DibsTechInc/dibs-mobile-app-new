@@ -3,6 +3,12 @@
 Consumer loyalty + booking app for Dibs studios. Fresh rebuild — the legacy
 Expo SDK 36 app is preserved on the `legacy` git branch.
 
+To build: STUDIO_SLUG=carlsbad-village-yoga eas build --profile production --platform ios
+STUDIO_SLUG=everyday-ballet eas build --profile production --platform ios
+
+Then submit ->
+STUDIO_SLUG=everyday-ballet eas submit --platform ios --latest
+
 ## Stack
 
 Expo SDK 56 · React Native 0.85 · TypeScript (strict) · Expo Router ·
