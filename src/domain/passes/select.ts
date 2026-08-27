@@ -76,18 +76,104 @@ export function sortPassesByPriority(passes: Pass[]): Pass[] {
   });
 }
 
+/** The event fields coverage decisions read. Every caller passes a full schedule row anyway. */
+export type ClassCoverageEvent = Pick<
+  ScheduleEvent,
+  'can_apply_pass' | 'private' | 'packageRestriction'
+>;
+
+/** Packages the studio never chose and must not be able to exclude. */
+const ADMIN_PACKAGE_PREFIX = '[Admin]';
+
+/**
+ * Platform machinery — comp passes, holds, the bookkeeping pass a card booking mints. A studio
+ * never ticked these into an allowlist and they must never be turned away by one.
+ *
+ * ⚠️ Must stay identical to `isPlatformPackage` in
+ * `dibs-api/services/shared/passes/package-allowlist.js`. The `front_desk_only` half is required,
+ * not decoration: studio 88's back-office "Unpaid" package carries `is_placeholder = false` (only
+ * 226/263 were backfilled), so the flag that actually says "admins only" is what exempts it.
+ */
+function isPlatformPackagePass(pass: Pass): boolean {
+  if (pass.is_placeholder === true) return true;
+  if (pass.studioPackage?.is_placeholder === true) return true;
+  const name = pass.studioPackage?.packageName?.trim() ?? '';
+  if (name.startsWith(ADMIN_PACKAGE_PREFIX)) return true;
+  if (pass.studioPackage?.front_desk_only === true && name.toLowerCase() === 'unpaid') return true;
+  return false;
+}
+
+/**
+ * May this pass's PACKAGE pay for this session?
+ *
+ * ⚠️ **The SERVER is the authority. This must stay identical to
+ * `dibs-api/services/shared/passes/package-allowlist.js#packageAllowedForEvent`, as seen through
+ * the wire**: the server has already folded the class type's list, the session's own override and
+ * both master switches into `event.packageRestriction` (`resolveEventPackageRestriction`), so the
+ * app's half is membership in the resolved list plus the platform exemption — never a second
+ * resolution of session-vs-type. Same one-owner shape as `uses.ts` / `credit/split.ts` /
+ * `pricing/class-charge.ts`, pinned by the golden tests in `__tests__/passes.test.ts`.
+ *
+ * Everything unknown fails OPEN, matching the widget's `packageAllowedForEvent`
+ * (dibs-widget-new `associatePassWithEventNew.js`):
+ *   • `packageRestriction` absent or null — an older API build → allowed
+ *   • `allowedPackageIds: null` — NO restriction declared, the majority state → allowed
+ * The only closed states: `packagesAllowed === false`, and an explicit id list (including `[]` —
+ * the studio unticked everything) that does not contain this pass's `studio_package_id`. A pass
+ * with no resolvable package id is refused by a real list, exactly as the server refuses it.
+ */
+export function packageAllowedForClass(event: ClassCoverageEvent, pass: Pass): boolean {
+  const restriction = event.packageRestriction;
+  if (!restriction) return true;
+
+  if (isPlatformPackagePass(pass)) return true;
+
+  if (restriction.packagesAllowed === false) return false;
+
+  const allowed = restriction.allowedPackageIds;
+  if (allowed === null || allowed === undefined) return true;
+  if (!Array.isArray(allowed)) return true;
+
+  const packageId = Number(pass.studio_package_id);
+  if (!Number.isInteger(packageId)) return false;
+  return allowed.includes(packageId);
+}
+
+/**
+ * Usable, visibility-matching passes that ONLY the package allowlist turns away.
+ *
+ * For the surfaces that must SAY why — a pass that silently stops covering reads as "the app lost
+ * my membership", so class detail and the cart name the excluded pass instead of hiding it (the
+ * same disabled-with-a-reason rule the admin selector follows).
+ */
+export function passesExcludedByRestriction(
+  passes: Pass[],
+  event: ClassCoverageEvent,
+  now: Date = new Date(),
+): Pass[] {
+  if (event.can_apply_pass === false) return [];
+  const isPrivateEvent = Boolean(event.private);
+  return sortPassesByPriority(
+    usablePasses(passes, now).filter(
+      (pass) =>
+        Boolean(pass.private_pass) === isPrivateEvent && !packageAllowedForClass(event, pass),
+    ),
+  );
+}
+
 /**
  * The pass that would pay for this class, or null.
  *
- * Honours the event's own `can_apply_pass` and the pass's `private_pass` flag, because checkout
- * enforces both — and a schedule row must never promise coverage checkout will refuse.
+ * Honours the event's own `can_apply_pass`, the pass's `private_pass` flag, AND the package
+ * allowlist the server resolved onto the row — because checkout enforces all three, and a
+ * schedule row must never promise coverage checkout will refuse.
  *
  * `Boolean()` around `private_pass` is deliberate: `null === false` is false, which is how a
  * public pass whose flag was null got silently dropped in the widget.
  */
 export function choosePassForClass(
   passes: Pass[],
-  event: Pick<ScheduleEvent, 'can_apply_pass' | 'private'>,
+  event: ClassCoverageEvent,
   now: Date = new Date(),
 ): Pass | null {
   // `can_apply_pass === false` is an explicit refusal. Null or undefined means the studio never
@@ -96,7 +182,8 @@ export function choosePassForClass(
 
   const isPrivateEvent = Boolean(event.private);
   const eligible = usablePasses(passes, now).filter(
-    (pass) => Boolean(pass.private_pass) === isPrivateEvent,
+    (pass) =>
+      Boolean(pass.private_pass) === isPrivateEvent && packageAllowedForClass(event, pass),
   );
 
   return sortPassesByPriority(eligible)[0] ?? null;

@@ -9,7 +9,7 @@
 import type { Pass } from '@/api/schemas/passes';
 import type { ScheduleEvent } from '@/api/schemas/schedule';
 import { formatPrice } from '@/domain/money/format';
-import { choosePassForClass, passName } from '@/domain/passes/select';
+import { choosePassForClass, passName, passesExcludedByRestriction } from '@/domain/passes/select';
 import { parseStoredTime } from '@/domain/time/studio-now';
 
 import type { ScheduleEntry } from './types';
@@ -150,10 +150,28 @@ function price(
   return { kind: 'unknown' };
 }
 
+/**
+ * The pass the allowlist turned away, named — or null.
+ *
+ * Only asked once nothing covers: a note beside a $0 "Included" line would explain away good
+ * news. Decided by the same domain helper the chooser uses, so the note and the refusal the
+ * server would give cannot disagree.
+ */
+function excludedPassName(
+  event: ScheduleEvent,
+  passes: Pass[] | undefined,
+  covered: boolean,
+): string | null {
+  if (covered || !passes || passes.length === 0) return null;
+  const excluded = passesExcludedByRestriction(passes, event);
+  return excluded[0] ? passName(excluded[0]) : null;
+}
+
 export function toScheduleEntry(
   event: ScheduleEvent,
   { showInstructor, currency, passes }: ScheduleEntryOptions,
 ): ScheduleEntry {
+  const priced = price(event, currency, passes);
   return {
     eventId: event.eventid,
     startsAt: event.start_date,
@@ -163,6 +181,7 @@ export function toScheduleEntry(
       : null,
     durationMinutes: durationMinutes(event),
     ...capacity(event),
-    price: price(event, currency, passes),
+    price: priced,
+    excludedPassName: excludedPassName(event, passes, priced.kind === 'covered'),
   };
 }

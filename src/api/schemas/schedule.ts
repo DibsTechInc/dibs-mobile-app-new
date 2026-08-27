@@ -42,6 +42,30 @@ const instructorSchema = z
   .passthrough();
 
 /**
+ * Which packages may pay for this session — resolved SERVER-side by
+ * `resolveEventPackageRestriction` (dibs-api `services/shared/passes/package-allowlist.js`), which
+ * already folded the class type's list, this session's own override, and both master switches into
+ * one answer. The app renders and filters by what it is told; it never re-resolves.
+ *
+ * ⚠️ Three values, three different answers — collapsing any two is a shipped-bug family:
+ *   • `allowedPackageIds: null` — NO restriction, every package applies. The MAJORITY state.
+ *   • `allowedPackageIds: []`   — the studio unticked everything; no package pays.
+ *   • the whole field ABSENT    — an older API build. FAIL OPEN (see the schema note below).
+ *
+ * `source` says which level answered ('session' | 'type') — display only, typed open so a new
+ * value never fails the schema.
+ */
+const packageRestrictionSchema = z
+  .object({
+    packagesAllowed: z.boolean(),
+    allowedPackageIds: z.array(z.number()).nullable(),
+    source: z.string().nullable().optional(),
+  })
+  .passthrough();
+
+export type PackageRestriction = z.infer<typeof packageRestrictionSchema>;
+
+/**
  * An off-peak / dynamic-pricing discount the backend already applied arithmetic to.
  *
  * Present only when the studio runs pricing rules AND one matched this session's day + time.
@@ -91,6 +115,15 @@ export const scheduleEventSchema = z
 
     /** Resolved virtual-class link (per-event override, else the type default). */
     manual_track_id: z.string().nullable().optional(),
+
+    /**
+     * The package allowlist, resolved server-side. MUST be declared here even though the schema is
+     * `.passthrough()` — undeclared it is invisible to TypeScript, unvalidated, and one
+     * "tidy the schema" away from being stripped, which is exactly how the widget's first
+     * allowlist attempt shipped inert. Optional + nullable: absent means an older API build, and
+     * every reader FAILS OPEN on it.
+     */
+    packageRestriction: packageRestrictionSchema.nullable().optional(),
 
     subscription_id: z.number().nullable().optional(),
     subscription_ids: z.array(z.number()).nullable().optional(),

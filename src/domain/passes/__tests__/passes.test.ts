@@ -11,7 +11,9 @@ import type { Pass } from '@/api/schemas/passes';
 import {
   choosePassForClass,
   isUsablePass,
+  packageAllowedForClass,
   passName,
+  passesExcludedByRestriction,
   sortPassesByPriority,
   usablePasses,
 } from '../select';
@@ -225,6 +227,141 @@ describe('choosePassForClass', () => {
 
   it('is null when the client holds nothing', () => {
     expect(choosePassForClass([], publicClass, NOW)).toBeNull();
+  });
+});
+
+describe('the package allowlist mirror', () => {
+  /**
+   * GOLDEN — pinned to the same studio-88 figures the server suites use
+   * (`dibs-api services/shared/passes/__tests__/find-passes-covering-class.test.js` and
+   * `.../class-pass/__tests__/choose-pass-for-class.test.js`): package 557 "Month Unlimited" on
+   * the STUDIO type's list, package 9383 "Virtual Class 10-pack" off it. If these drift from the
+   * server's verdicts, the app names one package and the server refuses another.
+   *
+   * The app's half consumes the WIRE shape — `resolveEventPackageRestriction`'s already-resolved
+   * answer — so there is no session-vs-type arithmetic here to test; that lives server-side.
+   */
+  const membership = () =>
+    pass({
+      id: 910,
+      totalUses: null,
+      studio_package_id: 557,
+      studioPackage: { packageName: 'Month Unlimited', unlimited: true },
+    });
+  const virtualPack = () =>
+    pass({
+      id: 911,
+      studio_package_id: 9383,
+      studioPackage: { packageName: 'Virtual Class 10-pack' },
+    });
+
+  const studioClass = (restriction: unknown) =>
+    ({
+      can_apply_pass: true,
+      private: false,
+      packageRestriction: restriction,
+    }) as Parameters<typeof choosePassForClass>[1];
+
+  const restrictedToMembership = { packagesAllowed: true, allowedPackageIds: [557], source: 'type' };
+
+  it('spends the listed pass and never the excluded one — the non-empty assertion', () => {
+    // Both directions in one case: the excluded pack being gone proves nothing on its own (an
+    // empty wallet looks the same); the membership still covering is what proves the filter
+    // discriminates.
+    const chosen = choosePassForClass(
+      [virtualPack(), membership()],
+      studioClass(restrictedToMembership),
+      NOW,
+    );
+    expect(chosen?.id).toBe(910);
+    expect(packageAllowedForClass(studioClass(restrictedToMembership), virtualPack())).toBe(false);
+  });
+
+  it('an ABSENT restriction means an older API build — FAIL OPEN', () => {
+    for (const absent of [undefined, null]) {
+      const chosen = choosePassForClass([virtualPack()], studioClass(absent), NOW);
+      expect(chosen?.id).toBe(911);
+    }
+  });
+
+  it('allowedPackageIds null means NO restriction — the majority state, never "none"', () => {
+    const open = studioClass({ packagesAllowed: true, allowedPackageIds: null, source: null });
+    expect(choosePassForClass([virtualPack(), membership()], open, NOW)?.id).toBe(910);
+    expect(packageAllowedForClass(open, virtualPack())).toBe(true);
+  });
+
+  it('an EMPTY list means the studio unticked everything — the opposite of null', () => {
+    const none = studioClass({ packagesAllowed: true, allowedPackageIds: [], source: 'type' });
+    expect(choosePassForClass([virtualPack(), membership()], none, NOW)).toBeNull();
+  });
+
+  it('packagesAllowed false refuses every non-platform pass', () => {
+    const off = studioClass({ packagesAllowed: false, allowedPackageIds: [], source: 'session' });
+    expect(choosePassForClass([membership()], off, NOW)).toBeNull();
+  });
+
+  it('[Admin] packages are EXEMPT even from an empty list — platform machinery', () => {
+    const none = studioClass({ packagesAllowed: false, allowedPackageIds: [], source: 'type' });
+    const comp = pass({
+      id: 920,
+      studio_package_id: 7001,
+      studioPackage: { packageName: '[Admin] Comp Session', front_desk_only: true },
+    });
+    expect(packageAllowedForClass(none, comp)).toBe(true);
+  });
+
+  it('a front-desk-only package named "Unpaid" is exempt — studio 88 package 11473', () => {
+    // `is_placeholder` is false on that row (only 226/263 were backfilled); `front_desk_only`
+    // carries the exemption, and BOTH conditions are required — "Unpaid" is a plausible name for
+    // a sellable package.
+    const none = studioClass({ packagesAllowed: true, allowedPackageIds: [], source: 'type' });
+    const holdLike = (frontDeskOnly: boolean) =>
+      pass({
+        id: 921,
+        studio_package_id: 11473,
+        studioPackage: { packageName: 'Unpaid', front_desk_only: frontDeskOnly },
+      });
+    expect(packageAllowedForClass(none, holdLike(true))).toBe(true);
+    expect(packageAllowedForClass(none, holdLike(false))).toBe(false);
+  });
+
+  it('a pass with NO resolvable package id is refused by a real list — server parity', () => {
+    expect(
+      packageAllowedForClass(
+        studioClass(restrictedToMembership),
+        pass({ id: 930, studio_package_id: null }),
+      ),
+    ).toBe(false);
+  });
+
+  describe('passesExcludedByRestriction — the named-note feed', () => {
+    it('returns ONLY passes the allowlist alone turns away, best first', () => {
+      const excluded = passesExcludedByRestriction(
+        [
+          virtualPack(),
+          membership(),
+          pass({ id: 940, private_pass: true }), // wrong visibility, NOT an allowlist story
+          pass({ id: 941, is_placeholder: true }), // not usable at all
+        ],
+        studioClass({ packagesAllowed: true, allowedPackageIds: [557], source: 'type' }),
+        NOW,
+      );
+      expect(excluded.map((p) => p.id)).toEqual([911]);
+    });
+
+    it('is empty when passes are off for the session — that is a different sentence', () => {
+      expect(
+        passesExcludedByRestriction(
+          [membership()],
+          { can_apply_pass: false, private: false, packageRestriction: null },
+          NOW,
+        ),
+      ).toEqual([]);
+    });
+
+    it('is empty on an older API — nothing to explain when nothing is excluded', () => {
+      expect(passesExcludedByRestriction([virtualPack()], studioClass(undefined), NOW)).toEqual([]);
+    });
   });
 });
 

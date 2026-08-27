@@ -245,6 +245,15 @@ export function ClassDetailScreen({
           )}
         </Card>
 
+        {/* A pass the studio's package allowlist turns away from this class, NAMED — the
+            disabled-with-a-reason rule. Priced with no explanation, a usually-covering
+            membership reads as the app having lost it. */}
+        {!coveredByPass && entry.excludedPassName ? (
+          <Text variant="caption" color="tertiary" style={{ marginTop: theme.spacing.sm }}>
+            {entry.excludedPassName} isn’t accepted for this class, so it’s priced as a drop-in.
+          </Text>
+        ) : null}
+
         {entry.isFull ? (
           <View style={{ marginTop: theme.spacing.base, alignSelf: 'flex-start' }}>
             <StatusTag label={entry.hasWaitlist ? 'Waitlist only' : 'Full'} tone="danger" />

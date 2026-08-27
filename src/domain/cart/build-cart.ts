@@ -167,7 +167,13 @@ export function buildCart(
       charge,
       passId: state === 'covered' && covering ? covering.id : null,
       passName: state === 'covered' && covering ? passName(covering) : null,
-      note: noteFor(state, entry),
+      // A pass the allowlist turned away is NAMED on the priced line, never silently dropped —
+      // `entry.excludedPassName` comes from the same helper the chooser uses, so the note and the
+      // refusal the server would give cannot disagree.
+      note:
+        state === 'ready' && entry.excludedPassName
+          ? `${entry.excludedPassName} isn’t accepted for this class, so it’s priced as a drop-in.`
+          : noteFor(state, entry),
     };
   });
 

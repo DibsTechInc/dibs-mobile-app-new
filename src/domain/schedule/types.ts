@@ -25,4 +25,11 @@ export interface ScheduleEntry {
     | { kind: 'covered'; label: string }
     | { kind: 'amount'; amountLabel: string }
     | { kind: 'unknown' };
+  /**
+   * A pass the client holds that the studio's package allowlist turns away from THIS class —
+   * named, so class detail and the cart can say why a usually-covering pass is not covering,
+   * instead of silently pricing the class (which reads as the app losing the membership).
+   * Null when a pass covers, when nothing was excluded, or when we have no pass data.
+   */
+  excludedPassName: string | null;
 }
