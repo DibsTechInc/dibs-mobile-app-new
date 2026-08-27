@@ -84,6 +84,15 @@ export const studioPackageSchema = z
 
     sortIndex: z.number().nullable().optional(),
 
+    /**
+     * This package pays for VIRTUAL classes. The SERVER already filters these out of the app's
+     * feed (`calledFrom: 'mobileApp'` + the studio's `show_virtuals_on_app` opt-in) and refuses
+     * buying one (`package_unavailable_in_app`), so the app makes no decision of its own —
+     * declared so the field is typed rather than invisible, same rule as `packageRestriction`
+     * on the schedule row. NULL/absent = ordinary package, or an older API build.
+     */
+    virtual_only: z.boolean().nullable().optional(),
+
     /** A PERCENTAGE (8.25 means 8.25%), added per row by the service from the studio location. */
     taxrate: z.number().nullable().optional(),
   })

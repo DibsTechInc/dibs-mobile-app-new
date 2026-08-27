@@ -20,7 +20,11 @@ export async function fetchPackages(
 ): Promise<StudioPackage[]> {
   const response = await client.post(
     'widget/get-packages',
-    { dibsStudioId },
+    // `calledFrom` is what tells the server this is the APP, so it can withhold virtual-only
+    // packages unless the studio opted virtual classes in — the same contract get-schedule uses.
+    // The server owns the decision (it holds both the flag and the config); the app just
+    // identifies itself. An older API ignores the field entirely.
+    { dibsStudioId, calledFrom: 'mobileApp' },
     packagesResponseSchema,
     { signal },
   );
