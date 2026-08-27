@@ -7,14 +7,21 @@
  */
 import type { AccountActivityRow, UpcomingPayment } from '@/api/schemas/billing';
 import { formatBalance } from '@/domain/money/format';
-import { formatInstantInStudioZone } from '@/domain/time/studio-now';
+import { formatInstantInStudioZone, formatStoredTime } from '@/domain/time/studio-now';
 
 export type BillingSectionStatus = 'loading' | 'ready' | 'partial' | 'error';
 
 export interface BillingHistoryItem {
   key: string;
   title: string;
+  /** When the money moved — the row's own left-column date ("Aug 27"). */
   dateLabel: string | null;
+  /**
+   * The CLASS this row is about — "9/18 · 10:00 AM" — or null for rows with no session behind
+   * them (a pack purchase, a comp credit). Two different dates on one row on purpose: the
+   * transaction date says when the money moved, this says which class it was about.
+   */
+  detailLabel: string | null;
   /** "$45.98", "+$100.00" for credit added, or null when the row moved no money. */
   amountLabel: string | null;
   /** "$10.00 refunded", or null. Stated alongside the amount, never folded into it. */
@@ -101,7 +108,38 @@ export interface BuildBillingInput {
  * payment states both figures; a split whose amounts did not survive the wire still says
  * "Credit + card" rather than pretending to be one or the other.
  */
+/**
+ * "9/18 · 10:00 AM" — the class this row is about, from `primary.eventDate`.
+ *
+ * `eventDate` is the event's `start_date`: a studio wall-clock reading wearing a Z, so it is
+ * printed VERBATIM via `formatStoredTime` — device-converting it would shift every class by the
+ * viewer's timezone (the platform's one unbreakable time rule). Null for rows with no session.
+ */
+function classDetailFor(row: AccountActivityRow): string | null {
+  const eventDate = row.primary?.eventDate;
+  if (!eventDate) return null;
+  try {
+    const day = formatStoredTime(eventDate, { month: 'numeric', day: 'numeric' });
+    const time = formatStoredTime(eventDate);
+    return `${day} · ${time}`;
+  } catch {
+    // Junk in the column must degrade to a row without a detail line, never to a crash on a
+    // money surface.
+    return null;
+  }
+}
+
 function paymentLabelFor(row: AccountActivityRow, currency: string): string | null {
+  /*
+   * A cancellation's credit is the one row whose "method" is a WHY, not a HOW. "+$22.00" beside
+   * a class name reads as a mystery deposit until the row says the class was cancelled — which
+   * is exactly the feedback that put this here (Alicia, 2026-08-27). The server's own
+   * `class_canceled` row carries no paymentMethod, so this slot is free for the reason.
+   */
+  if (row.activityType === 'class_canceled') {
+    return 'Class cancelled';
+  }
+
   switch (row.paymentMethod) {
     case 'credit':
       return 'Credit applied';
@@ -163,6 +201,7 @@ export function buildBillingData({
         title: titleFor(row),
         // A real instant, read back in the studio's zone — not printed verbatim.
         dateLabel: row.occurredAt ? formatInstantInStudioZone(row.occurredAt, timeZone) : null,
+        detailLabel: classDetailFor(row),
         amountLabel: !hasMoney
           ? null
           : sign === 'credit'

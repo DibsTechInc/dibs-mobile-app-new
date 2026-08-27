@@ -334,8 +334,18 @@ export function WalletScreen({
             empty: null,
             content: (
               <Card emphasis="flat">
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Text variant="secondary" color="secondary">
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: theme.spacing.md,
+                  }}
+                >
+                  {/* The label yields and wraps; the FIGURE never does. Without flexShrink a
+                      long studio name pushes the amount clean off the screen — reported on
+                      device at Carlsbad Village Yoga, 2026-08-27. */}
+                  <Text variant="secondary" color="secondary" style={{ flexShrink: 1 }}>
                     {data.credit.amount === 0
                       ? `No credit at ${studioName}`
                       : `Your balance at ${studioName}`}

@@ -45,6 +45,7 @@ export {
   PurchaseRefusedError,
   confirmPackagePurchase,
   createPackagePaymentIntent,
+  purchasePackageWithCredit,
   type CreatePackagePaymentIntentArgs,
 } from './package-purchase';
 export {
