@@ -8,6 +8,7 @@ STUDIO_SLUG=everyday-ballet eas build --profile production --platform ios
 
 Then submit ->
 STUDIO_SLUG=everyday-ballet eas submit --platform ios --latest
+STUDIO_SLUG=carlsbad-village-yoga eas submit --platform ios --latest
 
 ## Stack
 
