@@ -35,9 +35,18 @@ zod (API schemas) · decimal.js (money math)
 
 ```
 npm install
-after you change a slug --> 
+after you change a slug -->
 npx expo prebuild --clean
 npx expo run:ios --device "iPhone 17 Pro"
 npm run typecheck
 npm test
 ```
+
+Which studio you get comes from `STUDIO_SLUG` in `.env`, and which backend from
+`EXPO_PUBLIC_API_URL` there (it wins over the studio's own `api.url` in development).
+
+**Leave the `run:ios` terminal open.** Metro runs in the foreground and the app loads its
+JavaScript from it, so closing that terminal leaves the simulator showing a stale build —
+which looks like the app misbehaving rather than like a dead bundler.
+
+`--device` with no name gives an interactive picker of every simulator and connected device.
