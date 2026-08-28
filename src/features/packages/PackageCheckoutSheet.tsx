@@ -16,6 +16,7 @@
  * this sheet — their first cycle funds the card the subscription renews on, so the route sends
  * them straight down the card path exactly as before.
  */
+import { useEffect, useRef } from 'react';
 import { Pressable, Switch, View } from 'react-native';
 
 import { Button, Sheet, Text } from '@/components';
@@ -70,11 +71,23 @@ export function PackageCheckoutSheet({
 }: PackageCheckoutSheetProps) {
   const theme = useTheme();
 
+  /*
+   * The sheet takes ~240ms to slide away, and `pkg` goes null the instant the purchase lands.
+   * Rendering straight off it empties the panel on that first frame and what slides down is a
+   * blank card — the jump cut the design system rules out. Holding the last package for the
+   * length of the exit means the sheet leaves still showing what it was about.
+   */
+  const lastPkg = useRef<PackageView | null>(pkg);
+  useEffect(() => {
+    if (pkg) lastPkg.current = pkg;
+  }, [pkg]);
+  const shown = pkg ?? lastPkg.current;
+
   const isWorking = purchase?.kind === 'working';
   const creditOnly = applyCredit && split.kind === 'credit-only';
 
-  const terms = pkg
-    ? [pkg.allowanceLabel, pkg.validityLabel].filter(Boolean).join(' · ')
+  const terms = shown
+    ? [shown.allowanceLabel, shown.validityLabel].filter(Boolean).join(' · ')
     : '';
 
   /*
@@ -98,10 +111,10 @@ export function PackageCheckoutSheet({
       // wrong.
       dismissOnBackdropPress={!isWorking}
     >
-      {pkg ? (
+      {shown ? (
         <>
           <View style={{ gap: 2 }}>
-            <Text variant="heading">{pkg.name}</Text>
+            <Text variant="heading">{shown.name}</Text>
             {terms ? (
               <Text variant="secondary" color="secondary">
                 {terms}
@@ -121,9 +134,9 @@ export function PackageCheckoutSheet({
               <Text variant="bodyMedium">Total</Text>
               <Text variant="numeral">{totalLabel}</Text>
             </View>
-            {pkg.taxNote ? (
+            {shown.taxNote ? (
               <Text variant="caption" color="tertiary">
-                {pkg.taxNote}
+                {shown.taxNote}
               </Text>
             ) : null}
           </View>

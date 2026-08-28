@@ -30,6 +30,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ApiError, describeApiError } from '@/api/errors';
 import { Button, Card, EmptyState, ErrorState, Icon, Skeleton, StatusTag, Text } from '@/components';
+import { FadeRise } from '@/components/motion';
 import type { PackageView } from '@/domain/packages/build-packages';
 import type { SectionStatus, WalletPass } from '@/domain/wallet/build-wallet';
 import type { PurchaseStatus } from '@/features/packages/usePurchasePackage';
@@ -225,9 +226,16 @@ function PackageCard({
         {bought ? (
           // The end of the flow for this card. Confirmation copy, not another button — a Buy
           // button still sitting there after a successful purchase invites a second one.
-          <Text variant="secondary" color="success">
-            Added to your account. It is in Your passes above.
-          </Text>
+          //
+          // It ARRIVES rather than appearing: the checkout sheet is sliding away as this lands,
+          // and a line of text switching on mid-slide is the kind of single-frame change the
+          // design system rules out. The delay lets the sheet clear first, so the eye follows
+          // one thing at a time.
+          <FadeRise distance={6} delay={140}>
+            <Text variant="secondary" color="success">
+              Added to your account. It is in Your passes above.
+            </Text>
+          </FadeRise>
         ) : !pkg.isPurchasable ? (
           // Stated, not disabled-and-unexplained. A membership needs a subscription the app cannot
           // create yet, so the card says where to go rather than offering a button that refuses.
@@ -431,8 +439,13 @@ export function PackagesScreen({
           <View>
             <SectionHeading title="Your passes" subtitle="Already in your account." />
             <View style={{ gap: theme.spacing.md }}>
-              {ownedPasses.map((pass) => (
-                <OwnedPassRow key={pass.id} pass={pass} />
+              {/* Each row animates on its own MOUNT, so the rows already on screen stay put and
+                  only a newly-bought pass moves — it rises into the list the client was just
+                  told to look at, instead of appearing between two frames. */}
+              {ownedPasses.map((pass, index) => (
+                <FadeRise key={pass.id} index={index} distance={10}>
+                  <OwnedPassRow pass={pass} />
+                </FadeRise>
               ))}
             </View>
           </View>

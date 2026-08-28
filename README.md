@@ -35,7 +35,9 @@ zod (API schemas) · decimal.js (money math)
 
 ```
 npm install
-npm run ios / android
+after you change a slug --> 
+npx expo prebuild --clean
+npx expo run:ios --device "iPhone 17 Pro"
 npm run typecheck
 npm test
 ```
