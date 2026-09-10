@@ -185,6 +185,10 @@ export function useBookClass({ eventId, currency }: UseBookClassArgs) {
         void queryClient.invalidateQueries({
           queryKey: queryKeys.paymentMethods(account.userid),
         });
+        // A booking is exactly what ends first-class eligibility.
+        void queryClient.invalidateQueries({
+          queryKey: queryKeys.firstClassOffer(account.userid, studio.dibsStudioId),
+        });
       }
     },
 

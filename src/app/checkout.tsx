@@ -57,6 +57,11 @@ export default function CheckoutRoute() {
   const { config, timeZone } = useStudioConfig();
   const cart = useCart();
   const removeFromCart = useCartStore((state) => state.remove);
+  const firstClassOptOut = useCartStore((state) => state.firstClassOptOut);
+  const setFirstClassOptOut = useCartStore((state) => state.setFirstClassOptOut);
+  const setFirstClassOverPassEventId = useCartStore(
+    (state) => state.setFirstClassOverPassEventId,
+  );
   const checkout = useCartCheckout({ currency: config?.currency });
   // The SAME owner the wallet reads, so the card named here is the card the wallet calls default.
   const cards = useSavedCards();
@@ -186,6 +191,9 @@ export default function CheckoutRoute() {
         line,
         totalCents: effectiveTotalCents(line),
         ...(split ? { creditCents: split.creditAppliedCents, applyCredit } : {}),
+        // The ONE line the cart put the first-class price on. Its `charge` (and so its total
+        // above) already carries the first-class subtotal, so the flag and the figure agree.
+        ...(line.firstClass === 'applied' ? { applyFirstClassPrice: true } : {}),
       };
     });
   }, [outstandingCovered, outstandingChargeable, creditAllocation, applyCredit]);
@@ -288,6 +296,13 @@ export default function CheckoutRoute() {
       creditAppliedCents={creditTotals.creditCents}
       applyCredit={applyCredit}
       onApplyCreditChange={setApplyCredit}
+      firstClassOptOut={firstClassOptOut}
+      onFirstClassOptOutChange={setFirstClassOptOut}
+      onUseFirstClassInsteadOfPass={(eventId) => {
+        setFirstClassOverPassEventId(eventId);
+        setFirstClassOptOut(false);
+      }}
+      onKeepPass={() => setFirstClassOverPassEventId(null)}
       formatCents={(cents) => formatBalance(cents / 100, config?.currency)}
       onRemove={removeFromCart}
       onConfirm={() => checkout.run(bookableItems)}

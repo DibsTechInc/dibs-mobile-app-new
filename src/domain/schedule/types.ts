@@ -32,4 +32,10 @@ export interface ScheduleEntry {
    * Null when a pass covers, when nothing was excluded, or when we have no pass data.
    */
   excludedPassName: string | null;
+  /**
+   * The studio's first-class price on THIS row (client-agnostic, from the feed). "$15" — cents
+   * dropped when there are none. Null when the studio's price does not beat this class. A screen
+   * shows it ONLY when the offer endpoint also says this client is eligible.
+   */
+  firstClassPriceLabel: string | null;
 }

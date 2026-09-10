@@ -43,6 +43,8 @@ export class BookingRefusedError extends ApiError {
    */
   readonly creditSplit: CreditSplitResponse | null;
   readonly creditBalanceCents: number | null;
+  /** On `first_class_not_eligible`: the server's reason. Null on every other refusal. */
+  readonly firstClassReason: string | null;
 
   constructor(args: {
     status: number;
@@ -53,6 +55,7 @@ export class BookingRefusedError extends ApiError {
     existingBookingCount?: number | null;
     creditSplit?: CreditSplitResponse | null;
     creditBalanceCents?: number | null;
+    firstClassReason?: string | null;
     body: unknown;
   }) {
     super({
@@ -71,6 +74,7 @@ export class BookingRefusedError extends ApiError {
     this.existingBookingCount = args.existingBookingCount ?? null;
     this.creditSplit = args.creditSplit ?? null;
     this.creditBalanceCents = args.creditBalanceCents ?? null;
+    this.firstClassReason = args.firstClassReason ?? null;
   }
 }
 
@@ -91,6 +95,7 @@ function asRefusal(error: unknown): never {
         existingBookingCount: parsed.data.existingBookingCount ?? null,
         creditSplit: parsed.data.creditSplit ?? null,
         creditBalanceCents: parsed.data.creditBalanceCents ?? null,
+        firstClassReason: parsed.data.firstClassReason ?? null,
         body: error.body,
       });
     }
@@ -133,6 +138,13 @@ export interface CreateClassPaymentIntentArgs {
    * spent** — it only says what it showed.
    */
   displayedCreditCents?: number;
+  /**
+   * The client's CHOICE to use the studio's first-class price (2026-09-10) — a yes/no, never a
+   * figure. The server decides whether it applies (switch on, client new here, group class,
+   * cheaper) and refuses `first_class_not_eligible` with its own breakdown when it does not.
+   * `displayedTotalCents` must be the first-class total when this is on.
+   */
+  applyFirstClassPrice?: boolean;
 }
 
 export async function createClassPaymentIntent(
@@ -144,6 +156,7 @@ export async function createClassPaymentIntent(
     allowDuplicate,
     applyCredit,
     displayedCreditCents,
+    applyFirstClassPrice,
   }: CreateClassPaymentIntentArgs,
   signal?: AbortSignal,
 ) {
@@ -166,6 +179,9 @@ export async function createClassPaymentIntent(
         ...(typeof displayedCreditCents === 'number'
           ? { displayedCreditCents }
           : {}),
+        // Exact `true` only — the server takes a strict `=== true`, and an absent key is the
+        // request every older build sends.
+        ...(applyFirstClassPrice === true ? { applyFirstClassPrice: true } : {}),
       },
       createClassPaymentIntentResponseSchema,
       { authenticated: true, signal },
@@ -181,6 +197,8 @@ export interface BookClassWithCreditArgs {
   /** What the app showed as the class price. The server prices it again and refuses a mismatch. */
   displayedTotalCents: number;
   allowDuplicate?: boolean;
+  /** Same contract as on the card path: a yes/no the server verifies. */
+  applyFirstClassPrice?: boolean;
 }
 
 /**
@@ -196,7 +214,13 @@ export interface BookClassWithCreditArgs {
  */
 export async function bookClassWithCredit(
   client: ApiClient,
-  { dibsStudioId, eventId, displayedTotalCents, allowDuplicate }: BookClassWithCreditArgs,
+  {
+    dibsStudioId,
+    eventId,
+    displayedTotalCents,
+    allowDuplicate,
+    applyFirstClassPrice,
+  }: BookClassWithCreditArgs,
   signal?: AbortSignal,
 ): Promise<BookWithCreditResponse> {
   try {
@@ -208,6 +232,7 @@ export async function bookClassWithCredit(
         eventId,
         displayedTotalCents,
         ...(allowDuplicate === true ? { allowDuplicate: true } : {}),
+        ...(applyFirstClassPrice === true ? { applyFirstClassPrice: true } : {}),
       },
       bookWithCreditResponseSchema,
       { authenticated: true, signal },

@@ -34,6 +34,20 @@ export const classPriceBreakdownSchema = z
     taxRatePercent: z.number(),
     taxCents: z.number(),
     totalCents: z.number(),
+    /**
+     * The first-class price (2026-09-10). All optional: an older backend sends none of them and the
+     * app reads that as "not applied". When `firstClassApplied` is true, `subtotalCents` IS the
+     * first-class price and tax was computed on it. `firstClassReason` is an OPEN enum
+     * (eligible | inactive | has_visits | has_booking | already_redeemed | unknown_client |
+     * not_a_class | not_cheaper).
+     */
+    firstClassPriceCents: z.number().nullable().optional(),
+    firstClassAvailableOnThisClass: z.boolean().optional(),
+    firstClassEligible: z.boolean().optional(),
+    firstClassApplied: z.boolean().optional(),
+    firstClassSavingsCents: z.number().optional(),
+    firstClassDescription: z.string().nullable().optional(),
+    firstClassReason: z.string().optional(),
   })
   .passthrough();
 
@@ -130,6 +144,8 @@ export const bookingRefusalSchema = z
     creditSplit: creditSplitSchema.optional(),
     /** The live balance in cents, on the credit refusals. */
     creditBalanceCents: z.number().optional(),
+    /** On `first_class_not_eligible`: why the server would not apply the first-class price. */
+    firstClassReason: z.string().optional(),
   })
   .passthrough();
 

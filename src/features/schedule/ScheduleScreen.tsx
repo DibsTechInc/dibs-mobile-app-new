@@ -190,9 +190,11 @@ function ClassRow({
   bookedSpots,
   onPress,
   onBook,
+  firstClassEligible = false,
 }: {
   entry: ScheduleEntry;
   inCart: boolean;
+  firstClassEligible?: boolean;
   /** Live spots this client already holds in this class. 0 for most rows. */
   bookedSpots: number;
   onPress: () => void;
@@ -322,6 +324,13 @@ function ClassRow({
             tapped harder, and there is no waitlist flow in the app — so the row states the fact
             and stops. Saying nothing at all would be worse: the client would be left wondering
             why this row alone has no way to book. */}
+        {/* The pass wins over the offer on a row (D6), so a covered row never carries the pill. */}
+        {firstClassEligible &&
+        entry.firstClassPriceLabel &&
+        entry.price.kind !== 'covered' &&
+        !entry.isFull ? (
+          <StatusTag label={`${entry.firstClassPriceLabel} first class`} tone="accent" />
+        ) : null}
         {entry.isFull ? (
           <StatusTag label={entry.hasWaitlist ? 'Waitlist only' : 'Full'} tone="neutral" />
         ) : onBook ? (
@@ -358,6 +367,12 @@ export interface ScheduleScreenProps {
    * they hold nothing.
    */
   passes?: Pass[];
+  /**
+   * The client is new here and the studio's first-class price applies to them (2026-09-10).
+   * Resolved by `useFirstClassOffer`; false for a guest, while resolving and on a failed read —
+   * the pill is a promise, so it is shown only on a resolved yes.
+   */
+  firstClassEligible?: boolean;
   isLoading?: boolean;
   error?: unknown;
   isRefreshing?: boolean;
@@ -395,6 +410,7 @@ export interface ScheduleScreenProps {
 
 export function ScheduleScreen({
   days,
+  firstClassEligible = false,
   selectedDate,
   onSelectDate,
   studioName,
@@ -569,6 +585,7 @@ export function ScheduleScreen({
                 key={entry.eventId}
                 entry={entry}
                 inCart={inCart.has(entry.eventId)}
+                firstClassEligible={firstClassEligible}
                 bookedSpots={bookedSpotsFor(bookedCounts, entry.eventId)}
                 onPress={() => onOpenClass(entry.eventId)}
                 onBook={onBookClass ? () => onBookClass(entry.eventId) : undefined}

@@ -52,6 +52,27 @@ export interface ClassCharge {
   taxLabel: string;
   /** "$23.82" — what the card is charged. Always two decimals for the same reason. */
   totalLabel: string;
+  /**
+   * The FIRST-CLASS PRICE (2026-09-10). True when the subtotal above IS the studio's first-class
+   * price rather than the class's own. Mirrors the server's `firstClassApplied`: the app only
+   * ever says "I want it" and the server re-prices; this is what the app SHOWED.
+   */
+  firstClassApplied: boolean;
+  /** What the class costs WITHOUT the first-class price: the off-peak price if a rule applied, else list. */
+  regularSubtotalCents: number;
+  /** "$22" — the struck-through figure beside a first-class price. Equal to subtotalLabel otherwise. */
+  regularSubtotalLabel: string;
+  /** regularSubtotal − subtotal when applied, else 0. */
+  savingsCents: number;
+}
+
+export interface ClassChargeOptions {
+  /**
+   * Apply the studio's first-class price to this class. The caller has ALREADY established that
+   * the row carries `first_class_offer` and that this client is eligible — this only does the
+   * arithmetic, exactly as the server does it: subtotal = priceCents, tax on that.
+   */
+  firstClass?: { priceCents: number } | null;
 }
 
 const toCents = (dollars: number): number => Math.round(dollars * 100);
@@ -66,13 +87,21 @@ const empty = (status: ClassChargeStatus, currency: string): ClassCharge => ({
   subtotalLabel: formatPrice(0, currency),
   taxLabel: formatBalance(0, currency),
   totalLabel: formatBalance(0, currency),
+  firstClassApplied: false,
+  regularSubtotalCents: 0,
+  regularSubtotalLabel: formatPrice(0, currency),
+  savingsCents: 0,
 });
 
 /**
  * @param event    a raw `get-schedule` row
  * @param currency ISO-4217 from get-basic-config. Defaults to USD only because every pilot is US.
  */
-export function resolveClassCharge(event: ScheduleEvent, currency = 'USD'): ClassCharge {
+export function resolveClassCharge(
+  event: ScheduleEvent,
+  currency = 'USD',
+  { firstClass = null }: ClassChargeOptions = {},
+): ClassCharge {
   // Checked BEFORE the price: several studios leave `price_dibs` populated on classes they have
   // since flagged free. Same order as the server.
   if (event.free_class === true) return empty('free', currency);
@@ -92,7 +121,17 @@ export function resolveClassCharge(event: ScheduleEvent, currency = 'USD'): Clas
       ? toCents(event.pricing_rule.discounted_price)
       : null;
 
-  const subtotalCents = ruleDiscounted ?? listPriceCents;
+  const regularSubtotalCents = ruleDiscounted ?? listPriceCents;
+
+  // The first-class price replaces the subtotal ONLY when it is lower — the server's rule 5
+  // (`priceClassWithMatcher`): equal or higher is "not_cheaper" and the class prices normally.
+  const firstClassPriceCents =
+    firstClass && Number.isInteger(firstClass.priceCents) && firstClass.priceCents > 0
+      ? firstClass.priceCents
+      : null;
+  const firstClassApplied =
+    firstClassPriceCents !== null && firstClassPriceCents < regularSubtotalCents;
+  const subtotalCents = firstClassApplied ? firstClassPriceCents : regularSubtotalCents;
 
   // `dibs_studio_locations.tax_rate` is a PERCENTAGE (8.25 means 8.25%), not a multiplier —
   // dividing by 100 is what stops a $100 class being charged $487.50 of tax.
@@ -113,6 +152,10 @@ export function resolveClassCharge(event: ScheduleEvent, currency = 'USD'): Clas
     subtotalLabel: formatPrice(subtotalCents / 100, currency),
     taxLabel: formatBalance(taxCents / 100, currency),
     totalLabel: formatBalance(totalCents / 100, currency),
+    firstClassApplied,
+    regularSubtotalCents,
+    regularSubtotalLabel: formatPrice(regularSubtotalCents / 100, currency),
+    savingsCents: firstClassApplied ? regularSubtotalCents - subtotalCents : 0,
   };
 }
 
@@ -131,11 +174,20 @@ export function chargeFromServerBreakdown(
     totalCents: number;
     isFree: boolean;
     priceAvailable: boolean;
+    /** Optional: an older backend sends none of these, which reads as "not applied". */
+    firstClassApplied?: boolean;
+    firstClassSavingsCents?: number;
   },
   currency = 'USD',
 ): ClassCharge {
   if (!breakdown.priceAvailable) return empty('unknown', currency);
   if (breakdown.isFree || breakdown.totalCents <= 0) return empty('free', currency);
+
+  const firstClassApplied = breakdown.firstClassApplied === true;
+  // When applied, `subtotalCents` IS the first-class price; the regular figure is what it beat.
+  const regularSubtotalCents = firstClassApplied
+    ? breakdown.subtotalCents + (breakdown.firstClassSavingsCents ?? 0)
+    : breakdown.subtotalCents;
 
   return {
     status: 'chargeable',
@@ -149,5 +201,9 @@ export function chargeFromServerBreakdown(
     subtotalLabel: formatPrice(breakdown.subtotalCents / 100, currency),
     taxLabel: formatBalance(breakdown.taxCents / 100, currency),
     totalLabel: formatBalance(breakdown.totalCents / 100, currency),
+    firstClassApplied,
+    regularSubtotalCents,
+    regularSubtotalLabel: formatPrice(regularSubtotalCents / 100, currency),
+    savingsCents: firstClassApplied ? regularSubtotalCents - breakdown.subtotalCents : 0,
   };
 }

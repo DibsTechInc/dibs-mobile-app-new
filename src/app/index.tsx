@@ -14,6 +14,8 @@ import { studio } from '@/config/studio';
 import { buildGreeting } from '@/domain/home/build-home-data';
 import { bookRouteForSurface, resolveBookingSurface } from '@/domain/studio/booking-surface';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { useFirstClassOffer } from '@/features/first-class/useFirstClassOffer';
+import { formatPrice } from '@/domain/money/format';
 import { useCartCount } from '@/features/cart/cartStore';
 import { HomeScreen, type HomeChoice } from '@/features/home/HomeScreen';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
@@ -64,12 +66,27 @@ export default function HomeRoute() {
 
   const onRetry = useCallback(() => refetchConfig(), [refetchConfig]);
 
+  // The first-class price, said once and quietly, only on a resolved yes. Tapping it opens the
+  // schedule, where every eligible row wears the pill.
+  const firstClass = useFirstClassOffer();
+  const firstClassOffer = useMemo(
+    () =>
+      firstClass.isEligible && firstClass.priceCents
+        ? {
+            label: `Your first class is ${formatPrice(firstClass.priceCents / 100, config?.currency)} →`,
+            onPress: () => router.push(bookRoute),
+          }
+        : null,
+    [firstClass.isEligible, firstClass.priceCents, config?.currency, bookRoute],
+  );
+
   return (
     <>
       <HomeScreen
         greeting={greeting.title}
         subtitle={greeting.subtitle}
         choices={choices}
+        firstClassOffer={firstClassOffer}
         onOpenMenu={() => setMenuOpen(true)}
         /*
          * Only when there is something in it.
