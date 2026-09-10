@@ -22,6 +22,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { AuthScreen, type SessionPanelProps } from '@/features/auth/AuthScreen';
 import { resolveReturnPath } from '@/features/auth/returnPath';
 import { useAuthActions } from '@/features/auth/useAuthActions';
+import { useFirstClassWelcomeStore } from '@/features/first-class/firstClassWelcomeStore';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
 import { studio } from '@/config/studio';
 
@@ -65,6 +66,8 @@ export default function SignInRoute() {
     }) => {
       setError(null);
       const result = await signUp(values);
+      // The welcome sheet waits for the offer endpoint to resolve; it fires nowhere else.
+      if (result.ok) useFirstClassWelcomeStore.getState().markSignedUp();
       if (result.ok) goOnward();
       else setError(result.message ?? null);
     },

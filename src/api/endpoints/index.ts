@@ -61,6 +61,7 @@ export {
   CommitmentNotMetError,
   type CancelMembershipArgs,
 } from './membership';
+export { fetchFirstClassOffer } from './first-class-offer';
 export { fetchPackages } from './packages';
 export { confirmPasswordSet } from './password';
 export { fetchSchedule } from './schedule';

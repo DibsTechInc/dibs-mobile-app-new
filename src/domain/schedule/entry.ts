@@ -183,5 +183,9 @@ export function toScheduleEntry(
     ...capacity(event),
     price: priced,
     excludedPassName: excludedPassName(event, passes, priced.kind === 'covered'),
+    firstClassPriceLabel:
+      event.first_class_offer && event.first_class_offer.priceCents > 0
+        ? formatPrice(event.first_class_offer.priceCents / 100, currency)
+        : null,
   };
 }

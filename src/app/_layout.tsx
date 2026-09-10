@@ -8,6 +8,7 @@ import { queryClient } from '@/api/query-client';
 import { ClarityIntegration } from '@/features/analytics/ClarityIntegration';
 import { AppReleaseGate } from '@/features/app-release/AppReleaseGate';
 import { AuthProvider } from '@/features/auth/AuthProvider';
+import { FirstClassWelcomeSheet } from '@/features/first-class/FirstClassWelcomeSheet';
 import { installAuthBridge } from '@/features/auth/bridge';
 import { StripeSdkProvider } from '@/features/payments/StripeSdkProvider';
 import { AppWarmup } from '@/features/prefetch/AppWarmup';
@@ -59,6 +60,9 @@ export default function RootLayout() {
                     any of them lands on data, not a skeleton. Renders nothing; failures are
                     silent — every screen keeps its own loading and error states. */}
                 <AppWarmup />
+                {/* The one-time "your first class is $15" sheet after sign-up. Renders nothing
+                    until the offer endpoint has resolved eligible. */}
+                <FirstClassWelcomeSheet />
                 {/* Session recordings. Dormant unless this studio's studio.json carries a
                     Clarity project id — see ClarityIntegration. */}
                 <ClarityIntegration />

@@ -81,6 +81,27 @@ const pricingRuleSchema = z
   })
   .passthrough();
 
+/**
+ * The studio's FIRST-CLASS PRICE, as it applies to THIS class (2026-09-10).
+ *
+ * The client-agnostic half only: `null` unless the studio's switch is on AND the price beats what
+ * this row would otherwise cost after any off-peak rule. Whether the CLIENT is new here is never on
+ * the feed — that is `POST widget/first-class-offer`, and a row is only rendered with the offer when
+ * both agree. Cents throughout except the two `*Dollars` mirrors, which sit beside `pricing_rule`'s
+ * dollar figures. An ABSENT field is an older API build and reads as "no offer".
+ */
+export const firstClassOfferSchema = z
+  .object({
+    priceCents: z.number(),
+    savingsCents: z.number(),
+    listPriceCents: z.number(),
+    priceDollars: z.number().optional(),
+    insteadOfDollars: z.number().optional(),
+  })
+  .passthrough();
+
+export type FirstClassOffer = z.infer<typeof firstClassOfferSchema>;
+
 export const scheduleEventSchema = z
   .object({
     eventid: z.number(),
@@ -124,6 +145,13 @@ export const scheduleEventSchema = z
      * every reader FAILS OPEN on it.
      */
     packageRestriction: packageRestrictionSchema.nullable().optional(),
+
+    /**
+     * The first-class price on this row — declared for the same reason as `packageRestriction`:
+     * undeclared it is invisible to TypeScript and one tidy-up from being stripped. Absent or null
+     * both mean "no offer on this class".
+     */
+    first_class_offer: firstClassOfferSchema.nullable().optional(),
 
     subscription_id: z.number().nullable().optional(),
     subscription_ids: z.array(z.number()).nullable().optional(),

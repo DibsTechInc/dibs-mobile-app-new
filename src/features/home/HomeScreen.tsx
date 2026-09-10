@@ -63,6 +63,11 @@ export interface HomeScreenProps {
   choices: [HomeChoice, HomeChoice, HomeChoice];
   onOpenMenu: () => void;
   onOpenCart?: () => void;
+  /**
+   * "Your first class is $15 →" — one quiet line above the menu, ONLY when the offer endpoint has
+   * resolved eligible (2026-09-10). Null hides it; the three-choice row is untouched either way.
+   */
+  firstClassOffer?: { label: string; onPress: () => void } | null;
   /** Live hero from `get-basic-config`, used only when the build opts out of the bundled one. */
   remoteHeroUri?: string | null;
   /** Set when even the studio's config failed — the one case this screen cannot render. */
@@ -128,6 +133,7 @@ export function HomeScreen({
   choices,
   onOpenMenu,
   onOpenCart,
+  firstClassOffer = null,
   remoteHeroUri,
   error,
   onRetry,
@@ -280,6 +286,27 @@ export function HomeScreen({
         edge. FadeRise now only fades; the View owns the geometry.
       */}
       <FadeRise animate={playEntrance} delay={CHROME_DELAY} distance={0}>
+        {firstClassOffer ? (
+          <Pressable
+            onPress={firstClassOffer.onPress}
+            accessibilityRole="button"
+            accessibilityLabel={firstClassOffer.label}
+            style={{
+              alignSelf: 'flex-start',
+              marginHorizontal: theme.spacing.lg,
+              marginBottom: theme.spacing.md,
+              paddingVertical: theme.spacing.sm,
+              paddingHorizontal: theme.spacing.md,
+              borderRadius: theme.radii.pill,
+              borderWidth: 1,
+              borderColor: theme.heroScrim.hairline,
+            }}
+          >
+            <Text variant="secondary" color="inverse">
+              {firstClassOffer.label}
+            </Text>
+          </Pressable>
+        ) : null}
         <View
           style={{
             flexDirection: 'row',

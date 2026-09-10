@@ -57,6 +57,12 @@ export const queryKeys = {
   flashCredits: (userId: number, dibsStudioId: number) =>
     ['flashCredits', userId, dibsStudioId] as const,
   milestones: (userId: number) => ['milestones', userId] as const,
+  /**
+   * "Does the first-class price apply to ME here?" Account data — never persisted. Invalidated
+   * after any successful booking (a booking is what ends eligibility) and dropped on sign-out.
+   */
+  firstClassOffer: (userId: number, dibsStudioId: number) =>
+    ['firstClassOffer', userId, dibsStudioId] as const,
 } as const;
 
 /**

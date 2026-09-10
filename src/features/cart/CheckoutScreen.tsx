@@ -23,6 +23,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button, EmptyState, Icon, SkeletonList, StatusTag, Text } from '@/components';
 import type { CartLine } from '@/domain/cart/build-cart';
+import { formatPrice } from '@/domain/money/format';
 import type { CheckoutPaymentSummary } from '@/domain/payments/checkout-method';
 import { formatStoredTime } from '@/domain/time/studio-now';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -56,6 +57,14 @@ export interface CheckoutScreenProps {
   creditAppliedCents?: number;
   applyCredit?: boolean;
   onApplyCreditChange?: (next: boolean) => void;
+  /**
+   * The first-class price (2026-09-10). The cart decided WHICH line carries it; these only let the
+   * client switch it off for this cart, or take it instead of a pass on a covered line.
+   */
+  firstClassOptOut?: boolean;
+  onFirstClassOptOutChange?: (optOut: boolean) => void;
+  onUseFirstClassInsteadOfPass?: (eventId: number) => void;
+  onKeepPass?: () => void;
   /** Formats cents in the studio's currency. */
   formatCents?: (cents: number) => string;
   /** False when the studio is offboarded or in soft lockout — the CTA comes down. */
@@ -85,6 +94,11 @@ const priceRow = {
   justifyContent: 'space-between' as const,
   alignItems: 'center' as const,
 };
+
+/** "$15" / "$16.50" — a quoted price in cents, cents dropped when there are none. */
+function formatPriceCents(cents: number): string {
+  return formatPrice(cents / 100);
+}
 
 function OutcomeNote({
   outcome,
@@ -226,11 +240,19 @@ function LineCard({
   onRemove,
   removable,
   onBookAnother,
+  firstClassOptOut = false,
+  onFirstClassOptOutChange,
+  onUseFirstClassInsteadOfPass,
+  onKeepPass,
 }: {
   line: CheckoutLineView;
   onRemove: () => void;
   removable: boolean;
   onBookAnother?: () => void;
+  firstClassOptOut?: boolean;
+  onFirstClassOptOutChange?: (optOut: boolean) => void;
+  onUseFirstClassInsteadOfPass?: (eventId: number) => void;
+  onKeepPass?: () => void;
 }) {
   const theme = useTheme();
 
@@ -307,12 +329,37 @@ function LineCard({
             gap: theme.spacing.sm,
           }}
         >
-          <View style={priceRow}>
-            <Text variant="secondary" color="secondary">
-              {charge.isDiscounted ? 'Drop in (off-peak rate)' : 'Drop in'}
-            </Text>
-            <Text variant="secondary">{charge.subtotalLabel}</Text>
-          </View>
+          {charge.firstClassApplied ? (
+            // The regular price stays on screen, struck through — the saving is the whole point,
+            // and a line that only said "$15" would leave the client wondering what it replaced.
+            <>
+              <View style={priceRow}>
+                <Text variant="secondary" color="secondary">
+                  {charge.isDiscounted ? 'Drop in (off-peak rate)' : 'Drop in'}
+                </Text>
+                <Text
+                  variant="secondary"
+                  color="tertiary"
+                  style={{ textDecorationLine: 'line-through' }}
+                >
+                  {charge.regularSubtotalLabel}
+                </Text>
+              </View>
+              <View style={priceRow}>
+                <Text variant="secondary" color="accent">
+                  First class price
+                </Text>
+                <Text variant="secondary">{charge.subtotalLabel}</Text>
+              </View>
+            </>
+          ) : (
+            <View style={priceRow}>
+              <Text variant="secondary" color="secondary">
+                {charge.isDiscounted ? 'Drop in (off-peak rate)' : 'Drop in'}
+              </Text>
+              <Text variant="secondary">{charge.subtotalLabel}</Text>
+            </View>
+          )}
 
           {charge.taxCents > 0 ? (
             <View style={priceRow}>
@@ -356,6 +403,92 @@ function LineCard({
           class deserves to know the window has already closed on them before they tap. It applies
           to a pass booking exactly as much as to a card one — arguably more, since a late cancel
           there costs a class rather than money. */}
+      {/*
+        THE OFFER ROW (2026-09-10). Pre-activated (D6): when nothing covers the class the switch is
+        ON and the client can turn it off; when a pass covers it the pass wins and the row offers
+        the first-class price INSTEAD. Rendered only on lines the cart chose — the cart is the one
+        owner of "which line", so this never decides, it only reports and relays.
+      */}
+      {(line.firstClass === 'applied' || line.firstClass === 'available') &&
+      line.firstClassOffer &&
+      line.outcome.kind !== 'booked' &&
+      onFirstClassOptOutChange ? (
+        <Pressable
+          onPress={() => onFirstClassOptOutChange(!firstClassOptOut)}
+          accessibilityRole="switch"
+          accessibilityState={{ checked: !firstClassOptOut }}
+          accessibilityLabel="Use the first-class price"
+          style={{
+            marginTop: theme.spacing.md,
+            paddingVertical: theme.spacing.sm,
+            paddingHorizontal: theme.spacing.md,
+            borderRadius: theme.radii.card,
+            backgroundColor: theme.colors.accentWash,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: theme.spacing.md,
+          }}
+        >
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Text variant="secondary">
+              First class price — {formatPriceCents(line.firstClassOffer.priceCents)} instead of{' '}
+              {formatPriceCents(line.firstClassOffer.priceCents + line.firstClassOffer.savingsCents)}
+            </Text>
+            <Text variant="caption" color="tertiary">
+              Your first visit. One class, ever.
+            </Text>
+          </View>
+          <Switch
+            value={!firstClassOptOut}
+            onValueChange={(on) => onFirstClassOptOutChange(!on)}
+            trackColor={{ true: theme.colors.accentFill, false: theme.colors.border }}
+          />
+        </Pressable>
+      ) : line.firstClass === 'passInstead' &&
+        line.firstClassOffer &&
+        line.outcome.kind !== 'booked' &&
+        onUseFirstClassInsteadOfPass ? (
+        <View
+          style={{
+            marginTop: theme.spacing.md,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: theme.spacing.md,
+          }}
+        >
+          <Text variant="caption" color="tertiary" style={{ flexShrink: 1 }}>
+            Your pass covers this class
+          </Text>
+          <Text
+            variant="caption"
+            color="accent"
+            accessibilityRole="button"
+            onPress={() => onUseFirstClassInsteadOfPass(line.eventId)}
+          >
+            Use the first-class price instead ({formatPriceCents(line.firstClassOffer.priceCents)})
+          </Text>
+        </View>
+      ) : null}
+
+      {line.firstClass === 'applied' &&
+      line.entry?.price.kind === 'covered' &&
+      line.outcome.kind !== 'booked' &&
+      onKeepPass ? (
+        // The client swapped their pass for the first-class price on this line. The way back is
+        // one tap, right here — a swap with no undo is a dead end wearing a saving.
+        <Text
+          variant="caption"
+          color="accent"
+          accessibilityRole="button"
+          onPress={onKeepPass}
+          style={{ marginTop: theme.spacing.sm }}
+        >
+          Use your pass for this class instead
+        </Text>
+      ) : null}
+
       {line.cancelSentence && (line.state === 'ready' || covered) && line.outcome.kind !== 'booked' ? (
         <Text variant="caption" color="tertiary" style={{ marginTop: theme.spacing.md }}>
           {line.cancelSentence}
@@ -472,6 +605,10 @@ function BookedConfirmation({
 
 export function CheckoutScreen({
   lines,
+  firstClassOptOut = false,
+  onFirstClassOptOutChange,
+  onUseFirstClassInsteadOfPass,
+  onKeepPass,
   chargeableCount,
   coveredCount,
   totalCents,
@@ -599,6 +736,10 @@ export function CheckoutScreen({
                 // Withheld while a run is in flight — the runner guards against a second run, but
                 // a live-looking button that does nothing is its own small lie.
                 onBookAnother={isWorking ? undefined : () => onBookAnother(line.eventId)}
+                firstClassOptOut={firstClassOptOut}
+                onFirstClassOptOutChange={isWorking ? undefined : onFirstClassOptOutChange}
+                onUseFirstClassInsteadOfPass={isWorking ? undefined : onUseFirstClassInsteadOfPass}
+                onKeepPass={isWorking ? undefined : onKeepPass}
               />
             ))}
 

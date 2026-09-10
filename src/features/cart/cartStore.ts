@@ -27,6 +27,17 @@ interface CartState {
   /** Tapping the row's button again takes it back out. Every add has a visible undo. */
   toggle: (eventId: number) => void;
   clear: () => void;
+
+  // ── The first-class price, per cart (2026-09-10) ───────────────────────────────────────────
+  /** The client switched the offer off for this cart. Default OFF = the offer is pre-activated. */
+  firstClassOptOut: boolean;
+  setFirstClassOptOut: (optOut: boolean) => void;
+  /** A pass-covered line the client chose to price with the first-class price instead. */
+  firstClassOverPassEventId: number | null;
+  setFirstClassOverPassEventId: (eventId: number | null) => void;
+  /** Lines the server refused the offer on (`first_class_not_eligible`). Cleared with the cart. */
+  firstClassExcludedEventIds: ReadonlySet<number>;
+  excludeFirstClass: (eventId: number) => void;
 }
 
 export const useCartStore = create<CartState>((set) => ({
@@ -49,7 +60,23 @@ export const useCartStore = create<CartState>((set) => ({
         : { eventIds: [...state.eventIds, eventId] },
     ),
 
-  clear: () => set({ eventIds: [] }),
+  clear: () =>
+    set({
+      eventIds: [],
+      firstClassOptOut: false,
+      firstClassOverPassEventId: null,
+      firstClassExcludedEventIds: new Set(),
+    }),
+
+  firstClassOptOut: false,
+  setFirstClassOptOut: (optOut) => set({ firstClassOptOut: optOut }),
+  firstClassOverPassEventId: null,
+  setFirstClassOverPassEventId: (eventId) => set({ firstClassOverPassEventId: eventId }),
+  firstClassExcludedEventIds: new Set(),
+  excludeFirstClass: (eventId) =>
+    set((state) => ({
+      firstClassExcludedEventIds: new Set([...state.firstClassExcludedEventIds, eventId]),
+    })),
 }));
 
 /**

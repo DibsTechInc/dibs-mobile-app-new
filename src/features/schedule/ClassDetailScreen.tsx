@@ -48,6 +48,12 @@ export interface ClassDetailScreenProps {
    * no card-payable price at all.
    */
   charge: ClassCharge | null;
+  /**
+   * The same class at the studio's FIRST-CLASS PRICE, when this client is eligible for it and the
+   * row carries the offer. Null otherwise. Rendered beside the struck regular price; the button
+   * carries its total. A pass still wins (D6) — the cart offers the swap, not this screen.
+   */
+  firstClassCharge?: ClassCharge | null;
   /** Already in the cart. The CTA becomes the way to the cart rather than a second add. */
   inCart: boolean;
   /** Add this class to the cart. Absent when the studio cannot take bookings at all. */
@@ -65,6 +71,7 @@ export function ClassDetailScreen({
   cancelWindow,
   acceptingBookings,
   charge,
+  firstClassCharge = null,
   inCart,
   onAddToCart,
   onOpenCart,
@@ -105,7 +112,9 @@ export function ClassDetailScreen({
    */
   const coveredByPass = entry.price.kind === 'covered';
 
-  const effectiveCharge = charge;
+  // The first-class price replaces the card price when it applies; never a covered class's.
+  const firstClass = !coveredByPass && firstClassCharge?.firstClassApplied ? firstClassCharge : null;
+  const effectiveCharge = firstClass ?? charge;
   const chargeable = effectiveCharge?.status === 'chargeable';
 
   // A free class or one priced elsewhere books through paths that do not exist in the app yet, so
@@ -195,12 +204,35 @@ export function ClassDetailScreen({
             </View>
           ) : chargeable && effectiveCharge ? (
             <View style={{ gap: theme.spacing.sm }}>
-              <View style={priceRow}>
-                <Text variant="secondary" color="secondary">
-                  {effectiveCharge.isDiscounted ? 'Drop in (off-peak rate)' : 'Drop in'}
-                </Text>
-                <Text variant="secondary">{effectiveCharge.subtotalLabel}</Text>
-              </View>
+              {firstClass ? (
+                <>
+                  <View style={priceRow}>
+                    <Text variant="secondary" color="secondary">
+                      {effectiveCharge.isDiscounted ? 'Drop in (off-peak rate)' : 'Drop in'}
+                    </Text>
+                    <Text
+                      variant="secondary"
+                      color="tertiary"
+                      style={{ textDecorationLine: 'line-through' }}
+                    >
+                      {effectiveCharge.regularSubtotalLabel}
+                    </Text>
+                  </View>
+                  <View style={priceRow}>
+                    <Text variant="secondary" color="accent">
+                      First class price
+                    </Text>
+                    <Text variant="secondary">{effectiveCharge.subtotalLabel}</Text>
+                  </View>
+                </>
+              ) : (
+                <View style={priceRow}>
+                  <Text variant="secondary" color="secondary">
+                    {effectiveCharge.isDiscounted ? 'Drop in (off-peak rate)' : 'Drop in'}
+                  </Text>
+                  <Text variant="secondary">{effectiveCharge.subtotalLabel}</Text>
+                </View>
+              )}
 
               {effectiveCharge.taxCents > 0 ? (
                 <View style={priceRow}>

@@ -77,6 +77,14 @@ export const basicConfigSchema = z
      * older than this shows an update banner. Never make it required.
      */
     minAppVersion: z.string().optional(),
+
+    /**
+     * The studio's first-class price, in DOLLARS, and whether it is switched on (2026-09-10). Both
+     * optional: an older backend sends neither, and the feed's per-row `first_class_offer` plus the
+     * offer endpoint are what the app actually decides from — these are display hints only.
+     */
+    firstClassPrice: z.number().nullable().optional(),
+    firstClassPriceActive: z.boolean().optional(),
   })
   // Additive backend fields must not fail validation.
   .passthrough();

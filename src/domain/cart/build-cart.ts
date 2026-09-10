@@ -28,7 +28,12 @@
  * server's own chooser. A cart that priced a covered class would disagree with the row above it.
  */
 import type { Pass } from '@/api/schemas/passes';
-import type { ScheduleEvent } from '@/api/schemas/schedule';
+import type { FirstClassOffer, ScheduleEvent } from '@/api/schemas/schedule';
+import {
+  chooseFirstClassLine,
+  type FirstClassCandidate,
+  type FirstClassEligibility,
+} from '@/domain/cart/first-class';
 import { formatBalance } from '@/domain/money/format';
 import { choosePassForClass, passName } from '@/domain/passes/select';
 import { resolveClassCharge, type ClassCharge } from '@/domain/pricing/class-charge';
@@ -54,6 +59,17 @@ export interface CartLine {
   passName: string | null;
   /** What to tell the client about this line. Empty for `ready` — a good line needs no sentence. */
   note: string;
+  /** The row's own first-class offer (client-agnostic). Null when the studio's price does not beat this class. */
+  firstClassOffer: FirstClassOffer | null;
+  /**
+   * How the FIRST-CLASS PRICE relates to this line (2026-09-10):
+   *   `applied`     — this is THE line; `charge` already carries the first-class subtotal.
+   *   `available`   — this is the line it would go on, but the client switched it off for this cart.
+   *   `passInstead` — a pass covers this line; the client may choose the first-class price instead.
+   *   null          — nothing to say.
+   * At most ONE line is `applied` or `available`; `passInstead` lines are the covered alternatives.
+   */
+  firstClass: 'applied' | 'available' | 'passInstead' | null;
 }
 
 export interface CartSummary {
@@ -69,6 +85,10 @@ export interface CartSummary {
   totalLabel: string;
   /** True when there is at least one bookable line, by card OR by pass. */
   canCheckout: boolean;
+  /** The line carrying (or, when opted out, able to carry) the first-class price. Null when none. */
+  firstClassEventId: number | null;
+  /** Cents saved on that line when applied; 0 when opted out or none. */
+  firstClassSavingsCents: number;
 }
 
 export interface BuildCartOptions {
@@ -83,6 +103,18 @@ export interface BuildCartOptions {
    * rather than a wrong charge.
    */
   passes?: Pass[];
+  /**
+   * The client's first-class eligibility, from the offer endpoint. Undefined for a guest, while
+   * it resolves, and when the read FAILED — all three price the cart normally. Only a resolved
+   * `eligible: true` puts the offer on a line.
+   */
+  firstClassEligibility?: FirstClassEligibility | null;
+  /** The client switched the offer off for this cart. The chosen line still reports `available`. */
+  firstClassOptOut?: boolean;
+  /** The pass-covered line the client chose to price with the first-class price instead. */
+  firstClassOverPassEventId?: number | null;
+  /** Lines the server refused the offer on this session. */
+  firstClassExcludedEventIds?: ReadonlySet<number>;
 }
 
 function noteFor(state: CartLineState, entry: ScheduleEntry | null): string {
@@ -113,11 +145,43 @@ function noteFor(state: CartLineState, entry: ScheduleEntry | null): string {
 export function buildCart(
   events: ScheduleEvent[],
   eventIds: number[],
-  { showInstructor, currency, passes }: BuildCartOptions,
+  {
+    showInstructor,
+    currency,
+    passes,
+    firstClassEligibility,
+    firstClassOptOut = false,
+    firstClassOverPassEventId = null,
+    firstClassExcludedEventIds,
+  }: BuildCartOptions,
 ): CartSummary {
   // Indexed once rather than a `.find()` per id: a 20-class cart against a 150-event window is
   // 3,000 comparisons on every keystroke-equivalent re-render otherwise.
   const byId = new Map(events.map((event) => [event.eventid, event]));
+
+  // ── Pass 1: which line carries the first-class price ────────────────────────────────────────
+  // Decided BEFORE any line is priced, by the one chooser, from the same coverage answer the lines
+  // themselves use. An override on a covered line un-assigns that line's pass below.
+  const candidates: FirstClassCandidate[] = [];
+  for (const eventId of eventIds) {
+    const event = byId.get(eventId);
+    if (!event) continue;
+    const entry = toScheduleEntry(event, { showInstructor, currency, passes });
+    const charge = resolveClassCharge(event, currency);
+    const covering = passes && passes.length > 0 ? choosePassForClass(passes, event) : null;
+    candidates.push({
+      eventId,
+      startsAt: event.start_date,
+      offer: event.first_class_offer ?? null,
+      coveredByPass: Boolean(covering) && !entry.isFull,
+      chargeable: !entry.isFull && charge.status === 'chargeable',
+    });
+  }
+  const firstClassEventId = chooseFirstClassLine(candidates, firstClassEligibility, {
+    overPassEventId: firstClassOverPassEventId,
+    excludedEventIds: firstClassExcludedEventIds,
+  });
+  const eligible = firstClassEligibility?.eligible === true;
 
   const lines = eventIds.map<CartLine>((eventId) => {
     const event = byId.get(eventId);
@@ -133,15 +197,27 @@ export function buildCart(
         passId: null,
         passName: null,
         note: noteFor('gone', null),
+        firstClassOffer: null,
+        firstClass: null,
       };
     }
 
     const entry = toScheduleEntry(event, { showInstructor, currency, passes });
-    const charge = resolveClassCharge(event, currency);
+    const rowOffer = event.first_class_offer ?? null;
+    const isFirstClassLine = firstClassEventId === eventId;
+    const applyFirstClass = isFirstClassLine && !firstClassOptOut && rowOffer !== null;
+    const charge = resolveClassCharge(
+      event,
+      currency,
+      applyFirstClass && rowOffer ? { firstClass: { priceCents: rowOffer.priceCents } } : {},
+    );
 
     // The same chooser the row above used, so the cart cannot disagree with it. `undefined` passes
-    // means we have not asked — not that the client holds none.
-    const covering = passes && passes.length > 0 ? choosePassForClass(passes, event) : null;
+    // means we have not asked — not that the client holds none. When the client chose the
+    // first-class price INSTEAD of their pass on this line, the pass steps aside here and only
+    // here — the server books it as a card/credit class and never spends the pass.
+    const coveringPass = passes && passes.length > 0 ? choosePassForClass(passes, event) : null;
+    const covering = isFirstClassLine && coveringPass && applyFirstClass ? null : coveringPass;
 
     // Order matters, and it is the same order the server gates in.
     //   FULL first — a full class cannot be booked at any price, and telling somebody the fee for
@@ -174,6 +250,15 @@ export function buildCart(
         state === 'ready' && entry.excludedPassName
           ? `${entry.excludedPassName} isn’t accepted for this class, so it’s priced as a drop-in.`
           : noteFor(state, entry),
+      firstClassOffer: rowOffer,
+      firstClass:
+        isFirstClassLine && state === 'ready' && charge.firstClassApplied
+          ? 'applied'
+          : isFirstClassLine && state === 'ready' && rowOffer
+            ? 'available'
+            : state === 'covered' && rowOffer && eligible && !entry.isFull
+              ? 'passInstead'
+              : null,
     };
   });
 
@@ -192,5 +277,12 @@ export function buildCart(
     totalLabel: formatBalance(totalCents / 100, currency),
     // A cart of nothing but pass-covered classes is perfectly checkoutable — it just costs $0.
     canCheckout: chargeable.length + covered.length > 0,
+    firstClassEventId: lines.some((l) => l.firstClass === 'applied' || l.firstClass === 'available')
+      ? firstClassEventId
+      : null,
+    firstClassSavingsCents: lines.reduce(
+      (sum, l) => sum + (l.firstClass === 'applied' ? (l.charge?.savingsCents ?? 0) : 0),
+      0,
+    ),
   };
 }

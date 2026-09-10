@@ -10,6 +10,7 @@ import { useMemo } from 'react';
 import { studio } from '@/config/studio';
 import { buildCart, type CartSummary } from '@/domain/cart/build-cart';
 import { useClientPasses } from '@/features/account/useClientPasses';
+import { useFirstClassOffer } from '@/features/first-class/useFirstClassOffer';
 import { useSchedule } from '@/features/schedule/useSchedule';
 import { useStudioConfig } from '@/features/studio/StudioConfigProvider';
 
@@ -32,6 +33,12 @@ export function useCart(): CartState {
   const schedule = useSchedule();
   const { passes } = useClientPasses();
   const { config } = useStudioConfig();
+  // The first-class price: one eligibility answer, three per-cart choices. All resolved here so
+  // the bar, the checkout screen and the request carry the same line.
+  const { eligibility: firstClassEligibility } = useFirstClassOffer();
+  const firstClassOptOut = useCartStore((state) => state.firstClassOptOut);
+  const firstClassOverPassEventId = useCartStore((state) => state.firstClassOverPassEventId);
+  const firstClassExcludedEventIds = useCartStore((state) => state.firstClassExcludedEventIds);
 
   const summary = useMemo(
     () =>
@@ -39,8 +46,21 @@ export function useCart(): CartState {
         showInstructor: studio.display.showInstructor,
         currency: config?.currency,
         passes,
+        firstClassEligibility,
+        firstClassOptOut,
+        firstClassOverPassEventId,
+        firstClassExcludedEventIds,
       }),
-    [schedule.data, eventIds, config?.currency, passes],
+    [
+      schedule.data,
+      eventIds,
+      config?.currency,
+      passes,
+      firstClassEligibility,
+      firstClassOptOut,
+      firstClassOverPassEventId,
+      firstClassExcludedEventIds,
+    ],
   );
 
   return { ...summary, isResolving: !schedule.data && schedule.isPending };

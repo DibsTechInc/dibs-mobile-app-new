@@ -24,6 +24,7 @@ import { resolveClassCharge } from '@/domain/pricing/class-charge';
 import { findEvent, longDayLabel } from '@/domain/schedule/days';
 import { toScheduleEntry } from '@/domain/schedule/entry';
 import { useClientPasses } from '@/features/account/useClientPasses';
+import { useFirstClassOffer } from '@/features/first-class/useFirstClassOffer';
 import { useCartStore, useIsInCart } from '@/features/cart/cartStore';
 import { ClassDetailScreen } from '@/features/schedule/ClassDetailScreen';
 import { useSchedule } from '@/features/schedule/useSchedule';
@@ -35,6 +36,7 @@ export default function ClassDetailRoute() {
   const { config, timeZone } = useStudioConfig();
   const schedule = useSchedule();
   const { passes } = useClientPasses();
+  const { isEligible: firstClassEligible } = useFirstClassOffer();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -53,6 +55,21 @@ export default function ClassDetailRoute() {
   const charge = useMemo(
     () => (event ? resolveClassCharge(event, config?.currency) : null),
     [event, config?.currency],
+  );
+  /**
+   * The same class priced at the FIRST-CLASS PRICE (2026-09-10) — only when the row carries the
+   * offer AND the offer endpoint said this client is eligible. Null otherwise. The screen shows
+   * it beside the struck regular price; the cart applies it by the same rule when the class is
+   * added, so the button here and the line there agree.
+   */
+  const firstClassCharge = useMemo(
+    () =>
+      event && firstClassEligible && event.first_class_offer
+        ? resolveClassCharge(event, config?.currency, {
+            firstClass: { priceCents: event.first_class_offer.priceCents },
+          })
+        : null,
+    [event, config?.currency, firstClassEligible],
   );
 
   /**
@@ -138,6 +155,7 @@ export default function ClassDetailRoute() {
       )}
       acceptingBookings={acceptingBookings}
       charge={charge}
+      firstClassCharge={firstClassCharge?.firstClassApplied ? firstClassCharge : null}
       inCart={inCart}
       onAddToCart={acceptingBookings ? onAddToCart : undefined}
       onOpenCart={acceptingBookings ? () => router.push('/checkout') : undefined}

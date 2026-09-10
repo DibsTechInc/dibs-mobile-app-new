@@ -56,6 +56,7 @@ import { BookingRefusedError } from '@/api/endpoints/class-booking';
 import type { UpcomingBookingRow } from '@/api/schemas/upcoming';
 import { studio } from '@/config/studio';
 import type { CartLine } from '@/domain/cart/build-cart';
+import { FIRST_CLASS_NOT_ELIGIBLE_COPY } from '@/domain/cart/first-class';
 import { chargeFromServerBreakdown, type ClassCharge } from '@/domain/pricing/class-charge';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { applePaySheetParams, stripeRedirectUrl, withConnectedStripeAccount } from '@/features/payments/stripeSession';
@@ -139,6 +140,9 @@ export type LineOutcome =
  */
 const PERMANENT_REFUSALS = new Set(['class_unavailable_in_app']);
 
+/** The server refused the first-class price on this line — see the `first_class_not_eligible` handlers. */
+const dropFirstClass = (eventId: number) => useCartStore.getState().excludeFirstClass(eventId);
+
 export type CheckoutPhase =
   | { kind: 'idle' }
   | { kind: 'working' }
@@ -177,6 +181,11 @@ export interface BookableItem {
   creditCents?: number;
   /** The client's own toggle. Sent as a yes/no; it never carries an amount. */
   applyCredit?: boolean;
+  /**
+   * This line carries the FIRST-CLASS PRICE (2026-09-10): `totalCents` is the first-class total
+   * and the request says so. A yes/no the server verifies; at most one item per run carries it.
+   */
+  applyFirstClassPrice?: boolean;
 }
 
 export interface CartCheckoutState {
@@ -221,7 +230,13 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
    * inside the other) would give the same refusal two different handlers.
    */
   const bookWithCreditRef = useRef<
-    ((line: CartLine, totalCents: number, allowDuplicate?: boolean) => Promise<boolean>) | null
+    | ((
+        line: CartLine,
+        totalCents: number,
+        allowDuplicate?: boolean,
+        applyFirstClassPrice?: boolean,
+      ) => Promise<boolean>)
+    | null
   >(null);
 
   const setOutcome = useCallback((eventId: number, outcome: LineOutcome) => {
@@ -355,6 +370,7 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
       allowDuplicate = false,
       creditCents,
       applyCredit,
+      applyFirstClassPrice,
     }: BookableItem): Promise<boolean> => {
       // Named from the split we already hold: "Charging your card…" over a fully-credit-covered
       // line is a claim the client's card is being billed when it never will be. `run` routes
@@ -382,6 +398,7 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
           allowDuplicate,
           ...(applyCredit === undefined ? {} : { applyCredit }),
           ...(typeof creditCents === 'number' ? { displayedCreditCents: creditCents } : {}),
+          ...(applyFirstClassPrice === true ? { applyFirstClassPrice: true } : {}),
         });
 
         await withConnectedStripeAccount(
@@ -468,6 +485,19 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
             });
             return false;
           }
+          if (error.refusalCode === 'first_class_not_eligible' && error.breakdown) {
+            // Exactly the `price_changed` shape: the server's breakdown is the regular price, the
+            // offer is dropped from THIS line so a re-run never asks for it again, and nothing was
+            // charged. The cart store is the one owner of "which line carries the offer", so the
+            // exclusion lands there rather than in local state here.
+            dropFirstClass(line.eventId);
+            setOutcome(line.eventId, {
+              kind: 'priceChanged',
+              charge: chargeFromServerBreakdown(error.breakdown, currency),
+              message: FIRST_CLASS_NOT_ELIGIBLE_COPY,
+            });
+            return false;
+          }
           /*
            * Their credit turns out to cover the whole class, so there is nothing for a card to do
            * and Stripe would reject a $0 PaymentIntent. Book it the other way rather than reporting
@@ -475,7 +505,12 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
            * down the correct path. Exactly the shape of the `covered_by_pass` handoff above.
            */
           if (error.refusalCode === 'credit_covers_class' && bookWithCreditRef.current) {
-            return bookWithCreditRef.current(line, totalCents, allowDuplicate);
+            return bookWithCreditRef.current(
+              line,
+              totalCents,
+              allowDuplicate,
+              applyFirstClassPrice === true,
+            );
           }
           /*
            * The balance moved between the screen and the call. A RE-RENDER, not an error — the
@@ -539,7 +574,12 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
    * cannot go down the card flow at all. Never throws.
    */
   const bookOneWithCredit = useCallback(
-    async (line: CartLine, totalCents: number, allowDuplicate = false): Promise<boolean> => {
+    async (
+      line: CartLine,
+      totalCents: number,
+      allowDuplicate = false,
+      applyFirstClassPrice = false,
+    ): Promise<boolean> => {
       setOutcome(line.eventId, { kind: 'working', via: 'credit' });
 
       try {
@@ -548,6 +588,7 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
           eventId: line.eventId,
           displayedTotalCents: totalCents,
           allowDuplicate,
+          ...(applyFirstClassPrice === true ? { applyFirstClassPrice: true } : {}),
         });
 
         setOutcome(line.eventId, { kind: 'booked' });
@@ -600,6 +641,19 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
               kind: 'priceChanged',
               charge: chargeFromServerBreakdown(error.breakdown, currency),
               message: error.message,
+            });
+            return false;
+          }
+          if (error.refusalCode === 'first_class_not_eligible' && error.breakdown) {
+            // Exactly the `price_changed` shape: the server's breakdown is the regular price, the
+            // offer is dropped from THIS line so a re-run never asks for it again, and nothing was
+            // charged. The cart store is the one owner of "which line carries the offer", so the
+            // exclusion lands there rather than in local state here.
+            dropFirstClass(line.eventId);
+            setOutcome(line.eventId, {
+              kind: 'priceChanged',
+              charge: chargeFromServerBreakdown(error.breakdown, currency),
+              message: FIRST_CLASS_NOT_ELIGIBLE_COPY,
             });
             return false;
           }
@@ -667,7 +721,12 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
               item.line.state === 'covered'
                 ? await bookOneWithPass(item.line, item.allowDuplicate === true)
                 : creditCovers
-                  ? await bookOneWithCredit(item.line, item.totalCents, item.allowDuplicate === true)
+                  ? await bookOneWithCredit(
+                      item.line,
+                      item.totalCents,
+                      item.allowDuplicate === true,
+                      item.applyFirstClassPrice === true,
+                    )
                   : await bookOne(item);
             if (succeeded) booked += 1;
           } catch {
@@ -699,6 +758,10 @@ export function useCartCheckout({ currency }: UseCartCheckoutArgs = {}): CartChe
             // the Account screen shows the pre-booking balance for a full staleTime window.
             void queryClient.invalidateQueries({
               queryKey: queryKeys.credit(account.userid, studio.dibsStudioId),
+            });
+            // A booking is exactly what ends first-class eligibility.
+            void queryClient.invalidateQueries({
+              queryKey: queryKeys.firstClassOffer(account.userid, studio.dibsStudioId),
             });
             // The Payments screen must show the charge that just happened.
             void queryClient.invalidateQueries({

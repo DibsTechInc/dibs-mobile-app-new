@@ -23,6 +23,7 @@ import { studio } from '@/config/studio';
 import { buildBookedCounts } from '@/domain/bookings/booked-counts';
 import { fillEmptyDays, groupByStudioDay } from '@/domain/schedule/days';
 import { useClientPasses } from '@/features/account/useClientPasses';
+import { useFirstClassOffer } from '@/features/first-class/useFirstClassOffer';
 import { useUpcomingBookings } from '@/features/bookings/useUpcomingBookings';
 import { useCartStore } from '@/features/cart/cartStore';
 import { useCart } from '@/features/cart/useCart';
@@ -42,6 +43,7 @@ export default function ScheduleRoute() {
   // Rows a pass covers read "Included · {pass}" instead of a price, and land in the cart as $0
   // lines that book through `book-with-pass`. One coverage decision, shared by both.
   const { passes } = useClientPasses();
+  const { isEligible: firstClassEligible } = useFirstClassOffer();
   // Which of these classes the client is already in. The same query My Calendar reads, so a row
   // badged "Booked" and the calendar listing it are the same fact from the same cache entry.
   const bookings = useUpcomingBookings();
@@ -91,6 +93,7 @@ export default function ScheduleRoute() {
         showInstructor={studio.display.showInstructor}
         currency={config?.currency}
         passes={passes}
+        firstClassEligible={firstClassEligible}
         isLoading={schedule.isPending}
         error={schedule.error}
         isRefreshing={pull.isRefreshing}
